@@ -25,8 +25,9 @@
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 return;
             }
-            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-            document.documentElement.setAttribute('data-theme', prefersLight ? 'light' : 'dark');
+            // Mode sombre par défaut
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('gestloc-theme', 'dark');
         })();
     </script>
 </head>
@@ -90,8 +91,11 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button id="themeToggle" type="button" title="Changer le thème" aria-label="Changer le thème">
-                        <i class="fas fa-circle-half-stroke"></i>
+                    <button id="themeToggle" type="button"
+                            class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                            title="Changer le thème"
+                            aria-label="Changer le thème">
+                        <i class="fas fa-moon text-lg" id="themeIcon"></i>
                     </button>
                     <button onclick="openModal('sciModal')"
                             class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
@@ -134,11 +138,25 @@
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
+        // Fonction pour mettre à jour l'icône du thème
+        function updateThemeIcon() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const icon = document.getElementById('themeIcon');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-sun text-lg' : 'fas fa-moon text-lg';
+            }
+        }
+
+        // Initialiser l'icône au chargement
+        updateThemeIcon();
+
+        // Toggle du thème
         document.getElementById('themeToggle')?.addEventListener('click', function () {
             const current = document.documentElement.getAttribute('data-theme') || 'dark';
             const next = current === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('gestloc-theme', next);
+            updateThemeIcon();
         });
     </script>
 </body>
