@@ -53,18 +53,17 @@
             position: relative;
             z-index: 1;
             text-align: center;
-            padding: 48px 56px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
         }
 
         .logo-container {
-            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
         .icon {
@@ -75,7 +74,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
             font-size: 40px;
             box-shadow: 0 8px 24px rgba(100, 116, 139, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -99,10 +97,10 @@
         }
 
         .loading {
-            margin-top: 32px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 16px;
         }
 
         .progress-container {
@@ -111,7 +109,6 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 16px;
         }
 
         .progress-bar {
@@ -173,7 +170,7 @@
         <div class="logo-container">
             <div class="icon">🏠</div>
             <div class="title">Bay Bay</div>
-            <div class="version">Version 2.2.9</div>
+            <div class="version">Version 2.3.0</div>
         </div>
         <div class="loading">
             <div class="progress-container">
