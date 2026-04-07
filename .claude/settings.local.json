@@ -9,7 +9,11 @@
       "Bash(timeout 15 npm start)",
       "Bash(timeout 20 \"./Gestion Locative.exe\")",
       "Bash(timeout 15 \"./Gestion Locative.exe\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pyinstaller BayBay.spec --noconfirm)",
+      "Bash(timeout 10 \"./Bay Bay.exe\")",
+      "Read(//c/Users/PC/AppData/Roaming/baybay/**)",
+      "Read(//c/Users/PC/AppData/Roaming/BayBay/**)"
     ]
   }
 }

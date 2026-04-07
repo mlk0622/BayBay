@@ -1,21 +1,26 @@
 {
-  "name": "gestion-locative",
+  "name": "baybay",
   "version": "2.1.0",
-  "description": "Application de gestion immobilière multi-niveaux",
+  "description": "Bay Bay - Application de gestion immobilière multi-niveaux",
   "main": "main.js",
-  "author": "Gestion Locative",
+  "author": "Bay Bay",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlk0622/BayBay.git"
+  },
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
     "build:win": "electron-builder --win",
     "build:portable": "electron-builder --win portable",
+    "build:publish": "electron-builder --win --publish always",
     "pack": "electron-builder --dir"
   },
   "build": {
-    "appId": "com.gestionlocative.app",
-    "productName": "Gestion Locative",
-    "copyright": "Copyright © 2024 Gestion Locative",
+    "appId": "com.baybay.app",
+    "productName": "Bay Bay",
+    "copyright": "Copyright © 2024 Bay Bay",
     "directories": {
       "output": "release",
       "buildResources": "build-resources"
@@ -28,7 +33,7 @@
     ],
     "extraResources": [
       {
-        "from": "../dist/GestionLocative",
+        "from": "../dist/BayBay",
         "to": "backend",
         "filter": ["**/*"]
       }
@@ -49,10 +54,16 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Gestion Locative"
+      "shortcutName": "Bay Bay"
     },
     "portable": {
-      "artifactName": "GestionLocative-Portable-${version}.exe"
+      "artifactName": "BayBay-Portable-${version}.exe"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "mlk0622",
+      "repo": "BayBay",
+      "releaseType": "release"
     }
   },
   "devDependencies": {

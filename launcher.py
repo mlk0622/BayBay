@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Gestion Locative - Lanceur Principal
+Bay Bay - Lanceur Principal
 =====================================
 Stocke les données dans %APPDATA% pour éviter les problèmes de permissions
 """
@@ -14,7 +14,7 @@ import time
 import ctypes
 
 # ========== Configuration ==========
-APP_NAME = "Gestion Locative"
+APP_NAME = "Bay Bay"
 VERSION = "2.1.0"
 PORT = 5000
 HOST = "127.0.0.1"
@@ -45,15 +45,15 @@ def get_internal_dir():
 def get_user_data_dir():
     """
     Retourne le dossier de données utilisateur.
-    Utilise %APPDATA%/GestionLocative pour éviter les problèmes de permissions.
+    Utilise %APPDATA%/BayBay pour éviter les problèmes de permissions.
     """
     if sys.platform == 'win32':
-        # Windows: %APPDATA%\GestionLocative
+        # Windows: %APPDATA%\BayBay
         appdata = os.environ.get('APPDATA', os.path.expanduser('~'))
-        data_dir = os.path.join(appdata, 'GestionLocative')
+        data_dir = os.path.join(appdata, 'BayBay')
     else:
-        # Linux/Mac: ~/.gestion-locative
-        data_dir = os.path.join(os.path.expanduser('~'), '.gestion-locative')
+        # Linux/Mac: ~/.baybay
+        data_dir = os.path.join(os.path.expanduser('~'), '.baybay')
 
     return data_dir
 
@@ -66,7 +66,7 @@ def get_data_path():
     except PermissionError:
         # Fallback: utiliser un dossier temporaire
         import tempfile
-        data_path = os.path.join(tempfile.gettempdir(), 'GestionLocative')
+        data_path = os.path.join(tempfile.gettempdir(), 'BayBay')
         os.makedirs(data_path, exist_ok=True)
     return data_path
 
@@ -130,7 +130,7 @@ def setup_environment():
         sys.path.insert(0, internal_dir)
 
     # Définir la variable d'environnement pour app.py
-    os.environ['GESTION_LOCATIVE_DATA_DIR'] = get_data_path()
+    os.environ['BAYBAY_DATA_DIR'] = get_data_path()
 
 
 def open_browser():
@@ -152,7 +152,7 @@ def print_banner():
     banner = f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║              🏠 GESTION LOCATIVE v{VERSION}                    ║
+║                    🏠 BAY BAY v{VERSION}                        ║
 ║                                                              ║
 ║       Application de gestion immobilière multi-niveaux      ║
 ║                                                              ║

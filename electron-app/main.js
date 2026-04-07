@@ -6,7 +6,7 @@ const net = require('net');
 const fs = require('fs');
 
 // Configuration
-const APP_NAME = 'Gestion Locative';
+const APP_NAME = 'Bay Bay';
 const APP_VERSION = '2.1.0';
 const BACKEND_PORT = 5000;
 const BACKEND_HOST = '127.0.0.1';
@@ -47,10 +47,10 @@ function getBackendPath() {
     let backendPath;
     if (app.isPackaged) {
         // En production, le backend est dans resources/backend
-        backendPath = path.join(process.resourcesPath, 'backend', 'GestionLocative.exe');
+        backendPath = path.join(process.resourcesPath, 'backend', 'BayBay.exe');
     } else {
         // En développement
-        backendPath = path.join(__dirname, '..', 'dist', 'GestionLocative', 'GestionLocative.exe');
+        backendPath = path.join(__dirname, '..', 'dist', 'BayBay', 'BayBay.exe');
     }
     log(`Backend path: ${backendPath}`);
     log(`Backend exists: ${fs.existsSync(backendPath)}`);
@@ -219,7 +219,7 @@ function createTray() {
 
         const contextMenu = Menu.buildFromTemplate([
             {
-                label: 'Ouvrir Gestion Locative',
+                label: 'Ouvrir Bay Bay',
                 click: () => {
                     if (mainWindow) {
                         mainWindow.show();

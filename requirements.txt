@@ -1,4 +1,4 @@
-# Gestion Locative - Dépendances
+# Bay Bay - Dépendances
 # ================================
 
 # Framework web

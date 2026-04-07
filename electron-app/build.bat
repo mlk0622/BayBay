@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul 2>&1
-title Gestion Locative - Build Electron App
+title Bay Bay - Build Electron App
 color 0B
 
 echo.
 echo ╔══════════════════════════════════════════════════════════════╗
-echo ║      🏠 GESTION LOCATIVE - Build Application Electron        ║
+echo ║           🏠 BAY BAY - Build Application Electron            ║
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 
@@ -41,7 +41,7 @@ echo.
 cd ..
 
 :: Vérifier si le backend est déjà construit
-if not exist "dist\GestionLocative\GestionLocative.exe" (
+if not exist "dist\BayBay\BayBay.exe" (
     echo 📦 Construction du backend Python...
 
     pip show pyinstaller >nul 2>&1
@@ -51,7 +51,7 @@ if not exist "dist\GestionLocative\GestionLocative.exe" (
     )
 
     pip install -r requirements.txt --quiet
-    pyinstaller GestionLocative.spec --noconfirm
+    pyinstaller BayBay.spec --noconfirm
 
     if errorlevel 1 (
         echo ❌ Erreur lors de la construction du backend

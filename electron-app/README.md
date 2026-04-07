@@ -1,4 +1,4 @@
-# 🏠 Gestion Locative - Application Electron
+# 🏠 Bay Bay - Application Electron
 
 ## 📦 Fichiers générés
 
@@ -6,7 +6,7 @@ Après le build, vous trouverez dans `electron-app/release/`:
 
 | Fichier | Description |
 |---------|-------------|
-| `Gestion Locative Setup 2.1.0.exe` | **Installateur Windows** - Double-cliquez pour installer |
+| `Bay Bay Setup 2.1.0.exe` | **Installateur Windows** - Double-cliquez pour installer |
 | `win-unpacked/` | Version portable (pas besoin d'installer) |
 
 ---
@@ -37,7 +37,7 @@ Ce script:
 
 ```batch
 # 1. Construire le backend Python
-pyinstaller GestionLocative.spec --noconfirm
+pyinstaller BayBay.spec --noconfirm
 
 # 2. Aller dans le dossier Electron
 cd electron-app
@@ -73,7 +73,7 @@ npm run build:win
 ## 📁 Structure du projet
 
 ```
-gestion-locative/
+baybay/
 ├── electron-app/              # Application Electron
 │   ├── main.js               # Process principal
 │   ├── preload.js            # Bridge sécurisé
@@ -84,8 +84,8 @@ gestion-locative/
 │       ├── *.exe             # Installateur
 │       └── win-unpacked/     # Version portable
 │
-├── dist/GestionLocative/      # Backend Python compilé
-├── GestionLocative.spec       # Config PyInstaller
+├── dist/BayBay/              # Backend Python compilé
+├── BayBay.spec               # Config PyInstaller
 ├── launcher.py                # Lanceur Python
 ├── app.py                     # Application Flask
 └── BUILD_ELECTRON.bat         # 🚀 Script de build complet
@@ -117,7 +117,7 @@ Dans `electron-app/package.json`, ajoutez:
     "publish": {
       "provider": "github",
       "owner": "VOTRE_USER",
-      "repo": "gestion-locative"
+      "repo": "baybay"
     }
   }
 }
@@ -132,8 +132,8 @@ Dans `electron-app/package.json`, ajoutez:
 - Lancez la version portable pour voir les erreurs
 
 ### Le backend ne se lance pas
-- Vérifiez que `resources/backend/GestionLocative.exe` existe
-- Testez le backend seul: `dist\GestionLocative\GestionLocative.exe`
+- Vérifiez que `resources/backend/BayBay.exe` existe
+- Testez le backend seul: `dist\BayBay\BayBay.exe`
 
 ### Erreur de build npm
 ```batch

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Gestion Locative - Système d'Auto-Update
+Bay Bay - Système d'Auto-Update
 ==========================================
 Ce module gère les mises à jour automatiques de l'application.
 """
@@ -22,9 +22,9 @@ from urllib.error import URLError, HTTPError
 
 # URL du serveur de mise à jour (à configurer avec votre serveur)
 # Options:
-# 1. GitHub Releases API: https://api.github.com/repos/VOTRE_USER/gestion-locative/releases/latest
+# 1. GitHub Releases API: https://api.github.com/repos/VOTRE_USER/baybay/releases/latest
 # 2. Serveur personnalisé: https://votre-serveur.com/updates/latest.json
-UPDATE_SERVER_URL = "https://api.github.com/repos/VOTRE_USER/gestion-locative/releases/latest"
+UPDATE_SERVER_URL = "https://api.github.com/repos/VOTRE_USER/baybay/releases/latest"
 
 # Version actuelle de l'application
 CURRENT_VERSION = "2.1.0"
@@ -110,7 +110,7 @@ class AutoUpdater:
 
             # Requête vers le serveur
             headers = {
-                'User-Agent': f'GestionLocative/{self.current_version}',
+                'User-Agent': f'BayBay/{self.current_version}',
                 'Accept': 'application/json'
             }
             request = Request(self.server_url, headers=headers)
@@ -184,10 +184,10 @@ class AutoUpdater:
             print(f"📥 Téléchargement de la mise à jour...")
 
             # Créer un fichier temporaire
-            temp_dir = tempfile.mkdtemp(prefix='gestion_locative_update_')
+            temp_dir = tempfile.mkdtemp(prefix='baybay_update_')
             zip_path = os.path.join(temp_dir, 'update.zip')
 
-            headers = {'User-Agent': f'GestionLocative/{self.current_version}'}
+            headers = {'User-Agent': f'BayBay/{self.current_version}'}
             request = Request(download_url, headers=headers)
 
             with urlopen(request, timeout=60) as response:
@@ -249,14 +249,14 @@ class AutoUpdater:
             with open(update_script, 'w', encoding='utf-8') as f:
                 f.write('@echo off\n')
                 f.write('chcp 65001 >nul 2>&1\n')
-                f.write('title Mise à jour - Gestion Locative\n')
+                f.write('title Mise à jour - Bay Bay\n')
                 f.write('echo.\n')
                 f.write('echo Mise à jour en cours, veuillez patienter...\n')
                 f.write('timeout /t 2 /nobreak >nul\n')
                 f.write(f'xcopy /s /e /y "{source_dir}\\*" "{self.base_path}\\" >nul 2>&1\n')
                 f.write('echo.\n')
                 f.write('echo Mise à jour terminée!\n')
-                f.write(f'start "" "{os.path.join(self.base_path, "GestionLocative.exe")}"\n')
+                f.write(f'start "" "{os.path.join(self.base_path, "BayBay.exe")}"\n')
                 f.write(f'del /f /q "{update_script}"\n')
                 f.write(f'rmdir /s /q "{os.path.dirname(zip_path)}"\n')
 

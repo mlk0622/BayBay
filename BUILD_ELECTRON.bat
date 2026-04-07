@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul 2>&1
-title Gestion Locative - Build Complet
+title Bay Bay - Build Complet
 color 0B
 
 echo.
 echo ╔══════════════════════════════════════════════════════════════╗
-echo ║     🏠 GESTION LOCATIVE - Build Application Complète         ║
+echo ║          🏠 BAY BAY - Build Application Complète             ║
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 
@@ -64,7 +64,7 @@ pip install -r requirements.txt --quiet
 
 :: Construire le backend
 echo 🔨 Construction du backend...
-pyinstaller GestionLocative.spec --noconfirm
+pyinstaller BayBay.spec --noconfirm
 
 if errorlevel 1 (
     echo ❌ Erreur lors de la construction du backend

@@ -18,19 +18,19 @@ def get_user_data_dir():
     """
     Retourne le dossier de données utilisateur.
     Utilise la variable d'environnement si définie par launcher.py,
-    sinon utilise %APPDATA%/GestionLocative.
+    sinon utilise %APPDATA%/BayBay.
     """
     # Vérifier si launcher.py a défini le chemin
-    data_dir = os.environ.get('GESTION_LOCATIVE_DATA_DIR')
+    data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
         return data_dir
 
     # Sinon, calculer le chemin
     if sys.platform == 'win32':
         appdata = os.environ.get('APPDATA', os.path.expanduser('~'))
-        data_dir = os.path.join(appdata, 'GestionLocative')
+        data_dir = os.path.join(appdata, 'BayBay')
     else:
-        data_dir = os.path.join(os.path.expanduser('~'), '.gestion-locative')
+        data_dir = os.path.join(os.path.expanduser('~'), '.baybay')
 
     return data_dir
 
@@ -59,7 +59,7 @@ from models import db, SCI, BienImmobilier, Appartement, Locataire, Paiement, Ap
 app = Flask(__name__,
             template_folder=TEMPLATE_FOLDER,
             static_folder=STATIC_FOLDER)
-app.config['SECRET_KEY'] = 'gestion-locative-secret-key-2024'
+app.config['SECRET_KEY'] = 'baybay-secret-key-2024'
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

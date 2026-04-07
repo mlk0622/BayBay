@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
-# GestionLocative.spec - Configuration PyInstaller avec Auto-Update
+# BayBay.spec - Configuration PyInstaller avec Auto-Update
 # ==================================================================
 #
 # COMMANDE POUR CONSTRUIRE L'EXECUTABLE:
 #
-#   pyinstaller GestionLocative.spec --noconfirm
+#   pyinstaller BayBay.spec --noconfirm
 #
 # OU utiliser le script batch:
 #
@@ -161,7 +161,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='GestionLocative',
+    name='BayBay',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -187,5 +187,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='GestionLocative',
+    name='BayBay',
 )
