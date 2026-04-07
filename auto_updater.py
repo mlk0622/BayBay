@@ -20,14 +20,11 @@ from urllib.error import URLError, HTTPError
 
 # ========== CONFIGURATION ==========
 
-# URL du serveur de mise à jour (à configurer avec votre serveur)
-# Options:
-# 1. GitHub Releases API: https://api.github.com/repos/VOTRE_USER/baybay/releases/latest
-# 2. Serveur personnalisé: https://votre-serveur.com/updates/latest.json
-UPDATE_SERVER_URL = "https://api.github.com/repos/VOTRE_USER/baybay/releases/latest"
+# URL du serveur de mise à jour GitHub
+UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases/latest"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.2.8"
+CURRENT_VERSION = "2.2.9"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"

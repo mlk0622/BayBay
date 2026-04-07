@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.2.8';
+const APP_VERSION = '2.2.9';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -21,16 +21,42 @@ let isQuitting = false;
 if (!app.isPackaged) {
     console.log('Mode développement - auto-updater désactivé');
 } else {
-    autoUpdater.checkForUpdatesAndNotify();
+    // Configurer l'auto-updater pour GitHub
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
 
-    autoUpdater.on('update-available', () => {
-        console.log('Mise à jour disponible');
+    autoUpdater.on('checking-for-update', () => {
+        log('Vérification des mises à jour...');
     });
 
-    autoUpdater.on('update-downloaded', () => {
-        console.log('Mise à jour téléchargée');
-        autoUpdater.quitAndInstall();
+    autoUpdater.on('update-available', (info) => {
+        log(`Mise à jour disponible: v${info.version}`);
     });
+
+    autoUpdater.on('update-not-available', () => {
+        log('Application à jour');
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+        log(`Téléchargement: ${Math.round(progress.percent)}%`);
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+        log(`Mise à jour v${info.version} téléchargée, installation au prochain redémarrage`);
+        // Installer automatiquement après téléchargement
+        autoUpdater.quitAndInstall(false, true);
+    });
+
+    autoUpdater.on('error', (error) => {
+        log(`Erreur auto-update: ${error.message}`);
+    });
+
+    // Vérifier les mises à jour au démarrage (après un délai pour laisser l'app se charger)
+    setTimeout(() => {
+        autoUpdater.checkForUpdates().catch(err => {
+            log(`Impossible de vérifier les mises à jour: ${err.message}`);
+        });
+    }, 3000);
 }
 
 function log(message) {
@@ -55,11 +81,12 @@ function getBackendDirectory() {
 
 function createSplashWindow() {
     splashWindow = new BrowserWindow({
-        width: 400,
-        height: 300,
+        width: 420,
+        height: 340,
         frame: false,
         alwaysOnTop: true,
         transparent: true,
+        resizable: false,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
