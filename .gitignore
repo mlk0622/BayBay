@@ -1,6 +1,10 @@
 # ========================================
 # Bay Bay - .gitignore
 # ========================================
+electron-app/dist-simple/
+*.exe
+node_modules/
+
 
 # Python
 __pycache__/
