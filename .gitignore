@@ -41,8 +41,14 @@ dist/
 electron-app/node_modules/
 electron-app/release/
 electron-app/dist/
+electron-app/dist-simple/
 electron-app/.cache/
 electron-app/out/
+
+# Build files
+*.exe
+Bay Bay Setup *.exe
+BayBay-*.zip
 
 # npm
 node_modules/
