@@ -15,8 +15,8 @@ import ctypes
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "2.2.6"
-PORT = 5000
+VERSION = "2.2.8"
+PORT = 5001
 HOST = "127.0.0.1"
 
 # Détection du mode Electron (variable d'environnement ou argument)

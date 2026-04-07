@@ -27,7 +27,7 @@ from urllib.error import URLError, HTTPError
 UPDATE_SERVER_URL = "https://api.github.com/repos/VOTRE_USER/baybay/releases/latest"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.2.6"
+CURRENT_VERSION = "2.2.8"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
