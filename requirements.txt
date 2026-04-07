@@ -1,0 +1,21 @@
+# Gestion Locative - Dépendances
+# ================================
+
+# Framework web
+flask==3.0.0
+flask-sqlalchemy==3.1.1
+
+# Utilitaires
+python-dotenv==1.0.0
+Werkzeug>=3.0.0
+Jinja2>=3.1.0
+MarkupSafe>=2.1.0
+
+# Base de données
+SQLAlchemy>=2.0.0
+
+# PDF
+PyMuPDF==1.25.5
+
+# Pour le build (optionnel)
+# pyinstaller>=6.0.0

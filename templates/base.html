@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GestLoc{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb',
+                    }
+                }
+            }
+        };
+
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('gestloc-theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                return;
+            }
+            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            document.documentElement.setAttribute('data-theme', prefersLight ? 'light' : 'dark');
+        })();
+    </script>
+</head>
+<body class="app-shell min-h-screen">
+    <!-- Navigation -->
+    <nav class="app-nav sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                            <i class="fas fa-building text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold text-slate-900">GestLoc</span>
+                    </a>
+                </div>
+
+                <!-- Navigation Desktop -->
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="{{ url_for('dashboard') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-chart-pie mr-2"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('liste_biens') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'liste_biens' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-home mr-2"></i>Biens
+                    </a>
+                    <a href="{{ url_for('liste_locataires') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'liste_locataires' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-users mr-2"></i>Locataires
+                    </a>
+                    <a href="{{ url_for('appels_loyer') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'appels_loyer' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-file-invoice mr-2"></i>Appels
+                    </a>
+                    <a href="{{ url_for('quittances') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'quittances' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-receipt mr-2"></i>Quittances
+                    </a>
+                    <a href="{{ url_for('resume_loyers') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'resume_loyers' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-chart-bar mr-2"></i>Résumé
+                    </a>
+                    <a href="{{ url_for('comptes_locatifs') }}"
+                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'comptes_locatifs' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-calculator mr-2"></i>Comptes
+                    </a>
+                    <a href="{{ url_for('parametres') }}"
+                       class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                              {% if request.endpoint == 'parametres' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="themeToggle" type="button" title="Changer le thème" aria-label="Changer le thème">
+                        <i class="fas fa-circle-half-stroke"></i>
+                    </button>
+                    <button onclick="openModal('sciModal')"
+                            class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Nouvelle SCI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Mobile -->
+        <div class="lg:hidden border-t border-slate-200 overflow-x-auto bg-white">
+            <div class="flex px-4 py-2 gap-2">
+                <a href="{{ url_for('dashboard') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Dashboard</a>
+                <a href="{{ url_for('liste_biens') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_biens' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Biens</a>
+                <a href="{{ url_for('liste_locataires') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_locataires' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Locataires</a>
+                <a href="{{ url_for('appels_loyer') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'appels_loyer' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Appels</a>
+                <a href="{{ url_for('quittances') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'quittances' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Quittances</a>
+                <a href="{{ url_for('parametres') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'parametres' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}"><i class="fas fa-cog"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modals -->
+    {% include 'modals/sci_modal.html' %}
+    {% include 'modals/bien_modal.html' %}
+    {% include 'modals/appartement_modal.html' %}
+    {% include 'modals/locataire_modal.html' %}
+    {% include 'modals/paiement_modal.html' %}
+    {% include 'modals/delete_modal.html' %}
+    {% include 'modals/schedule_modal.html' %}
+    {% include 'modals/etat_lieux_modal.html' %}
+    {% if request.endpoint != 'locataire_detail' %}
+    {% include 'modals/assurance_modal.html' %}
+    {% endif %}
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        document.getElementById('themeToggle')?.addEventListener('click', function () {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('gestloc-theme', next);
+        });
+    </script>
+</body>
+</html>

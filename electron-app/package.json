@@ -1,0 +1,65 @@
+{
+  "name": "gestion-locative",
+  "version": "2.1.0",
+  "description": "Application de gestion immobilière multi-niveaux",
+  "main": "main.js",
+  "author": "Gestion Locative",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:portable": "electron-builder --win portable",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.gestionlocative.app",
+    "productName": "Gestion Locative",
+    "copyright": "Copyright © 2024 Gestion Locative",
+    "directories": {
+      "output": "release",
+      "buildResources": "build-resources"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../dist/GestionLocative",
+        "to": "backend",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "requestedExecutionLevel": "asInvoker",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Gestion Locative"
+    },
+    "portable": {
+      "artifactName": "GestionLocative-Portable-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  }
+}

@@ -1,0 +1,121 @@
+# ========================================
+# Gestion Locative - .gitignore
+# ========================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# PyInstaller
+*.manifest
+*.spec.bak
+build/
+dist/
+
+# Electron
+electron-app/node_modules/
+electron-app/release/
+electron-app/dist/
+electron-app/.cache/
+electron-app/out/
+
+# npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+app.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+instance/
+
+# Uploads (données utilisateur)
+uploads/
+data/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+.cache/
+tmp/
+temp/
+
+# Test files
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.mypy_cache/
+
+# Documentation build
+docs/_build/
+
+# Secrets
+*.pem
+*.key
+credentials.json
+secrets.json

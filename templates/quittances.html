@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Quittances - GestLoc{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-white drop-shadow-lg">Quittances de Loyer</h1>
+            <p class="text-white/80 mt-1">Gérez vos quittances</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="openScheduleModal('quittance')" class="px-4 py-2 rounded-xl font-semibold bg-orange-400/100 text-white hover:bg-orange-600 transition-all shadow-lg">
+                <i class="fas fa-clock mr-2"></i>Programmer
+            </button>
+            <button onclick="openQuittanceModal()" class="ios-button text-white px-4 py-2">
+                <i class="fas fa-plus mr-2"></i>Nouvelle quittance
+            </button>
+        </div>
+    </div>
+
+    <div class="glass-card overflow-hidden">
+        {% if quittances %}
+        <div class="overflow-x-auto">
+            <table class="w-full table-ios">
+                <thead>
+                    <tr>
+                        <th>Période</th>
+                        <th>Locataire</th>
+                        <th>Loyer HC</th>
+                        <th>Charges</th>
+                        <th>Total</th>
+                        <th>Payé</th>
+                        <th>Date paiement</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for q in quittances %}
+                    <tr>
+                        <td class="font-medium text-white">{{ MOIS_FR[q.mois] }} {{ q.annee }}</td>
+                        <td class="text-white">{{ q.locataire.nom_complet }}</td>
+                        <td class="text-white">{{ q.loyer_hc|currency }}</td>
+                        <td class="text-white/70">{{ q.charges|currency }}</td>
+                        <td class="font-semibold text-white">{{ q.total|currency }}</td>
+                        <td class="font-medium text-green-400">{{ q.montant_paye|currency }}</td>
+                        <td class="text-white/70">{{ q.date_paiement|date_fr if q.date_paiement else '-' }}</td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                {% if q.locataire.email %}
+                                <button onclick="openQuittanceEmailModal({{ q.id }})" class="action-btn email" title="Envoyer par email">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                {% endif %}
+                                <a href="/api/quittance/{{ q.id }}/pdf" target="_blank" class="action-btn pdf" title="PDF">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <button onclick="showDeleteModal('quittance', {{ q.id }}, 'Quittance {{ MOIS_FR[q.mois] }} {{ q.annee }}')" class="action-btn delete" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <p class="text-white/70 mb-4">Aucune quittance</p>
+            <button onclick="openQuittanceModal()" class="ios-button text-white px-6 py-3">
+                <i class="fas fa-plus mr-2"></i>Créer une quittance
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="quittanceEmailModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/60 p-4">
+    <div class="glass-card w-full max-w-2xl p-6 space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-white">Envoyer la quittance par email</h3>
+            <button type="button" onclick="closeModal('quittanceEmailModal')" class="text-white/70 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Modèle du corps</label>
+            <select id="quittanceEmailModele" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" onchange="applyQuittanceEmailTemplate()">
+                <option value="standard">Standard</option>
+                <option value="court">Court</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Sujet</label>
+            <input id="quittanceEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Corps HTML</label>
+            <textarea id="quittanceEmailCorps" rows="8" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Corps personnalisé (optionnel)"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="closeModal('quittanceEmailModal')" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">Annuler</button>
+            <button type="button" onclick="sendQuittanceEmail()" class="ios-button text-white px-4 py-2">
+                <i class="fas fa-paper-plane mr-2"></i>Envoyer
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const locatairesQuittance = [
+    {% for loc in locataires %}
+    { id: {{ loc.id }}, nom: "{{ loc.nom_complet }}", loyer: {{ loc.loyer_actuel or 0 }}, charges: {{ loc.charges_actuelles or 0 }}, total: {{ loc.total_mensuel or 0 }} },
+    {% endfor %}
+];
+
+function openQuittanceModal() {
+    const select = document.getElementById('quittanceLocataire');
+    select.innerHTML = '<option value="">-- Sélectionner --</option>';
+    locatairesQuittance.forEach(l => {
+        select.innerHTML += `<option value="${l.id}" data-total="${l.total}">${l.nom}</option>`;
+    });
+
+    select.onchange = function() {
+        const selected = locatairesQuittance.find(l => l.id == this.value);
+        if (selected) {
+            document.getElementById('quittanceMontant').value = selected.total;
+        }
+    };
+
+    document.getElementById('quittanceMois').value = {{ mois_actuel }};
+    document.getElementById('quittanceAnnee').value = {{ annee_actuelle }};
+    document.getElementById('quittanceDatePaiement').value = new Date().toISOString().split('T')[0];
+    openModal('quittanceModal');
+}
+
+function openScheduleModal(type) {
+    document.getElementById('scheduleType').value = type;
+    const today = new Date();
+    document.getElementById('scheduleMois').value = today.getMonth() + 1;
+    document.getElementById('scheduleAnnee').value = today.getFullYear();
+
+    const locatairesList = document.getElementById('locatairesList');
+    locatairesList.innerHTML = '';
+    locatairesQuittance.forEach(l => {
+        locatairesList.innerHTML += `
+            <label class="flex items-center p-2 rounded-lg hover:bg-white/50 cursor-pointer">
+                <input type="checkbox" name="locataires_ids" value="${l.id}" class="mr-3 w-4 h-4 accent-blue-500">
+                <span>${l.nom}</span>
+            </label>
+        `;
+    });
+
+    openModal('scheduleModal');
+}
+
+let currentQuittanceEmailId = null;
+
+function applyQuittanceEmailTemplate() {
+    const modele = document.getElementById('quittanceEmailModele').value;
+    const sujetField = document.getElementById('quittanceEmailSujet');
+    const corpsField = document.getElementById('quittanceEmailCorps');
+
+    if (modele === 'court') {
+        sujetField.value = 'Quittance - Document en pièce jointe';
+        corpsField.value = '<p>Bonjour,</p><p>Veuillez trouver votre quittance en pièce jointe.</p><p>Cordialement.</p>';
+    } else {
+        sujetField.value = 'Quittance de loyer';
+        corpsField.value = '<p>Bonjour,</p><p>Veuillez trouver ci-joint votre quittance de loyer.</p><p>Cordialement.</p>';
+    }
+}
+
+function openQuittanceEmailModal(quittanceId) {
+    currentQuittanceEmailId = quittanceId;
+    document.getElementById('quittanceEmailModele').value = 'standard';
+    applyQuittanceEmailTemplate();
+    openModal('quittanceEmailModal');
+}
+
+async function sendQuittanceEmail() {
+    if (!currentQuittanceEmailId) return;
+
+    try {
+        const payload = {
+            modele_email: document.getElementById('quittanceEmailModele').value,
+            sujet: document.getElementById('quittanceEmailSujet').value,
+            corps: document.getElementById('quittanceEmailCorps').value
+        };
+
+        const response = await fetch(`/api/quittance/${currentQuittanceEmailId}/envoyer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            closeModal('quittanceEmailModal');
+            showNotification(data.message || 'Email envoyé avec succès', 'success');
+        } else {
+            showNotification('Erreur: ' + (data.error || data.message || 'Erreur inconnue'), 'error');
+        }
+    } catch (error) {
+        showNotification('Erreur lors de l\'envoi', 'error');
+    }
+}
+
+</script>
+{% endblock %}

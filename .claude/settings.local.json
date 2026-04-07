@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pyinstaller GestionLocative.spec --noconfirm)",
+      "Bash(dir /b)",
+      "Bash(cd:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(timeout 15 npm start)",
+      "Bash(timeout 20 \"./Gestion Locative.exe\")",
+      "Bash(timeout 15 \"./Gestion Locative.exe\")",
+      "Bash(ls:*)"
+    ]
+  }
+}
