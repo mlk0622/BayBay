@@ -1,6 +1,6 @@
 {
   "name": "baybay",
-  "version": "2.2.3",
+  "version": "2.2.6",
   "description": "Bay Bay - Application de gestion immobilière multi-niveaux",
   "main": "main.js",
   "author": "Bay Bay",
@@ -26,7 +26,6 @@
     "files": [
       "main.js",
       "splash.html",
-      "splash.css",
       "package.json"
     ],
     "extraResources": [

@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.2.3';
+const APP_VERSION = '2.2.6';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -39,7 +39,8 @@ function log(message) {
 
 function getBackendPath() {
     if (app.isPackaged) {
-        return path.join(process.resourcesPath, 'backend', 'BayBay.exe');
+        // Pour @electron/packager, le backend est dans resources/backend
+        return path.join(path.dirname(process.execPath), 'resources', 'backend', 'BayBay.exe');
     } else {
         return path.join(__dirname, '..', 'dist', 'BayBay', 'BayBay.exe');
     }
@@ -47,7 +48,7 @@ function getBackendPath() {
 
 function getBackendDirectory() {
     if (app.isPackaged) {
-        return path.join(process.resourcesPath, 'backend');
+        return path.join(path.dirname(process.execPath), 'resources', 'backend');
     } else {
         return path.join(__dirname, '..', 'dist', 'BayBay');
     }
