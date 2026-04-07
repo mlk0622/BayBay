@@ -10,26 +10,53 @@ echo ╚════════════════════════
 echo.
 
 :: Vérifier GitHub CLI
+echo 🔍 Vérification GitHub CLI...
 gh --version >nul 2>&1
 if errorlevel 1 (
     echo ❌ GitHub CLI (gh) n'est pas installé
     echo.
-    echo Installez-le: winget install GitHub.cli
-    echo Puis: gh auth login
+    echo 📥 INSTALLATION REQUISE:
+    echo    1. Installez GitHub CLI: winget install GitHub.cli
+    echo    2. Redémarrez cette fenêtre CMD
+    echo    3. Connectez-vous: gh auth login
+    echo    4. Relancez ce script
+    echo.
+    echo 🔗 Alternative: https://cli.github.com/
     pause
     exit /b 1
 )
 
 :: Vérifier l'authentification
+echo 🔍 Vérification authentification GitHub...
 gh auth status >nul 2>&1
 if errorlevel 1 (
     echo ❌ Vous n'êtes pas connecté à GitHub
-    echo Exécutez: gh auth login
+    echo.
+    echo 🔐 AUTHENTIFICATION REQUISE:
+    echo    Exécutez: gh auth login
+    echo    Puis suivez les instructions à l'écran
     pause
     exit /b 1
 )
 
 echo ✅ GitHub CLI configuré
+
+:: Vérifier l'accès au repository
+echo 🔍 Vérification accès repository...
+gh repo view mlk0622/BayBay --json name >nul 2>&1
+if errorlevel 1 (
+    echo ❌ Impossible d'accéder au repository mlk0622/BayBay
+    echo.
+    echo 🔧 VÉRIFICATIONS:
+    echo    1. Le repository existe-t-il sur GitHub ?
+    echo    2. Avez-vous les droits d'écriture ?
+    echo    3. Êtes-vous connecté au bon compte ?
+    echo.
+    echo 🔗 URL: https://github.com/mlk0622/BayBay
+    pause
+    exit /b 1
+)
+echo ✅ Repository accessible
 echo.
 
 :: Lire la version actuelle depuis package.json
@@ -64,13 +91,17 @@ echo ✅ launcher.py mis à jour
 powershell -Command "(Get-Content 'electron-app\main.js') -replace \"APP_VERSION = '[0-9.]+'\", \"APP_VERSION = '%NEW_VERSION%'\" | Set-Content 'electron-app\main.js'"
 echo ✅ main.js mis à jour
 
+:: Mettre à jour splash.html
+powershell -Command "(Get-Content 'electron-app\splash.html') -replace 'Version [0-9.]+', 'Version %NEW_VERSION%' | Set-Content 'electron-app\splash.html'"
+echo ✅ splash.html mis à jour
+
 echo.
 echo ══════════════════════════════════════════════════════════════
 echo  ÉTAPE 2: Build du backend Python
 echo ══════════════════════════════════════════════════════════════
 echo.
 
-pyinstaller BayBay.spec --noconfirm >nul 2>&1
+pyinstaller BayBay.spec --noconfirm
 if errorlevel 1 (
     echo ❌ Erreur build Python
     pause
@@ -86,7 +117,7 @@ echo.
 
 cd electron-app
 if exist "release" rmdir /s /q "release"
-call npm run build:win -- --publish never >nul 2>&1
+call npm run build:win -- --publish never
 if errorlevel 1 (
     echo ❌ Erreur build Electron
     cd ..
@@ -95,6 +126,19 @@ if errorlevel 1 (
 )
 cd ..
 echo ✅ Application Electron compilée
+
+:: Vérifier que les fichiers de release existent
+if not exist "electron-app\release\Bay Bay Setup %NEW_VERSION%.exe" (
+    echo ❌ Fichier Bay Bay Setup %NEW_VERSION%.exe manquant
+    pause
+    exit /b 1
+)
+if not exist "electron-app\release\latest.yml" (
+    echo ❌ Fichier latest.yml manquant
+    pause
+    exit /b 1
+)
+echo ✅ Fichiers de release vérifiés
 
 echo.
 echo ══════════════════════════════════════════════════════════════

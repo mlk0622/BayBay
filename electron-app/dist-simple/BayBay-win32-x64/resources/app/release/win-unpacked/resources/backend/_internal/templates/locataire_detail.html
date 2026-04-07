@@ -1,0 +1,936 @@
+{% extends "base.html" %}
+
+{% block title %}{{ locataire.nom }} {{ locataire.prenom }} - GestLoc{% endblock %}
+
+{% block content %}
+<style>
+    .locataire-dark .bg-white {
+        background: rgba(18, 24, 38, 0.72) !important;
+        border-color: rgba(255, 255, 255, 0.16) !important;
+        backdrop-filter: blur(14px);
+    }
+    .locataire-dark .bg-slate-50 { background: rgba(255, 255, 255, 0.06) !important; }
+    .locataire-dark .text-slate-900 { color: #f4f7ff !important; }
+    .locataire-dark .text-slate-700,
+    .locataire-dark .text-slate-600,
+    .locataire-dark .text-slate-500,
+    .locataire-dark .text-slate-400 { color: rgba(221, 231, 255, 0.82) !important; }
+
+    /* Icônes des sections - TOUJOURS NOIRES */
+    .fa-shield-alt { color: #111827 !important; }
+    .fa-file-signature { color: #111827 !important; }
+    .fa-clipboard-list { color: #111827 !important; }
+
+    /* Boutons Annuler - texte noir */
+    button.bg-white,
+    button[class*="bg-white"] {
+        color: #111827 !important;
+    }
+</style>
+<div class="locataire-dark">
+<!-- Header -->
+<div class="mb-8">
+    <a href="{{ url_for('liste_locataires') }}" class="inline-flex items-center text-sm text-slate-500 hover:text-primary mb-4">
+        <i class="fas fa-arrow-left mr-2"></i>Retour aux locataires
+    </a>
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-semibold text-2xl">
+                {{ locataire.prenom[0] }}{{ locataire.nom[0] }}
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">{{ locataire.nom }} {{ locataire.prenom }}</h1>
+                {% if locataire.appartement %}
+                <p class="text-slate-500">{{ locataire.appartement.bien.adresse }} - Apt {{ locataire.appartement.numero_porte }}</p>
+                {% else %}
+                <p class="text-slate-400">Aucun logement attribué</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+            <button onclick="openLocataireAssuranceModal()" class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                <i class="fas fa-shield-alt mr-2 text-slate-400"></i>Assurance
+            </button>
+            <button onclick="openEtatModal()" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                <i class="fas fa-clipboard-check mr-2"></i>Nouvel état des lieux
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Infos principales -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Contact -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <i class="fas fa-address-card text-blue-600"></i>
+            </div>
+            <h3 class="font-semibold text-slate-900">Contact</h3>
+        </div>
+        <div class="space-y-3">
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Email</p>
+                <p class="text-slate-900 font-medium">{{ locataire.email or 'Non renseigné' }}</p>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Téléphone</p>
+                <p class="text-slate-900 font-medium">{{ locataire.telephone or 'Non renseigné' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loyer -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <i class="fas fa-euro-sign text-green-600"></i>
+            </div>
+            <h3 class="font-semibold text-slate-900">Loyer</h3>
+        </div>
+        <div class="space-y-3">
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Total mensuel</p>
+                <p class="text-2xl font-bold text-slate-900">{{ locataire.total_mensuel|currency }}</p>
+            </div>
+            {% if locataire.appartement %}
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Détail</p>
+                <p class="text-slate-600">{{ locataire.loyer_actuel|currency }} + {{ locataire.charges_actuelles|currency }} charges</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bail -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                <i class="fas fa-calendar text-purple-600"></i>
+            </div>
+            <h3 class="font-semibold text-slate-900">Bail</h3>
+        </div>
+        <div class="space-y-3">
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Début du bail</p>
+                <p class="text-slate-900 font-medium">{{ locataire.date_debut_bail|date_fr if locataire.date_debut_bail else 'Non renseigné' }}</p>
+            </div>
+            {% if locataire.date_fin_bail %}
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Fin du bail</p>
+                <p class="text-slate-900 font-medium">{{ locataire.date_fin_bail|date_fr }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Assurance et Bail -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Assurance -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-slate-900">
+                <i class="fas fa-shield-alt text-green-600 mr-2"></i>Attestation d'assurance
+            </h3>
+            <button onclick="openLocataireAssuranceModal()" class="text-sm text-primary hover:text-primary-dark font-medium">
+                {% if assurance %}Modifier{% else %}Ajouter{% endif %}
+            </button>
+        </div>
+        {% if assurance %}
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
+                    <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-slate-900">{{ assurance.nom_fichier }}</p>
+                    <p class="text-xs text-slate-500">
+                        {% if assurance.date_validite %}
+                        Validité: {{ assurance.date_validite|date_fr }}
+                        {% if assurance.date_validite < now.date() %}
+                        <span class="text-red-500 font-medium ml-1">(Expirée)</span>
+                        {% endif %}
+                        {% else %}
+                        Date de validité non définie
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="/api/locataire/{{ locataire.id }}/assurance" target="_blank"
+                   class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                    <i class="fas fa-download mr-2"></i>Télécharger
+                </a>
+                <button onclick="deleteAssurance()" class="inline-flex items-center px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-100">
+                    <i class="fas fa-trash mr-2"></i>Supprimer
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-slate-50 rounded-xl">
+            <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-file-alt text-slate-400 text-2xl"></i>
+            </div>
+            <p class="text-slate-500 text-sm">Aucune attestation</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bail -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-slate-900">
+                <i class="fas fa-file-signature text-indigo-600 mr-2"></i>Bail
+            </h3>
+            <button onclick="openLocataireBailModal()" class="text-sm text-primary hover:text-primary-dark font-medium">
+                {% if bail %}Modifier{% else %}Ajouter{% endif %}
+            </button>
+        </div>
+        {% if bail %}
+        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <i class="fas fa-file-pdf text-indigo-600 text-xl"></i>
+                </div>
+                <div>
+                    <p class="font-medium text-slate-900">{{ bail.nom_fichier }}</p>
+                    <p class="text-xs text-slate-500">Document de bail</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="/api/locataire/{{ locataire.id }}/bail" target="_blank"
+                   class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                    <i class="fas fa-download mr-2"></i>Télécharger
+                </a>
+                <button onclick="deleteBail()" class="inline-flex items-center px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-100">
+                    <i class="fas fa-trash mr-2"></i>Supprimer
+                </button>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-slate-50 rounded-xl">
+            <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-file-signature text-slate-400 text-2xl"></i>
+            </div>
+            <p class="text-slate-500 text-sm">Aucun bail</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- États des lieux -->
+<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <h3 class="font-semibold text-slate-900">
+                <i class="fas fa-clipboard-list text-purple-600 mr-2"></i>États des lieux
+            </h3>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">{{ etats_lieux|length }}</span>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="openUploadEtatModal()" class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                <i class="fas fa-upload mr-2 text-slate-400"></i>Upload PDF
+            </button>
+            <button onclick="openEtatModal()" class="inline-flex items-center px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                <i class="fas fa-plus mr-2"></i>Nouveau
+            </button>
+        </div>
+    </div>
+
+    {% if etats_lieux %}
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Photos</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">PDF</th>
+                    <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for etat in etats_lieux %}
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4">
+                        {% if etat.type_etat.value == 'Entrée' %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <i class="fas fa-sign-in-alt mr-1"></i>Entrée
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                            <i class="fas fa-sign-out-alt mr-1"></i>Sortie
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-900">{{ etat.date_etat|date_fr }}</td>
+                    <td class="px-6 py-4">
+                        <button onclick="openPhotosModal({{ etat.id }}, '{{ etat.type_etat.value }}', '{{ etat.date_etat|date_fr }}')"
+                                class="inline-flex items-center text-sm text-primary hover:text-primary-dark font-medium">
+                            <i class="fas fa-images mr-1"></i>
+                            <span class="photos-count-{{ etat.id }}">...</span>
+                        </button>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if etat.chemin_fichier %}
+                        <a href="/api/etat-lieux/{{ etat.id }}/download" target="_blank"
+                           class="inline-flex items-center text-sm text-purple-600 hover:text-purple-700 font-medium">
+                            <i class="fas fa-file-pdf mr-1"></i>Télécharger
+                        </a>
+                        {% else %}
+                        <button onclick="openAttachPdfModal({{ etat.id }})"
+                                class="inline-flex items-center text-sm text-slate-500 hover:text-primary font-medium">
+                            <i class="fas fa-paperclip mr-1"></i>Attacher PDF
+                        </button>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="openPhotosModal({{ etat.id }}, '{{ etat.type_etat.value }}', '{{ etat.date_etat|date_fr }}')"
+                                    class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-200" title="Gérer les photos">
+                                <i class="fas fa-camera text-sm"></i>
+                            </button>
+                            {% if etat.chemin_fichier %}
+                            <a href="/api/etat-lieux/{{ etat.id }}/download" target="_blank"
+                               class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center hover:bg-purple-200" title="Télécharger PDF">
+                                <i class="fas fa-download text-sm"></i>
+                            </a>
+                            {% else %}
+                            <button onclick="openAttachPdfModal({{ etat.id }})"
+                                    class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center hover:bg-slate-200" title="Rattacher un PDF">
+                                <i class="fas fa-paperclip text-sm"></i>
+                            </button>
+                            {% endif %}
+                            <button onclick="deleteEtat({{ etat.id }})"
+                                    class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200" title="Supprimer">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-clipboard-list text-slate-400 text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun état des lieux</h3>
+        <p class="text-slate-500 mb-6">Créez ou uploadez un état des lieux pour ce locataire</p>
+        <div class="flex justify-center gap-3">
+            <button onclick="openUploadEtatModal()"
+                    class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                <i class="fas fa-upload mr-2"></i>Upload PDF
+            </button>
+            <button onclick="openEtatModal()"
+                    class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                <i class="fas fa-plus mr-2"></i>Créer
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- MODALS -->
+
+<!-- Modal État des lieux -->
+<div id="etatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Nouvel état des lieux</h3>
+            <button onclick="closeModal('etatModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="etatForm">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type_etat" value="Entrée" checked class="w-4 h-4 text-primary">
+                            <span class="text-sm"><i class="fas fa-sign-in-alt text-green-500 mr-1"></i>Entrée</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="type_etat" value="Sortie" class="w-4 h-4 text-primary">
+                            <span class="text-sm"><i class="fas fa-sign-out-alt text-orange-500 mr-1"></i>Sortie</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                    <input type="date" name="date_etat" id="etatDate" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+                <div class="bg-slate-50 rounded-xl p-4">
+                    <h4 class="font-medium text-slate-900 mb-3">Informations bailleur pour le PDF</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-slate-500 mb-1">Nom / Dénomination</label>
+                            <input type="text" name="bailleur_nom" placeholder="Ex: SCI Les Tilleuls"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs text-slate-500 mb-1">Adresse</label>
+                            <input type="text" name="bailleur_adresse" placeholder="Adresse du bailleur"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Email</label>
+                            <input type="email" name="bailleur_email" placeholder="contact@..."
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Téléphone</label>
+                            <input type="text" name="bailleur_telephone" placeholder="06 ..."
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Observations</label>
+                    <textarea name="observations" rows="3" placeholder="Notes, remarques..."
+                              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('etatModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-save mr-2"></i>Créer et télécharger PDF
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Upload État des lieux -->
+<div id="uploadEtatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Uploader un état des lieux</h3>
+            <button onclick="closeModal('uploadEtatModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="uploadEtatForm" enctype="multipart/form-data">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                    <select name="type_etat" required
+                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="entree">Entrée</option>
+                        <option value="sortie">Sortie</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                    <input type="date" name="date_etat" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <input type="file" name="file" accept=".pdf" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('uploadEtatModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-upload mr-2"></i>Uploader
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Rattacher PDF à un état des lieux existant -->
+<div id="attachPdfModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Rattacher un PDF</h3>
+            <button onclick="closeModal('attachPdfModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="attachPdfForm" enctype="multipart/form-data">
+            <input type="hidden" id="attachPdfEtatId" name="etat_id">
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-slate-600">Sélectionnez un PDF à rattacher à cet état des lieux.</p>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <input type="file" name="file" accept=".pdf" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('attachPdfModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-paperclip mr-2"></i>Rattacher
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Photo -->
+<div id="photoModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Photo du locataire</h3>
+            <button onclick="closeModal('photoModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="photoForm" enctype="multipart/form-data">
+            <div class="p-6">
+                <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+                     onclick="document.getElementById('photoInput').click()">
+                    <i class="fas fa-camera text-slate-400 text-3xl mb-3"></i>
+                    <p class="text-slate-600 font-medium">Cliquez pour sélectionner une photo</p>
+                    <p class="text-slate-400 text-sm mt-1">JPG, PNG - Max 10MB</p>
+                    <input type="file" id="photoInput" name="file" accept="image/*" class="hidden" required>
+                </div>
+                <div id="photoPreview" class="hidden mt-4 text-center">
+                    <img id="photoPreviewImg" src="" class="w-32 h-32 rounded-xl object-cover mx-auto shadow">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('photoModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-save mr-2"></i>Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Assurance -->
+<div id="locataireAssuranceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Attestation d'assurance</h3>
+            <button onclick="closeModal('locataireAssuranceModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="locataireAssuranceForm" enctype="multipart/form-data">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <input type="file" name="file" accept=".pdf" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Date de validité</label>
+                    <input type="date" name="date_validite"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('locataireAssuranceModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-save mr-2"></i>Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Photos État des lieux -->
+<div id="photosModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Photos - <span id="photosTitle"></span></h3>
+            <button onclick="closeModal('photosModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-6">
+            <!-- Upload zone -->
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors mb-6"
+                 onclick="document.getElementById('photosInput').click()">
+                <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2"></i>
+                <p class="text-slate-600 font-medium">Cliquez ou glissez des photos ici</p>
+                <p class="text-slate-400 text-sm">JPG, PNG - Max 10MB par fichier</p>
+                <input type="file" id="photosInput" accept="image/*" multiple class="hidden" onchange="uploadPhotos(event)">
+            </div>
+
+            <!-- Progress -->
+            <div id="photosProgress" class="hidden mb-6">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="text-slate-600">Upload en cours...</span>
+                    <span id="photosPercent" class="font-medium">0%</span>
+                </div>
+                <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="photosBar" class="h-full bg-primary transition-all" style="width:0%"></div>
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            <div id="photosGallery" class="grid grid-cols-2 sm:grid-cols-3 gap-4"></div>
+
+            <!-- Empty state -->
+            <div id="photosEmpty" class="text-center py-12 hidden">
+                <i class="fas fa-images text-slate-300 text-4xl mb-3"></i>
+                <p class="text-slate-500">Aucune photo pour cet état des lieux</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bail -->
+<div id="locataireBailModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-900">Bail du locataire</h3>
+            <button onclick="closeModal('locataireBailModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="locataireBailForm" enctype="multipart/form-data">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <input type="file" name="file" accept=".pdf" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('locataireBailModal')" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-save mr-2"></i>Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[60]" onclick="closeLightbox()">
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+        <i class="fas fa-times"></i>
+    </button>
+    <img id="lightboxImg" src="" class="max-w-[90vw] max-h-[90vh] object-contain" onclick="event.stopPropagation()">
+</div>
+
+<script>
+const locataireId = {{ locataire.id }};
+let currentEtatId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('etatDate').value = new Date().toISOString().split('T')[0];
+
+    // Charger compteurs photos
+    {% for etat in etats_lieux %}
+    fetch('/api/etat-lieux/{{ etat.id }}/photos').then(r=>r.json()).then(p=>{
+        document.querySelector('.photos-count-{{ etat.id }}').textContent = p.length + ' photo(s)';
+    }).catch(()=>{
+        document.querySelector('.photos-count-{{ etat.id }}').textContent = '0';
+    });
+    {% endfor %}
+});
+
+function openModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+}
+
+function closeModal(id) {
+    const modal = document.getElementById(id);
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+}
+
+function openEtatModal() { openModal('etatModal'); }
+function openUploadEtatModal() { openModal('uploadEtatModal'); }
+function openPhotoModal() { openModal('photoModal'); }
+function openLocataireAssuranceModal() { openModal('locataireAssuranceModal'); }
+function openLocataireBailModal() { openModal('locataireBailModal'); }
+
+function openAttachPdfModal(etatId) {
+    document.getElementById('attachPdfEtatId').value = etatId;
+    openModal('attachPdfModal');
+}
+
+function openPhotosModal(etatId, type, date) {
+    currentEtatId = etatId;
+    document.getElementById('photosTitle').textContent = type + ' - ' + date;
+    openModal('photosModal');
+    loadPhotos(etatId);
+}
+
+function loadPhotos(etatId) {
+    const gallery = document.getElementById('photosGallery');
+    const empty = document.getElementById('photosEmpty');
+    gallery.innerHTML = '<div class="col-span-3 text-center py-4"><i class="fas fa-spinner fa-spin text-slate-400"></i></div>';
+
+    fetch('/api/etat-lieux/' + etatId + '/photos').then(r=>r.json()).then(photos => {
+        if (!photos.length) {
+            gallery.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+        gallery.innerHTML = photos.map(p => `
+            <div class="relative group rounded-xl overflow-hidden">
+                <img src="${p.url}" class="w-full h-32 object-cover cursor-pointer" onclick="openLightbox('${p.url}')">
+                <button onclick="event.stopPropagation();deletePhoto(${p.id})"
+                        class="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+    });
+}
+
+function uploadPhotos(e) {
+    if (!currentEtatId || !e.target.files.length) return;
+    const progress = document.getElementById('photosProgress');
+    const bar = document.getElementById('photosBar');
+    const percent = document.getElementById('photosPercent');
+    progress.classList.remove('hidden');
+
+    const fd = new FormData();
+    for (let f of e.target.files) fd.append('files', f);
+
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+            const p = Math.round((e.loaded/e.total)*100);
+            bar.style.width = p + '%';
+            percent.textContent = p + '%';
+        }
+    };
+    xhr.onload = () => {
+        progress.classList.add('hidden');
+        if (xhr.status === 200) {
+            showNotification('Photos uploadées', 'success');
+            loadPhotos(currentEtatId);
+        }
+        e.target.value = '';
+    };
+    xhr.open('POST', '/api/etat-lieux/' + currentEtatId + '/photos');
+    xhr.send(fd);
+}
+
+function deletePhoto(id) {
+    if (!confirm('Supprimer cette photo ?')) return;
+    fetch('/api/etat-lieux/photo/' + id, {method:'DELETE'}).then(()=>{
+        loadPhotos(currentEtatId);
+        showNotification('Photo supprimée', 'success');
+    });
+}
+
+function deleteEtat(id) {
+    if (!confirm('Supprimer cet état des lieux ?')) return;
+    fetch('/api/etat-lieux/' + id, {method:'DELETE'}).then(r=>{
+        if (r.ok) {
+            showNotification('Supprimé', 'success');
+            setTimeout(()=>location.reload(), 500);
+        }
+    });
+}
+
+function openLightbox(url) {
+    document.getElementById('lightboxImg').src = url;
+    const lb = document.getElementById('lightbox');
+    lb.classList.remove('hidden');
+    lb.style.display = 'flex';
+}
+
+function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('hidden');
+    lb.style.display = 'none';
+}
+
+// Photo preview
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    if (e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            document.getElementById('photoPreviewImg').src = ev.target.result;
+            document.getElementById('photoPreview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+// Form submissions
+document.getElementById('etatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fd = new FormData(this);
+    const data = {}; fd.forEach((v,k) => data[k] = v);
+
+    try {
+        // 1. Créer l'état des lieux
+        const r = await fetch('/api/locataire/' + locataireId + '/etat-lieux', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+        });
+
+        if (r.ok) {
+            const result = await r.json();
+            showNotification('État des lieux créé', 'success');
+
+            // 2. Générer et télécharger le PDF pré-rempli
+            const typeEtat = (data.type_etat || '').toLowerCase().startsWith('ent') ? 'entree' : 'sortie';
+            const pdfPayload = {
+                type_etat: typeEtat,
+                date_etat: data.date_etat || '',
+                observations: data.observations || '',
+                bailleur_nom: data.bailleur_nom || '',
+                bailleur_adresse: data.bailleur_adresse || '',
+                bailleur_email: data.bailleur_email || '',
+                bailleur_telephone: data.bailleur_telephone || ''
+            };
+
+            const pdfResponse = await fetch('/api/locataire/' + locataireId + '/etat-lieux/prefill-pdf', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(pdfPayload)
+            });
+
+            if (pdfResponse.ok) {
+                const pdfResult = await pdfResponse.json();
+                if (pdfResult.success && pdfResult.download_url) {
+                    window.open(pdfResult.download_url, '_blank');
+                }
+            }
+
+            closeModal('etatModal');
+            setTimeout(()=>location.reload(), 500);
+        } else {
+            showNotification('Erreur lors de la création', 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur lors de la création', 'error');
+    }
+});
+
+document.getElementById('uploadEtatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const r = await fetch('/api/locataire/' + locataireId + '/etat-lieux/upload', { method: 'POST', body: new FormData(this) });
+    if (r.ok) { showNotification('PDF uploadé', 'success'); closeModal('uploadEtatModal'); setTimeout(()=>location.reload(),500); }
+});
+
+document.getElementById('photoForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const r = await fetch('/api/locataire/' + locataireId + '/photo', { method: 'POST', body: new FormData(this) });
+    if (r.ok) { showNotification('Photo enregistrée', 'success'); closeModal('photoModal'); setTimeout(()=>location.reload(),500); }
+});
+
+document.getElementById('locataireAssuranceForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    try {
+        const r = await fetch('/api/locataire/' + locataireId + '/assurance', { method: 'POST', body: new FormData(this) });
+        const result = await r.json();
+        if (r.ok && result.success) {
+            showNotification('Assurance enregistrée', 'success');
+            closeModal('locataireAssuranceModal');
+            setTimeout(()=>location.reload(),500);
+        } else {
+            showNotification(result.error || 'Erreur upload assurance', 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur upload assurance', 'error');
+    }
+});
+
+document.getElementById('locataireBailForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    try {
+        const r = await fetch('/api/locataire/' + locataireId + '/bail', { method: 'POST', body: new FormData(this) });
+        const result = await r.json();
+        if (r.ok && result.success) {
+            showNotification('Bail enregistré', 'success');
+            closeModal('locataireBailModal');
+            setTimeout(()=>location.reload(),500);
+        } else {
+            showNotification(result.error || 'Erreur upload bail', 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur upload bail', 'error');
+    }
+});
+
+document.getElementById('attachPdfForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const etatId = document.getElementById('attachPdfEtatId').value;
+    try {
+        const r = await fetch('/api/etat-lieux/' + etatId + '/attach-pdf', { method: 'POST', body: new FormData(this) });
+        const result = await r.json();
+        if (r.ok && result.success) {
+            showNotification('PDF rattaché avec succès', 'success');
+            closeModal('attachPdfModal');
+            setTimeout(()=>location.reload(),500);
+        } else {
+            showNotification(result.error || 'Erreur rattachement PDF', 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur rattachement PDF', 'error');
+    }
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function deleteAssurance() {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette attestation d\'assurance ?')) return;
+    fetch('/api/locataire/' + locataireId + '/assurance', {method: 'DELETE'})
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                showNotification('Assurance supprimée', 'success');
+                setTimeout(()=>location.reload(), 500);
+            } else {
+                showNotification(result.error || 'Erreur lors de la suppression', 'error');
+            }
+        })
+        .catch(() => showNotification('Erreur lors de la suppression', 'error'));
+}
+
+function deleteBail() {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce document de bail ?')) return;
+    fetch('/api/locataire/' + locataireId + '/bail', {method: 'DELETE'})
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                showNotification('Bail supprimé', 'success');
+                setTimeout(()=>location.reload(), 500);
+            } else {
+                showNotification(result.error || 'Erreur lors de la suppression', 'error');
+            }
+        })
+        .catch(() => showNotification('Erreur lors de la suppression', 'error'));
+}
+
+</script>
+</div>
+{% endblock %}

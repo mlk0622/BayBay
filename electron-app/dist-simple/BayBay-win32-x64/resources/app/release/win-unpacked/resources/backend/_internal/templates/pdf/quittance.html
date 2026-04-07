@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quittance de Loyer - {{ mois_fr[quittance.mois] }} {{ quittance.annee }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #059669; padding-bottom: 20px; }
+        .header h1 { color: #059669; font-size: 28px; margin-bottom: 5px; }
+        .header p { color: #666; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 14px; color: #059669; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+        .grid { display: flex; justify-content: space-between; gap: 40px; }
+        .grid-item { flex: 1; }
+        .label { font-size: 12px; color: #666; margin-bottom: 2px; }
+        .value { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .table th { background: #f3f4f6; font-size: 12px; text-transform: uppercase; color: #666; }
+        .table td { font-size: 14px; }
+        .table .total-row { background: #ecfdf5; font-weight: bold; }
+        .table .total-row td { color: #059669; font-size: 16px; }
+        .amount { text-align: right; }
+        .footer { margin-top: 50px; text-align: center; color: #666; font-size: 12px; }
+        .attestation { background: #ecfdf5; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center; }
+        .attestation h3 { color: #059669; margin-bottom: 10px; }
+        .attestation p { font-size: 14px; line-height: 1.6; }
+        .signature { margin-top: 40px; display: flex; justify-content: flex-end; }
+        .signature-box { text-align: center; }
+        .signature-line { border-top: 1px solid #333; width: 200px; margin-top: 60px; padding-top: 5px; }
+        @media print {
+            body { padding: 20px; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>QUITTANCE DE LOYER</h1>
+            <p>{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</p>
+        </div>
+
+        <div class="section">
+            <div class="grid">
+                <div class="grid-item">
+                    <div class="section-title">Bailleur</div>
+                    {% if sci %}
+                    <div class="value" style="font-size: 16px; font-weight: bold;">{{ sci.nom }}</div>
+                    {% if sci.adresse %}<div class="value">{{ sci.adresse }}</div>{% endif %}
+                    {% if sci.code_postal or sci.ville %}<div class="value">{{ sci.code_postal or '' }} {{ sci.ville }}</div>{% endif %}
+                    {% if sci.siret %}<div class="label">SIRET: {{ sci.siret }}</div>{% endif %}
+                    {% endif %}
+                </div>
+                <div class="grid-item">
+                    <div class="section-title">Locataire</div>
+                    <div class="value" style="font-size: 16px; font-weight: bold;">{{ locataire.nom_complet }}</div>
+                    {% if appartement and bien %}
+                    <div class="value">{{ appartement.numero_porte }}</div>
+                    <div class="value">{{ bien.adresse }}</div>
+                    {% if bien.code_postal or bien.ville %}<div class="value">{{ bien.code_postal or '' }} {{ bien.ville or '' }}</div>{% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Détail du règlement</div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Désignation</th>
+                        <th class="amount">Montant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Loyer hors charges</td>
+                        <td class="amount">{{ "%.2f"|format(quittance.loyer_hc) }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Provisions pour charges</td>
+                        <td class="amount">{{ "%.2f"|format(quittance.charges) }} €</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td>TOTAL</td>
+                        <td class="amount">{{ "%.2f"|format(quittance.total) }} €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="attestation">
+            <h3>ATTESTATION DE PAIEMENT</h3>
+            <p>
+                Je soussigné(e), représentant de <strong>{{ sci.nom if sci else '-' }}</strong>,
+                reconnais avoir reçu de <strong>{{ locataire.nom_complet }}</strong>
+                la somme de <strong>{{ "%.2f"|format(quittance.montant_paye) }} €</strong>
+                {% if quittance.date_paiement %}
+                en date du <strong>{{ quittance.date_paiement.strftime('%d/%m/%Y') }}</strong>
+                {% endif %}
+                au titre du loyer et des charges du mois de <strong>{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</strong>.
+            </p>
+        </div>
+
+        <div class="signature">
+            <div class="signature-box">
+                <div class="signature-line">Le Bailleur</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Quittance émise le {{ quittance.date_emission.strftime('%d/%m/%Y') if quittance.date_emission else '-' }}</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #999;">
+                Cette quittance annule tous les reçus qui auraient pu être établis précédemment en cas de paiement partiel du montant ci-dessus.
+            </p>
+        </div>
+
+        <div class="no-print" style="margin-top: 30px; text-align: center;">
+            <button onclick="window.print()" style="background: #059669; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                Imprimer / Télécharger PDF
+            </button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400/20 to-pink-400/20 flex items-center justify-center">
+                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-white">Paramètres</h1>
+                <p class="text-white/60">Configuration de l'application</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Email -->
+    <div class="glass-card p-8">
+        <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-blue-400/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-semibold text-white">Configuration Email</h2>
+        </div>
+
+        <form id="emailConfigForm" class="space-y-6">
+            <!-- Serveur SMTP -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="smtp_server" class="block text-sm font-medium text-white/70 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                            </svg>
+                            <span>Serveur SMTP</span>
+                        </div>
+                    </label>
+                    <input type="text" id="smtp_server" name="smtp_server"
+                        value="{{ config_email.serveur_smtp if config_email else '' }}"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
+                        placeholder="smtp.gmail.com" required>
+                    <p class="mt-2 text-sm text-white/50">Gmail: smtp.gmail.com, Outlook: smtp-mail.outlook.com</p>
+                </div>
+
+                <div>
+                    <label for="smtp_port" class="block text-sm font-medium text-white/70 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                            </svg>
+                            <span>Port SMTP</span>
+                        </div>
+                    </label>
+                    <input type="number" id="smtp_port" name="smtp_port"
+                        value="{{ config_email.port_smtp if config_email else '587' }}"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
+                        placeholder="587" required>
+                    <p class="mt-2 text-sm text-white/50">TLS: 587, SSL: 465</p>
+                </div>
+            </div>
+
+            <!-- Email et mot de passe -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="email_address" class="block text-sm font-medium text-white/70 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                            </svg>
+                            <span>Adresse email</span>
+                        </div>
+                    </label>
+                    <input type="email" id="email_address" name="email_address"
+                        value="{{ config_email.email_expediteur if config_email else '' }}"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
+                        placeholder="votre.email@example.com" required>
+                </div>
+
+                <div>
+                    <label for="email_password" class="block text-sm font-medium text-white/70 mb-2">
+                        <div class="flex items-center space-x-2">
+                            <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                            <span>Mot de passe / Mot de passe d'application</span>
+                        </div>
+                    </label>
+                    <input type="password" id="email_password" name="email_password"
+                        value="{{ config_email.mot_de_passe if config_email else '' }}"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
+                        placeholder="••••••••" required>
+                    <p class="mt-2 text-sm text-white/50">Pour Gmail, utilisez un mot de passe d'application</p>
+                </div>
+            </div>
+
+            <!-- Email expéditeur par défaut -->
+            <div>
+                <label for="default_sender" class="block text-sm font-medium text-white/70 mb-2">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        </svg>
+                        <span>Email expéditeur par défaut (optionnel)</span>
+                    </div>
+                </label>
+                <input type="email" id="default_sender" name="default_sender"
+                    value="{{ config_email.email_expediteur if config_email else '' }}"
+                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all"
+                    placeholder="gestion@votresci.com">
+                <p class="mt-2 text-sm text-white/50">Email utilisé par défaut pour l'envoi des appels de loyer</p>
+            </div>
+
+            <!-- Use TLS -->
+            <div class="flex items-center space-x-3">
+                <input type="checkbox" id="use_tls" name="use_tls"
+                    {{ 'checked' if config_email and config_email.use_tls else 'checked' }}
+                    class="w-5 h-5 rounded bg-white/10 border-white/20 text-purple-500 focus:ring-2 focus:ring-purple-400/50">
+                <label for="use_tls" class="text-white">Utiliser TLS (recommandé)</label>
+            </div>
+
+            <!-- Boutons -->
+            <div class="flex items-center space-x-4 pt-6">
+                <button type="submit"
+                    class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-purple-500/30 flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>Enregistrer la configuration</span>
+                </button>
+
+                <button type="button" onclick="testEmailConfig()"
+                    class="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white rounded-xl font-medium transition-all border border-white/20 flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span>Tester la configuration</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Aide -->
+    <div class="glass-card p-6 mt-6">
+        <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-green-400/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-white">Configuration Gmail</h3>
+        </div>
+        <div class="text-white/70 space-y-2">
+            <p>Pour utiliser Gmail, vous devez activer l'authentification à deux facteurs et créer un mot de passe d'application :</p>
+            <ol class="list-decimal list-inside space-y-1 ml-4">
+                <li>Activez la vérification en deux étapes sur votre compte Google</li>
+                <li>Allez dans les paramètres de sécurité de votre compte Google</li>
+                <li>Créez un "Mot de passe d'application" pour "Mail"</li>
+                <li>Utilisez ce mot de passe d'application dans le champ ci-dessus</li>
+            </ol>
+            <p class="mt-4">Serveur SMTP : <code class="px-2 py-1 bg-white/10 rounded">smtp.gmail.com</code></p>
+            <p>Port : <code class="px-2 py-1 bg-white/10 rounded">587</code> (TLS)</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('emailConfigForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = {
+        smtp_server: formData.get('smtp_server'),
+        smtp_port: parseInt(formData.get('smtp_port')),
+        email_address: formData.get('email_address'),
+        email_password: formData.get('email_password'),
+        default_sender: formData.get('default_sender'),
+        use_tls: document.getElementById('use_tls').checked
+    };
+
+    try {
+        const response = await fetch('/api/config-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            showNotification('Configuration enregistrée avec succès', 'success');
+        } else {
+            const error = await response.json();
+            showNotification('Erreur: ' + error.message, 'error');
+        }
+    } catch (error) {
+        showNotification('Erreur lors de l\'enregistrement', 'error');
+    }
+});
+
+async function testEmailConfig() {
+    const formData = new FormData(document.getElementById('emailConfigForm'));
+    const data = {
+        smtp_server: formData.get('smtp_server'),
+        smtp_port: parseInt(formData.get('smtp_port')),
+        email_address: formData.get('email_address'),
+        email_password: formData.get('email_password'),
+        use_tls: document.getElementById('use_tls').checked
+    };
+
+    try {
+        showNotification('Test de la configuration en cours...', 'info');
+
+        const response = await fetch('/api/test-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        const rawText = await response.text();
+        let result = null;
+
+        try {
+            result = rawText ? JSON.parse(rawText) : {};
+        } catch (e) {
+            const snippet = (rawText || '').replace(/\s+/g, ' ').slice(0, 180);
+            result = {
+                success: false,
+                message: snippet ? `Réponse non JSON (HTTP ${response.status}): ${snippet}` : `Réponse serveur invalide (HTTP ${response.status})`
+            };
+        }
+
+        if (response.ok && result.success) {
+            showNotification(result.message || 'Test réussi ! Un email de test a été envoyé.', 'success');
+            return;
+        }
+
+        const message = result.message || result.error || `Erreur HTTP ${response.status}`;
+        showNotification('Échec du test: ' + message, 'error');
+    } catch (error) {
+        showNotification('Erreur lors du test de connexion', 'error');
+    }
+}
+</script>
+{% endblock %}
