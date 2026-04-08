@@ -25,7 +25,7 @@ from urllib.error import URLError, HTTPError
 UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.2.3.6"
+CURRENT_VERSION = "2.2.3.7"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
@@ -337,15 +337,21 @@ class AutoUpdater:
             headers = {'User-Agent': f'BayBay/{self.current_version}'}
             request = Request(download_url, headers=headers)
 
-            with urlopen(request, timeout=120) as response:
+            with urlopen(request, timeout=300) as response:  # 5 min timeout pour gros fichiers
                 total_size = int(response.headers.get('Content-Length', 0))
                 log_debug(f"[AutoUpdater] Taille totale: {total_size / 1024 / 1024:.2f} MB")
                 downloaded = 0
-                chunk_size = 65536  # 64KB chunks pour plus de rapidité
+                chunk_size = 131072  # 128KB chunks pour plus de rapidité
+                last_log_percent = 0
 
                 with open(setup_path, 'wb') as f:
                     while True:
-                        chunk = response.read(chunk_size)
+                        try:
+                            chunk = response.read(chunk_size)
+                        except Exception as e:
+                            log_debug(f"[AutoUpdater] Erreur lecture chunk: {e}")
+                            raise
+
                         if not chunk:
                             break
                         f.write(chunk)
@@ -354,6 +360,11 @@ class AutoUpdater:
                         if total_size > 0:
                             percent = (downloaded / total_size) * 100
                             self.update_status['progress'] = percent
+
+                            # Logger tous les 10%
+                            if int(percent / 10) > int(last_log_percent / 10):
+                                log_debug(f"[AutoUpdater] Telechargement: {percent:.1f}% ({downloaded / 1024 / 1024:.1f} / {total_size / 1024 / 1024:.1f} MB)")
+                                last_log_percent = percent
 
                             if progress_callback:
                                 progress_callback(downloaded, total_size)
@@ -622,13 +633,19 @@ def register_update_routes(app):
         silent_install = data.get('silent', True)
         log_debug(f"[API] silent_install = {silent_install}")
 
-        # Lancer la mise à jour dans un thread
+        # Lancer la mise à jour dans un thread NON-daemon pour qu'il survive
         def do_update():
             log_debug("[API] Thread de mise a jour demarre")
-            updater.perform_update(silent_install=silent_install)
+            try:
+                updater.perform_update(silent_install=silent_install)
+            except Exception as e:
+                log_debug(f"[API] ERREUR dans thread update: {e}")
+                log_debug(f"[API] Traceback: {traceback.format_exc()}")
 
-        thread = threading.Thread(target=do_update, daemon=True)
+        # IMPORTANT: daemon=False pour que le thread survive au retour de l'API
+        thread = threading.Thread(target=do_update, daemon=False)
         thread.start()
+        log_debug(f"[API] Thread demarre avec daemon=False")
 
         return jsonify({
             'success': True,

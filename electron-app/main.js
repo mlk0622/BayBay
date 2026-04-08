@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.2.3.6';
+const APP_VERSION = '2.2.3.7';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -91,6 +91,17 @@ function checkForUpdatesViaBackend() {
 function triggerUpdate() {
     log('Déclenchement de la mise à jour...');
 
+    // Afficher une notification que le téléchargement commence
+    if (mainWindow) {
+        dialog.showMessageBox(mainWindow, {
+            type: 'info',
+            title: 'Téléchargement en cours',
+            message: 'Téléchargement de la mise à jour...',
+            detail: 'Le téléchargement peut prendre plusieurs minutes selon votre connexion.\nL\'application va se fermer automatiquement pour installer la mise à jour.',
+            buttons: ['OK']
+        });
+    }
+
     const postData = JSON.stringify({ silent: false });
 
     const options = {
@@ -102,7 +113,7 @@ function triggerUpdate() {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(postData)
         },
-        timeout: 30000
+        timeout: 600000  // 10 minutes timeout pour gros fichiers
     };
 
     const req = http.request(options, (res) => {
@@ -119,7 +130,7 @@ function triggerUpdate() {
 
                 if (result.success) {
                     // La mise à jour est lancée, le backend va fermer l'application
-                    log('Mise à jour lancée, fermeture de l\'application...');
+                    log('Mise à jour lancée, l\'application va se fermer...');
                 } else {
                     dialog.showErrorBox('Erreur de mise à jour', result.message || 'Impossible de lancer la mise à jour');
                 }
@@ -132,6 +143,11 @@ function triggerUpdate() {
     req.on('error', (error) => {
         log(`Erreur lors du déclenchement de la mise à jour: ${error.message}`);
         dialog.showErrorBox('Erreur de mise à jour', error.message);
+    });
+
+    req.on('timeout', () => {
+        req.destroy();
+        log('Timeout lors du téléchargement de la mise à jour');
     });
 
     req.write(postData);
