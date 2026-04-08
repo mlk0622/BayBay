@@ -25,14 +25,14 @@
 ### Initialisation du thème (mode sombre par défaut)
 ```javascript
 (function initTheme() {
-    const savedTheme = localStorage.getItem('gestloc-theme');
+    const savedTheme = localStorage.getItem('baybay-theme');
     if (savedTheme) {
         document.documentElement.setAttribute('data-theme', savedTheme);
         return;
     }
     // Mode sombre par défaut
     document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('gestloc-theme', 'dark');
+    localStorage.setItem('baybay-theme', 'dark');
 })();
 ```
 
@@ -65,7 +65,7 @@ document.getElementById('themeToggle')?.addEventListener('click', function () {
     const current = document.documentElement.getAttribute('data-theme') || 'dark';
     const next = current === 'light' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('gestloc-theme', next);
+    localStorage.setItem('baybay-theme', next);
     updateThemeIcon();
 });
 ```

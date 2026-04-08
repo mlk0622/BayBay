@@ -337,7 +337,7 @@ function createMainWindow() {
 
     mainWindow.setMenuBarVisibility(false);
 
-    Menu.setApplicationMenu(Menu.buildFromTemplate([
+    /* Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
             label: 'Bay Bay',
             submenu: [
@@ -395,7 +395,9 @@ function createMainWindow() {
                 }
             ]
         }
-    ]));
+    ]));*/
+
+    Menu.setApplicationMenu(null);
 
     return mainWindow;
 }

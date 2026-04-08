@@ -1,5 +1,5 @@
 // =====================================================
-// GestLoc - Application JavaScript
+// BayBay - Application JavaScript
 // =====================================================
 
 // Modal functions

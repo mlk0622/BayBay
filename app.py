@@ -2071,7 +2071,7 @@ def test_email():
             email_expediteur,
             mot_de_passe,
             email_test,
-            "Test de configuration email - GestLoc",
+            "Test de configuration email - BayBay",
             "<p>Test réussi !</p><p>Votre configuration email fonctionne correctement.</p>",
             serveur=serveur_smtp,
             port=port_smtp,
