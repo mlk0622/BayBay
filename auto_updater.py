@@ -21,11 +21,11 @@ from urllib.error import URLError, HTTPError
 
 # ========== CONFIGURATION ==========
 
-# URL du serveur de mise à jour GitHub (liste des releases, pas /latest qui peut retourner 404)
-UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases"
+# URL du serveur de mise à jour GitHub (endpoint /latest pour obtenir la derniere release)
+UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases/latest"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.2.3.8"
+CURRENT_VERSION = "2.4.5"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
@@ -544,12 +544,33 @@ class AutoUpdater:
 
         self.update_status['message'] = 'Lancement de l\'installation...'
 
-        # Lancer le script en mode détaché
-        subprocess.Popen(
-            update_script,
-            shell=True,
-            creationflags=subprocess.CREATE_NEW_CONSOLE | subprocess.DETACHED_PROCESS
-        )
+        # Lancer le script en mode détaché avec une nouvelle console
+        # Note: CREATE_NEW_CONSOLE et DETACHED_PROCESS sont incompatibles
+        # Utiliser seulement CREATE_NEW_CONSOLE pour voir la fenêtre de mise à jour
+        try:
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = 1  # SW_SHOWNORMAL
+
+            subprocess.Popen(
+                ['cmd.exe', '/c', update_script],
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+                startupinfo=startupinfo,
+                close_fds=True
+            )
+            log_debug("[AutoUpdater] Script lance avec succes")
+        except Exception as e:
+            log_debug(f"[AutoUpdater] Erreur lancement script: {e}")
+            log_debug(f"[AutoUpdater] Traceback: {traceback.format_exc()}")
+            # Fallback: essayer avec os.startfile
+            try:
+                log_debug("[AutoUpdater] Tentative avec os.startfile...")
+                os.startfile(update_script)
+                log_debug("[AutoUpdater] os.startfile OK")
+            except Exception as e2:
+                log_debug(f"[AutoUpdater] Erreur os.startfile: {e2}")
+                self.update_status['error'] = str(e2)
+                return False
 
         log_debug("[AutoUpdater] Script lance, fermeture de l'application...")
         # Quitter l'application
