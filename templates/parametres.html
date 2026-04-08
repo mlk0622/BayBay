@@ -126,6 +126,25 @@
                 <label for="use_tls" class="text-white">Utiliser TLS (recommandé)</label>
             </div>
 
+            <!-- Modèle de test -->
+            <div>
+                <label for="test_email_modele" class="block text-sm font-medium text-white/70 mb-2">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        <span>Modèle du mail de test</span>
+                    </div>
+                </label>
+                <select id="test_email_modele" name="test_email_modele"
+                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all">
+                    <option value="standard">Standard</option>
+                    <option value="court">Court</option>
+                    <option value="rappel">Rappel</option>
+                </select>
+                <p class="mt-2 text-sm text-white/50">Le contenu du test changera selon le modèle choisi.</p>
+            </div>
+
             <!-- Boutons -->
             <div class="flex items-center space-x-4 pt-6">
                 <button type="submit"
@@ -212,7 +231,8 @@ async function testEmailConfig() {
         smtp_port: parseInt(formData.get('smtp_port')),
         email_address: formData.get('email_address'),
         email_password: formData.get('email_password'),
-        use_tls: document.getElementById('use_tls').checked
+            use_tls: document.getElementById('use_tls').checked,
+            modele_email: formData.get('test_email_modele')
     };
 
     try {

@@ -375,23 +375,23 @@ def _build_email_quittance(locataire, quittance, sci=None, modele_email='standar
     prenom = locataire.prenom or locataire.nom
 
     if modele_email == 'court':
-        sujet = f"Quittance - {periode}"
+        sujet = "Quittance - {{periode}}"
         corps = f"""
         <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-            <p>Bonjour {prenom},</p>
-            <p>Veuillez trouver votre quittance de loyer ({periode}) en pièce jointe.</p>
-            <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+            <p>Bonjour {{locataire_prenom}},</p>
+            <p>Veuillez trouver votre quittance de loyer (<strong>{{periode}}</strong>) en pièce jointe.</p>
+            <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
         </body></html>
         """
         return sujet, corps
 
-    sujet = f"Quittance de loyer - {periode}"
+    sujet = "Quittance de loyer - {{periode}}"
     corps = f"""
     <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-        <p>Bonjour {prenom} {locataire.nom},</p>
-        <p>Veuillez trouver ci-joint votre quittance de loyer pour <strong>{periode}</strong>.</p>
-        <p><strong>Montant payé :</strong> {format_currency(quittance.montant_paye)}</p>
-        <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+        <p>Bonjour {{locataire_prenom}} {{locataire_nom}},</p>
+        <p>Veuillez trouver ci-joint votre quittance de loyer pour <strong>{{periode}}</strong>.</p>
+        <p><strong>Montant payé :</strong> {{montant_paye}}</p>
+        <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
     </body></html>
     """
     return sujet, corps
@@ -405,30 +405,165 @@ def _build_email_appel(locataire, appel, sci=None, modele_email='standard'):
     echeance = format_date(appel.date_echeance) if appel.date_echeance else "Non définie"
 
     if modele_email == 'rappel':
-        sujet = f"Rappel - Appel de loyer {periode}"
+        sujet = "Rappel - Appel de loyer {{periode}}"
         corps = f"""
         <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-            <p>Bonjour {prenom},</p>
-            <p>Rappel de votre appel de loyer pour <strong>{periode}</strong>.</p>
-            <p><strong>Total à régler :</strong> {total}</p>
-            <p><strong>Date d'échéance :</strong> {echeance}</p>
+            <p>Bonjour {{locataire_prenom}},</p>
+            <p>Rappel de votre appel de loyer pour <strong>{{periode}}</strong>.</p>
+            <p><strong>Total à régler :</strong> {{total_avec_arrieres}}</p>
+            <p><strong>Date d'échéance :</strong> {{date_echeance}}</p>
             <p>Le détail est joint en PDF.</p>
-            <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+            <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
         </body></html>
         """
         return sujet, corps
 
-    sujet = f"Appel de loyer - {periode}"
+    sujet = "Appel de loyer - {{periode}}"
     corps = f"""
     <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-        <p>Bonjour {prenom} {locataire.nom},</p>
-        <p>Veuillez trouver ci-joint votre appel de loyer pour <strong>{periode}</strong>.</p>
-        <p><strong>Total à payer :</strong> {total}</p>
-        <p><strong>Date d'échéance :</strong> {echeance}</p>
-        <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+        <p>Bonjour {{locataire_prenom}} {{locataire_nom}},</p>
+        <p>Veuillez trouver ci-joint votre appel de loyer pour <strong>{{periode}}</strong>.</p>
+        <p><strong>Total à payer :</strong> {{total_avec_arrieres}}</p>
+        <p><strong>Date d'échéance :</strong> {{date_echeance}}</p>
+        <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
     </body></html>
     """
     return sujet, corps
+
+
+def _normalize_modele_email(modele_email, default='standard'):
+    modele = (modele_email or default)
+    if not isinstance(modele, str):
+        return default
+    modele = modele.strip().lower()
+    return modele if modele in ('standard', 'court', 'rappel') else default
+
+
+def _safe_text(value, default=''):
+    if value is None:
+        return default
+    if isinstance(value, Decimal):
+        return format_currency(value)
+    if isinstance(value, datetime):
+        return format_datetime(value)
+    if isinstance(value, date):
+        return format_date(value)
+    return str(value)
+
+
+def _build_email_variable_context(locataire=None, appel=None, quittance=None, sci=None, config=None):
+    appartement = locataire.appartement if locataire and locataire.appartement else None
+    bien = appartement.bien if appartement and getattr(appartement, 'bien', None) else None
+
+    if not sci and bien:
+        sci = bien.sci if getattr(bien, 'sci', None) else None
+
+    periode = ''
+    mois = ''
+    annee = ''
+    total = Decimal('0.00')
+    total_avec_arrieres = Decimal('0.00')
+    arrieres = Decimal('0.00')
+    date_echeance = None
+    date_paiement = None
+    date_emission = None
+    montant_paye = Decimal('0.00')
+
+    if appel:
+        mois = appel.mois
+        annee = appel.annee
+        periode = f"{MOIS_FR.get(appel.mois, appel.mois)} {appel.annee}"
+        total = Decimal(str(appel.total or 0))
+        total_avec_arrieres = Decimal(str(appel.total_avec_arrieres or 0))
+        arrieres = Decimal(str(appel.arrieres or 0))
+        date_echeance = appel.date_echeance
+        date_emission = appel.date_emission
+
+    if quittance:
+        mois = quittance.mois
+        annee = quittance.annee
+        periode = f"{MOIS_FR.get(quittance.mois, quittance.mois)} {quittance.annee}"
+        total = Decimal(str(quittance.total or 0))
+        montant_paye = Decimal(str(quittance.montant_paye or 0))
+        date_paiement = quittance.date_paiement
+        date_emission = quittance.date_emission
+
+    return {
+        'locataire_prenom': getattr(locataire, 'prenom', '') or '',
+        'locataire_nom': getattr(locataire, 'nom', '') or '',
+        'locataire_nom_complet': getattr(locataire, 'nom_complet', '') or '',
+        'locataire_email': getattr(locataire, 'email', '') or '',
+        'locataire_telephone': getattr(locataire, 'telephone', '') or '',
+        'locataire_adresse_precedente': getattr(locataire, 'adresse_precedente', '') or '',
+        'locataire_total_mensuel': _safe_text(getattr(locataire, 'total_mensuel', None)),
+        'locataire_loyer_actuel': _safe_text(getattr(locataire, 'loyer_actuel', None)),
+        'locataire_charges_actuelles': _safe_text(getattr(locataire, 'charges_actuelles', None)),
+        'locataire_date_debut_bail': _safe_text(getattr(locataire, 'date_debut_bail', None)),
+        'locataire_date_fin_bail': _safe_text(getattr(locataire, 'date_fin_bail', None)),
+        'appartement_numero_porte': getattr(appartement, 'numero_porte', '') or '',
+        'appartement_type': getattr(appartement, 'type_appartement', '') or '',
+        'appartement_surface': _safe_text(getattr(appartement, 'surface', None)),
+        'appartement_loyer_mensuel': _safe_text(getattr(appartement, 'loyer_mensuel', None)),
+        'appartement_charges': _safe_text(getattr(appartement, 'charges', None)),
+        'appartement_etage': getattr(appartement, 'etage', '') or '',
+        'bien_adresse': getattr(bien, 'adresse', '') or '',
+        'bien_code_postal': getattr(bien, 'code_postal', '') or '',
+        'bien_ville': getattr(bien, 'ville', '') or '',
+        'bien_type_bien': getattr(bien, 'type_bien', '') or '',
+        'sci_nom': getattr(sci, 'nom', '') or '',
+        'sci_adresse': getattr(sci, 'adresse', '') or '',
+        'sci_code_postal': getattr(sci, 'code_postal', '') or '',
+        'sci_ville': getattr(sci, 'ville', '') or '',
+        'sci_email': getattr(sci, 'email', '') or '',
+        'periode': periode,
+        'mois': mois,
+        'annee': annee,
+        'total': _safe_text(total),
+        'total_avec_arrieres': _safe_text(total_avec_arrieres),
+        'arrieres': _safe_text(arrieres),
+        'date_echeance': _safe_text(date_echeance),
+        'date_paiement': _safe_text(date_paiement),
+        'date_emission': _safe_text(date_emission),
+        'montant_paye': _safe_text(montant_paye),
+        'email_expediteur': getattr(config, 'email_expediteur', '') if config else '',
+    }
+
+
+def _render_email_template(template_text, context):
+    if not template_text:
+        return ''
+
+    pattern = re.compile(r'\{\{\s*([a-zA-Z0-9_]+)\s*\}\}')
+
+    def replace(match):
+        key = match.group(1)
+        return html.escape(str(context.get(key, '')))
+
+    return pattern.sub(replace, template_text)
+
+
+def _build_email_test(modele_email='standard'):
+    modele_email = _normalize_modele_email(modele_email)
+
+    if modele_email == 'court':
+        sujet = "Test email - version courte"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test de configuration email en mode court pour <strong>{{email_expediteur}}</strong>.</p><p>Cordialement.</p></body></html>"
+    elif modele_email == 'rappel':
+        sujet = "Test email - rappel"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test de configuration email en mode rappel depuis <strong>{{email_expediteur}}</strong>.</p><p>Ce message vérifie simplement l'envoi SMTP.</p><p>Cordialement.</p></body></html>"
+    else:
+        sujet = "Test de configuration email - BayBay"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test réussi !</p><p>Votre configuration email fonctionne correctement pour <strong>{{email_expediteur}}</strong>.</p></body></html>"
+
+    return sujet, corps
+
+
+def _render_email_preview_payload(sujet, corps, context):
+    return {
+        'success': True,
+        'subject': _render_email_template(sujet, context),
+        'body': _render_email_template(corps, context)
+    }
 
 
 def _generate_quittance_pdf_file(quittance, force_regenerate=False):
@@ -1989,6 +2124,10 @@ def envoyer_quittance_email(quittance_id):
     if (data.get('corps') or '').strip():
         corps = data.get('corps').strip()
 
+    email_context = _build_email_variable_context(locataire=locataire, quittance=quittance, sci=sci, config=config)
+    sujet = _render_email_template(sujet, email_context)
+    corps = _render_email_template(corps, email_context)
+
     # Envoyer l'email
     success, message = envoyer_email(
         config.email_expediteur,
@@ -2008,6 +2147,27 @@ def envoyer_quittance_email(quittance_id):
         return jsonify({'success': True, 'message': 'Quittance envoyée par email'})
     else:
         return jsonify({'success': False, 'error': message}), 500
+
+
+@app.route('/api/quittance/<int:quittance_id>/preview-email', methods=['POST'])
+def preview_quittance_email(quittance_id):
+    data = request.get_json(silent=True) or {}
+    quittance = Quittance.query.get_or_404(quittance_id)
+    locataire = quittance.locataire
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_quittance(locataire, quittance, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, quittance=quittance, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
 # Configuration email
 @app.route('/api/config-email', methods=['POST'])
@@ -2051,6 +2211,7 @@ def test_email():
         mot_de_passe = data.get('mot_de_passe') or data.get('email_password')
         serveur_smtp = data.get('serveur_smtp') or data.get('smtp_server') or 'smtp.gmail.com'
         email_test = data.get('email_test') or email_expediteur
+        modele_email = _normalize_modele_email(data.get('modele_email'))
 
         port_value = data.get('port_smtp') or data.get('smtp_port') or 587
         try:
@@ -2067,12 +2228,23 @@ def test_email():
         if not email_expediteur or not mot_de_passe:
             return jsonify({'success': False, 'message': 'Email expéditeur et mot de passe obligatoires'}), 400
 
+        sujet, corps = _build_email_test(modele_email)
+        if (data.get('sujet') or '').strip():
+            sujet = data.get('sujet').strip()
+        if (data.get('corps') or '').strip():
+            corps = data.get('corps').strip()
+
+        config_context = SimpleNamespace(email_expediteur=email_expediteur)
+        email_context = _build_email_variable_context(config=config_context)
+        sujet = _render_email_template(sujet, email_context)
+        corps = _render_email_template(corps, email_context)
+
         success, message = envoyer_email(
             email_expediteur,
             mot_de_passe,
             email_test,
-            "Test de configuration email - BayBay",
-            "<p>Test réussi !</p><p>Votre configuration email fonctionne correctement.</p>",
+            sujet,
+            corps,
             serveur=serveur_smtp,
             port=port_smtp,
             use_tls=use_tls
@@ -2124,6 +2296,7 @@ def delete_programmation_appel(prog_id):
 @app.route('/api/programmation-appel/<int:prog_id>/send', methods=['POST'])
 def send_programmation_now(prog_id):
     prog = ProgrammationAppel.query.get_or_404(prog_id)
+    data = request.get_json(silent=True) or {}
     locataires = prog.get_locataires()
     config = ConfigEmail.query.first()
 
@@ -2182,8 +2355,16 @@ def send_programmation_now(prog_id):
         bien = appartement.bien if appartement else None
         sci = bien.sci if bien else None
 
-        # Utiliser le builder d'email standard
-        sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email='standard')
+        modele_email = _normalize_modele_email(data.get('modele_email'))
+        sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+        if (data.get('sujet') or '').strip():
+            sujet = data.get('sujet').strip()
+        if (data.get('corps') or '').strip():
+            corps = data.get('corps').strip()
+
+        email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+        sujet = _render_email_template(sujet, email_context)
+        corps = _render_email_template(corps, email_context)
 
         # Envoyer l'email avec le PDF en pièce jointe
         success, message = envoyer_email(
@@ -2226,6 +2407,53 @@ def send_programmation_now(prog_id):
         }
     })
 
+
+@app.route('/api/programmation-appel/<int:prog_id>/preview-email', methods=['POST'])
+def preview_programmation_email(prog_id):
+    data = request.get_json(silent=True) or {}
+    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    locataires = prog.get_locataires()
+
+    if not locataires:
+        return jsonify({'success': False, 'message': 'Aucun locataire trouvé pour cette programmation'}), 400
+
+    locataire = locataires[0]
+    if not locataire.appartement:
+        return jsonify({'success': False, 'message': 'Le locataire sélectionné n\'a pas d\'appartement'}), 400
+
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    mois = prog.mois
+    annee = prog.annee
+    appel = AppelLoyer.query.filter_by(locataire_id=locataire.id, mois=mois, annee=annee).first()
+
+    if not appel:
+        arrieres = locataire.get_arrieres(mois, annee)
+        appel = SimpleNamespace(
+            mois=mois,
+            annee=annee,
+            loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+            charges=locataire.charges_actuelles or Decimal('0.00'),
+            arrieres=arrieres,
+            date_echeance=date(annee, mois, 5),
+            date_emission=date.today(),
+            total=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')),
+            total_avec_arrieres=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')) + arrieres,
+        )
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
+
 # Envoyer appel par email
 @app.route('/api/appel-loyer/<int:appel_id>/envoyer', methods=['POST'])
 def envoyer_appel_email(appel_id):
@@ -2257,6 +2485,10 @@ def envoyer_appel_email(appel_id):
     if (data.get('corps') or '').strip():
         corps = data.get('corps').strip()
 
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    sujet = _render_email_template(sujet, email_context)
+    corps = _render_email_template(corps, email_context)
+
     success, message = envoyer_email(
         config.email_expediteur,
         config.mot_de_passe,
@@ -2274,6 +2506,27 @@ def envoyer_appel_email(appel_id):
     if success:
         return jsonify({'success': True, 'message': 'Appel de loyer envoyé par email'})
     return jsonify({'success': False, 'error': message}), 500
+
+
+@app.route('/api/appel-loyer/<int:appel_id>/preview-email', methods=['POST'])
+def preview_appel_email(appel_id):
+    data = request.get_json(silent=True) or {}
+    appel = AppelLoyer.query.get_or_404(appel_id)
+    locataire = appel.locataire
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
 # Generate all appels for current month
 @app.route('/api/generate-all-appels', methods=['POST'])

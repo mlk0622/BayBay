@@ -19,6 +19,22 @@ function closeModal(modalId) {
     }
 }
 
+function closeEmailPreviewModal() {
+    closeModal('emailPreviewModal');
+}
+
+function openEmailPreviewModal(title, subject, bodyHtml) {
+    const modalTitle = document.getElementById('emailPreviewTitle');
+    const modalSubject = document.getElementById('emailPreviewSubject');
+    const previewFrame = document.getElementById('emailPreviewFrame');
+
+    if (modalTitle) modalTitle.textContent = title || 'Aperçu du mail';
+    if (modalSubject) modalSubject.textContent = subject || '';
+    if (previewFrame) previewFrame.srcdoc = bodyHtml || '<html><body style="font-family:Arial,sans-serif;padding:24px;">Aucun contenu à afficher.</body></html>';
+
+    openModal('emailPreviewModal');
+}
+
 // Fonction pour ouvrir le modal d'édition de SCI
 async function openEditSciModal(sciId) {
     try {
