@@ -5,7 +5,7 @@ Bay Bay - Système d'Auto-Update
 ==========================================
 Ce module gère les mises à jour automatiques de l'application.
 Télécharge le Setup.exe depuis GitHub et lance la réinstallation.
-Les données utilisateur dans %APPDATA%\BayBay sont préservées.
+Les données utilisateur dans %APPDATA%/BayBay sont préservées.
 """
 
 import os
@@ -20,11 +20,11 @@ from urllib.error import URLError, HTTPError
 
 # ========== CONFIGURATION ==========
 
-# URL du serveur de mise à jour GitHub
-UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases/latest"
+# URL du serveur de mise à jour GitHub (liste des releases, pas /latest qui peut retourner 404)
+UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.3.3.1"
+CURRENT_VERSION = "2.3.3.2"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
@@ -128,7 +128,7 @@ class AutoUpdater:
 
         try:
             if not silent:
-                print("🔍 Vérification des mises à jour sur GitHub...")
+                print("[AutoUpdater] Verification des mises a jour sur GitHub...")
 
             # Requête vers l'API GitHub Releases
             headers = {
@@ -138,7 +138,27 @@ class AutoUpdater:
             request = Request(self.server_url, headers=headers)
 
             with urlopen(request, timeout=15) as response:
-                data = json.loads(response.read().decode('utf-8'))
+                releases = json.loads(response.read().decode('utf-8'))
+
+            # Trouver la première release non-draft et non-prerelease
+            data = None
+            if isinstance(releases, list):
+                for release in releases:
+                    if not release.get('draft', False) and not release.get('prerelease', False):
+                        data = release
+                        break
+                # Si aucune release stable, prendre la première
+                if not data and releases:
+                    data = releases[0]
+            elif isinstance(releases, dict):
+                # Si c'est directement un objet (ancien format /latest)
+                data = releases
+
+            if not data:
+                if not silent:
+                    print("[AutoUpdater] Aucune release trouvee")
+                self.update_status['checking'] = False
+                return None
 
             # Parser la réponse GitHub Releases
             if 'tag_name' in data:
@@ -147,23 +167,40 @@ class AutoUpdater:
                 release_notes = data.get('body', '')
                 asset_name = None
 
+                if not silent:
+                    print(f"[AutoUpdater] Release trouvee: {remote_version}")
+
                 # Chercher le fichier Setup.exe dans les assets
+                # Formats supportés: "Bay Bay Setup X.X.X.exe", "Bay.Bay.Setup.X.X.X.exe", etc.
                 for asset in data.get('assets', []):
                     name = asset['name'].lower()
-                    # Priorité: fichier Setup ou installer .exe
+                    # Fichier .exe contenant "setup" ou "install"
                     if name.endswith('.exe') and ('setup' in name or 'install' in name):
                         download_url = asset['browser_download_url']
                         asset_name = asset['name']
-                        print(f"[AutoUpdater] Asset Setup trouvé: {asset['name']}")
+                        if not silent:
+                            print(f"[AutoUpdater] Asset Setup trouve: {asset['name']}")
                         break
 
-                # Si pas de setup explicite, prendre le premier .exe
+                # Si pas de setup explicite, chercher un .exe contenant "baybay" ou "bay.bay"
+                if not download_url:
+                    for asset in data.get('assets', []):
+                        name = asset['name'].lower()
+                        if name.endswith('.exe') and ('baybay' in name or 'bay.bay' in name or 'bay bay' in name):
+                            download_url = asset['browser_download_url']
+                            asset_name = asset['name']
+                            if not silent:
+                                print(f"[AutoUpdater] Asset BayBay exe trouve: {asset['name']}")
+                            break
+
+                # En dernier recours, prendre le premier .exe
                 if not download_url:
                     for asset in data.get('assets', []):
                         if asset['name'].lower().endswith('.exe'):
                             download_url = asset['browser_download_url']
                             asset_name = asset['name']
-                            print(f"[AutoUpdater] Asset exe trouvé: {asset['name']}")
+                            if not silent:
+                                print(f"[AutoUpdater] Asset exe trouve: {asset['name']}")
                             break
 
                 is_newer = self._is_newer_version(remote_version)
@@ -184,9 +221,9 @@ class AutoUpdater:
 
                 if not silent:
                     if is_newer:
-                        print(f"✅ Mise à jour disponible: {remote_version} (actuelle: {self.current_version})")
+                        print(f"[AutoUpdater] Mise a jour disponible: {remote_version} (actuelle: {self.current_version})")
                     else:
-                        print(f"✅ Application à jour (v{self.current_version})")
+                        print(f"[AutoUpdater] Application a jour (v{self.current_version})")
 
                 self.update_status['checking'] = False
                 return update_info
@@ -197,21 +234,21 @@ class AutoUpdater:
         except HTTPError as e:
             error_msg = f"Erreur HTTP: {e.code}"
             if not silent:
-                print(f"❌ {error_msg}")
+                print(f"[AutoUpdater] {error_msg}")
             self.update_status['error'] = error_msg
             self.update_status['checking'] = False
             return None
         except URLError as e:
-            error_msg = f"Erreur réseau: {e.reason}"
+            error_msg = f"Erreur reseau: {e.reason}"
             if not silent:
-                print(f"❌ {error_msg}")
+                print(f"[AutoUpdater] {error_msg}")
             self.update_status['error'] = error_msg
             self.update_status['checking'] = False
             return None
         except Exception as e:
             error_msg = f"Erreur: {e}"
             if not silent:
-                print(f"❌ {error_msg}")
+                print(f"[AutoUpdater] {error_msg}")
             self.update_status['error'] = error_msg
             self.update_status['checking'] = False
             return None

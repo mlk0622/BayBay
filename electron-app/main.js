@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.3.3.1';
+const APP_VERSION = '2.3.3.2';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -407,10 +407,8 @@ app.whenReady().then(async () => {
         log('Backend démarré avec succès');
         createMainWindow();
 
-        // Vérifier les mises à jour après un délai (laisser l'interface se charger)
-        setTimeout(() => {
-            checkForUpdatesViaBackend();
-        }, 5000);
+        // Vérifier les mises à jour immédiatement après le démarrage
+        checkForUpdatesViaBackend();
     } catch (error) {
         log(`Erreur de démarrage: ${error.message}`);
 
