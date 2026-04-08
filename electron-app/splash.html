@@ -170,7 +170,7 @@
         <div class="logo-container">
             <div class="icon">🏠</div>
             <div class="title">Bay Bay</div>
-            <div class="version">Version 2.4.6.8.8.7.6.5.4.3.2.1</div>
+            <div class="version"></div>
         </div>
         <div class="loading">
             <div class="progress-container">
@@ -179,5 +179,11 @@
             <div class="loading-text">Chargement<span class="dots"></span></div>
         </div>
     </div>
+
+    <script>
+    const params = new URLSearchParams(window.location.search);
+    const version = params.get('version') || 'inconnue';
+    document.querySelector('.version').textContent = `Version ${version}`;
+    </script>
 </body>
 </html>

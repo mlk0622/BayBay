@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.4.6';
+const APP_VERSION = app.getVersion();
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -188,7 +188,7 @@ function createSplashWindow() {
         }
     });
 
-    splashWindow.loadFile('splash.html');
+    splashWindow.loadFile('splash.html', { query: { version: app.getVersion() } });
 
     splashWindow.on('closed', () => {
         splashWindow = null;

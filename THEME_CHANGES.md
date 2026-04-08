@@ -81,7 +81,7 @@ document.getElementById('themeToggle')?.addEventListener('click', function () {
 
 Pour appliquer les modifications :
 ```batch
-BUILD_ELECTRON.bat
+build.bat
 ```
 
 Les fichiers générés auront le thème sombre par défaut.
