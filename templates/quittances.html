@@ -38,7 +38,10 @@
                 <tbody>
                     {% for q in quittances %}
                     <tr>
-                        <td class="font-medium text-white">{{ MOIS_FR[q.mois] }} {{ q.annee }}</td>
+                        <td class="font-medium text-white">
+                            {{ MOIS_FR[q.mois] }} {{ q.annee }}
+                            <div class="text-xs text-white/60 mt-1">Ref: {{ q.public_ref }}</div>
+                        </td>
                         <td class="text-white">{{ q.locataire.nom_complet }}</td>
                         <td class="text-white">{{ q.loyer_hc|currency }}</td>
                         <td class="text-white/70">{{ q.charges|currency }}</td>
@@ -48,11 +51,11 @@
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
                                 {% if q.locataire.email %}
-                                <button onclick="openQuittanceEmailModal({{ q.id }})" class="action-btn email" title="Envoyer par email">
+                                <button onclick="openQuittanceEmailModal({{ q.id }}, '{{ q.public_ref }}')" class="action-btn email" title="Envoyer par email">
                                     <i class="fas fa-envelope"></i>
                                 </button>
                                 {% endif %}
-                                <a href="/api/quittance/{{ q.id }}/pdf" target="_blank" class="action-btn pdf" title="PDF">
+                                <a href="/quittance/document/{{ q.public_ref }}/pdf" target="_blank" class="action-btn pdf" title="PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>
                                 <button onclick="showDeleteModal('quittance', {{ q.id }}, 'Quittance {{ MOIS_FR[q.mois] }} {{ q.annee }}')" class="action-btn delete" title="Supprimer">
@@ -97,6 +100,16 @@
         <div>
             <label class="block text-sm text-white/80 mb-2">Sujet</label>
             <input id="quittanceEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/15 bg-black/25 px-3 py-2">
+            <label class="inline-flex items-center gap-2 text-sm text-white/90 cursor-pointer">
+                <input id="quittanceEmailIncludePdf" type="checkbox" class="accent-blue-500" checked>
+                <span>Joindre le PDF de la quittance</span>
+            </label>
+            <button type="button" onclick="openQuittanceLinkedPdf()" class="px-3 py-1.5 rounded-lg border border-white/20 text-white/80 hover:text-white text-sm">
+                <i class="fas fa-file-pdf mr-2"></i>Voir le PDF lié
+            </button>
         </div>
 
         <div>
@@ -164,6 +177,9 @@ function openQuittanceModal() {
     document.getElementById('quittanceMois').value = {{ mois_actuel }};
     document.getElementById('quittanceAnnee').value = {{ annee_actuelle }};
     document.getElementById('quittanceDatePaiement').value = new Date().toISOString().split('T')[0];
+    if (window.resetQuittanceSignaturePad) {
+        window.resetQuittanceSignaturePad();
+    }
     openModal('quittanceModal');
 }
 
@@ -188,6 +204,7 @@ function openScheduleModal(type) {
 }
 
 let currentQuittanceEmailId = null;
+let currentQuittanceEmailRef = null;
 
 function applyQuittanceEmailTemplate() {
     const modele = document.getElementById('quittanceEmailModele').value;
@@ -202,11 +219,18 @@ function applyQuittanceEmailTemplate() {
     }
 }
 
-function openQuittanceEmailModal(quittanceId) {
+function openQuittanceEmailModal(quittanceId, quittanceRef) {
     currentQuittanceEmailId = quittanceId;
+    currentQuittanceEmailRef = quittanceRef;
     document.getElementById('quittanceEmailModele').value = 'standard';
+    document.getElementById('quittanceEmailIncludePdf').checked = true;
     applyQuittanceEmailTemplate();
     openModal('quittanceEmailModal');
+}
+
+function openQuittanceLinkedPdf() {
+    if (!currentQuittanceEmailRef) return;
+    window.open(`/quittance/document/${currentQuittanceEmailRef}/pdf`, '_blank');
 }
 
 async function sendQuittanceEmail() {
@@ -216,7 +240,8 @@ async function sendQuittanceEmail() {
         const payload = {
             modele_email: document.getElementById('quittanceEmailModele').value,
             sujet: document.getElementById('quittanceEmailSujet').value,
-            corps: getRichTextEditorValue('quittanceEmailCorps')
+            corps: getRichTextEditorValue('quittanceEmailCorps'),
+            include_pdf: document.getElementById('quittanceEmailIncludePdf').checked
         };
 
         const response = await fetch(`/api/quittance/${currentQuittanceEmailId}/envoyer`, {

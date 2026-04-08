@@ -148,6 +148,16 @@
             <input id="appelEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
         </div>
 
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/15 bg-black/25 px-3 py-2">
+            <label class="inline-flex items-center gap-2 text-sm text-white/90 cursor-pointer">
+                <input id="appelEmailIncludePdf" type="checkbox" class="accent-blue-500" checked>
+                <span>Joindre le PDF de l'appel</span>
+            </label>
+            <button type="button" onclick="openAppelLinkedPdf()" class="px-3 py-1.5 rounded-lg border border-white/20 text-white/80 hover:text-white text-sm">
+                <i class="fas fa-file-pdf mr-2"></i>Voir le PDF lié
+            </button>
+        </div>
+
         <div>
             <label class="block text-sm text-white/80 mb-2">Corps Mail</label>
             <div class="rich-editor-shell" data-target="appelEmailCorps">
@@ -230,8 +240,14 @@ function applyAppelEmailTemplate() {
 function openAppelEmailModal(appelId) {
     currentAppelEmailId = appelId;
     document.getElementById('appelEmailModele').value = 'standard';
+    document.getElementById('appelEmailIncludePdf').checked = true;
     applyAppelEmailTemplate();
     openModal('appelEmailModal');
+}
+
+function openAppelLinkedPdf() {
+    if (!currentAppelEmailId) return;
+    window.open(`/api/appel-loyer/${currentAppelEmailId}/pdf`, '_blank');
 }
 
 async function sendAppelEmail() {
@@ -241,7 +257,8 @@ async function sendAppelEmail() {
         const payload = {
             modele_email: document.getElementById('appelEmailModele').value,
             sujet: document.getElementById('appelEmailSujet').value,
-            corps: getRichTextEditorValue('appelEmailCorps')
+            corps: getRichTextEditorValue('appelEmailCorps'),
+            include_pdf: document.getElementById('appelEmailIncludePdf').checked
         };
 
         const response = await fetch(`/api/appel-loyer/${currentAppelEmailId}/envoyer`, {

@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, after_this_request
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, after_this_request, has_request_context
 import json
 import re
 import html
+import base64
+import hashlib
+import io
+import secrets
 from decimal import Decimal
 from datetime import datetime, date
 import os
@@ -12,6 +16,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from werkzeug.utils import secure_filename
+from sqlalchemy import text
 
 
 def get_user_data_dir():
@@ -76,8 +81,39 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'appels_loyer'), exist_ok=
 
 db.init_app(app)
 
+
+def _generate_quittance_public_ref():
+    return f"Q{secrets.token_hex(6).upper()}"
+
+
+def _ensure_quittance_public_ref_schema():
+    columns = db.session.execute(text('PRAGMA table_info(quittance)')).fetchall()
+    column_names = {row[1] for row in columns}
+    if 'public_ref' not in column_names:
+        db.session.execute(text('ALTER TABLE quittance ADD COLUMN public_ref VARCHAR(24)'))
+    db.session.execute(text('CREATE UNIQUE INDEX IF NOT EXISTS idx_quittance_public_ref ON quittance(public_ref)'))
+    db.session.commit()
+
+
+def _backfill_quittance_public_refs():
+    existing_refs = {ref for (ref,) in db.session.query(Quittance.public_ref).filter(Quittance.public_ref.isnot(None)).all()}
+    pending = Quittance.query.filter((Quittance.public_ref.is_(None)) | (Quittance.public_ref == '')).all()
+    if not pending:
+        return
+
+    for quittance in pending:
+        ref = _generate_quittance_public_ref()
+        while ref in existing_refs:
+            ref = _generate_quittance_public_ref()
+        quittance.public_ref = ref
+        existing_refs.add(ref)
+
+    db.session.commit()
+
 with app.app_context():
     db.create_all()
+    _ensure_quittance_public_ref_schema()
+    _backfill_quittance_public_refs()
 
 def format_currency(value):
     if value is None:
@@ -566,21 +602,169 @@ def _render_email_preview_payload(sujet, corps, context):
     }
 
 
-def _generate_quittance_pdf_file(quittance, force_regenerate=False):
+def _as_bool(value, default=True):
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in ('1', 'true', 'yes', 'on')
+    return bool(value)
+
+
+def _quittance_signature_path(quittance_id):
+    signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'quittances', 'signatures')
+    os.makedirs(signatures_dir, exist_ok=True)
+    return os.path.join(signatures_dir, f'quittance_signature_{quittance_id}.png')
+
+
+def _save_quittance_signature_data(quittance_id, signature_data_url):
+    if not signature_data_url:
+        return False, None
+
+    if not isinstance(signature_data_url, str) or not signature_data_url.startswith('data:image/png;base64,'):
+        return False, 'Format de signature invalide (PNG base64 attendu).'
+
+    encoded = signature_data_url.split(',', 1)[1]
+    try:
+        image_bytes = base64.b64decode(encoded)
+    except Exception:
+        return False, 'Signature non décodable.'
+
+    path = _quittance_signature_path(quittance_id)
+    with open(path, 'wb') as output:
+        output.write(image_bytes)
+    return True, None
+
+
+def _load_quittance_signature_data(quittance_id):
+    path = _quittance_signature_path(quittance_id)
+    if not os.path.exists(path):
+        return None, None
+
+    with open(path, 'rb') as image_file:
+        image_bytes = image_file.read()
+
+    encoded = base64.b64encode(image_bytes).decode('ascii')
+    return f'data:image/png;base64,{encoded}', hashlib.sha256(image_bytes).hexdigest()
+
+
+def _decorative_signature_path():
+    signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
+    os.makedirs(signatures_dir, exist_ok=True)
+    return os.path.join(signatures_dir, 'decorative_signature.png')
+
+
+def _save_decorative_signature_data(signature_data_url):
+    if not signature_data_url:
+        return False, None
+
+    if not isinstance(signature_data_url, str) or not signature_data_url.startswith('data:image/png;base64,'):
+        return False, 'Format de signature décorative invalide (PNG base64 attendu).'
+
+    encoded = signature_data_url.split(',', 1)[1]
+    try:
+        image_bytes = base64.b64decode(encoded)
+    except Exception:
+        return False, 'Signature décorative non décodable.'
+
+    with open(_decorative_signature_path(), 'wb') as output:
+        output.write(image_bytes)
+    return True, None
+
+
+def _load_decorative_signature_data():
+    path = _decorative_signature_path()
+    if not os.path.exists(path):
+        return None
+    with open(path, 'rb') as image_file:
+        image_bytes = image_file.read()
+    encoded = base64.b64encode(image_bytes).decode('ascii')
+    return f'data:image/png;base64,{encoded}'
+
+
+def _clear_decorative_signature_data():
+    path = _decorative_signature_path()
+    if os.path.exists(path):
+        os.remove(path)
+
+
+def _quittance_integrity_payload(quittance, signature_hash=''):
+    date_paiement = quittance.date_paiement.strftime('%Y-%m-%d') if quittance.date_paiement else ''
+    date_emission = quittance.date_emission.strftime('%Y-%m-%d') if quittance.date_emission else ''
+    public_ref = (quittance.public_ref or '').strip()
+    canonical = '|'.join([
+        str(quittance.id),
+        public_ref,
+        str(quittance.locataire_id),
+        str(quittance.mois),
+        str(quittance.annee),
+        str(quittance.loyer_hc),
+        str(quittance.charges),
+        str(quittance.montant_paye),
+        date_paiement,
+        date_emission,
+        signature_hash or ''
+    ])
+    digest = hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+    verification_id = f'{public_ref or "Q-UNKNOWN"}-{digest[:8].upper()}'
+    return verification_id, digest
+
+
+def _build_qr_data_url(text):
+    if not text:
+        return None
+    try:
+        import qrcode
+    except Exception:
+        return None
+
+    qr = qrcode.QRCode(version=1, box_size=5, border=2)
+    qr.add_data(text)
+    qr.make(fit=True)
+    image = qr.make_image(fill_color='black', back_color='white')
+    buffer = io.BytesIO()
+    image.save(buffer, format='PNG')
+    encoded = base64.b64encode(buffer.getvalue()).decode('ascii')
+    return f'data:image/png;base64,{encoded}'
+
+
+def _build_quittance_pdf_context(quittance):
     locataire = quittance.locataire
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    signature_data_url, signature_hash = _load_quittance_signature_data(quittance.id)
+    decorative_signature_data_url = _load_decorative_signature_data()
+    displayed_signature_data_url = signature_data_url or decorative_signature_data_url
+    verification_id, integrity_hash = _quittance_integrity_payload(quittance, signature_hash=signature_hash or '')
 
-    html_content = render_template(
-        'pdf/quittance.html',
-        quittance=quittance,
-        locataire=locataire,
-        appartement=appartement,
-        bien=bien,
-        sci=sci,
-        mois_fr=MOIS_FR
-    )
+    if has_request_context():
+        verification_url = f"{request.url_root.rstrip('/')}/quittance/verification/{quittance.public_ref}"
+    else:
+        verification_url = f"/quittance/verification/{quittance.public_ref}"
+
+    qr_data_url = _build_qr_data_url(verification_url)
+
+    return {
+        'quittance': quittance,
+        'locataire': locataire,
+        'appartement': appartement,
+        'bien': bien,
+        'sci': sci,
+        'mois_fr': MOIS_FR,
+        'signature_data_url': displayed_signature_data_url,
+        'has_approval_signature': bool(signature_data_url),
+        'document_reference': quittance.public_ref,
+        'verification_id': verification_id,
+        'integrity_hash': integrity_hash,
+        'verification_url': verification_url,
+        'verification_generated_at': datetime.now().strftime('%d/%m/%Y %H:%M'),
+        'qr_data_url': qr_data_url,
+    }
+
+
+def _generate_quittance_pdf_file(quittance, force_regenerate=False):
+    locataire = quittance.locataire
+    html_content = render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
 
     periode = f"{quittance.annee}_{quittance.mois:02d}"
     raw_name = f"quittance_{quittance.id}_{locataire.nom}_{locataire.prenom}_{periode}.pdf"
@@ -965,7 +1149,8 @@ def etats_lieux():
 @app.route('/parametres')
 def parametres():
     config_email = ConfigEmail.query.first()
-    return render_template('parametres.html', config_email=config_email)
+    decorative_signature_data_url = _load_decorative_signature_data()
+    return render_template('parametres.html', config_email=config_email, decorative_signature_data_url=decorative_signature_data_url)
 
 # API Routes
 @app.route('/api/sci', methods=['POST'])
@@ -2055,10 +2240,21 @@ def create_quittance():
         loyer_hc=loyer_hc,
         charges=charges,
         montant_paye=montant_paye,
+        public_ref=_generate_quittance_public_ref(),
         date_paiement=date_paiement
     )
+
+    while Quittance.query.filter_by(public_ref=quittance.public_ref).first() is not None:
+        quittance.public_ref = _generate_quittance_public_ref()
+
     db.session.add(quittance)
     db.session.commit()
+
+    signature_data = (data.get('signature_data') or '').strip()
+    if signature_data:
+        saved, signature_error = _save_quittance_signature_data(quittance.id, signature_data)
+        if not saved:
+            return jsonify({'success': False, 'error': signature_error or 'Signature invalide'}), 400
 
     # Genere le PDF local en arriere-plan applicatif des la creation.
     _generate_quittance_pdf_file(quittance, force_regenerate=True)
@@ -2072,20 +2268,50 @@ def create_quittance():
 
 @app.route('/api/quittance/<int:quittance_id>/pdf')
 def pdf_quittance(quittance_id):
+    return jsonify({
+        'success': False,
+        'message': 'Accès direct désactivé. Utilisez la référence publique du document.'
+    }), 410
+
+
+@app.route('/quittance/document/<string:public_ref>/pdf')
+def pdf_quittance_public(public_ref):
+    quittance = Quittance.query.filter_by(public_ref=public_ref).first_or_404()
+    html = render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
+    return html
+
+
+@app.route('/api/quittance/<int:quittance_id>/verify', methods=['GET'])
+def verify_quittance_integrity(quittance_id):
     quittance = Quittance.query.get_or_404(quittance_id)
+    return redirect(url_for('verify_quittance_page', public_ref=quittance.public_ref))
+
+
+@app.route('/quittance/verification/<string:public_ref>', methods=['GET'])
+def verify_quittance_page(public_ref):
+    quittance = Quittance.query.filter_by(public_ref=public_ref).first_or_404()
+    signature_data_url, signature_hash = _load_quittance_signature_data(quittance.id)
+    verification_id, integrity_hash = _quittance_integrity_payload(quittance, signature_hash=signature_hash or '')
     locataire = quittance.locataire
-    appartement = locataire.appartement
+    appartement = locataire.appartement if locataire else None
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    generated_at = datetime.now().strftime('%d/%m/%Y à %H:%M')
 
-    html = render_template('pdf/quittance.html',
-                          quittance=quittance,
-                          locataire=locataire,
-                          appartement=appartement,
-                          bien=bien,
-                          sci=sci,
-                          mois_fr=MOIS_FR)
-    return html
+    return render_template(
+        'quittance_verification.html',
+        quittance=quittance,
+        locataire=locataire,
+        appartement=appartement,
+        bien=bien,
+        sci=sci,
+        verification_id=verification_id,
+        integrity_hash=integrity_hash,
+        signature_present=bool(signature_data_url),
+        generated_at=generated_at,
+        logiciel='BAYBAY',
+        statut_validation='VALIDEE'
+    )
 
 @app.route('/api/quittance/<int:quittance_id>', methods=['DELETE'])
 def delete_quittance(quittance_id):
@@ -2112,10 +2338,13 @@ def envoyer_quittance_email(quittance_id):
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
 
-    # Toujours régénérer le PDF pour utiliser le template actuel
-    pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
-    if not pdf_path:
-        return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
+    pdf_path = None
+    if include_pdf:
+        # Toujours régénérer le PDF pour utiliser le template actuel
+        pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
+        if not pdf_path:
+            return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
 
     modele_email = (data.get('modele_email') or 'standard').strip().lower()
     sujet, corps = _build_email_quittance(locataire, quittance, sci=sci, modele_email=modele_email)
@@ -2135,7 +2364,7 @@ def envoyer_quittance_email(quittance_id):
         locataire.email,
         sujet,
         corps,
-        piece_jointe=pdf_path,
+        piece_jointe=pdf_path if include_pdf else None,
         serveur=config.serveur_smtp,
         port=config.port_smtp,
         use_tls=bool(config.use_tls)
@@ -2144,7 +2373,10 @@ def envoyer_quittance_email(quittance_id):
     # On garde le fichier local pour les prochains envois.
 
     if success:
-        return jsonify({'success': True, 'message': 'Quittance envoyée par email'})
+        message = 'Quittance envoyée par email'
+        if include_pdf:
+            message += ' avec PDF joint'
+        return jsonify({'success': True, 'message': message})
     else:
         return jsonify({'success': False, 'error': message}), 500
 
@@ -2183,6 +2415,9 @@ def save_config_email():
     if not email_expediteur or not mot_de_passe:
         return jsonify({'success': False, 'message': 'Email expéditeur et mot de passe obligatoires'}), 400
 
+    clear_signature = _as_bool(data.get('clear_signature'), default=False)
+    signature_data = (data.get('signature_data') or '').strip()
+
     if config:
         config.email_expediteur = email_expediteur
         config.mot_de_passe = mot_de_passe
@@ -2200,6 +2435,14 @@ def save_config_email():
         db.session.add(config)
 
     db.session.commit()
+
+    if clear_signature:
+        _clear_decorative_signature_data()
+    elif signature_data:
+        saved, signature_error = _save_decorative_signature_data(signature_data)
+        if not saved:
+            return jsonify({'success': False, 'message': signature_error or 'Signature décorative invalide'}), 400
+
     return jsonify({'success': True})
 
 @app.route('/api/test-email', methods=['POST'])
@@ -2309,6 +2552,7 @@ def send_programmation_now(prog_id):
     # Utiliser le mois/année de la programmation
     mois = prog.mois
     annee = prog.annee
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
 
     resultats = []
     echecs = []
@@ -2344,11 +2588,13 @@ def send_programmation_now(prog_id):
             db.session.add(appel)
             db.session.commit()
 
-        # Générer le PDF avec le template (toujours régénérer pour utiliser le template actuel)
-        pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
-        if not pdf_path:
-            echecs.append(f"Erreur PDF pour {locataire.nom_complet}: {pdf_error}")
-            continue
+        pdf_path = None
+        if include_pdf:
+            # Générer le PDF avec le template (toujours régénérer pour utiliser le template actuel)
+            pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
+            if not pdf_path:
+                echecs.append(f"Erreur PDF pour {locataire.nom_complet}: {pdf_error}")
+                continue
 
         # Récupérer les infos pour l'email
         appartement = locataire.appartement
@@ -2373,7 +2619,7 @@ def send_programmation_now(prog_id):
             locataire.email,
             sujet,
             corps,
-            piece_jointe=pdf_path,
+            piece_jointe=pdf_path if include_pdf else None,
             serveur=config.serveur_smtp,
             port=config.port_smtp,
             use_tls=bool(config.use_tls)
@@ -2454,6 +2700,38 @@ def preview_programmation_email(prog_id):
     email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
     return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
+
+@app.route('/api/programmation-appel/<int:prog_id>/linked-pdf', methods=['GET'])
+def linked_programmation_pdf(prog_id):
+    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    locataires = prog.get_locataires()
+
+    if not locataires:
+        return jsonify({'success': False, 'message': 'Aucun locataire trouvé pour cette programmation'}), 400
+
+    locataire = locataires[0]
+    appel = AppelLoyer.query.filter_by(
+        locataire_id=locataire.id,
+        mois=prog.mois,
+        annee=prog.annee
+    ).first()
+
+    if not appel:
+        arrieres = locataire.get_arrieres(prog.mois, prog.annee)
+        appel = AppelLoyer(
+            locataire_id=locataire.id,
+            mois=prog.mois,
+            annee=prog.annee,
+            loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+            charges=locataire.charges_actuelles or Decimal('0.00'),
+            arrieres=arrieres,
+            date_echeance=date(prog.annee, prog.mois, 5)
+        )
+        db.session.add(appel)
+        db.session.commit()
+
+    return jsonify({'success': True, 'pdf_url': f'/api/appel-loyer/{appel.id}/pdf'})
+
 # Envoyer appel par email
 @app.route('/api/appel-loyer/<int:appel_id>/envoyer', methods=['POST'])
 def envoyer_appel_email(appel_id):
@@ -2473,10 +2751,13 @@ def envoyer_appel_email(appel_id):
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
 
-    # Toujours régénérer le PDF pour utiliser le template actuel
-    pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
-    if not pdf_path:
-        return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
+    pdf_path = None
+    if include_pdf:
+        # Toujours régénérer le PDF pour utiliser le template actuel
+        pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
+        if not pdf_path:
+            return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
 
     modele_email = (data.get('modele_email') or 'standard').strip().lower()
     sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
@@ -2495,7 +2776,7 @@ def envoyer_appel_email(appel_id):
         locataire.email,
         sujet,
         corps,
-        piece_jointe=pdf_path,
+        piece_jointe=pdf_path if include_pdf else None,
         serveur=config.serveur_smtp,
         port=config.port_smtp,
         use_tls=bool(config.use_tls)
@@ -2504,7 +2785,10 @@ def envoyer_appel_email(appel_id):
     # On garde le fichier local pour les prochains envois.
 
     if success:
-        return jsonify({'success': True, 'message': 'Appel de loyer envoyé par email'})
+        message = 'Appel de loyer envoyé par email'
+        if include_pdf:
+            message += ' avec PDF joint'
+        return jsonify({'success': True, 'message': message})
     return jsonify({'success': False, 'error': message}), 500
 
 

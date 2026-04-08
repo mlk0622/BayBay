@@ -157,6 +157,16 @@
                 <input id="programmationEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
             </div>
 
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/15 bg-black/25 px-3 py-2">
+                <label class="inline-flex items-center gap-2 text-sm text-white/90 cursor-pointer">
+                    <input id="programmationEmailIncludePdf" type="checkbox" class="accent-blue-500" checked>
+                    <span>Joindre le PDF de l'appel</span>
+                </label>
+                <button type="button" onclick="openProgrammationLinkedPdf()" class="px-3 py-1.5 rounded-lg border border-white/20 text-white/80 hover:text-white text-sm">
+                    <i class="fas fa-file-pdf mr-2"></i>Voir le PDF lié
+                </button>
+            </div>
+
             <div>
                 <label class="block text-sm text-white/80 mb-2">Corps Mail</label>
                 <div class="rich-editor-shell" data-target="programmationEmailCorps">
@@ -206,8 +216,27 @@ let currentProgrammationId = null;
 async function sendNow(programmationId) {
     currentProgrammationId = programmationId;
     document.getElementById('programmationEmailModele').value = 'standard';
+    document.getElementById('programmationEmailIncludePdf').checked = true;
     applyProgrammationEmailTemplate();
     openProgrammationEmailModal();
+}
+
+async function openProgrammationLinkedPdf() {
+    if (!currentProgrammationId) return;
+
+    try {
+        const response = await fetch(`/api/programmation-appel/${currentProgrammationId}/linked-pdf`);
+        const data = await response.json();
+
+        if (response.ok && data.success && data.pdf_url) {
+            window.open(data.pdf_url, '_blank');
+            return;
+        }
+
+        showNotification('Erreur: ' + (data.message || data.error || 'PDF non disponible'), 'error');
+    } catch (error) {
+        showNotification('Erreur lors de l\'ouverture du PDF', 'error');
+    }
 }
 
 function openProgrammationEmailModal() {
@@ -242,7 +271,8 @@ async function sendProgrammationEmailNow() {
         const payload = {
             modele_email: document.getElementById('programmationEmailModele').value,
             sujet: document.getElementById('programmationEmailSujet').value,
-            corps: getRichTextEditorValue('programmationEmailCorps')
+            corps: getRichTextEditorValue('programmationEmailCorps'),
+            include_pdf: document.getElementById('programmationEmailIncludePdf').checked
         };
 
         const response = await fetch(`/api/programmation-appel/${currentProgrammationId}/send`, {
