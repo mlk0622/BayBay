@@ -303,6 +303,7 @@ function createMainWindow() {
         minWidth: 1000,
         minHeight: 600,
         show: false,
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -333,6 +334,8 @@ function createMainWindow() {
     if (!app.isPackaged) {
         mainWindow.webContents.openDevTools();
     }
+
+    mainWindow.setMenuBarVisibility(false);
 
     Menu.setApplicationMenu(Menu.buildFromTemplate([
         {
