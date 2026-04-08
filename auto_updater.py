@@ -25,7 +25,7 @@ from urllib.error import URLError, HTTPError
 UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.2.3.5"
+CURRENT_VERSION = "2.2.3.6"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
