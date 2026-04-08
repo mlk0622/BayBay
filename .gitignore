@@ -1,7 +1,10 @@
 # ========================================
 # Bay Bay - .gitignore
 # ========================================
-electron-app/dist-simple/
+build/
+dist/
+.claude-code/
+electron-app/
 *.exe
 node_modules/
 
