@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.3.1';
+const APP_VERSION = '2.3.2';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
