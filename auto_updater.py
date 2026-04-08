@@ -24,7 +24,7 @@ from urllib.error import URLError, HTTPError
 UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.3.3.2"
+CURRENT_VERSION = "2.3.3.3"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
@@ -97,20 +97,31 @@ class AutoUpdater:
             print(f"Erreur sauvegarde config: {e}")
 
     def _version_tuple(self, version_str):
-        """Convertit une version string en tuple comparable"""
+        """Convertit une version string en tuple comparable (supporte jusqu'a 4 chiffres)"""
         try:
             # Enlever le 'v' si présent
-            version_str = version_str.lstrip('v')
+            version_str = str(version_str).lstrip('v')
             parts = version_str.split('.')
-            return tuple(int(p) for p in parts[:3])
+            # Prendre jusqu'a 4 parties (pour supporter X.X.X.X)
+            result = []
+            for p in parts[:4]:
+                try:
+                    result.append(int(p))
+                except ValueError:
+                    result.append(0)
+            # Completer avec des zeros si moins de 4 parties
+            while len(result) < 4:
+                result.append(0)
+            return tuple(result)
         except Exception:
-            return (0, 0, 0)
+            return (0, 0, 0, 0)
 
     def _is_newer_version(self, remote_version):
         """Vérifie si la version distante est plus récente"""
         current = self._version_tuple(self.current_version)
         remote = self._version_tuple(remote_version)
-        print(f"[AutoUpdater] Comparaison: locale={current} vs distante={remote}")
+        print(f"[AutoUpdater] Comparaison: locale={self.current_version}{current} vs distante={remote_version}{remote}")
+        print(f"[AutoUpdater] {remote} > {current} = {remote > current}")
         return remote > current
 
     def check_for_updates(self, silent=False):
@@ -508,9 +519,16 @@ def register_update_routes(app):
     @app.route('/api/updates/check')
     def api_check_updates():
         """API pour vérifier les mises à jour"""
+        print(f"[API] /api/updates/check appelé")
+        print(f"[API] CURRENT_VERSION = {CURRENT_VERSION}")
+
         updater = AutoUpdater()
-        result = updater.check_for_updates(silent=True)
+        print(f"[API] updater.current_version = {updater.current_version}")
+
+        result = updater.check_for_updates(silent=False)  # Mettre silent=False pour voir les logs
+
         if result:
+            print(f"[API] Resultat: version={result.get('version')}, is_newer={result.get('is_newer')}")
             return jsonify({
                 'available': result.get('is_newer', False),
                 'version': result.get('version'),
@@ -519,10 +537,12 @@ def register_update_routes(app):
                 'download_url': result.get('download_url'),
                 'asset_name': result.get('asset_name')
             })
+
+        print(f"[API] Erreur: aucun resultat")
         return jsonify({
             'available': False,
             'current_version': CURRENT_VERSION,
-            'error': 'Impossible de vérifier les mises à jour'
+            'error': 'Impossible de verifier les mises a jour'
         })
 
     @app.route('/api/updates/download', methods=['POST'])
