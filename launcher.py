@@ -15,7 +15,7 @@ import ctypes
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "2.3.2"
+VERSION = "2.3.3"
 PORT = 5001
 HOST = "127.0.0.1"
 
@@ -184,14 +184,15 @@ def start_application():
         # Importer l'application Flask
         from app import app, db
 
-        # Enregistrer les routes de mise à jour (seulement en mode standalone)
-        if not ELECTRON_MODE:
-            try:
-                from auto_updater import register_update_routes
-                register_update_routes(app)
+        # Enregistrer les routes de mise à jour (toujours, y compris en mode Electron)
+        try:
+            from auto_updater import register_update_routes
+            register_update_routes(app)
+            if not ELECTRON_MODE:
                 print("🔄 Système de mise à jour activé")
-            except ImportError:
-                print("⚠️  Système de mise à jour non disponible")
+        except ImportError as e:
+            if not ELECTRON_MODE:
+                print(f"⚠️  Système de mise à jour non disponible: {e}")
 
         # Créer les tables de la base de données
         with app.app_context():

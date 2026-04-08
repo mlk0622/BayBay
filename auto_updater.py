@@ -4,16 +4,16 @@
 Bay Bay - Système d'Auto-Update
 ==========================================
 Ce module gère les mises à jour automatiques de l'application.
+Télécharge le Setup.exe depuis GitHub et lance la réinstallation.
+Les données utilisateur dans %APPDATA%\BayBay sont préservées.
 """
 
 import os
 import sys
 import json
-import shutil
 import tempfile
 import threading
-import hashlib
-import zipfile
+import subprocess
 from datetime import datetime
 from urllib.request import urlopen, Request
 from urllib.error import URLError, HTTPError
@@ -24,20 +24,31 @@ from urllib.error import URLError, HTTPError
 UPDATE_SERVER_URL = "https://api.github.com/repos/mlk0622/BayBay/releases/latest"
 
 # Version actuelle de l'application
-CURRENT_VERSION = "2.3.2"
+CURRENT_VERSION = "2.3.3"
 
 # Fichier de configuration local
 CONFIG_FILE = "update_config.json"
 
+# Nom de l'application pour la recherche du désinstallateur
+APP_NAME = "Bay Bay"
+
 
 class AutoUpdater:
-    """Gestionnaire de mises à jour automatiques"""
+    """Gestionnaire de mises à jour automatiques via Setup.exe"""
 
     def __init__(self, current_version=CURRENT_VERSION, server_url=UPDATE_SERVER_URL):
         self.current_version = current_version
         self.server_url = server_url
         self.base_path = self._get_base_path()
         self.config = self._load_config()
+        self.update_status = {
+            'checking': False,
+            'downloading': False,
+            'installing': False,
+            'progress': 0,
+            'error': None,
+            'message': ''
+        }
 
     def _get_base_path(self):
         """Retourne le chemin de base de l'application"""
@@ -45,15 +56,24 @@ class AutoUpdater:
             return os.path.dirname(sys.executable)
         return os.path.dirname(os.path.abspath(__file__))
 
+    def _get_user_data_dir(self):
+        """Retourne le chemin des données utilisateur (préservées lors de la mise à jour)"""
+        if sys.platform == 'win32':
+            appdata = os.environ.get('APPDATA', os.path.expanduser('~'))
+            return os.path.join(appdata, 'BayBay')
+        return os.path.join(os.path.expanduser('~'), '.baybay')
+
     def _load_config(self):
-        """Charge la configuration locale"""
-        config_path = os.path.join(self.base_path, "data", CONFIG_FILE)
+        """Charge la configuration locale depuis le dossier utilisateur"""
+        # Stocker la config dans le dossier utilisateur pour la préserver
+        user_data = self._get_user_data_dir()
+        config_path = os.path.join(user_data, CONFIG_FILE)
         default_config = {
             "auto_check": True,
             "check_interval_hours": 24,
             "last_check": None,
             "skip_version": None,
-            "update_channel": "stable"  # stable, beta
+            "update_channel": "stable"
         }
 
         try:
@@ -66,9 +86,10 @@ class AutoUpdater:
         return default_config
 
     def _save_config(self):
-        """Sauvegarde la configuration locale"""
-        config_path = os.path.join(self.base_path, "data", CONFIG_FILE)
-        os.makedirs(os.path.dirname(config_path), exist_ok=True)
+        """Sauvegarde la configuration locale dans le dossier utilisateur"""
+        user_data = self._get_user_data_dir()
+        os.makedirs(user_data, exist_ok=True)
+        config_path = os.path.join(user_data, CONFIG_FILE)
         try:
             with open(config_path, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, indent=2)
@@ -89,11 +110,12 @@ class AutoUpdater:
         """Vérifie si la version distante est plus récente"""
         current = self._version_tuple(self.current_version)
         remote = self._version_tuple(remote_version)
+        print(f"[AutoUpdater] Comparaison: locale={current} vs distante={remote}")
         return remote > current
 
     def check_for_updates(self, silent=False):
         """
-        Vérifie s'il y a une mise à jour disponible
+        Vérifie s'il y a une mise à jour disponible sur GitHub
 
         Args:
             silent: Si True, ne pas afficher de messages
@@ -101,98 +123,133 @@ class AutoUpdater:
         Returns:
             dict avec les infos de mise à jour ou None
         """
+        self.update_status['checking'] = True
+        self.update_status['error'] = None
+
         try:
             if not silent:
-                print("🔍 Vérification des mises à jour...")
+                print("🔍 Vérification des mises à jour sur GitHub...")
 
-            # Requête vers le serveur
+            # Requête vers l'API GitHub Releases
             headers = {
                 'User-Agent': f'BayBay/{self.current_version}',
-                'Accept': 'application/json'
+                'Accept': 'application/vnd.github.v3+json'
             }
             request = Request(self.server_url, headers=headers)
 
-            with urlopen(request, timeout=10) as response:
+            with urlopen(request, timeout=15) as response:
                 data = json.loads(response.read().decode('utf-8'))
 
-            # Parser la réponse (format GitHub Releases)
+            # Parser la réponse GitHub Releases
             if 'tag_name' in data:
                 remote_version = data['tag_name']
                 download_url = None
                 release_notes = data.get('body', '')
+                asset_name = None
 
-                # Trouver l'asset Windows (zip)
+                # Chercher le fichier Setup.exe dans les assets
                 for asset in data.get('assets', []):
-                    if asset['name'].endswith('.zip') and 'windows' in asset['name'].lower():
+                    name = asset['name'].lower()
+                    # Priorité: fichier Setup ou installer .exe
+                    if name.endswith('.exe') and ('setup' in name or 'install' in name):
                         download_url = asset['browser_download_url']
+                        asset_name = asset['name']
+                        print(f"[AutoUpdater] Asset Setup trouvé: {asset['name']}")
                         break
 
-                # Si pas trouvé, prendre le premier zip
+                # Si pas de setup explicite, prendre le premier .exe
                 if not download_url:
                     for asset in data.get('assets', []):
-                        if asset['name'].endswith('.zip'):
+                        if asset['name'].lower().endswith('.exe'):
                             download_url = asset['browser_download_url']
+                            asset_name = asset['name']
+                            print(f"[AutoUpdater] Asset exe trouvé: {asset['name']}")
                             break
+
+                is_newer = self._is_newer_version(remote_version)
 
                 update_info = {
                     'version': remote_version,
                     'download_url': download_url,
+                    'asset_name': asset_name,
                     'release_notes': release_notes,
                     'published_at': data.get('published_at'),
-                    'is_newer': self._is_newer_version(remote_version)
+                    'is_newer': is_newer,
+                    'current_version': self.current_version
                 }
 
                 # Mettre à jour la date de vérification
                 self.config['last_check'] = datetime.now().isoformat()
                 self._save_config()
 
-                if update_info['is_newer'] and not silent:
-                    print(f"✅ Mise à jour disponible: v{remote_version}")
+                if not silent:
+                    if is_newer:
+                        print(f"✅ Mise à jour disponible: {remote_version} (actuelle: {self.current_version})")
+                    else:
+                        print(f"✅ Application à jour (v{self.current_version})")
 
+                self.update_status['checking'] = False
                 return update_info
 
+            self.update_status['checking'] = False
             return None
 
         except HTTPError as e:
+            error_msg = f"Erreur HTTP: {e.code}"
             if not silent:
-                print(f"❌ Erreur HTTP: {e.code}")
+                print(f"❌ {error_msg}")
+            self.update_status['error'] = error_msg
+            self.update_status['checking'] = False
             return None
         except URLError as e:
+            error_msg = f"Erreur réseau: {e.reason}"
             if not silent:
-                print(f"❌ Erreur réseau: {e.reason}")
+                print(f"❌ {error_msg}")
+            self.update_status['error'] = error_msg
+            self.update_status['checking'] = False
             return None
         except Exception as e:
+            error_msg = f"Erreur: {e}"
             if not silent:
-                print(f"❌ Erreur: {e}")
+                print(f"❌ {error_msg}")
+            self.update_status['error'] = error_msg
+            self.update_status['checking'] = False
             return None
 
-    def download_update(self, download_url, progress_callback=None):
+    def download_setup(self, download_url, asset_name=None, progress_callback=None):
         """
-        Télécharge la mise à jour
+        Télécharge le Setup.exe depuis GitHub
 
         Args:
-            download_url: URL du fichier à télécharger
-            progress_callback: Fonction callback(downloaded, total) pour afficher la progression
+            download_url: URL du fichier Setup.exe
+            asset_name: Nom du fichier (optionnel)
+            progress_callback: Fonction callback(downloaded, total) pour la progression
 
         Returns:
             Chemin du fichier téléchargé ou None
         """
-        try:
-            print(f"📥 Téléchargement de la mise à jour...")
+        self.update_status['downloading'] = True
+        self.update_status['progress'] = 0
+        self.update_status['message'] = 'Téléchargement en cours...'
 
-            # Créer un fichier temporaire
+        try:
+            print(f"📥 Téléchargement du Setup depuis GitHub...")
+            print(f"   URL: {download_url}")
+
+            # Créer un dossier temporaire pour le téléchargement
             temp_dir = tempfile.mkdtemp(prefix='baybay_update_')
-            zip_path = os.path.join(temp_dir, 'update.zip')
+            filename = asset_name or 'BayBay_Setup.exe'
+            setup_path = os.path.join(temp_dir, filename)
 
             headers = {'User-Agent': f'BayBay/{self.current_version}'}
             request = Request(download_url, headers=headers)
 
-            with urlopen(request, timeout=60) as response:
+            with urlopen(request, timeout=120) as response:
                 total_size = int(response.headers.get('Content-Length', 0))
                 downloaded = 0
-                chunk_size = 8192
+                chunk_size = 65536  # 64KB chunks pour plus de rapidité
 
-                with open(zip_path, 'wb') as f:
+                with open(setup_path, 'wb') as f:
                     while True:
                         chunk = response.read(chunk_size)
                         if not chunk:
@@ -200,105 +257,195 @@ class AutoUpdater:
                         f.write(chunk)
                         downloaded += len(chunk)
 
-                        if progress_callback and total_size > 0:
-                            progress_callback(downloaded, total_size)
-                        elif total_size > 0:
+                        if total_size > 0:
                             percent = (downloaded / total_size) * 100
-                            print(f"\r   Progression: {percent:.1f}%", end='', flush=True)
+                            self.update_status['progress'] = percent
 
-            print("\n✅ Téléchargement terminé")
-            return zip_path
+                            if progress_callback:
+                                progress_callback(downloaded, total_size)
+                            else:
+                                print(f"\r   Progression: {percent:.1f}% ({downloaded // 1024 // 1024}MB / {total_size // 1024 // 1024}MB)", end='', flush=True)
+
+            print(f"\n✅ Téléchargement terminé: {setup_path}")
+            self.update_status['downloading'] = False
+            self.update_status['progress'] = 100
+            return setup_path
 
         except Exception as e:
-            print(f"\n❌ Erreur de téléchargement: {e}")
+            error_msg = f"Erreur de téléchargement: {e}"
+            print(f"\n❌ {error_msg}")
+            self.update_status['error'] = error_msg
+            self.update_status['downloading'] = False
             return None
 
-    def install_update(self, zip_path):
+    def create_update_script(self, setup_path, silent_install=True):
         """
-        Installe la mise à jour
+        Crée un script batch qui:
+        1. Attend la fermeture de l'application
+        2. Lance le nouveau Setup.exe (mode silencieux ou interactif)
+        3. Nettoie les fichiers temporaires
 
         Args:
-            zip_path: Chemin du fichier zip téléchargé
+            setup_path: Chemin du Setup.exe téléchargé
+            silent_install: Si True, installation silencieuse
 
         Returns:
-            True si succès, False sinon
+            Chemin du script batch ou None
         """
         try:
-            print("📦 Installation de la mise à jour...")
+            print("📦 Préparation de la mise à jour...")
 
-            # Créer un dossier de backup
-            backup_dir = os.path.join(self.base_path, '_backup_' + datetime.now().strftime('%Y%m%d_%H%M%S'))
+            # Créer le script dans le dossier temp
+            script_dir = os.path.dirname(setup_path)
+            update_script = os.path.join(script_dir, '_baybay_update.bat')
 
-            # Extraire le zip
-            temp_extract = os.path.join(os.path.dirname(zip_path), 'extracted')
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(temp_extract)
+            # Options NSIS pour installation silencieuse
+            # /S = silencieux
+            nsis_args = "/S" if silent_install else ""
 
-            # Trouver le dossier racine dans l'extraction
-            extracted_items = os.listdir(temp_extract)
-            if len(extracted_items) == 1 and os.path.isdir(os.path.join(temp_extract, extracted_items[0])):
-                source_dir = os.path.join(temp_extract, extracted_items[0])
-            else:
-                source_dir = temp_extract
-
-            # Créer le script de mise à jour qui s'exécutera après fermeture
-            update_script = os.path.join(self.base_path, '_update.bat')
             with open(update_script, 'w', encoding='utf-8') as f:
                 f.write('@echo off\n')
                 f.write('chcp 65001 >nul 2>&1\n')
-                f.write('title Mise à jour - Bay Bay\n')
+                f.write('title Mise à jour Bay Bay\n')
                 f.write('echo.\n')
-                f.write('echo Mise à jour en cours, veuillez patienter...\n')
+                f.write('echo ========================================\n')
+                f.write('echo    Mise à jour de Bay Bay en cours\n')
+                f.write('echo ========================================\n')
+                f.write('echo.\n')
+                f.write('echo Fermeture de l\'application...\n')
+                f.write('echo.\n')
+
+                # Attendre que l'application se ferme (max 30 secondes)
+                f.write('set /a count=0\n')
+                f.write(':waitloop\n')
+                f.write('tasklist /FI "IMAGENAME eq BayBay.exe" 2>NUL | find /I /N "BayBay.exe">NUL\n')
+                f.write('if "%ERRORLEVEL%"=="0" (\n')
+                f.write('    set /a count+=1\n')
+                f.write('    if %count% GEQ 30 (\n')
+                f.write('        echo Timeout - Fermeture forcee...\n')
+                f.write('        taskkill /F /IM BayBay.exe >nul 2>&1\n')
+                f.write('        timeout /t 2 /nobreak >nul\n')
+                f.write('    ) else (\n')
+                f.write('        timeout /t 1 /nobreak >nul\n')
+                f.write('        goto waitloop\n')
+                f.write('    )\n')
+                f.write(')\n')
+                f.write('echo.\n')
+
+                # Fermer aussi Electron si lancé
+                f.write('taskkill /F /IM "Bay Bay.exe" >nul 2>&1\n')
                 f.write('timeout /t 2 /nobreak >nul\n')
-                f.write(f'xcopy /s /e /y "{source_dir}\\*" "{self.base_path}\\" >nul 2>&1\n')
+
+                # Lancer le nouveau Setup
+                f.write('echo Installation de la nouvelle version...\n')
                 f.write('echo.\n')
-                f.write('echo Mise à jour terminée!\n')
-                f.write(f'start "" "{os.path.join(self.base_path, "BayBay.exe")}"\n')
-                f.write(f'del /f /q "{update_script}"\n')
-                f.write(f'rmdir /s /q "{os.path.dirname(zip_path)}"\n')
+                f.write(f'start /wait "" "{setup_path}" {nsis_args}\n')
+                f.write('echo.\n')
 
-            print("✅ Mise à jour préparée")
-            print("🔄 L'application va redémarrer...")
+                # Nettoyer
+                f.write('echo Nettoyage...\n')
+                f.write(f'rmdir /s /q "{script_dir}" >nul 2>&1\n')
+                f.write('echo.\n')
+                f.write('echo ========================================\n')
+                f.write('echo    Mise à jour terminée!\n')
+                f.write('echo ========================================\n')
+                f.write('echo.\n')
+                f.write('timeout /t 3 /nobreak >nul\n')
+                f.write('exit\n')
 
+            print(f"✅ Script de mise à jour créé: {update_script}")
             return update_script
 
         except Exception as e:
-            print(f"❌ Erreur d'installation: {e}")
+            print(f"❌ Erreur création script: {e}")
+            self.update_status['error'] = str(e)
             return None
 
-    def perform_update(self):
-        """Effectue le processus complet de mise à jour"""
+    def perform_update(self, silent_install=True, progress_callback=None):
+        """
+        Effectue le processus complet de mise à jour:
+        1. Vérifie les mises à jour
+        2. Télécharge le Setup.exe
+        3. Crée et lance le script de mise à jour
+        4. Quitte l'application
+
+        Args:
+            silent_install: Si True, installation silencieuse
+            progress_callback: Callback pour la progression
+
+        Returns:
+            True si mise à jour lancée, False sinon
+        """
+        self.update_status['installing'] = True
+        self.update_status['message'] = 'Vérification des mises à jour...'
+
         # Vérifier les mises à jour
         update_info = self.check_for_updates()
 
-        if not update_info or not update_info.get('is_newer'):
-            print("✅ Vous avez la dernière version")
+        if not update_info:
+            self.update_status['installing'] = False
+            self.update_status['error'] = 'Impossible de vérifier les mises à jour'
+            return False
+
+        if not update_info.get('is_newer'):
+            print(f"✅ Vous avez la dernière version ({self.current_version})")
+            self.update_status['installing'] = False
+            self.update_status['message'] = 'Application à jour'
             return False
 
         # Afficher les infos
-        print(f"\n📋 Notes de version {update_info['version']}:")
-        print("-" * 40)
-        print(update_info.get('release_notes', 'Pas de notes disponibles')[:500])
-        print("-" * 40)
+        print(f"\n📋 Nouvelle version disponible: {update_info['version']}")
+        print(f"   Version actuelle: {self.current_version}")
+        if update_info.get('release_notes'):
+            print(f"\n📝 Notes de version:")
+            print("-" * 40)
+            print(update_info['release_notes'][:500])
+            print("-" * 40)
 
-        # Télécharger
+        # Vérifier qu'il y a une URL de téléchargement
         download_url = update_info.get('download_url')
         if not download_url:
-            print("❌ Aucun fichier de téléchargement disponible")
+            error = "Aucun fichier Setup.exe disponible dans cette release"
+            print(f"❌ {error}")
+            self.update_status['error'] = error
+            self.update_status['installing'] = False
             return False
 
-        zip_path = self.download_update(download_url)
-        if not zip_path:
+        # Télécharger le Setup
+        self.update_status['message'] = 'Téléchargement en cours...'
+        setup_path = self.download_setup(
+            download_url,
+            update_info.get('asset_name'),
+            progress_callback
+        )
+
+        if not setup_path:
+            self.update_status['installing'] = False
             return False
 
-        # Installer
-        update_script = self.install_update(zip_path)
+        # Créer le script de mise à jour
+        self.update_status['message'] = 'Préparation de l\'installation...'
+        update_script = self.create_update_script(setup_path, silent_install)
+
         if not update_script:
+            self.update_status['installing'] = False
             return False
 
-        # Lancer le script de mise à jour et quitter
-        import subprocess
-        subprocess.Popen(update_script, shell=True)
+        # Lancer le script et quitter
+        print("\n🚀 Lancement de la mise à jour...")
+        print("   L'application va se fermer et se réinstaller automatiquement.")
+        print("   Vos données seront conservées.\n")
+
+        self.update_status['message'] = 'Lancement de l\'installation...'
+
+        # Lancer le script en mode détaché
+        subprocess.Popen(
+            update_script,
+            shell=True,
+            creationflags=subprocess.CREATE_NEW_CONSOLE | subprocess.DETACHED_PROCESS
+        )
+
+        # Quitter l'application
         sys.exit(0)
 
 
@@ -330,12 +477,15 @@ def register_update_routes(app):
             return jsonify({
                 'available': result.get('is_newer', False),
                 'version': result.get('version'),
+                'current_version': result.get('current_version', CURRENT_VERSION),
                 'release_notes': result.get('release_notes'),
-                'current_version': CURRENT_VERSION
+                'download_url': result.get('download_url'),
+                'asset_name': result.get('asset_name')
             })
         return jsonify({
             'available': False,
-            'current_version': CURRENT_VERSION
+            'current_version': CURRENT_VERSION,
+            'error': 'Impossible de vérifier les mises à jour'
         })
 
     @app.route('/api/updates/download', methods=['POST'])
@@ -349,18 +499,23 @@ def register_update_routes(app):
 
         download_url = update_info.get('download_url')
         if not download_url:
-            return jsonify({'success': False, 'message': 'URL de téléchargement non disponible'})
+            return jsonify({'success': False, 'message': 'Aucun fichier Setup.exe disponible'})
+
+        # Récupérer les options
+        data = request.get_json() or {}
+        silent_install = data.get('silent', True)
 
         # Lancer la mise à jour dans un thread
         def do_update():
-            updater.perform_update()
+            updater.perform_update(silent_install=silent_install)
 
         thread = threading.Thread(target=do_update, daemon=True)
         thread.start()
 
         return jsonify({
             'success': True,
-            'message': 'Mise à jour en cours, l\'application va redémarrer'
+            'message': 'Mise à jour en cours, l\'application va redémarrer',
+            'version': update_info.get('version')
         })
 
     @app.route('/api/updates/config', methods=['GET', 'POST'])
@@ -378,6 +533,12 @@ def register_update_routes(app):
 
         return jsonify(updater.config)
 
+    @app.route('/api/updates/status')
+    def api_update_status():
+        """API pour obtenir le statut de la mise à jour en cours"""
+        updater = AutoUpdater()
+        return jsonify(updater.update_status)
+
 
 # ========== TESTS ==========
 
@@ -393,6 +554,7 @@ if __name__ == '__main__':
     if result:
         print(f"\nVersion distante: {result.get('version')}")
         print(f"Mise à jour disponible: {result.get('is_newer')}")
+        print(f"URL de téléchargement: {result.get('download_url')}")
+        print(f"Nom du fichier: {result.get('asset_name')}")
     else:
         print("\nImpossible de vérifier les mises à jour")
-        print("(Configurez UPDATE_SERVER_URL avec votre serveur)")

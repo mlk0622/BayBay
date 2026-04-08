@@ -1,6 +1,6 @@
 {
   "name": "baybay",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Bay Bay - Application de gestion immobilière multi-niveaux",
   "main": "main.js",
   "author": "Bay Bay",
@@ -61,8 +61,5 @@
     "@electron/packager": "^19.1.0",
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0"
-  },
-  "dependencies": {
-    "electron-updater": "^6.0.0"
   }
 }

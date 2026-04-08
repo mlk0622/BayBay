@@ -1,13 +1,13 @@
-const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, shell, ipcMain, dialog } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const net = require('net');
-const { autoUpdater } = require('electron-updater');
+const http = require('http');
 const fs = require('fs');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-const APP_VERSION = '2.3.2';
+const APP_VERSION = '2.3.3';
 const BACKEND_PORT = 5001;
 const BACKEND_HOST = 'localhost';
 const MAX_STARTUP_TIME = 30000; // 30 secondes
@@ -17,46 +17,125 @@ let splashWindow;
 let backendProcess = null;
 let isQuitting = false;
 
-// Configuration de l'auto-updater
-if (!app.isPackaged) {
-    console.log('Mode développement - auto-updater désactivé');
-} else {
-    // Configurer l'auto-updater pour GitHub
-    autoUpdater.autoDownload = true;
-    autoUpdater.autoInstallOnAppQuit = true;
+// Fonction pour vérifier les mises à jour via l'API backend
+function checkForUpdatesViaBackend() {
+    if (!app.isPackaged) {
+        log('Mode développement - vérification des mises à jour désactivée');
+        return;
+    }
 
-    autoUpdater.on('checking-for-update', () => {
-        log('Vérification des mises à jour...');
-    });
+    log('Vérification des mises à jour via le backend...');
 
-    autoUpdater.on('update-available', (info) => {
-        log(`Mise à jour disponible: v${info.version}`);
-    });
+    const options = {
+        hostname: BACKEND_HOST,
+        port: BACKEND_PORT,
+        path: '/api/updates/check',
+        method: 'GET',
+        timeout: 15000
+    };
 
-    autoUpdater.on('update-not-available', () => {
-        log('Application à jour');
-    });
+    const req = http.request(options, (res) => {
+        let data = '';
 
-    autoUpdater.on('download-progress', (progress) => {
-        log(`Téléchargement: ${Math.round(progress.percent)}%`);
-    });
-
-    autoUpdater.on('update-downloaded', (info) => {
-        log(`Mise à jour v${info.version} téléchargée, installation au prochain redémarrage`);
-        // Installer automatiquement après téléchargement
-        autoUpdater.quitAndInstall(false, true);
-    });
-
-    autoUpdater.on('error', (error) => {
-        log(`Erreur auto-update: ${error.message}`);
-    });
-
-    // Vérifier les mises à jour au démarrage (après un délai pour laisser l'app se charger)
-    setTimeout(() => {
-        autoUpdater.checkForUpdates().catch(err => {
-            log(`Impossible de vérifier les mises à jour: ${err.message}`);
+        res.on('data', (chunk) => {
+            data += chunk;
         });
-    }, 3000);
+
+        res.on('end', () => {
+            try {
+                const result = JSON.parse(data);
+                log(`Résultat vérification: ${JSON.stringify(result)}`);
+
+                if (result.available) {
+                    log(`Mise à jour disponible: ${result.version} (actuelle: ${result.current_version})`);
+
+                    // Afficher une notification à l'utilisateur
+                    if (mainWindow) {
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'info',
+                            title: 'Mise à jour disponible',
+                            message: `Une nouvelle version de ${APP_NAME} est disponible!`,
+                            detail: `Version actuelle: ${result.current_version}\nNouvelle version: ${result.version}\n\nVoulez-vous mettre à jour maintenant?\n\nVos données seront conservées.`,
+                            buttons: ['Mettre à jour', 'Plus tard'],
+                            defaultId: 0,
+                            cancelId: 1
+                        }).then(({ response }) => {
+                            if (response === 0) {
+                                // Lancer la mise à jour
+                                triggerUpdate();
+                            }
+                        });
+                    }
+                } else {
+                    log(`Application à jour (v${result.current_version})`);
+                }
+            } catch (e) {
+                log(`Erreur parsing réponse mise à jour: ${e.message}`);
+            }
+        });
+    });
+
+    req.on('error', (error) => {
+        log(`Erreur vérification mise à jour: ${error.message}`);
+    });
+
+    req.on('timeout', () => {
+        req.destroy();
+        log('Timeout lors de la vérification des mises à jour');
+    });
+
+    req.end();
+}
+
+// Fonction pour déclencher la mise à jour via le backend
+function triggerUpdate() {
+    log('Déclenchement de la mise à jour...');
+
+    const postData = JSON.stringify({ silent: false });
+
+    const options = {
+        hostname: BACKEND_HOST,
+        port: BACKEND_PORT,
+        path: '/api/updates/download',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+        },
+        timeout: 30000
+    };
+
+    const req = http.request(options, (res) => {
+        let data = '';
+
+        res.on('data', (chunk) => {
+            data += chunk;
+        });
+
+        res.on('end', () => {
+            try {
+                const result = JSON.parse(data);
+                log(`Résultat mise à jour: ${JSON.stringify(result)}`);
+
+                if (result.success) {
+                    // La mise à jour est lancée, le backend va fermer l'application
+                    log('Mise à jour lancée, fermeture de l\'application...');
+                } else {
+                    dialog.showErrorBox('Erreur de mise à jour', result.message || 'Impossible de lancer la mise à jour');
+                }
+            } catch (e) {
+                log(`Erreur parsing réponse: ${e.message}`);
+            }
+        });
+    });
+
+    req.on('error', (error) => {
+        log(`Erreur lors du déclenchement de la mise à jour: ${error.message}`);
+        dialog.showErrorBox('Erreur de mise à jour', error.message);
+    });
+
+    req.write(postData);
+    req.end();
 }
 
 function log(message) {
@@ -281,6 +360,13 @@ function createMainWindow() {
             label: 'Aide',
             submenu: [
                 {
+                    label: 'Vérifier les mises à jour',
+                    click: () => {
+                        checkForUpdatesViaBackend();
+                    }
+                },
+                { type: 'separator' },
+                {
                     label: 'Documentation',
                     click: () => shell.openExternal('https://github.com/mlk0622/BayBay#readme')
                 },
@@ -320,6 +406,11 @@ app.whenReady().then(async () => {
         await startBackend();
         log('Backend démarré avec succès');
         createMainWindow();
+
+        // Vérifier les mises à jour après un délai (laisser l'interface se charger)
+        setTimeout(() => {
+            checkForUpdatesViaBackend();
+        }, 5000);
     } catch (error) {
         log(`Erreur de démarrage: ${error.message}`);
 
