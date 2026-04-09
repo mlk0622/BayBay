@@ -15,7 +15,7 @@ import ctypes
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "2.5.4"
+VERSION = "2.5.5"
 PORT = 5001
 HOST = "127.0.0.1"
 
