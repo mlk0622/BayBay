@@ -122,6 +122,10 @@
             </div>
         </div>
 
+        <!--
+        Bloc de validation documentaire temporairement masque.
+        Le backend continue de calculer verification_id / integrity_hash / verification_url / qr_data_url.
+        Pour le reactiver plus tard, decommenter simplement ce bloc.
         <div class="integrity">
             <h4>Validation documentaire</h4>
             <div class="integrity-row"><strong>ID vérification:</strong> {{ verification_id }}</div>
@@ -135,6 +139,7 @@
             </div>
             {% endif %}
         </div>
+        -->
 
         <div class="footer">
             <p>Quittance émise le {{ quittance.date_emission.strftime('%d/%m/%Y') if quittance.date_emission else '-' }}</p>

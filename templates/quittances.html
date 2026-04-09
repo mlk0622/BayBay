@@ -10,7 +10,7 @@
             <p class="text-white/80 mt-1">Gérez vos quittances</p>
         </div>
         <div class="flex gap-3">
-            <button onclick="openScheduleModal('quittance')" class="px-4 py-2 rounded-xl font-semibold bg-orange-400/100 text-white hover:bg-orange-600 transition-all shadow-lg">
+            <button onclick="openQuittanceSchedulePicker()" class="px-4 py-2 rounded-xl font-semibold bg-orange-400/100 text-white hover:bg-orange-600 transition-all shadow-lg">
                 <i class="fas fa-clock mr-2"></i>Programmer
             </button>
             <button onclick="openQuittanceModal()" class="ios-button text-white px-4 py-2">
@@ -156,9 +156,54 @@
 <script>
 const locatairesQuittance = [
     {% for loc in locataires %}
-    { id: {{ loc.id }}, nom: "{{ loc.nom_complet }}", loyer: {{ loc.loyer_actuel or 0 }}, charges: {{ loc.charges_actuelles or 0 }}, total: {{ loc.total_mensuel or 0 }} },
+    {
+        id: {{ loc.id }},
+        nom: {{ (loc.nom_complet or '')|tojson }},
+        email: {{ (loc.email or '')|tojson }},
+        loyer: {{ loc.loyer_actuel or 0 }},
+        charges: {{ loc.charges_actuelles or 0 }},
+        total: {{ loc.total_mensuel or 0 }}
+    },
     {% endfor %}
 ];
+
+function openQuittanceSchedulePicker() {
+    const select = document.getElementById('quittanceScheduleLocataire');
+    const emailField = document.getElementById('quittanceScheduleEmail');
+
+    const eligibleLocataires = locatairesQuittance.filter((l) => !!(l.email || '').trim());
+    select.innerHTML = '<option value="">-- Sélectionner un locataire --</option>';
+
+    eligibleLocataires.forEach((loc) => {
+        select.innerHTML += `<option value="${loc.id}">${loc.nom}</option>`;
+    });
+
+    emailField.value = '';
+    select.onchange = () => {
+        const selected = eligibleLocataires.find((l) => String(l.id) === String(select.value));
+        emailField.value = selected ? (selected.email || '') : '';
+    };
+
+    openModal('quittanceSchedulePickerModal');
+}
+
+function confirmQuittanceSchedulePicker() {
+    const select = document.getElementById('quittanceScheduleLocataire');
+    const selected = locatairesQuittance.find((l) => String(l.id) === String(select.value));
+
+    if (!selected) {
+        showNotification('Sélectionnez un locataire', 'warning');
+        return;
+    }
+
+    if (!(selected.email || '').trim()) {
+        showNotification('Le locataire sélectionné n\'a pas d\'email', 'error');
+        return;
+    }
+
+    closeModal('quittanceSchedulePickerModal');
+    openScheduleModal(selected.id, selected.nom, selected.email);
+}
 
 function openQuittanceModal() {
     const select = document.getElementById('quittanceLocataire');
@@ -181,26 +226,6 @@ function openQuittanceModal() {
         window.resetQuittanceSignaturePad();
     }
     openModal('quittanceModal');
-}
-
-function openScheduleModal(type) {
-    document.getElementById('scheduleType').value = type;
-    const today = new Date();
-    document.getElementById('scheduleMois').value = today.getMonth() + 1;
-    document.getElementById('scheduleAnnee').value = today.getFullYear();
-
-    const locatairesList = document.getElementById('locatairesList');
-    locatairesList.innerHTML = '';
-    locatairesQuittance.forEach(l => {
-        locatairesList.innerHTML += `
-            <label class="flex items-center p-2 rounded-lg hover:bg-white/50 cursor-pointer">
-                <input type="checkbox" name="locataires_ids" value="${l.id}" class="mr-3 w-4 h-4 accent-blue-500">
-                <span>${l.nom}</span>
-            </label>
-        `;
-    });
-
-    openModal('scheduleModal');
 }
 
 let currentQuittanceEmailId = null;
@@ -292,4 +317,32 @@ async function previewQuittanceEmail() {
 }
 
 </script>
+
+<div id="quittanceSchedulePickerModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/60 p-4">
+    <div class="glass-card w-full max-w-lg p-6 space-y-4">
+        <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-white">Programmer un appel depuis Quittances</h3>
+            <button type="button" onclick="closeModal('quittanceSchedulePickerModal')" class="text-white/70 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Locataire</label>
+            <select id="quittanceScheduleLocataire" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2">
+                <option value="">-- Sélectionner un locataire --</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Email du locataire</label>
+            <input id="quittanceScheduleEmail" type="text" readonly class="w-full rounded-lg bg-black/40 border border-white/20 text-white/80 px-3 py-2" placeholder="Sélectionnez un locataire">
+        </div>
+
+        <div class="flex justify-end gap-3">
+            <button type="button" onclick="closeModal('quittanceSchedulePickerModal')" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">Annuler</button>
+            <button type="button" onclick="confirmQuittanceSchedulePicker()" class="ios-button text-white px-4 py-2">Continuer</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

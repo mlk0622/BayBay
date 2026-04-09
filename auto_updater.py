@@ -99,6 +99,8 @@ class AutoUpdater:
             'downloading': False,
             'installing': False,
             'progress': 0,
+            'downloaded_mb': 0,
+            'total_mb': 0,
             'error': None,
             'message': ''
         }
@@ -345,6 +347,8 @@ class AutoUpdater:
 
         self.update_status['downloading'] = True
         self.update_status['progress'] = 0
+        self.update_status['downloaded_mb'] = 0
+        self.update_status['total_mb'] = 0
         self.update_status['message'] = 'Telechargement en cours...'
 
         try:
@@ -363,6 +367,8 @@ class AutoUpdater:
                 downloaded = 0
                 chunk_size = 131072  # 128KB chunks pour plus de rapidité
                 last_log_percent = 0
+                total_mb = (total_size / 1024 / 1024) if total_size > 0 else 0
+                self.update_status['total_mb'] = round(total_mb, 1)
 
                 with open(setup_path, 'wb') as f:
                     while True:
@@ -380,6 +386,9 @@ class AutoUpdater:
                         if total_size > 0:
                             percent = (downloaded / total_size) * 100
                             self.update_status['progress'] = percent
+                            downloaded_mb = downloaded / 1024 / 1024
+                            self.update_status['downloaded_mb'] = round(downloaded_mb, 1)
+                            self.update_status['message'] = f"Telechargement en cours... {percent:.1f}%"
 
                             # Logger tous les 10%
                             if int(percent / 10) > int(last_log_percent / 10):
@@ -388,11 +397,16 @@ class AutoUpdater:
 
                             if progress_callback:
                                 progress_callback(downloaded, total_size)
+                        else:
+                            downloaded_mb = downloaded / 1024 / 1024
+                            self.update_status['downloaded_mb'] = round(downloaded_mb, 1)
+                            self.update_status['message'] = f"Telechargement en cours... {downloaded_mb:.1f} MB"
 
             log_debug(f"[AutoUpdater] Telechargement termine: {setup_path}")
             log_debug(f"[AutoUpdater] Taille fichier: {os.path.getsize(setup_path)} bytes")
             self.update_status['downloading'] = False
             self.update_status['progress'] = 100
+            self.update_status['message'] = 'Telechargement termine'
             return setup_path
 
         except Exception as e:
@@ -442,26 +456,12 @@ class AutoUpdater:
                 f.write('echo Fermeture de l\'application...\n')
                 f.write('echo.\n')
 
-                # Attendre que l'application se ferme (max 30 secondes)
-                f.write('set /a count=0\n')
-                f.write(':waitloop\n')
-                f.write('tasklist /FI "IMAGENAME eq BayBay.exe" 2>NUL | find /I /N "BayBay.exe">NUL\n')
-                f.write('if "%ERRORLEVEL%"=="0" (\n')
-                f.write('    set /a count+=1\n')
-                f.write('    if %count% GEQ 30 (\n')
-                f.write('        echo Timeout - Fermeture forcee...\n')
-                f.write('        taskkill /F /IM BayBay.exe >nul 2>&1\n')
-                f.write('        timeout /t 2 /nobreak >nul\n')
-                f.write('    ) else (\n')
-                f.write('        timeout /t 1 /nobreak >nul\n')
-                f.write('        goto waitloop\n')
-                f.write('    )\n')
-                f.write(')\n')
-                f.write('echo.\n')
-
-                # Fermer aussi Electron si lancé
+                # Fermeture forcee immediate (sans fermeture classique/attente)
+                f.write('taskkill /F /IM BayBay.exe >nul 2>&1\n')
                 f.write('taskkill /F /IM "Bay Bay.exe" >nul 2>&1\n')
-                f.write('timeout /t 2 /nobreak >nul\n')
+                f.write('taskkill /F /IM electron.exe >nul 2>&1\n')
+                f.write('timeout /t 1 /nobreak >nul\n')
+                f.write('echo.\n')
 
                 # Lancer le nouveau Setup
                 f.write('echo Installation de la nouvelle version...\n')
@@ -674,6 +674,8 @@ def register_update_routes(app):
         updater = get_shared_updater()
         updater.update_status['error'] = None
         updater.update_status['progress'] = 0
+        updater.update_status['downloaded_mb'] = 0
+        updater.update_status['total_mb'] = 0
         updater.update_status['message'] = 'Demarrage de la mise a jour...'
         update_info = updater.check_for_updates(silent=False)
 

@@ -19,6 +19,8 @@ let isQuitting = false;
 let isUpdateInProgress = false;
 let updateProgressWindow = null;
 let updateStatusPollInterval = null;
+let isUpdateProgressWindowReady = false;
+let pendingProgressState = { percent: 0, message: 'Demarrage...' };
 
 function escapeHtml(text) {
     return String(text || '')
@@ -31,6 +33,7 @@ function escapeHtml(text) {
 
 function createUpdateProgressWindow() {
     if (updateProgressWindow && !updateProgressWindow.isDestroyed()) {
+        updateProgressWindow.show();
         updateProgressWindow.focus();
         return updateProgressWindow;
     }
@@ -45,6 +48,7 @@ function createUpdateProgressWindow() {
         alwaysOnTop: true,
         modal: !!ownerWindow,
         parent: ownerWindow,
+        show: false,
         autoHideMenuBar: true,
         title: 'Mise a jour Bay Bay',
         webPreferences: {
@@ -78,6 +82,7 @@ function createUpdateProgressWindow() {
                     <div id="percent">0%</div>
                     <div id="hint">Preparation...</div>
                 </div>
+                <div id="bytes" class="status">0.0 / 0.0 MB</div>
                 <div id="status" class="status">Demarrage...</div>
             </div>
             <script>
@@ -90,27 +95,66 @@ function createUpdateProgressWindow() {
                         document.getElementById('status').textContent = message;
                     }
                 };
+
+                window.setBytes = function(downloaded, total) {
+                    const d = Number.isFinite(downloaded) ? downloaded : 0;
+                    const t = Number.isFinite(total) ? total : 0;
+                    const suffix = t > 0 ? (d.toFixed(1) + ' / ' + t.toFixed(1) + ' MB') : (d.toFixed(1) + ' MB telecharges');
+                    document.getElementById('bytes').textContent = suffix;
+                };
             </script>
         </body>
         </html>
     `;
 
+    isUpdateProgressWindowReady = false;
     updateProgressWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    updateProgressWindow.once('ready-to-show', () => {
+        if (updateProgressWindow && !updateProgressWindow.isDestroyed()) {
+            updateProgressWindow.show();
+            updateProgressWindow.focus();
+        }
+    });
+
+    updateProgressWindow.webContents.on('did-finish-load', () => {
+        isUpdateProgressWindowReady = true;
+        updateProgressWindowUi(
+            pendingProgressState.percent,
+            pendingProgressState.message,
+            pendingProgressState.downloadedMb,
+            pendingProgressState.totalMb
+        );
+    });
+
     updateProgressWindow.on('closed', () => {
         updateProgressWindow = null;
+        isUpdateProgressWindowReady = false;
     });
 
     return updateProgressWindow;
 }
 
-function updateProgressWindowUi(percent, message) {
+function updateProgressWindowUi(percent, message, downloadedMb = 0, totalMb = 0) {
+    pendingProgressState = {
+        percent: Number.isFinite(percent) ? percent : 0,
+        message: message || '',
+        downloadedMb: Number.isFinite(downloadedMb) ? downloadedMb : 0,
+        totalMb: Number.isFinite(totalMb) ? totalMb : 0
+    };
+
     if (!updateProgressWindow || updateProgressWindow.isDestroyed()) {
         return;
     }
 
-    const p = Number.isFinite(percent) ? percent : 0;
-    const m = escapeHtml(message || '');
-    updateProgressWindow.webContents.executeJavaScript(`window.setProgress(${p}, "${m}");`).catch(() => {});
+    if (!isUpdateProgressWindowReady) {
+        return;
+    }
+
+    const p = pendingProgressState.percent;
+    const m = escapeHtml(pendingProgressState.message || '');
+    const downloaded = pendingProgressState.downloadedMb;
+    const total = pendingProgressState.totalMb;
+    updateProgressWindow.webContents.executeJavaScript(`window.setProgress(${p}, "${m}"); window.setBytes(${downloaded}, ${total});`).catch(() => {});
 }
 
 function stopUpdateStatusPolling() {
@@ -157,7 +201,9 @@ function startUpdateStatusPolling() {
                     const status = JSON.parse(data);
                     const percent = Number(status.progress || 0);
                     const message = status.message || 'Mise a jour en cours...';
-                    updateProgressWindowUi(percent, message);
+                    const downloadedMb = Number(status.downloaded_mb || 0);
+                    const totalMb = Number(status.total_mb || 0);
+                    updateProgressWindowUi(percent, message, downloadedMb, totalMb);
 
                     if (status.error) {
                         stopUpdateStatusPolling();
@@ -263,7 +309,7 @@ function triggerUpdate() {
     log('Déclenchement de la mise à jour...');
 
     createUpdateProgressWindow();
-    updateProgressWindowUi(0, 'Demarrage du telechargement...');
+    updateProgressWindowUi(0, 'Demarrage du telechargement...', 0, 0);
 
     const postData = JSON.stringify({ silent: false });
 
@@ -294,7 +340,7 @@ function triggerUpdate() {
                 if (result.success) {
                     isUpdateInProgress = true;
                     startUpdateStatusPolling();
-                    updateProgressWindowUi(1, 'Telechargement en cours...');
+                    updateProgressWindowUi(1, 'Telechargement en cours...', 0, 0);
                     log('Mise a jour demarree, suivi de progression actif');
                 } else {
                     stopUpdateStatusPolling();

@@ -1,6 +1,6 @@
 <!-- Modal de programmation d'appel de loyer -->
 <div id="scheduleModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
             <h3 class="text-lg font-semibold text-slate-900">
                 <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>Programmer un Appel de Loyer
@@ -53,13 +53,39 @@
                 <!-- Message personnalisé -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Message personnalisé (optionnel)</label>
-                    <textarea id="schedule_message" name="message" rows="4"
-                              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"
-                              placeholder="Message qui sera ajouté à l'email..."></textarea>
+                    <div class="rich-editor-shell" data-target="schedule_message">
+                        <div class="rich-editor-toolbar">
+                            <button type="button" data-command="bold"><strong>B</strong></button>
+                            <button type="button" data-command="italic"><em>I</em></button>
+                            <button type="button" data-command="underline"><u>U</u></button>
+                            <button type="button" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" data-command="removeFormat">Tx</button>
+                            <select data-variable-select aria-label="Variables du mail"></select>
+                            <button type="button" data-insert-variable>Insérer</button>
+                            <label title="Couleur du texte">
+                                <input type="color" data-command="foreColor" value="#111827">
+                            </label>
+                            <select data-command="fontName" aria-label="Police du mail" title="Police">
+                                <option value="Arial">Arial</option>
+                                <option value="Verdana">Verdana</option>
+                                <option value="Tahoma">Tahoma</option>
+                                <option value="Trebuchet MS">Trebuchet</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New</option>
+                            </select>
+                        </div>
+                        <div id="scheduleMessageEditor" class="rich-editor-area" contenteditable="true" data-placeholder="Rédigez ici le message personnalisé..."></div>
+                        <textarea id="schedule_message" name="message" class="hidden"></textarea>
+                    </div>
                 </div>
             </div>
 
             <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="previewScheduleMessage()"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <i class="fas fa-eye mr-2"></i>Aperçu
+                </button>
                 <button type="button" onclick="closeScheduleModal()"
                         class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
                     Annuler
@@ -94,6 +120,22 @@ function closeScheduleModal() {
     modal.classList.add('hidden');
     modal.style.display = 'none';
     document.getElementById('scheduleForm').reset();
+    if (window.setRichTextEditorValue) {
+        setRichTextEditorValue('schedule_message', '');
+    }
+}
+
+function previewScheduleMessage() {
+    const contenu = window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : (document.getElementById('schedule_message').value || '');
+    const nom = document.getElementById('schedule_locataire_nom').value || 'locataire';
+    const body = contenu || '<p>Aucun message personnalisé saisi.</p>';
+
+    if (window.openEmailPreviewModal) {
+        openEmailPreviewModal('Aperçu - Message de programmation', `Message pour ${nom}`, body);
+        return;
+    }
+
+    showNotification('Prévisualisation indisponible', 'warning');
 }
 
 document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
@@ -111,7 +153,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async functio
         heure_envoi: formData.get('date_envoi_time'),
         mois: nextMonth.getMonth() + 1,
         annee: nextMonth.getFullYear(),
-        message: formData.get('message'),
+        message: window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : formData.get('message'),
         recurrent: false,
         tous_locataires: false
     };
