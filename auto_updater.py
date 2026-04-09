@@ -36,6 +36,26 @@ APP_NAME = "Bay Bay"
 # Fichier de log pour le debug
 LOG_FILE = "updater_debug.log"
 
+# Instance partagee pour conserver l'etat de progression entre les routes API.
+_SHARED_UPDATER = None
+
+
+def resolve_current_version(default_version=CURRENT_VERSION):
+    """Retourne la version runtime de l'application si disponible."""
+    # Priorite: version injectee par launcher.py au demarrage.
+    env_version = os.environ.get('BAYBAY_VERSION', '').strip()
+    if env_version:
+        return env_version
+    return default_version
+
+
+def get_shared_updater():
+    """Retourne une instance unique d'AutoUpdater pour conserver update_status."""
+    global _SHARED_UPDATER
+    if _SHARED_UPDATER is None:
+        _SHARED_UPDATER = AutoUpdater()
+    return _SHARED_UPDATER
+
 
 def get_log_path():
     """Retourne le chemin du fichier de log dans %APPDATA%/BayBay"""
@@ -69,8 +89,8 @@ def log_debug(message):
 class AutoUpdater:
     """Gestionnaire de mises à jour automatiques via Setup.exe"""
 
-    def __init__(self, current_version=CURRENT_VERSION, server_url=UPDATE_SERVER_URL):
-        self.current_version = current_version
+    def __init__(self, current_version=None, server_url=UPDATE_SERVER_URL):
+        self.current_version = current_version or resolve_current_version()
         self.server_url = server_url
         self.base_path = self._get_base_path()
         self.config = self._load_config()
@@ -572,9 +592,21 @@ class AutoUpdater:
                 self.update_status['error'] = str(e2)
                 return False
 
-        log_debug("[AutoUpdater] Script lance, fermeture de l'application...")
-        # Quitter l'application
-        sys.exit(0)
+        log_debug("[AutoUpdater] Script lance, fermeture forcee du backend...")
+
+        # Arret force du processus backend pour eviter qu'il bloque l'installation.
+        try:
+            if sys.platform == 'win32':
+                subprocess.Popen(
+                    ['taskkill', '/F', '/PID', str(os.getpid())],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+        except Exception as kill_err:
+            log_debug(f"[AutoUpdater] Echec taskkill backend: {kill_err}")
+
+        os._exit(0)
 
 
 def check_updates_async(callback=None):
@@ -598,16 +630,18 @@ def register_update_routes(app):
     from flask import jsonify, request
 
     log_debug(f"[Flask] Enregistrement des routes de mise a jour")
-    log_debug(f"[Flask] CURRENT_VERSION = {CURRENT_VERSION}")
+    log_debug(f"[Flask] CURRENT_VERSION (fallback) = {CURRENT_VERSION}")
+    log_debug(f"[Flask] VERSION runtime detectee = {resolve_current_version()}")
     log_debug(f"[Flask] Fichier de log: {get_log_path()}")
 
     @app.route('/api/updates/check')
     def api_check_updates():
         """API pour vérifier les mises à jour"""
         log_debug(f"[API] === /api/updates/check appele ===")
-        log_debug(f"[API] CURRENT_VERSION dans le module = {CURRENT_VERSION}")
+        log_debug(f"[API] CURRENT_VERSION fallback = {CURRENT_VERSION}")
+        log_debug(f"[API] CURRENT_VERSION runtime = {resolve_current_version()}")
 
-        updater = AutoUpdater()
+        updater = get_shared_updater()
         log_debug(f"[API] updater.current_version = {updater.current_version}")
 
         result = updater.check_for_updates(silent=False)
@@ -617,7 +651,7 @@ def register_update_routes(app):
             response = {
                 'available': result.get('is_newer', False),
                 'version': result.get('version'),
-                'current_version': result.get('current_version', CURRENT_VERSION),
+                'current_version': result.get('current_version', resolve_current_version()),
                 'release_notes': result.get('release_notes'),
                 'download_url': result.get('download_url'),
                 'asset_name': result.get('asset_name')
@@ -628,7 +662,7 @@ def register_update_routes(app):
         log_debug(f"[API] ERREUR: aucun resultat retourne")
         return jsonify({
             'available': False,
-            'current_version': CURRENT_VERSION,
+            'current_version': resolve_current_version(),
             'error': 'Impossible de verifier les mises a jour'
         })
 
@@ -637,7 +671,10 @@ def register_update_routes(app):
         """API pour télécharger et installer une mise à jour"""
         log_debug(f"[API] === /api/updates/download appele ===")
 
-        updater = AutoUpdater()
+        updater = get_shared_updater()
+        updater.update_status['error'] = None
+        updater.update_status['progress'] = 0
+        updater.update_status['message'] = 'Demarrage de la mise a jour...'
         update_info = updater.check_for_updates(silent=False)
 
         if not update_info or not update_info.get('is_newer'):
@@ -677,7 +714,7 @@ def register_update_routes(app):
     @app.route('/api/updates/config', methods=['GET', 'POST'])
     def api_update_config():
         """API pour configurer les mises à jour automatiques"""
-        updater = AutoUpdater()
+        updater = get_shared_updater()
 
         if request.method == 'POST':
             data = request.get_json() or {}
@@ -692,7 +729,7 @@ def register_update_routes(app):
     @app.route('/api/updates/status')
     def api_update_status():
         """API pour obtenir le statut de la mise à jour en cours"""
-        updater = AutoUpdater()
+        updater = get_shared_updater()
         return jsonify(updater.update_status)
 
 

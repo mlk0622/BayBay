@@ -16,6 +16,177 @@ let mainWindow;
 let splashWindow;
 let backendProcess = null;
 let isQuitting = false;
+let isUpdateInProgress = false;
+let updateProgressWindow = null;
+let updateStatusPollInterval = null;
+
+function escapeHtml(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function createUpdateProgressWindow() {
+    if (updateProgressWindow && !updateProgressWindow.isDestroyed()) {
+        updateProgressWindow.focus();
+        return updateProgressWindow;
+    }
+
+    const ownerWindow = mainWindow && !mainWindow.isDestroyed() ? mainWindow : undefined;
+    updateProgressWindow = new BrowserWindow({
+        width: 520,
+        height: 240,
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        alwaysOnTop: true,
+        modal: !!ownerWindow,
+        parent: ownerWindow,
+        autoHideMenuBar: true,
+        title: 'Mise a jour Bay Bay',
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true
+        }
+    });
+
+    const html = `
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <title>Mise a jour</title>
+            <style>
+                body { font-family: Segoe UI, Arial, sans-serif; margin: 0; background: #f4f7fb; color: #1f2937; }
+                .wrap { padding: 18px 20px; }
+                h1 { font-size: 18px; margin: 0 0 8px; }
+                .sub { font-size: 13px; color: #4b5563; margin-bottom: 14px; }
+                .bar { width: 100%; height: 18px; background: #e5e7eb; border-radius: 9px; overflow: hidden; }
+                .fill { height: 100%; width: 0%; background: linear-gradient(90deg, #059669, #10b981); transition: width 0.25s ease; }
+                .meta { margin-top: 10px; display: flex; justify-content: space-between; font-size: 13px; }
+                .status { margin-top: 14px; font-size: 13px; color: #374151; min-height: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="wrap">
+                <h1>Mise a jour en cours...</h1>
+                <div class="sub">Le telechargement peut prendre quelques minutes. Merci de patienter.</div>
+                <div class="bar"><div id="fill" class="fill"></div></div>
+                <div class="meta">
+                    <div id="percent">0%</div>
+                    <div id="hint">Preparation...</div>
+                </div>
+                <div id="status" class="status">Demarrage...</div>
+            </div>
+            <script>
+                window.setProgress = function(percent, message) {
+                    const safePercent = Number.isFinite(percent) ? Math.max(0, Math.min(100, percent)) : 0;
+                    document.getElementById('fill').style.width = safePercent + '%';
+                    document.getElementById('percent').textContent = Math.round(safePercent) + '%';
+                    document.getElementById('hint').textContent = safePercent >= 100 ? 'Termine' : 'Telechargement';
+                    if (message) {
+                        document.getElementById('status').textContent = message;
+                    }
+                };
+            </script>
+        </body>
+        </html>
+    `;
+
+    updateProgressWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+    updateProgressWindow.on('closed', () => {
+        updateProgressWindow = null;
+    });
+
+    return updateProgressWindow;
+}
+
+function updateProgressWindowUi(percent, message) {
+    if (!updateProgressWindow || updateProgressWindow.isDestroyed()) {
+        return;
+    }
+
+    const p = Number.isFinite(percent) ? percent : 0;
+    const m = escapeHtml(message || '');
+    updateProgressWindow.webContents.executeJavaScript(`window.setProgress(${p}, "${m}");`).catch(() => {});
+}
+
+function stopUpdateStatusPolling() {
+    if (updateStatusPollInterval) {
+        clearInterval(updateStatusPollInterval);
+        updateStatusPollInterval = null;
+    }
+}
+
+function forceCloseForUpdate(reason) {
+    log(`Fermeture forcee pour mise a jour (${reason})`);
+    isQuitting = true;
+    stopUpdateStatusPolling();
+
+    const windows = BrowserWindow.getAllWindows();
+    windows.forEach((win) => {
+        try {
+            win.destroy();
+        } catch (e) {
+            log(`Erreur fermeture fenetre: ${e.message}`);
+        }
+    });
+
+    app.exit(0);
+}
+
+function startUpdateStatusPolling() {
+    stopUpdateStatusPolling();
+
+    updateStatusPollInterval = setInterval(() => {
+        const options = {
+            hostname: BACKEND_HOST,
+            port: BACKEND_PORT,
+            path: '/api/updates/status',
+            method: 'GET',
+            timeout: 10000
+        };
+
+        const req = http.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+                try {
+                    const status = JSON.parse(data);
+                    const percent = Number(status.progress || 0);
+                    const message = status.message || 'Mise a jour en cours...';
+                    updateProgressWindowUi(percent, message);
+
+                    if (status.error) {
+                        stopUpdateStatusPolling();
+                        dialog.showErrorBox('Erreur de mise a jour', status.error);
+                        return;
+                    }
+
+                    // Quand le script d'installation est lance, on ferme l'UI Electron de force.
+                    if (message.toLowerCase().includes('lancement de l\'installation')) {
+                        forceCloseForUpdate('installation lancee');
+                    }
+                } catch (e) {
+                    log(`Erreur parsing status update: ${e.message}`);
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            log(`Erreur polling status update: ${error.message}`);
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            log('Timeout polling status update');
+        });
+
+        req.end();
+    }, 800);
+}
 
 // Fonction pour vérifier les mises à jour via l'API backend
 function checkForUpdatesViaBackend() {
@@ -91,16 +262,8 @@ function checkForUpdatesViaBackend() {
 function triggerUpdate() {
     log('Déclenchement de la mise à jour...');
 
-    // Afficher une notification que le téléchargement commence
-    if (mainWindow) {
-        dialog.showMessageBox(mainWindow, {
-            type: 'info',
-            title: 'Téléchargement en cours',
-            message: 'Téléchargement de la mise à jour...',
-            detail: 'Le téléchargement peut prendre plusieurs minutes selon votre connexion.\nL\'application va se fermer automatiquement pour installer la mise à jour.',
-            buttons: ['OK']
-        });
-    }
+    createUpdateProgressWindow();
+    updateProgressWindowUi(0, 'Demarrage du telechargement...');
 
     const postData = JSON.stringify({ silent: false });
 
@@ -129,9 +292,12 @@ function triggerUpdate() {
                 log(`Résultat mise à jour: ${JSON.stringify(result)}`);
 
                 if (result.success) {
-                    // La mise à jour est lancée, le backend va fermer l'application
-                    log('Mise à jour lancée, l\'application va se fermer...');
+                    isUpdateInProgress = true;
+                    startUpdateStatusPolling();
+                    updateProgressWindowUi(1, 'Telechargement en cours...');
+                    log('Mise a jour demarree, suivi de progression actif');
                 } else {
+                    stopUpdateStatusPolling();
                     dialog.showErrorBox('Erreur de mise à jour', result.message || 'Impossible de lancer la mise à jour');
                 }
             } catch (e) {
@@ -403,6 +569,11 @@ function createMainWindow() {
 }
 
 function stopBackend() {
+    if (isUpdateInProgress) {
+        log('Mise a jour en cours - backend conserve pour finaliser l installation');
+        return;
+    }
+
     if (backendProcess && !backendProcess.killed) {
         log('Arrêt du backend...');
         isQuitting = true;
@@ -472,7 +643,9 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
-    stopBackend();
+    if (!isUpdateInProgress) {
+        stopBackend();
+    }
     app.quit();
 });
 
