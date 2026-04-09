@@ -134,7 +134,7 @@ uploads/signatures/*
 
 # Données locales utilisateur
 data/
-gestion_locative.db
+baybay.db
 *.db
 *.sqlite
 *.sqlite3

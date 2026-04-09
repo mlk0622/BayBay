@@ -56,7 +56,7 @@ os.makedirs(USER_DATA_DIR, exist_ok=True)
 TEMPLATE_FOLDER = os.path.join(INTERNAL_DIR, 'templates')
 STATIC_FOLDER = os.path.join(INTERNAL_DIR, 'static')
 UPLOAD_FOLDER = os.path.join(USER_DATA_DIR, 'uploads')
-DATABASE_PATH = os.path.join(USER_DATA_DIR, 'gestion_locative.db')
+DATABASE_PATH = os.path.join(USER_DATA_DIR, 'baybay.db')
 
 # Importer models
 from models import db, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, StatutPaiement, StatutLocataire, TypeEtatLieux
