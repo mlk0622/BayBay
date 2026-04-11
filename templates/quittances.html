@@ -50,11 +50,9 @@
                         <td class="text-white/70">{{ q.date_paiement|date_fr if q.date_paiement else '-' }}</td>
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
-                                {% if q.locataire.email %}
                                 <button onclick="openQuittanceEmailModal({{ q.id }}, '{{ q.public_ref }}')" class="action-btn email" title="Envoyer par email">
                                     <i class="fas fa-envelope"></i>
                                 </button>
-                                {% endif %}
                                 <a href="/quittance/document/{{ q.public_ref }}/pdf" target="_blank" class="action-btn pdf" title="PDF">
                                     <i class="fas fa-file-pdf"></i>
                                 </a>

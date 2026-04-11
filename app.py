@@ -147,6 +147,82 @@ MOIS_FR = {
 app.jinja_env.globals['MOIS_FR'] = MOIS_FR
 
 # Fonction de génération HTML vers PDF
+def _postprocess_pdf_rounded_borders(pdf_path):
+    """Remplace les bordures rectilignes vertes (#059669) par des rectangles arrondis."""
+    try:
+        import fitz
+        GREEN = (5 / 255, 150 / 255, 105 / 255)  # #059669
+
+        doc = fitz.open(pdf_path)
+        for page in doc:
+            drawings = page.get_drawings()
+            # Collecter les lignes vertes qui forment un rectangle (bordure attestation)
+            # On distingue les simples border-bottom (horizontaux) des bordures
+            # de rectangle (qui ont aussi des segments verticaux).
+            green_all = []
+            for d in drawings:
+                c = d.get("color")
+                if c and len(c) >= 3 and c[1] > 0.5 and c[0] < 0.1 and c[2] > 0.3:
+                    green_all.append(d["rect"])
+
+            # Segments verticaux = lignes où la largeur est quasi nulle
+            has_vertical = any(abs(r.x1 - r.x0) < 1 for r in green_all)
+            if not has_vertical:
+                continue  # Pas de rectangle fermé, seulement des border-bottom
+
+            # Ne garder que les lignes qui font partie du rectangle
+            # (segments verticaux + segments horizontaux à la même hauteur)
+            vertical = [r for r in green_all if abs(r.x1 - r.x0) < 1]
+            vy_min = min(min(r.y0, r.y1) for r in vertical)
+            vy_max = max(max(r.y0, r.y1) for r in vertical)
+            # Garder les horizontaux dont le y est dans la zone du rectangle
+            green_rects = []
+            for r in green_all:
+                is_vertical = abs(r.x1 - r.x0) < 1
+                is_in_rect_zone = (min(r.y0, r.y1) >= vy_min - 2) and (max(r.y0, r.y1) <= vy_max + 2)
+                if is_vertical or is_in_rect_zone:
+                    green_rects.append(r)
+
+            if not green_rects:
+                continue
+
+            # Calculer la bounding box globale de toutes les lignes vertes
+            x0 = min(r.x0 for r in green_rects)
+            y0 = min(r.y0 for r in green_rects)
+            x1 = max(r.x1 for r in green_rects)
+            y1 = max(r.y1 for r in green_rects)
+            bbox = fitz.Rect(x0, y0, x1, y1)
+
+            # Effacer chaque ligne verte individuellement (fine bande blanche)
+            radius = 8
+            shape = page.new_shape()
+            for gr in green_rects:
+                erase = gr + (-1, -1, 1, 1)
+                shape.draw_rect(erase)
+                shape.finish(color=(1, 1, 1), fill=(1, 1, 1), width=0)
+            shape.commit()
+
+            # Dessiner le rectangle arrondi
+            shape = page.new_shape()
+            radius = 8
+            r = bbox
+            shape.draw_line(fitz.Point(r.x0 + radius, r.y0), fitz.Point(r.x1 - radius, r.y0))
+            shape.draw_curve(fitz.Point(r.x1 - radius, r.y0), fitz.Point(r.x1, r.y0), fitz.Point(r.x1, r.y0 + radius))
+            shape.draw_line(fitz.Point(r.x1, r.y0 + radius), fitz.Point(r.x1, r.y1 - radius))
+            shape.draw_curve(fitz.Point(r.x1, r.y1 - radius), fitz.Point(r.x1, r.y1), fitz.Point(r.x1 - radius, r.y1))
+            shape.draw_line(fitz.Point(r.x1 - radius, r.y1), fitz.Point(r.x0 + radius, r.y1))
+            shape.draw_curve(fitz.Point(r.x0 + radius, r.y1), fitz.Point(r.x0, r.y1), fitz.Point(r.x0, r.y1 - radius))
+            shape.draw_line(fitz.Point(r.x0, r.y1 - radius), fitz.Point(r.x0, r.y0 + radius))
+            shape.draw_curve(fitz.Point(r.x0, r.y0 + radius), fitz.Point(r.x0, r.y0), fitz.Point(r.x0 + radius, r.y0))
+            shape.finish(color=GREEN, width=1)
+            shape.commit()
+
+        doc.save(pdf_path, incremental=True, encryption=0)
+        doc.close()
+    except Exception as e:
+        print(f"[WARN] Post-traitement PDF (rounded borders) echoue: {e}")
+
+
 def html_to_pdf(html_content, output_path):
     """Convertit HTML en PDF et sauvegarde le fichier"""
 
@@ -361,7 +437,7 @@ def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jo
 
         if piece_jointe:
             with open(piece_jointe, 'rb') as f:
-                part = MIMEApplication(f.read(), Name=os.path.basename(piece_jointe))
+                part = MIMEApplication(f.read(), _subtype='pdf', Name=os.path.basename(piece_jointe))
                 part['Content-Disposition'] = f'attachment; filename="{os.path.basename(piece_jointe)}"'
                 msg.attach(part)
 
@@ -779,6 +855,7 @@ def _generate_quittance_pdf_file(quittance, force_regenerate=False):
     if not ok:
         return None, error
 
+    _postprocess_pdf_rounded_borders(pdf_path)
     return pdf_path, None
 
 
