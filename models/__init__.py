@@ -529,6 +529,7 @@ class ProgrammationAppel(db.Model):
     recurrent = db.Column(db.Boolean, default=False)
     statut = db.Column(db.String(20), default='en_attente')  # 'en_attente', 'envoye', 'erreur'
     email_expediteur = db.Column(db.String(200), nullable=True)  # Email depuis lequel envoyer
+    sujet = db.Column(db.Text, nullable=True)  # Sujet personnalisé du mail
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def get_locataires(self):

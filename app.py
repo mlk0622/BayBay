@@ -110,10 +110,18 @@ def _backfill_quittance_public_refs():
 
     db.session.commit()
 
+def _ensure_programmation_schema():
+    columns = db.session.execute(text('PRAGMA table_info(programmation_appel)')).fetchall()
+    column_names = {row[1] for row in columns}
+    if 'sujet' not in column_names:
+        db.session.execute(text('ALTER TABLE programmation_appel ADD COLUMN sujet TEXT'))
+        db.session.commit()
+
 with app.app_context():
     db.create_all()
     _ensure_quittance_public_ref_schema()
     _backfill_quittance_public_refs()
+    _ensure_programmation_schema()
 
 def format_currency(value):
     if value is None:
@@ -2599,7 +2607,8 @@ def create_programmation_appel():
         tous_locataires=data.get('tous_locataires', False),
         locataires_ids=locataires_ids_json,
         recurrent=data.get('recurrent', False),
-        email_expediteur=data.get('email_expediteur'),
+        email_expediteur=data.get('email_expediteur') or None,
+        sujet=data.get('sujet') or None,
         statut='en_attente'
     )
     db.session.add(prog)
@@ -2682,6 +2691,8 @@ def send_programmation_now(prog_id):
         sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
         if (data.get('sujet') or '').strip():
             sujet = data.get('sujet').strip()
+        elif (prog.sujet or '').strip():
+            sujet = prog.sujet.strip()
         if (data.get('corps') or '').strip():
             corps = data.get('corps').strip()
 

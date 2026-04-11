@@ -36,6 +36,14 @@
                     <p class="text-slate-400 text-xs mt-1">Si vide, utilise la configuration par défaut.</p>
                 </div>
 
+                <!-- Sujet du mail -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Sujet du mail (optionnel)</label>
+                    <input type="text" id="schedule_sujet" name="sujet"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="Laissez vide pour utiliser le sujet par défaut">
+                </div>
+
                 <!-- Date et heure d'envoi -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -149,6 +157,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async functio
         locataire_id: parseInt(document.getElementById('schedule_locataire_id').value),
         locataires_ids: [parseInt(document.getElementById('schedule_locataire_id').value)],
         email_expediteur: formData.get('email_expediteur'),
+        sujet: formData.get('sujet'),
         date_envoi: formData.get('date_envoi_date'),
         heure_envoi: formData.get('date_envoi_time'),
         mois: nextMonth.getMonth() + 1,
