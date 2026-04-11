@@ -495,6 +495,7 @@ class Quittance(db.Model):
     loyer_hc = db.Column(db.Numeric(10, 2), nullable=False)
     charges = db.Column(db.Numeric(10, 2), nullable=False, default=0)
     montant_paye = db.Column(db.Numeric(10, 2), nullable=False)
+    public_ref = db.Column(db.String(24), unique=True, nullable=True, index=True)
     date_paiement = db.Column(db.Date, nullable=True)
     date_emission = db.Column(db.Date, default=date.today)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -528,6 +529,7 @@ class ProgrammationAppel(db.Model):
     recurrent = db.Column(db.Boolean, default=False)
     statut = db.Column(db.String(20), default='en_attente')  # 'en_attente', 'envoye', 'erreur'
     email_expediteur = db.Column(db.String(200), nullable=True)  # Email depuis lequel envoyer
+    sujet = db.Column(db.Text, nullable=True)  # Sujet personnalisé du mail
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def get_locataires(self):

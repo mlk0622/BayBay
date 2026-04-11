@@ -41,7 +41,23 @@
       "Bash(mkdir -p \"dist-simple/BayBay-win32-x64/resources/backend\")",
       "Bash(cp -r \"../dist/BayBay/\"* \"dist-simple/BayBay-win32-x64/resources/backend/\")",
       "Bash(where makensis:*)",
-      "Bash(\"C:/Program Files \\(x86\\)/NSIS/makensis.exe\" installer.nsi)"
+      "Bash(\"C:/Program Files \\(x86\\)/NSIS/makensis.exe\" installer.nsi)",
+      "Bash(node --check main.js)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('auto_updater.py', encoding='utf-8'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python -c \"import subprocess; print\\('CREATE_NO_WINDOW=', hex\\(subprocess.CREATE_NO_WINDOW\\)\\); print\\('CREATE_BREAKAWAY_FROM_JOB=', hex\\(subprocess.CREATE_BREAKAWAY_FROM_JOB\\)\\)\")",
+      "Bash(python -c ':*)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('auto_updater.py', encoding='utf-8'\\).read\\(\\)\\); print\\('AST OK'\\)\")",
+      "Bash(powershell:*)",
+      "Bash(xxd)",
+      "Bash(node --check C:/Users/Mathis/Documents/Developpement/BayBay/electron-app/main.js)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('auto_updater.py', encoding='utf-8'\\).read\\(\\)\\); print\\('PY OK'\\)\")",
+      "Bash(mkdir -p C:/Users/Mathis/AppData/Local/Temp/baybay_test_gen)",
+      "Bash(node --check electron-app/main.js)",
+      "Bash(mkdir -p C:/Users/Mathis/AppData/Local/Temp/baybay_test)",
+      "Bash(rm -rf C:/Users/Mathis/AppData/Local/Temp/baybay_test)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(where wkhtmltopdf:*)"
     ]
   }
 }

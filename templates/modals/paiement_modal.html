@@ -191,6 +191,17 @@
                     <input type="date" name="date_paiement" id="quittanceDatePaiement"
                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                 </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-slate-700">Signature bailleur (optionnel)</label>
+                        <button type="button" onclick="resetQuittanceSignaturePad()" class="text-xs px-2 py-1 rounded border border-slate-300 text-slate-600 hover:bg-slate-100">
+                            Effacer
+                        </button>
+                    </div>
+                    <canvas id="quittanceSignatureCanvas" width="520" height="160" class="w-full h-40 rounded-lg border border-slate-300 bg-white"></canvas>
+                    <p class="text-xs text-slate-500 mt-1">Dessinez votre signature ici, elle sera intégrée à la quittance PDF.</p>
+                    <input type="hidden" name="signature_data" id="quittanceSignatureData">
+                </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('quittanceModal')"

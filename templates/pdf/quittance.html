@@ -4,97 +4,80 @@
     <meta charset="UTF-8">
     <title>Quittance de Loyer - {{ mois_fr[quittance.mois] }} {{ quittance.annee }}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #059669; padding-bottom: 20px; }
-        .header h1 { color: #059669; font-size: 28px; margin-bottom: 5px; }
-        .header p { color: #666; }
-        .section { margin-bottom: 30px; }
-        .section-title { font-size: 14px; color: #059669; text-transform: uppercase; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
-        .grid { display: flex; justify-content: space-between; gap: 40px; }
-        .grid-item { flex: 1; }
-        .label { font-size: 12px; color: #666; margin-bottom: 2px; }
-        .value { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
-        .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        .table th { background: #f3f4f6; font-size: 12px; text-transform: uppercase; color: #666; }
-        .table td { font-size: 14px; }
-        .table .total-row { background: #ecfdf5; font-weight: bold; }
-        .table .total-row td { color: #059669; font-size: 16px; }
-        .amount { text-align: right; }
-        .footer { margin-top: 50px; text-align: center; color: #666; font-size: 12px; }
-        .attestation { background: #ecfdf5; border: 2px solid #059669; padding: 20px; border-radius: 8px; margin-top: 30px; text-align: center; }
-        .attestation h3 { color: #059669; margin-bottom: 10px; }
-        .attestation p { font-size: 14px; line-height: 1.6; }
-        .signature { margin-top: 40px; display: flex; justify-content: flex-end; }
-        .signature-box { text-align: center; }
-        .signature-line { border-top: 1px solid #333; width: 200px; margin-top: 60px; padding-top: 5px; }
+        * { margin: 0; padding: 0; }
+        body { font-family: Helvetica, Arial, sans-serif; padding: 20px; color: #333; font-size: 13px; }
+        @page { size: A4; margin: 10mm; }
         @media print {
-            body { padding: 20px; }
+            body { padding: 0; }
             .no-print { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>QUITTANCE DE LOYER</h1>
-            <p>{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</p>
+    <div style="max-width: 800px; margin: 0 auto;">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 14px;">
+            <h1 style="color: #059669; font-size: 24px; margin-bottom: 10px;">QUITTANCE DE LOYER</h1>
+            <p style="color: #666; margin-bottom: 1px;">{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</p>
+            <p style="font-size: 12px; margin-bottom: 0;">Référence document: <strong>{{ document_reference }}</strong></p>
+            <table style="width: 100%; margin-top: 6px;" cellpadding="0" cellspacing="0"><tr><td style="border-top: 2px solid #059669; font-size: 1px; line-height: 1px;">&nbsp;</td></tr></table>
         </div>
 
-        <div class="section">
-            <div class="grid">
-                <div class="grid-item">
-                    <div class="section-title">Bailleur</div>
+        <!-- Bailleur / Locataire -->
+        <table style="width: 100%; margin-bottom: 12px;" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="vertical-align: top; width: 48%; padding-right: 20px;">
+                    <div style="font-size: 12px; color: #059669; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #059669; padding-bottom: 3px;">BAILLEUR</div>
                     {% if sci %}
-                    <div class="value" style="font-size: 16px; font-weight: bold;">{{ sci.nom }}</div>
-                    {% if sci.adresse %}<div class="value">{{ sci.adresse }}</div>{% endif %}
-                    {% if sci.code_postal or sci.ville %}<div class="value">{{ sci.code_postal or '' }} {{ sci.ville }}</div>{% endif %}
-                    {% if sci.siret %}<div class="label">SIRET: {{ sci.siret }}</div>{% endif %}
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">{{ sci.nom }}</div>
+                    {% if sci.adresse %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ sci.adresse }}</div>{% endif %}
+                    {% if sci.code_postal or sci.ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ sci.code_postal or '' }} {{ sci.ville }}</div>{% endif %}
+                    {% if sci.siret %}<div style="font-size: 12px; color: #666; margin-bottom: 2px;">SIRET: {{ sci.siret }}</div>{% endif %}
                     {% endif %}
-                </div>
-                <div class="grid-item">
-                    <div class="section-title">Locataire</div>
-                    <div class="value" style="font-size: 16px; font-weight: bold;">{{ locataire.nom_complet }}</div>
+                </td>
+                <td style="vertical-align: top; width: 48%; padding-left: 20px;">
+                    <div style="font-size: 12px; color: #059669; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #059669; padding-bottom: 3px;">LOCATAIRE</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">{{ locataire.nom_complet }}</div>
                     {% if appartement and bien %}
-                    <div class="value">{{ appartement.numero_porte }}</div>
-                    <div class="value">{{ bien.adresse }}</div>
-                    {% if bien.code_postal or bien.ville %}<div class="value">{{ bien.code_postal or '' }} {{ bien.ville or '' }}</div>{% endif %}
+                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ appartement.numero_porte }}</div>
+                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bien.adresse }}</div>
+                    {% if bien.code_postal or bien.ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bien.code_postal or '' }} {{ bien.ville or '' }}</div>{% endif %}
                     {% endif %}
-                </div>
-            </div>
-        </div>
+                </td>
+            </tr>
+        </table>
 
-        <div class="section">
-            <div class="section-title">Détail du règlement</div>
-            <table class="table">
+        <!-- Détail du règlement -->
+        <div style="margin-bottom: 12px;">
+            <div style="font-size: 12px; color: #059669; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #e5e7eb; padding-bottom: 3px;">DÉTAIL DU RÈGLEMENT</div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 6px;" cellpadding="0" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Désignation</th>
-                        <th class="amount">Montant</th>
+                        <th style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; font-size: 11px; color: #666;">DÉSIGNATION</th>
+                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; font-size: 11px; color: #666;">MONTANT</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Loyer hors charges</td>
-                        <td class="amount">{{ "%.2f"|format(quittance.loyer_hc) }} €</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px;">Loyer hors charges</td>
+                        <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; font-size: 13px;">{{ "%.2f"|format(quittance.loyer_hc) }} €</td>
                     </tr>
                     <tr>
-                        <td>Provisions pour charges</td>
-                        <td class="amount">{{ "%.2f"|format(quittance.charges) }} €</td>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px;">Provisions pour charges</td>
+                        <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; font-size: 13px;">{{ "%.2f"|format(quittance.charges) }} €</td>
                     </tr>
-                    <tr class="total-row">
-                        <td>TOTAL</td>
-                        <td class="amount">{{ "%.2f"|format(quittance.total) }} €</td>
+                    <tr>
+                        <td style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; font-weight: bold; color: #059669; background-color: #f0fdf4;">TOTAL</td>
+                        <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; font-size: 14px; font-weight: bold; color: #059669; background-color: #f0fdf4;">{{ "%.2f"|format(quittance.total) }} €</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="attestation">
-            <h3>ATTESTATION DE PAIEMENT</h3>
-            <p>
+        <!-- Attestation de paiement -->
+        <div style="border: 1px solid #059669; padding: 14px 12px; margin-top: 8px; text-align: center; -webkit-border-radius: 8px; border-radius: 8px;">
+            <h3 style="color: #059669; margin-bottom: 8px; padding-top: 4px; font-size: 13px;">ATTESTATION DE PAIEMENT</h3>
+            <p style="font-size: 12px; line-height: 1.4;">
                 Je soussigné(e), représentant de <strong>{{ sci.nom if sci else '-' }}</strong>,
                 reconnais avoir reçu de <strong>{{ locataire.nom_complet }}</strong>
                 la somme de <strong>{{ "%.2f"|format(quittance.montant_paye) }} €</strong>
@@ -105,13 +88,40 @@
             </p>
         </div>
 
-        <div class="signature">
-            <div class="signature-box">
-                <div class="signature-line">Le Bailleur</div>
-            </div>
-        </div>
+        <!-- Signature alignée à droite via table push -->
+        <table style="width: 100%; margin-top: 10px;" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="width: 65%;"></td>
+                <td style="width: 35%; text-align: center;">
+                    {% if signature_data_url %}
+                    <img src="{{ signature_data_url }}" alt="Signature bailleur" style="max-width: 180px; max-height: 60px;">
+                    {% endif %}
+                    <div style="border-top: 1px solid #333; padding-top: 4px; font-size: 12px; margin-top: 14px;">Le Bailleur</div>
+                </td>
+            </tr>
+        </table>
 
-        <div class="footer">
+        <!--
+        Bloc de validation documentaire temporairement masque.
+        Le backend continue de calculer verification_id / integrity_hash / verification_url / qr_data_url.
+        Pour le reactiver plus tard, decommenter simplement ce bloc.
+        <div class="integrity">
+            <h4>Validation documentaire</h4>
+            <div class="integrity-row"><strong>ID vérification:</strong> {{ verification_id }}</div>
+            <div class="integrity-row"><strong>Empreinte SHA-256:</strong> {{ integrity_hash }}</div>
+            <div class="integrity-row"><strong>Vérifier:</strong> {{ verification_url }}</div>
+            <div class="integrity-row"><strong>Généré le:</strong> {{ verification_generated_at }}</div>
+            <div class="integrity-row"><strong>Origine:</strong> Document généré par l'entreprise via le logiciel BAYBAY.</div>
+            {% if qr_data_url %}
+            <div class="integrity-qr">
+                <img src="{{ qr_data_url }}" alt="QR vérification">
+            </div>
+            {% endif %}
+        </div>
+        -->
+
+        <!-- Footer -->
+        <div style="margin-top: 14px; text-align: center; color: #666; font-size: 11px;">
             <p>Quittance émise le {{ quittance.date_emission.strftime('%d/%m/%Y') if quittance.date_emission else '-' }}</p>
             <p style="margin-top: 10px; font-size: 11px; color: #999;">
                 Cette quittance annule tous les reçus qui auraient pu être établis précédemment en cas de paiement partiel du montant ci-dessus.
@@ -119,7 +129,7 @@
         </div>
 
         <div class="no-print" style="margin-top: 30px; text-align: center;">
-            <button onclick="window.print()" style="background: #059669; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            <button onclick="window.print()" style="background: #059669; color: white; padding: 12px 24px; border: none; cursor: pointer; font-size: 14px;">
                 Imprimer / Télécharger PDF
             </button>
         </div>

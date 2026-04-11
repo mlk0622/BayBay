@@ -3,10 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}GestLoc{% endblock %}</title>
+    <title>{% block title %}BayBay{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}">
+    <style>
+        .rich-editor-shell {
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        .rich-editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .rich-editor-toolbar button,
+        .rich-editor-toolbar label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
+            min-width: 32px;
+            padding: 0 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .rich-editor-toolbar button:hover,
+        .rich-editor-toolbar label:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .rich-editor-toolbar input[type="color"] {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .rich-editor-toolbar select {
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            padding: 0 10px;
+            font-size: 13px;
+            max-width: 100%;
+        }
+
+        .rich-editor-area {
+            min-height: 300px;
+            max-height: 52vh;
+            padding: 14px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            outline: none;
+            background: rgba(0, 0, 0, 0.22);
+            line-height: 1.6;
+            white-space: normal;
+            overflow-y: auto;
+        }
+
+        .rich-editor-area:empty:before {
+            content: attr(data-placeholder);
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .rich-editor-area ul,
+        .rich-editor-area ol {
+            padding-left: 2rem;
+            margin: 0.5rem 0;
+            color: #fff;
+            list-style-position: outside;
+        }
+
+        .rich-editor-area ul {
+            list-style-type: disc;
+        }
+
+        .rich-editor-area ol {
+            list-style-type: decimal;
+        }
+
+        .rich-editor-area li {
+            color: #fff !important;
+            display: list-item;
+        }
+
+        .rich-editor-area li::marker {
+            color: #fff !important;
+        }
+
+        .rich-editor-area p {
+            margin: 0 0 0.75rem;
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -20,14 +126,14 @@
         };
 
         (function initTheme() {
-            const savedTheme = localStorage.getItem('gestloc-theme');
+            const savedTheme = localStorage.getItem('baybay-theme');
             if (savedTheme) {
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 return;
             }
             // Mode sombre par défaut
             document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('gestloc-theme', 'dark');
+            localStorage.setItem('baybay-theme', 'dark');
         })();
     </script>
 </head>
@@ -42,7 +148,7 @@
                         <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                             <i class="fas fa-building text-white text-lg"></i>
                         </div>
-                        <span class="text-xl font-bold text-slate-900">GestLoc</span>
+                        <span class="text-xl font-bold text-slate-900">BayBay</span>
                     </a>
                 </div>
 
@@ -91,12 +197,12 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button id="themeToggle" type="button"
+                    <!-- <button id="themeToggle" type="button"
                             class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                             title="Changer le thème"
                             aria-label="Changer le thème">
                         <i class="fas fa-moon text-lg" id="themeIcon"></i>
-                    </button>
+                    </button> -->
                     <button onclick="openModal('sciModal')"
                             class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                         <i class="fas fa-plus mr-2"></i>Nouvelle SCI
@@ -136,8 +242,268 @@
     {% include 'modals/assurance_modal.html' %}
     {% endif %}
 
+    <div id="emailPreviewModal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-black/70 p-4">
+        <div class="glass-card w-full max-w-6xl max-h-[92vh] overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-white/10">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <h3 id="emailPreviewTitle" class="text-xl font-semibold text-white">Aperçu du mail</h3>
+                        <p class="text-sm text-white/60 mt-1">Rendu HTML exact avant envoi</p>
+                    </div>
+                    <button type="button" onclick="closeEmailPreviewModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="mt-4 rounded-xl border border-white/10 bg-white px-4 py-3 text-slate-900">
+                    <div class="text-xs uppercase tracking-[0.2em] mb-1 text-black" style="color: #000;">Sujet</div>
+                    <div id="emailPreviewSubject" class="font-semibold break-words text-black" style="color: #000;"></div>
+                </div>
+            </div>
+            <div class="flex-1 min-h-0 bg-slate-100 p-4 overflow-hidden">
+                <iframe id="emailPreviewFrame" title="Aperçu du mail" class="w-full h-full min-h-[68vh] rounded-2xl border border-slate-200 bg-white overflow-auto"></iframe>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     <script>
+        function emailVariable(name) {
+            return String.fromCharCode(123, 123) + name + String.fromCharCode(125, 125);
+        }
+
+        window.BAYBAY_EMAIL_VARIABLES = [
+            { value: emailVariable('locataire_prenom'), label: 'Locataire prénom' },
+            { value: emailVariable('locataire_nom'), label: 'Locataire nom' },
+            { value: emailVariable('locataire_nom_complet'), label: 'Locataire nom complet' },
+            { value: emailVariable('locataire_email'), label: 'Locataire email' },
+            { value: emailVariable('locataire_telephone'), label: 'Locataire téléphone' },
+            { value: emailVariable('locataire_adresse_precedente'), label: 'Locataire adresse précédente' },
+            { value: emailVariable('locataire_total_mensuel'), label: 'Locataire total mensuel' },
+            { value: emailVariable('locataire_loyer_actuel'), label: 'Locataire loyer actuel' },
+            { value: emailVariable('locataire_charges_actuelles'), label: 'Locataire charges actuelles' },
+            { value: emailVariable('locataire_date_debut_bail'), label: 'Locataire date début bail' },
+            { value: emailVariable('locataire_date_fin_bail'), label: 'Locataire date fin bail' },
+            { value: emailVariable('appartement_numero_porte'), label: 'Appartement numéro' },
+            { value: emailVariable('appartement_type'), label: 'Appartement type' },
+            { value: emailVariable('appartement_surface'), label: 'Appartement surface' },
+            { value: emailVariable('appartement_loyer_mensuel'), label: 'Appartement loyer mensuel' },
+            { value: emailVariable('appartement_charges'), label: 'Appartement charges' },
+            { value: emailVariable('appartement_etage'), label: 'Appartement étage' },
+            { value: emailVariable('bien_adresse'), label: 'Bien adresse' },
+            { value: emailVariable('bien_code_postal'), label: 'Bien code postal' },
+            { value: emailVariable('bien_ville'), label: 'Bien ville' },
+            { value: emailVariable('bien_type_bien'), label: 'Bien type' },
+            { value: emailVariable('sci_nom'), label: 'SCI nom' },
+            { value: emailVariable('sci_adresse'), label: 'SCI adresse' },
+            { value: emailVariable('sci_code_postal'), label: 'SCI code postal' },
+            { value: emailVariable('sci_ville'), label: 'SCI ville' },
+            { value: emailVariable('sci_email'), label: 'SCI email' },
+            { value: emailVariable('periode'), label: 'Période' },
+            { value: emailVariable('total'), label: 'Total' },
+            { value: emailVariable('total_avec_arrieres'), label: 'Total avec arriérés' },
+            { value: emailVariable('arrieres'), label: 'Arriérés' },
+            { value: emailVariable('montant_paye'), label: 'Montant payé' },
+            { value: emailVariable('date_paiement'), label: 'Date paiement' },
+            { value: emailVariable('date_echeance'), label: 'Date échéance' },
+            { value: emailVariable('date_emission'), label: 'Date émission' },
+            { value: emailVariable('email_expediteur'), label: 'Email expéditeur' }
+        ];
+
+        (function initRichEditors() {
+            function applyDefaultFontIfNeeded(htmlValue) {
+                const value = (htmlValue || '').trim();
+                if (!value) return '';
+                if (/font-family\s*:/i.test(value)) return value;
+                return `<div style="font-family: Arial, sans-serif;">${value}</div>`;
+            }
+
+            function escapeHtml(text) {
+                return String(text)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function syncEditor(root) {
+                const editor = root.querySelector('[contenteditable="true"]');
+                const targetId = root.dataset.target;
+                const target = document.getElementById(targetId);
+                if (target && editor) {
+                    target.value = editor.innerHTML;
+                }
+            }
+
+            function saveSelection(root) {
+                const editor = root.querySelector('[contenteditable="true"]');
+                const selection = window.getSelection();
+                if (!editor || !selection || selection.rangeCount === 0) return;
+
+                const range = selection.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer)) {
+                    root._savedRange = range;
+                }
+            }
+
+            function setEditorValue(root, html) {
+                const editor = root.querySelector('[contenteditable="true"]');
+                if (editor) {
+                    editor.innerHTML = html || '';
+                    syncEditor(root);
+                }
+            }
+
+            function runCommand(root, command, value) {
+                const editor = root.querySelector('[contenteditable="true"]');
+                if (!editor) return;
+                editor.focus();
+                if (command === 'fontName') {
+                    document.execCommand('styleWithCSS', false, true);
+                }
+                document.execCommand(command, false, value || null);
+                syncEditor(root);
+            }
+
+            function insertTextAtCursor(root, text) {
+                const editor = root.querySelector('[contenteditable="true"]');
+                if (!editor) return;
+                editor.focus();
+                if (root._savedRange) {
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(root._savedRange);
+                }
+                const selection = window.getSelection();
+                if (!selection || selection.rangeCount === 0) {
+                    editor.innerHTML += escapeHtml(text);
+                    syncEditor(root);
+                    return;
+                }
+
+                if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+                    document.execCommand('insertText', false, text);
+                    syncEditor(root);
+                    if (selection.rangeCount > 0) {
+                        root._savedRange = selection.getRangeAt(0).cloneRange();
+                    }
+                    return;
+                }
+
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                const fragment = document.createDocumentFragment();
+                fragment.appendChild(document.createTextNode(text));
+                const lastNode = fragment.lastChild;
+                range.insertNode(fragment);
+
+                if (lastNode) {
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    root._savedRange = range.cloneRange();
+                }
+
+                syncEditor(root);
+            }
+
+            function populateVariableSelect(select) {
+                if (!select || select.dataset.populated === '1') return;
+                select.innerHTML = '<option value="">Insérer une variable...</option>';
+                window.BAYBAY_EMAIL_VARIABLES.forEach((variable) => {
+                    const option = document.createElement('option');
+                    option.value = variable.value;
+                    option.textContent = variable.label;
+                    select.appendChild(option);
+                });
+                select.dataset.populated = '1';
+            }
+
+            function setupEditor(root) {
+                if (root.dataset.initialized === '1') return;
+                const editor = root.querySelector('[contenteditable="true"]');
+                if (!editor) return;
+
+                root.querySelectorAll('[data-command]').forEach((control) => {
+                    const command = control.dataset.command;
+                    const isColorInput = control.tagName === 'INPUT' && control.type === 'color';
+                    const isSelect = control.tagName === 'SELECT';
+
+                    const handler = (event) => {
+                        event.preventDefault();
+                        runCommand(root, command, control.dataset.value || control.value);
+                    };
+
+                    if (isColorInput) {
+                        control.addEventListener('input', handler);
+                        control.addEventListener('change', handler);
+                    } else if (isSelect) {
+                        control.addEventListener('change', handler);
+                    } else {
+                        if (control.tagName === 'BUTTON') {
+                            control.addEventListener('mousedown', (event) => event.preventDefault());
+                        }
+                        control.addEventListener('click', handler);
+                    }
+                });
+
+                root.querySelectorAll('[data-insert-variable]').forEach((button) => {
+                    button.addEventListener('mousedown', (event) => event.preventDefault());
+                    button.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        const variableSelect = root.querySelector('[data-variable-select]');
+                        if (!variableSelect || !variableSelect.value) return;
+                        insertTextAtCursor(root, variableSelect.value);
+                        variableSelect.value = '';
+                    });
+                });
+
+                const variableSelect = root.querySelector('[data-variable-select]');
+                const insertVariableButton = root.querySelector('[data-insert-variable]');
+                if (variableSelect) {
+                    populateVariableSelect(variableSelect);
+                }
+
+                editor.addEventListener('input', () => syncEditor(root));
+                editor.addEventListener('keyup', () => saveSelection(root));
+                editor.addEventListener('mouseup', () => saveSelection(root));
+                editor.addEventListener('click', () => saveSelection(root));
+                editor.addEventListener('focus', () => saveSelection(root));
+                editor.addEventListener('blur', () => syncEditor(root));
+                syncEditor(root);
+                root.dataset.initialized = '1';
+            }
+
+            window.setRichTextEditorValue = function(editorId, html) {
+                const root = document.querySelector(`[data-target="${editorId}"]`);
+                if (!root) return;
+                if (root.dataset.initialized !== '1') {
+                    setupEditor(root);
+                }
+                setEditorValue(root, html);
+            };
+
+            window.getRichTextEditorValue = function(editorId) {
+                const target = document.getElementById(editorId);
+                if (!target) return '';
+                return applyDefaultFontIfNeeded(target.value);
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('[data-target]').forEach(setupEditor);
+            });
+
+            document.addEventListener('selectionchange', () => {
+                const active = document.activeElement;
+                if (!active || active.getAttribute('contenteditable') !== 'true') return;
+                const root = active.closest('[data-target]');
+                if (root) {
+                    saveSelection(root);
+                }
+            });
+        })();
+
         // Fonction pour mettre à jour l'icône du thème
         function updateThemeIcon() {
             const theme = document.documentElement.getAttribute('data-theme');
@@ -155,7 +521,7 @@
             const current = document.documentElement.getAttribute('data-theme') || 'dark';
             const next = current === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('gestloc-theme', next);
+            localStorage.setItem('baybay-theme', next);
             updateThemeIcon();
         });
     </script>

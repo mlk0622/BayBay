@@ -1,9 +1,19 @@
 # ========================================
 # Bay Bay - .gitignore
 # ========================================
-electron-app/dist-simple/
+build/
+dist/
+.claude-code/
+electron-app/
 *.exe
 node_modules/
+
+# Build/Publish/Installer scripts and outputs
+publish.bat
+build.bat
+installer.nsi
+build/
+dist/
 
 
 # Python
@@ -94,9 +104,40 @@ app.log
 *.sqlite3
 instance/
 
-# Uploads (données utilisateur)
-uploads/
+# Uploads (structure versionnée, contenu ignoré)
+uploads/*
+!uploads/.gitkeep
+!uploads/assurances/
+uploads/assurances/*
+!uploads/assurances/.gitkeep
+!uploads/etats_lieux/
+uploads/etats_lieux/*
+!uploads/etats_lieux/.gitkeep
+!uploads/etats_lieux/photos/
+uploads/etats_lieux/photos/*
+!uploads/etats_lieux/photos/.gitkeep
+!uploads/photos/
+uploads/photos/*
+!uploads/photos/.gitkeep
+!uploads/quittances/
+uploads/quittances/*
+!uploads/quittances/.gitkeep
+!uploads/quittances/signatures/
+uploads/quittances/signatures/*
+!uploads/quittances/signatures/.gitkeep
+!uploads/appels_loyer/
+uploads/appels_loyer/*
+!uploads/appels_loyer/.gitkeep
+!uploads/signatures/
+uploads/signatures/*
+!uploads/signatures/.gitkeep
+
+# Données locales utilisateur
 data/
+baybay.db
+*.db
+*.sqlite
+*.sqlite3
 
 # Environment variables
 .env

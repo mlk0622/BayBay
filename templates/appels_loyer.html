@@ -74,7 +74,6 @@
                         <td class="py-4 px-4 text-white/70">{{ appel.date_echeance.strftime('%d/%m/%Y') if appel.date_echeance else '-' }}</td>
                         <td class="py-4 px-4">
                             <div class="flex items-center justify-end space-x-2">
-                                {% if appel.locataire.email %}
                                 <button onclick="openScheduleModalFor({{ appel.locataire.id }}, '{{ appel.locataire.nom_complet }}', '{{ appel.locataire.email }}')"
                                     class="p-2 bg-purple-400/20 hover:bg-purple-400/30 text-purple-400 rounded-lg transition-all" title="Programmer l'envoi">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +86,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                 </button>
-                                {% endif %}
                                 <a href="/api/appel-loyer/{{ appel.id }}/pdf" target="_blank"
                                     class="p-2 bg-blue-400/20 hover:bg-blue-400/30 text-blue-400 rounded-lg transition-all" title="Télécharger PDF">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,10 +125,10 @@
 {% include 'modals/schedule_modal.html' %}
 
 <div id="appelEmailModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/60 p-4">
-    <div class="glass-card w-full max-w-2xl p-6 space-y-4">
+    <div class="glass-card w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between">
             <h3 class="text-xl font-semibold text-white">Envoyer l'appel de loyer par email</h3>
-            <button type="button" onclick="closeModal('appelEmailModal')" class="text-white/70 hover:text-white">
+            <button type="button" onclick="closeModal('appelEmailModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -148,12 +146,49 @@
             <input id="appelEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
         </div>
 
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/15 bg-black/25 px-3 py-2">
+            <label class="inline-flex items-center gap-2 text-sm text-white/90 cursor-pointer">
+                <input id="appelEmailIncludePdf" type="checkbox" class="accent-blue-500" checked>
+                <span>Joindre le PDF de l'appel</span>
+            </label>
+            <button type="button" onclick="openAppelLinkedPdf()" class="px-3 py-1.5 rounded-lg border border-white/20 text-white/80 hover:text-white text-sm">
+                <i class="fas fa-file-pdf mr-2"></i>Voir le PDF lié
+            </button>
+        </div>
+
         <div>
-            <label class="block text-sm text-white/80 mb-2">Corps HTML</label>
-            <textarea id="appelEmailCorps" rows="8" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Corps personnalisé (optionnel)"></textarea>
+            <label class="block text-sm text-white/80 mb-2">Corps Mail</label>
+            <div class="rich-editor-shell" data-target="appelEmailCorps">
+                <div class="rich-editor-toolbar">
+                    <button type="button" data-command="bold"><strong>B</strong></button>
+                    <button type="button" data-command="italic"><em>I</em></button>
+                    <button type="button" data-command="underline"><u>U</u></button>
+                    <button type="button" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" data-command="removeFormat">Tx</button>
+                    <select data-variable-select aria-label="Variables du mail"></select>
+                    <button type="button" data-insert-variable>Insérer</button>
+                    <label title="Couleur du texte">
+                        <input type="color" data-command="foreColor" value="#ffffff">
+                    </label>
+                    <select data-command="fontName" aria-label="Police du mail" title="Police">
+                        <option value="Arial">Arial</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="Trebuchet MS">Trebuchet</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
+                <div id="appelEmailCorpsEditor" class="rich-editor-area" contenteditable="true" data-placeholder="Rédigez ici le corps du mail..."></div>
+                <textarea id="appelEmailCorps" class="hidden"></textarea>
+            </div>
         </div>
 
         <div class="flex justify-end gap-3">
+            <button type="button" onclick="previewAppelEmail()" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">
+                <i class="fas fa-eye mr-2"></i>Aperçu
+            </button>
             <button type="button" onclick="closeModal('appelEmailModal')" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">Annuler</button>
             <button type="button" onclick="sendAppelEmail()" class="ios-button text-white px-4 py-2">
                 <i class="fas fa-paper-plane mr-2"></i>Envoyer
@@ -190,22 +225,27 @@ let currentAppelEmailId = null;
 function applyAppelEmailTemplate() {
     const modele = document.getElementById('appelEmailModele').value;
     const sujetField = document.getElementById('appelEmailSujet');
-    const corpsField = document.getElementById('appelEmailCorps');
 
     if (modele === 'rappel') {
         sujetField.value = 'Rappel - Appel de loyer';
-        corpsField.value = '<p>Bonjour,</p><p>Ceci est un rappel concernant votre appel de loyer.</p><p>Le détail est en pièce jointe.</p><p>Cordialement.</p>';
+        setRichTextEditorValue('appelEmailCorps', '<p>Bonjour,</p><p>Ceci est un <strong>rappel</strong> concernant votre appel de loyer.</p><p>Le détail est en pièce jointe.</p><p>Cordialement.</p>');
     } else {
         sujetField.value = 'Appel de loyer';
-        corpsField.value = '<p>Bonjour,</p><p>Veuillez trouver ci-joint votre appel de loyer.</p><p>Cordialement.</p>';
+        setRichTextEditorValue('appelEmailCorps', '<p>Bonjour,</p><p>Veuillez trouver ci-joint votre appel de loyer.</p><p>Cordialement.</p>');
     }
 }
 
 function openAppelEmailModal(appelId) {
     currentAppelEmailId = appelId;
     document.getElementById('appelEmailModele').value = 'standard';
+    document.getElementById('appelEmailIncludePdf').checked = true;
     applyAppelEmailTemplate();
     openModal('appelEmailModal');
+}
+
+function openAppelLinkedPdf() {
+    if (!currentAppelEmailId) return;
+    window.open(`/api/appel-loyer/${currentAppelEmailId}/pdf`, '_blank');
 }
 
 async function sendAppelEmail() {
@@ -215,7 +255,8 @@ async function sendAppelEmail() {
         const payload = {
             modele_email: document.getElementById('appelEmailModele').value,
             sujet: document.getElementById('appelEmailSujet').value,
-            corps: document.getElementById('appelEmailCorps').value
+            corps: getRichTextEditorValue('appelEmailCorps'),
+            include_pdf: document.getElementById('appelEmailIncludePdf').checked
         };
 
         const response = await fetch(`/api/appel-loyer/${currentAppelEmailId}/envoyer`, {
@@ -234,6 +275,34 @@ async function sendAppelEmail() {
         }
     } catch (error) {
         showNotification('Erreur lors de l\'envoi', 'error');
+    }
+}
+
+async function previewAppelEmail() {
+    if (!currentAppelEmailId) return;
+
+    try {
+        const payload = {
+            modele_email: document.getElementById('appelEmailModele').value,
+            sujet: document.getElementById('appelEmailSujet').value,
+            corps: getRichTextEditorValue('appelEmailCorps')
+        };
+
+        const response = await fetch(`/api/appel-loyer/${currentAppelEmailId}/preview-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            openEmailPreviewModal('Aperçu - Appel de loyer', data.subject || '', data.body || '');
+        } else {
+            showNotification('Erreur: ' + (data.message || data.error || 'Impossible de générer l\'aperçu'), 'error');
+        }
+    } catch (error) {
+        showNotification('Erreur lors de la génération de l\'aperçu', 'error');
     }
 }
 

@@ -1,7 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, after_this_request
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, after_this_request, has_request_context
 import json
 import re
 import html
+import base64
+import hashlib
+import io
+import secrets
 from decimal import Decimal
 from datetime import datetime, date
 import os
@@ -12,6 +16,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from werkzeug.utils import secure_filename
+from sqlalchemy import text
 
 
 def get_user_data_dir():
@@ -51,7 +56,7 @@ os.makedirs(USER_DATA_DIR, exist_ok=True)
 TEMPLATE_FOLDER = os.path.join(INTERNAL_DIR, 'templates')
 STATIC_FOLDER = os.path.join(INTERNAL_DIR, 'static')
 UPLOAD_FOLDER = os.path.join(USER_DATA_DIR, 'uploads')
-DATABASE_PATH = os.path.join(USER_DATA_DIR, 'gestion_locative.db')
+DATABASE_PATH = os.path.join(USER_DATA_DIR, 'baybay.db')
 
 # Importer models
 from models import db, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, StatutPaiement, StatutLocataire, TypeEtatLieux
@@ -76,8 +81,47 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'appels_loyer'), exist_ok=
 
 db.init_app(app)
 
+
+def _generate_quittance_public_ref():
+    return f"Q{secrets.token_hex(6).upper()}"
+
+
+def _ensure_quittance_public_ref_schema():
+    columns = db.session.execute(text('PRAGMA table_info(quittance)')).fetchall()
+    column_names = {row[1] for row in columns}
+    if 'public_ref' not in column_names:
+        db.session.execute(text('ALTER TABLE quittance ADD COLUMN public_ref VARCHAR(24)'))
+    db.session.execute(text('CREATE UNIQUE INDEX IF NOT EXISTS idx_quittance_public_ref ON quittance(public_ref)'))
+    db.session.commit()
+
+
+def _backfill_quittance_public_refs():
+    existing_refs = {ref for (ref,) in db.session.query(Quittance.public_ref).filter(Quittance.public_ref.isnot(None)).all()}
+    pending = Quittance.query.filter((Quittance.public_ref.is_(None)) | (Quittance.public_ref == '')).all()
+    if not pending:
+        return
+
+    for quittance in pending:
+        ref = _generate_quittance_public_ref()
+        while ref in existing_refs:
+            ref = _generate_quittance_public_ref()
+        quittance.public_ref = ref
+        existing_refs.add(ref)
+
+    db.session.commit()
+
+def _ensure_programmation_schema():
+    columns = db.session.execute(text('PRAGMA table_info(programmation_appel)')).fetchall()
+    column_names = {row[1] for row in columns}
+    if 'sujet' not in column_names:
+        db.session.execute(text('ALTER TABLE programmation_appel ADD COLUMN sujet TEXT'))
+        db.session.commit()
+
 with app.app_context():
     db.create_all()
+    _ensure_quittance_public_ref_schema()
+    _backfill_quittance_public_refs()
+    _ensure_programmation_schema()
 
 def format_currency(value):
     if value is None:
@@ -111,6 +155,82 @@ MOIS_FR = {
 app.jinja_env.globals['MOIS_FR'] = MOIS_FR
 
 # Fonction de génération HTML vers PDF
+def _postprocess_pdf_rounded_borders(pdf_path):
+    """Remplace les bordures rectilignes vertes (#059669) par des rectangles arrondis."""
+    try:
+        import fitz
+        GREEN = (5 / 255, 150 / 255, 105 / 255)  # #059669
+
+        doc = fitz.open(pdf_path)
+        for page in doc:
+            drawings = page.get_drawings()
+            # Collecter les lignes vertes qui forment un rectangle (bordure attestation)
+            # On distingue les simples border-bottom (horizontaux) des bordures
+            # de rectangle (qui ont aussi des segments verticaux).
+            green_all = []
+            for d in drawings:
+                c = d.get("color")
+                if c and len(c) >= 3 and c[1] > 0.5 and c[0] < 0.1 and c[2] > 0.3:
+                    green_all.append(d["rect"])
+
+            # Segments verticaux = lignes où la largeur est quasi nulle
+            has_vertical = any(abs(r.x1 - r.x0) < 1 for r in green_all)
+            if not has_vertical:
+                continue  # Pas de rectangle fermé, seulement des border-bottom
+
+            # Ne garder que les lignes qui font partie du rectangle
+            # (segments verticaux + segments horizontaux à la même hauteur)
+            vertical = [r for r in green_all if abs(r.x1 - r.x0) < 1]
+            vy_min = min(min(r.y0, r.y1) for r in vertical)
+            vy_max = max(max(r.y0, r.y1) for r in vertical)
+            # Garder les horizontaux dont le y est dans la zone du rectangle
+            green_rects = []
+            for r in green_all:
+                is_vertical = abs(r.x1 - r.x0) < 1
+                is_in_rect_zone = (min(r.y0, r.y1) >= vy_min - 2) and (max(r.y0, r.y1) <= vy_max + 2)
+                if is_vertical or is_in_rect_zone:
+                    green_rects.append(r)
+
+            if not green_rects:
+                continue
+
+            # Calculer la bounding box globale de toutes les lignes vertes
+            x0 = min(r.x0 for r in green_rects)
+            y0 = min(r.y0 for r in green_rects)
+            x1 = max(r.x1 for r in green_rects)
+            y1 = max(r.y1 for r in green_rects)
+            bbox = fitz.Rect(x0, y0, x1, y1)
+
+            # Effacer chaque ligne verte individuellement (fine bande blanche)
+            radius = 8
+            shape = page.new_shape()
+            for gr in green_rects:
+                erase = gr + (-1, -1, 1, 1)
+                shape.draw_rect(erase)
+                shape.finish(color=(1, 1, 1), fill=(1, 1, 1), width=0)
+            shape.commit()
+
+            # Dessiner le rectangle arrondi
+            shape = page.new_shape()
+            radius = 8
+            r = bbox
+            shape.draw_line(fitz.Point(r.x0 + radius, r.y0), fitz.Point(r.x1 - radius, r.y0))
+            shape.draw_curve(fitz.Point(r.x1 - radius, r.y0), fitz.Point(r.x1, r.y0), fitz.Point(r.x1, r.y0 + radius))
+            shape.draw_line(fitz.Point(r.x1, r.y0 + radius), fitz.Point(r.x1, r.y1 - radius))
+            shape.draw_curve(fitz.Point(r.x1, r.y1 - radius), fitz.Point(r.x1, r.y1), fitz.Point(r.x1 - radius, r.y1))
+            shape.draw_line(fitz.Point(r.x1 - radius, r.y1), fitz.Point(r.x0 + radius, r.y1))
+            shape.draw_curve(fitz.Point(r.x0 + radius, r.y1), fitz.Point(r.x0, r.y1), fitz.Point(r.x0, r.y1 - radius))
+            shape.draw_line(fitz.Point(r.x0, r.y1 - radius), fitz.Point(r.x0, r.y0 + radius))
+            shape.draw_curve(fitz.Point(r.x0, r.y0 + radius), fitz.Point(r.x0, r.y0), fitz.Point(r.x0 + radius, r.y0))
+            shape.finish(color=GREEN, width=1)
+            shape.commit()
+
+        doc.save(pdf_path, incremental=True, encryption=0)
+        doc.close()
+    except Exception as e:
+        print(f"[WARN] Post-traitement PDF (rounded borders) echoue: {e}")
+
+
 def html_to_pdf(html_content, output_path):
     """Convertit HTML en PDF et sauvegarde le fichier"""
 
@@ -325,7 +445,7 @@ def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jo
 
         if piece_jointe:
             with open(piece_jointe, 'rb') as f:
-                part = MIMEApplication(f.read(), Name=os.path.basename(piece_jointe))
+                part = MIMEApplication(f.read(), _subtype='pdf', Name=os.path.basename(piece_jointe))
                 part['Content-Disposition'] = f'attachment; filename="{os.path.basename(piece_jointe)}"'
                 msg.attach(part)
 
@@ -375,23 +495,23 @@ def _build_email_quittance(locataire, quittance, sci=None, modele_email='standar
     prenom = locataire.prenom or locataire.nom
 
     if modele_email == 'court':
-        sujet = f"Quittance - {periode}"
+        sujet = "Quittance - {{periode}}"
         corps = f"""
         <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-            <p>Bonjour {prenom},</p>
-            <p>Veuillez trouver votre quittance de loyer ({periode}) en pièce jointe.</p>
-            <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+            <p>Bonjour {{locataire_prenom}},</p>
+            <p>Veuillez trouver votre quittance de loyer (<strong>{{periode}}</strong>) en pièce jointe.</p>
+            <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
         </body></html>
         """
         return sujet, corps
 
-    sujet = f"Quittance de loyer - {periode}"
+    sujet = "Quittance de loyer - {{periode}}"
     corps = f"""
     <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-        <p>Bonjour {prenom} {locataire.nom},</p>
-        <p>Veuillez trouver ci-joint votre quittance de loyer pour <strong>{periode}</strong>.</p>
-        <p><strong>Montant payé :</strong> {format_currency(quittance.montant_paye)}</p>
-        <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+        <p>Bonjour {{locataire_prenom}} {{locataire_nom}},</p>
+        <p>Veuillez trouver ci-joint votre quittance de loyer pour <strong>{{periode}}</strong>.</p>
+        <p><strong>Montant payé :</strong> {{montant_paye}}</p>
+        <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
     </body></html>
     """
     return sujet, corps
@@ -405,47 +525,330 @@ def _build_email_appel(locataire, appel, sci=None, modele_email='standard'):
     echeance = format_date(appel.date_echeance) if appel.date_echeance else "Non définie"
 
     if modele_email == 'rappel':
-        sujet = f"Rappel - Appel de loyer {periode}"
+        sujet = "Rappel - Appel de loyer {{periode}}"
         corps = f"""
         <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-            <p>Bonjour {prenom},</p>
-            <p>Rappel de votre appel de loyer pour <strong>{periode}</strong>.</p>
-            <p><strong>Total à régler :</strong> {total}</p>
-            <p><strong>Date d'échéance :</strong> {echeance}</p>
+            <p>Bonjour {{locataire_prenom}},</p>
+            <p>Rappel de votre appel de loyer pour <strong>{{periode}}</strong>.</p>
+            <p><strong>Total à régler :</strong> {{total_avec_arrieres}}</p>
+            <p><strong>Date d'échéance :</strong> {{date_echeance}}</p>
             <p>Le détail est joint en PDF.</p>
-            <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+            <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
         </body></html>
         """
         return sujet, corps
 
-    sujet = f"Appel de loyer - {periode}"
+    sujet = "Appel de loyer - {{periode}}"
     corps = f"""
     <html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\">
-        <p>Bonjour {prenom} {locataire.nom},</p>
-        <p>Veuillez trouver ci-joint votre appel de loyer pour <strong>{periode}</strong>.</p>
-        <p><strong>Total à payer :</strong> {total}</p>
-        <p><strong>Date d'échéance :</strong> {echeance}</p>
-        <p>Cordialement,<br><strong>{nom_sci}</strong></p>
+        <p>Bonjour {{locataire_prenom}} {{locataire_nom}},</p>
+        <p>Veuillez trouver ci-joint votre appel de loyer pour <strong>{{periode}}</strong>.</p>
+        <p><strong>Total à payer :</strong> {{total_avec_arrieres}}</p>
+        <p><strong>Date d'échéance :</strong> {{date_echeance}}</p>
+        <p>Cordialement,<br><strong>{{sci_nom}}</strong></p>
     </body></html>
     """
     return sujet, corps
 
 
-def _generate_quittance_pdf_file(quittance, force_regenerate=False):
+def _normalize_modele_email(modele_email, default='standard'):
+    modele = (modele_email or default)
+    if not isinstance(modele, str):
+        return default
+    modele = modele.strip().lower()
+    return modele if modele in ('standard', 'court', 'rappel') else default
+
+
+def _safe_text(value, default=''):
+    if value is None:
+        return default
+    if isinstance(value, Decimal):
+        return format_currency(value)
+    if isinstance(value, datetime):
+        return format_datetime(value)
+    if isinstance(value, date):
+        return format_date(value)
+    return str(value)
+
+
+def _build_email_variable_context(locataire=None, appel=None, quittance=None, sci=None, config=None):
+    appartement = locataire.appartement if locataire and locataire.appartement else None
+    bien = appartement.bien if appartement and getattr(appartement, 'bien', None) else None
+
+    if not sci and bien:
+        sci = bien.sci if getattr(bien, 'sci', None) else None
+
+    periode = ''
+    mois = ''
+    annee = ''
+    total = Decimal('0.00')
+    total_avec_arrieres = Decimal('0.00')
+    arrieres = Decimal('0.00')
+    date_echeance = None
+    date_paiement = None
+    date_emission = None
+    montant_paye = Decimal('0.00')
+
+    if appel:
+        mois = appel.mois
+        annee = appel.annee
+        periode = f"{MOIS_FR.get(appel.mois, appel.mois)} {appel.annee}"
+        total = Decimal(str(appel.total or 0))
+        total_avec_arrieres = Decimal(str(appel.total_avec_arrieres or 0))
+        arrieres = Decimal(str(appel.arrieres or 0))
+        date_echeance = appel.date_echeance
+        date_emission = appel.date_emission
+
+    if quittance:
+        mois = quittance.mois
+        annee = quittance.annee
+        periode = f"{MOIS_FR.get(quittance.mois, quittance.mois)} {quittance.annee}"
+        total = Decimal(str(quittance.total or 0))
+        montant_paye = Decimal(str(quittance.montant_paye or 0))
+        date_paiement = quittance.date_paiement
+        date_emission = quittance.date_emission
+
+    return {
+        'locataire_prenom': getattr(locataire, 'prenom', '') or '',
+        'locataire_nom': getattr(locataire, 'nom', '') or '',
+        'locataire_nom_complet': getattr(locataire, 'nom_complet', '') or '',
+        'locataire_email': getattr(locataire, 'email', '') or '',
+        'locataire_telephone': getattr(locataire, 'telephone', '') or '',
+        'locataire_adresse_precedente': getattr(locataire, 'adresse_precedente', '') or '',
+        'locataire_total_mensuel': _safe_text(getattr(locataire, 'total_mensuel', None)),
+        'locataire_loyer_actuel': _safe_text(getattr(locataire, 'loyer_actuel', None)),
+        'locataire_charges_actuelles': _safe_text(getattr(locataire, 'charges_actuelles', None)),
+        'locataire_date_debut_bail': _safe_text(getattr(locataire, 'date_debut_bail', None)),
+        'locataire_date_fin_bail': _safe_text(getattr(locataire, 'date_fin_bail', None)),
+        'appartement_numero_porte': getattr(appartement, 'numero_porte', '') or '',
+        'appartement_type': getattr(appartement, 'type_appartement', '') or '',
+        'appartement_surface': _safe_text(getattr(appartement, 'surface', None)),
+        'appartement_loyer_mensuel': _safe_text(getattr(appartement, 'loyer_mensuel', None)),
+        'appartement_charges': _safe_text(getattr(appartement, 'charges', None)),
+        'appartement_etage': getattr(appartement, 'etage', '') or '',
+        'bien_adresse': getattr(bien, 'adresse', '') or '',
+        'bien_code_postal': getattr(bien, 'code_postal', '') or '',
+        'bien_ville': getattr(bien, 'ville', '') or '',
+        'bien_type_bien': getattr(bien, 'type_bien', '') or '',
+        'sci_nom': getattr(sci, 'nom', '') or '',
+        'sci_adresse': getattr(sci, 'adresse', '') or '',
+        'sci_code_postal': getattr(sci, 'code_postal', '') or '',
+        'sci_ville': getattr(sci, 'ville', '') or '',
+        'sci_email': getattr(sci, 'email', '') or '',
+        'periode': periode,
+        'mois': mois,
+        'annee': annee,
+        'total': _safe_text(total),
+        'total_avec_arrieres': _safe_text(total_avec_arrieres),
+        'arrieres': _safe_text(arrieres),
+        'date_echeance': _safe_text(date_echeance),
+        'date_paiement': _safe_text(date_paiement),
+        'date_emission': _safe_text(date_emission),
+        'montant_paye': _safe_text(montant_paye),
+        'email_expediteur': getattr(config, 'email_expediteur', '') if config else '',
+    }
+
+
+def _render_email_template(template_text, context):
+    if not template_text:
+        return ''
+
+    pattern = re.compile(r'\{\{\s*([a-zA-Z0-9_]+)\s*\}\}')
+
+    def replace(match):
+        key = match.group(1)
+        return html.escape(str(context.get(key, '')))
+
+    return pattern.sub(replace, template_text)
+
+
+def _build_email_test(modele_email='standard'):
+    modele_email = _normalize_modele_email(modele_email)
+
+    if modele_email == 'court':
+        sujet = "Test email - version courte"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test de configuration email en mode court pour <strong>{{email_expediteur}}</strong>.</p><p>Cordialement.</p></body></html>"
+    elif modele_email == 'rappel':
+        sujet = "Test email - rappel"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test de configuration email en mode rappel depuis <strong>{{email_expediteur}}</strong>.</p><p>Ce message vérifie simplement l'envoi SMTP.</p><p>Cordialement.</p></body></html>"
+    else:
+        sujet = "Test de configuration email - BayBay"
+        corps = "<html><body style=\"font-family:Arial,sans-serif;line-height:1.6;color:#111827;\"><p>Bonjour,</p><p>Test réussi !</p><p>Votre configuration email fonctionne correctement pour <strong>{{email_expediteur}}</strong>.</p></body></html>"
+
+    return sujet, corps
+
+
+def _render_email_preview_payload(sujet, corps, context):
+    return {
+        'success': True,
+        'subject': _render_email_template(sujet, context),
+        'body': _render_email_template(corps, context)
+    }
+
+
+def _as_bool(value, default=True):
+    if value is None:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in ('1', 'true', 'yes', 'on')
+    return bool(value)
+
+
+def _quittance_signature_path(quittance_id):
+    signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'quittances', 'signatures')
+    os.makedirs(signatures_dir, exist_ok=True)
+    return os.path.join(signatures_dir, f'quittance_signature_{quittance_id}.png')
+
+
+def _save_quittance_signature_data(quittance_id, signature_data_url):
+    if not signature_data_url:
+        return False, None
+
+    if not isinstance(signature_data_url, str) or not signature_data_url.startswith('data:image/png;base64,'):
+        return False, 'Format de signature invalide (PNG base64 attendu).'
+
+    encoded = signature_data_url.split(',', 1)[1]
+    try:
+        image_bytes = base64.b64decode(encoded)
+    except Exception:
+        return False, 'Signature non décodable.'
+
+    path = _quittance_signature_path(quittance_id)
+    with open(path, 'wb') as output:
+        output.write(image_bytes)
+    return True, None
+
+
+def _load_quittance_signature_data(quittance_id):
+    path = _quittance_signature_path(quittance_id)
+    if not os.path.exists(path):
+        return None, None
+
+    with open(path, 'rb') as image_file:
+        image_bytes = image_file.read()
+
+    encoded = base64.b64encode(image_bytes).decode('ascii')
+    return f'data:image/png;base64,{encoded}', hashlib.sha256(image_bytes).hexdigest()
+
+
+def _decorative_signature_path():
+    signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
+    os.makedirs(signatures_dir, exist_ok=True)
+    return os.path.join(signatures_dir, 'decorative_signature.png')
+
+
+def _save_decorative_signature_data(signature_data_url):
+    if not signature_data_url:
+        return False, None
+
+    if not isinstance(signature_data_url, str) or not signature_data_url.startswith('data:image/png;base64,'):
+        return False, 'Format de signature décorative invalide (PNG base64 attendu).'
+
+    encoded = signature_data_url.split(',', 1)[1]
+    try:
+        image_bytes = base64.b64decode(encoded)
+    except Exception:
+        return False, 'Signature décorative non décodable.'
+
+    with open(_decorative_signature_path(), 'wb') as output:
+        output.write(image_bytes)
+    return True, None
+
+
+def _load_decorative_signature_data():
+    path = _decorative_signature_path()
+    if not os.path.exists(path):
+        return None
+    with open(path, 'rb') as image_file:
+        image_bytes = image_file.read()
+    encoded = base64.b64encode(image_bytes).decode('ascii')
+    return f'data:image/png;base64,{encoded}'
+
+
+def _clear_decorative_signature_data():
+    path = _decorative_signature_path()
+    if os.path.exists(path):
+        os.remove(path)
+
+
+def _quittance_integrity_payload(quittance, signature_hash=''):
+    date_paiement = quittance.date_paiement.strftime('%Y-%m-%d') if quittance.date_paiement else ''
+    date_emission = quittance.date_emission.strftime('%Y-%m-%d') if quittance.date_emission else ''
+    public_ref = (quittance.public_ref or '').strip()
+    canonical = '|'.join([
+        str(quittance.id),
+        public_ref,
+        str(quittance.locataire_id),
+        str(quittance.mois),
+        str(quittance.annee),
+        str(quittance.loyer_hc),
+        str(quittance.charges),
+        str(quittance.montant_paye),
+        date_paiement,
+        date_emission,
+        signature_hash or ''
+    ])
+    digest = hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+    verification_id = f'{public_ref or "Q-UNKNOWN"}-{digest[:8].upper()}'
+    return verification_id, digest
+
+
+def _build_qr_data_url(text):
+    if not text:
+        return None
+    try:
+        import qrcode
+    except Exception:
+        return None
+
+    qr = qrcode.QRCode(version=1, box_size=5, border=2)
+    qr.add_data(text)
+    qr.make(fit=True)
+    image = qr.make_image(fill_color='black', back_color='white')
+    buffer = io.BytesIO()
+    image.save(buffer, format='PNG')
+    encoded = base64.b64encode(buffer.getvalue()).decode('ascii')
+    return f'data:image/png;base64,{encoded}'
+
+
+def _build_quittance_pdf_context(quittance):
     locataire = quittance.locataire
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    signature_data_url, signature_hash = _load_quittance_signature_data(quittance.id)
+    decorative_signature_data_url = _load_decorative_signature_data()
+    displayed_signature_data_url = signature_data_url or decorative_signature_data_url
+    verification_id, integrity_hash = _quittance_integrity_payload(quittance, signature_hash=signature_hash or '')
 
-    html_content = render_template(
-        'pdf/quittance.html',
-        quittance=quittance,
-        locataire=locataire,
-        appartement=appartement,
-        bien=bien,
-        sci=sci,
-        mois_fr=MOIS_FR
-    )
+    if has_request_context():
+        verification_url = f"{request.url_root.rstrip('/')}/quittance/verification/{quittance.public_ref}"
+    else:
+        verification_url = f"/quittance/verification/{quittance.public_ref}"
+
+    qr_data_url = _build_qr_data_url(verification_url)
+
+    return {
+        'quittance': quittance,
+        'locataire': locataire,
+        'appartement': appartement,
+        'bien': bien,
+        'sci': sci,
+        'mois_fr': MOIS_FR,
+        'signature_data_url': displayed_signature_data_url,
+        'has_approval_signature': bool(signature_data_url),
+        'document_reference': quittance.public_ref,
+        'verification_id': verification_id,
+        'integrity_hash': integrity_hash,
+        'verification_url': verification_url,
+        'verification_generated_at': datetime.now().strftime('%d/%m/%Y %H:%M'),
+        'qr_data_url': qr_data_url,
+    }
+
+
+def _generate_quittance_pdf_file(quittance, force_regenerate=False):
+    locataire = quittance.locataire
+    html_content = render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
 
     periode = f"{quittance.annee}_{quittance.mois:02d}"
     raw_name = f"quittance_{quittance.id}_{locataire.nom}_{locataire.prenom}_{periode}.pdf"
@@ -460,6 +863,7 @@ def _generate_quittance_pdf_file(quittance, force_regenerate=False):
     if not ok:
         return None, error
 
+    _postprocess_pdf_rounded_borders(pdf_path)
     return pdf_path, None
 
 
@@ -830,7 +1234,8 @@ def etats_lieux():
 @app.route('/parametres')
 def parametres():
     config_email = ConfigEmail.query.first()
-    return render_template('parametres.html', config_email=config_email)
+    decorative_signature_data_url = _load_decorative_signature_data()
+    return render_template('parametres.html', config_email=config_email, decorative_signature_data_url=decorative_signature_data_url)
 
 # API Routes
 @app.route('/api/sci', methods=['POST'])
@@ -1920,10 +2325,21 @@ def create_quittance():
         loyer_hc=loyer_hc,
         charges=charges,
         montant_paye=montant_paye,
+        public_ref=_generate_quittance_public_ref(),
         date_paiement=date_paiement
     )
+
+    while Quittance.query.filter_by(public_ref=quittance.public_ref).first() is not None:
+        quittance.public_ref = _generate_quittance_public_ref()
+
     db.session.add(quittance)
     db.session.commit()
+
+    signature_data = (data.get('signature_data') or '').strip()
+    if signature_data:
+        saved, signature_error = _save_quittance_signature_data(quittance.id, signature_data)
+        if not saved:
+            return jsonify({'success': False, 'error': signature_error or 'Signature invalide'}), 400
 
     # Genere le PDF local en arriere-plan applicatif des la creation.
     _generate_quittance_pdf_file(quittance, force_regenerate=True)
@@ -1937,20 +2353,50 @@ def create_quittance():
 
 @app.route('/api/quittance/<int:quittance_id>/pdf')
 def pdf_quittance(quittance_id):
+    return jsonify({
+        'success': False,
+        'message': 'Accès direct désactivé. Utilisez la référence publique du document.'
+    }), 410
+
+
+@app.route('/quittance/document/<string:public_ref>/pdf')
+def pdf_quittance_public(public_ref):
+    quittance = Quittance.query.filter_by(public_ref=public_ref).first_or_404()
+    html = render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
+    return html
+
+
+@app.route('/api/quittance/<int:quittance_id>/verify', methods=['GET'])
+def verify_quittance_integrity(quittance_id):
     quittance = Quittance.query.get_or_404(quittance_id)
+    return redirect(url_for('verify_quittance_page', public_ref=quittance.public_ref))
+
+
+@app.route('/quittance/verification/<string:public_ref>', methods=['GET'])
+def verify_quittance_page(public_ref):
+    quittance = Quittance.query.filter_by(public_ref=public_ref).first_or_404()
+    signature_data_url, signature_hash = _load_quittance_signature_data(quittance.id)
+    verification_id, integrity_hash = _quittance_integrity_payload(quittance, signature_hash=signature_hash or '')
     locataire = quittance.locataire
-    appartement = locataire.appartement
+    appartement = locataire.appartement if locataire else None
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    generated_at = datetime.now().strftime('%d/%m/%Y à %H:%M')
 
-    html = render_template('pdf/quittance.html',
-                          quittance=quittance,
-                          locataire=locataire,
-                          appartement=appartement,
-                          bien=bien,
-                          sci=sci,
-                          mois_fr=MOIS_FR)
-    return html
+    return render_template(
+        'quittance_verification.html',
+        quittance=quittance,
+        locataire=locataire,
+        appartement=appartement,
+        bien=bien,
+        sci=sci,
+        verification_id=verification_id,
+        integrity_hash=integrity_hash,
+        signature_present=bool(signature_data_url),
+        generated_at=generated_at,
+        logiciel='BAYBAY',
+        statut_validation='VALIDEE'
+    )
 
 @app.route('/api/quittance/<int:quittance_id>', methods=['DELETE'])
 def delete_quittance(quittance_id):
@@ -1977,10 +2423,13 @@ def envoyer_quittance_email(quittance_id):
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
 
-    # Toujours régénérer le PDF pour utiliser le template actuel
-    pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
-    if not pdf_path:
-        return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
+    pdf_path = None
+    if include_pdf:
+        # Toujours régénérer le PDF pour utiliser le template actuel
+        pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
+        if not pdf_path:
+            return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
 
     modele_email = (data.get('modele_email') or 'standard').strip().lower()
     sujet, corps = _build_email_quittance(locataire, quittance, sci=sci, modele_email=modele_email)
@@ -1989,6 +2438,10 @@ def envoyer_quittance_email(quittance_id):
     if (data.get('corps') or '').strip():
         corps = data.get('corps').strip()
 
+    email_context = _build_email_variable_context(locataire=locataire, quittance=quittance, sci=sci, config=config)
+    sujet = _render_email_template(sujet, email_context)
+    corps = _render_email_template(corps, email_context)
+
     # Envoyer l'email
     success, message = envoyer_email(
         config.email_expediteur,
@@ -1996,7 +2449,7 @@ def envoyer_quittance_email(quittance_id):
         locataire.email,
         sujet,
         corps,
-        piece_jointe=pdf_path,
+        piece_jointe=pdf_path if include_pdf else None,
         serveur=config.serveur_smtp,
         port=config.port_smtp,
         use_tls=bool(config.use_tls)
@@ -2005,9 +2458,33 @@ def envoyer_quittance_email(quittance_id):
     # On garde le fichier local pour les prochains envois.
 
     if success:
-        return jsonify({'success': True, 'message': 'Quittance envoyée par email'})
+        message = 'Quittance envoyée par email'
+        if include_pdf:
+            message += ' avec PDF joint'
+        return jsonify({'success': True, 'message': message})
     else:
         return jsonify({'success': False, 'error': message}), 500
+
+
+@app.route('/api/quittance/<int:quittance_id>/preview-email', methods=['POST'])
+def preview_quittance_email(quittance_id):
+    data = request.get_json(silent=True) or {}
+    quittance = Quittance.query.get_or_404(quittance_id)
+    locataire = quittance.locataire
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_quittance(locataire, quittance, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, quittance=quittance, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
 # Configuration email
 @app.route('/api/config-email', methods=['POST'])
@@ -2022,6 +2499,9 @@ def save_config_email():
 
     if not email_expediteur or not mot_de_passe:
         return jsonify({'success': False, 'message': 'Email expéditeur et mot de passe obligatoires'}), 400
+
+    clear_signature = _as_bool(data.get('clear_signature'), default=False)
+    signature_data = (data.get('signature_data') or '').strip()
 
     if config:
         config.email_expediteur = email_expediteur
@@ -2040,6 +2520,14 @@ def save_config_email():
         db.session.add(config)
 
     db.session.commit()
+
+    if clear_signature:
+        _clear_decorative_signature_data()
+    elif signature_data:
+        saved, signature_error = _save_decorative_signature_data(signature_data)
+        if not saved:
+            return jsonify({'success': False, 'message': signature_error or 'Signature décorative invalide'}), 400
+
     return jsonify({'success': True})
 
 @app.route('/api/test-email', methods=['POST'])
@@ -2051,6 +2539,7 @@ def test_email():
         mot_de_passe = data.get('mot_de_passe') or data.get('email_password')
         serveur_smtp = data.get('serveur_smtp') or data.get('smtp_server') or 'smtp.gmail.com'
         email_test = data.get('email_test') or email_expediteur
+        modele_email = _normalize_modele_email(data.get('modele_email'))
 
         port_value = data.get('port_smtp') or data.get('smtp_port') or 587
         try:
@@ -2067,12 +2556,23 @@ def test_email():
         if not email_expediteur or not mot_de_passe:
             return jsonify({'success': False, 'message': 'Email expéditeur et mot de passe obligatoires'}), 400
 
+        sujet, corps = _build_email_test(modele_email)
+        if (data.get('sujet') or '').strip():
+            sujet = data.get('sujet').strip()
+        if (data.get('corps') or '').strip():
+            corps = data.get('corps').strip()
+
+        config_context = SimpleNamespace(email_expediteur=email_expediteur)
+        email_context = _build_email_variable_context(config=config_context)
+        sujet = _render_email_template(sujet, email_context)
+        corps = _render_email_template(corps, email_context)
+
         success, message = envoyer_email(
             email_expediteur,
             mot_de_passe,
             email_test,
-            "Test de configuration email - GestLoc",
-            "<p>Test réussi !</p><p>Votre configuration email fonctionne correctement.</p>",
+            sujet,
+            corps,
             serveur=serveur_smtp,
             port=port_smtp,
             use_tls=use_tls
@@ -2107,7 +2607,8 @@ def create_programmation_appel():
         tous_locataires=data.get('tous_locataires', False),
         locataires_ids=locataires_ids_json,
         recurrent=data.get('recurrent', False),
-        email_expediteur=data.get('email_expediteur'),
+        email_expediteur=data.get('email_expediteur') or None,
+        sujet=data.get('sujet') or None,
         statut='en_attente'
     )
     db.session.add(prog)
@@ -2124,6 +2625,7 @@ def delete_programmation_appel(prog_id):
 @app.route('/api/programmation-appel/<int:prog_id>/send', methods=['POST'])
 def send_programmation_now(prog_id):
     prog = ProgrammationAppel.query.get_or_404(prog_id)
+    data = request.get_json(silent=True) or {}
     locataires = prog.get_locataires()
     config = ConfigEmail.query.first()
 
@@ -2136,6 +2638,7 @@ def send_programmation_now(prog_id):
     # Utiliser le mois/année de la programmation
     mois = prog.mois
     annee = prog.annee
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
 
     resultats = []
     echecs = []
@@ -2171,19 +2674,31 @@ def send_programmation_now(prog_id):
             db.session.add(appel)
             db.session.commit()
 
-        # Générer le PDF avec le template (toujours régénérer pour utiliser le template actuel)
-        pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
-        if not pdf_path:
-            echecs.append(f"Erreur PDF pour {locataire.nom_complet}: {pdf_error}")
-            continue
+        pdf_path = None
+        if include_pdf:
+            # Générer le PDF avec le template (toujours régénérer pour utiliser le template actuel)
+            pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
+            if not pdf_path:
+                echecs.append(f"Erreur PDF pour {locataire.nom_complet}: {pdf_error}")
+                continue
 
         # Récupérer les infos pour l'email
         appartement = locataire.appartement
         bien = appartement.bien if appartement else None
         sci = bien.sci if bien else None
 
-        # Utiliser le builder d'email standard
-        sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email='standard')
+        modele_email = _normalize_modele_email(data.get('modele_email'))
+        sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+        if (data.get('sujet') or '').strip():
+            sujet = data.get('sujet').strip()
+        elif (prog.sujet or '').strip():
+            sujet = prog.sujet.strip()
+        if (data.get('corps') or '').strip():
+            corps = data.get('corps').strip()
+
+        email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+        sujet = _render_email_template(sujet, email_context)
+        corps = _render_email_template(corps, email_context)
 
         # Envoyer l'email avec le PDF en pièce jointe
         success, message = envoyer_email(
@@ -2192,7 +2707,7 @@ def send_programmation_now(prog_id):
             locataire.email,
             sujet,
             corps,
-            piece_jointe=pdf_path,
+            piece_jointe=pdf_path if include_pdf else None,
             serveur=config.serveur_smtp,
             port=config.port_smtp,
             use_tls=bool(config.use_tls)
@@ -2226,6 +2741,85 @@ def send_programmation_now(prog_id):
         }
     })
 
+
+@app.route('/api/programmation-appel/<int:prog_id>/preview-email', methods=['POST'])
+def preview_programmation_email(prog_id):
+    data = request.get_json(silent=True) or {}
+    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    locataires = prog.get_locataires()
+
+    if not locataires:
+        return jsonify({'success': False, 'message': 'Aucun locataire trouvé pour cette programmation'}), 400
+
+    locataire = locataires[0]
+    if not locataire.appartement:
+        return jsonify({'success': False, 'message': 'Le locataire sélectionné n\'a pas d\'appartement'}), 400
+
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    mois = prog.mois
+    annee = prog.annee
+    appel = AppelLoyer.query.filter_by(locataire_id=locataire.id, mois=mois, annee=annee).first()
+
+    if not appel:
+        arrieres = locataire.get_arrieres(mois, annee)
+        appel = SimpleNamespace(
+            mois=mois,
+            annee=annee,
+            loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+            charges=locataire.charges_actuelles or Decimal('0.00'),
+            arrieres=arrieres,
+            date_echeance=date(annee, mois, 5),
+            date_emission=date.today(),
+            total=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')),
+            total_avec_arrieres=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')) + arrieres,
+        )
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
+
+
+@app.route('/api/programmation-appel/<int:prog_id>/linked-pdf', methods=['GET'])
+def linked_programmation_pdf(prog_id):
+    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    locataires = prog.get_locataires()
+
+    if not locataires:
+        return jsonify({'success': False, 'message': 'Aucun locataire trouvé pour cette programmation'}), 400
+
+    locataire = locataires[0]
+    appel = AppelLoyer.query.filter_by(
+        locataire_id=locataire.id,
+        mois=prog.mois,
+        annee=prog.annee
+    ).first()
+
+    if not appel:
+        arrieres = locataire.get_arrieres(prog.mois, prog.annee)
+        appel = AppelLoyer(
+            locataire_id=locataire.id,
+            mois=prog.mois,
+            annee=prog.annee,
+            loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+            charges=locataire.charges_actuelles or Decimal('0.00'),
+            arrieres=arrieres,
+            date_echeance=date(prog.annee, prog.mois, 5)
+        )
+        db.session.add(appel)
+        db.session.commit()
+
+    return jsonify({'success': True, 'pdf_url': f'/api/appel-loyer/{appel.id}/pdf'})
+
 # Envoyer appel par email
 @app.route('/api/appel-loyer/<int:appel_id>/envoyer', methods=['POST'])
 def envoyer_appel_email(appel_id):
@@ -2245,10 +2839,13 @@ def envoyer_appel_email(appel_id):
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
 
-    # Toujours régénérer le PDF pour utiliser le template actuel
-    pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
-    if not pdf_path:
-        return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
+    include_pdf = _as_bool(data.get('include_pdf'), default=True)
+    pdf_path = None
+    if include_pdf:
+        # Toujours régénérer le PDF pour utiliser le template actuel
+        pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
+        if not pdf_path:
+            return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
 
     modele_email = (data.get('modele_email') or 'standard').strip().lower()
     sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
@@ -2257,13 +2854,17 @@ def envoyer_appel_email(appel_id):
     if (data.get('corps') or '').strip():
         corps = data.get('corps').strip()
 
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    sujet = _render_email_template(sujet, email_context)
+    corps = _render_email_template(corps, email_context)
+
     success, message = envoyer_email(
         config.email_expediteur,
         config.mot_de_passe,
         locataire.email,
         sujet,
         corps,
-        piece_jointe=pdf_path,
+        piece_jointe=pdf_path if include_pdf else None,
         serveur=config.serveur_smtp,
         port=config.port_smtp,
         use_tls=bool(config.use_tls)
@@ -2272,8 +2873,32 @@ def envoyer_appel_email(appel_id):
     # On garde le fichier local pour les prochains envois.
 
     if success:
-        return jsonify({'success': True, 'message': 'Appel de loyer envoyé par email'})
+        message = 'Appel de loyer envoyé par email'
+        if include_pdf:
+            message += ' avec PDF joint'
+        return jsonify({'success': True, 'message': message})
     return jsonify({'success': False, 'error': message}), 500
+
+
+@app.route('/api/appel-loyer/<int:appel_id>/preview-email', methods=['POST'])
+def preview_appel_email(appel_id):
+    data = request.get_json(silent=True) or {}
+    appel = AppelLoyer.query.get_or_404(appel_id)
+    locataire = appel.locataire
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement else None
+    sci = bien.sci if bien else None
+    config = ConfigEmail.query.first()
+
+    modele_email = _normalize_modele_email(data.get('modele_email'))
+    sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
+    if (data.get('sujet') or '').strip():
+        sujet = data.get('sujet').strip()
+    if (data.get('corps') or '').strip():
+        corps = data.get('corps').strip()
+
+    email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
+    return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
 # Generate all appels for current month
 @app.route('/api/generate-all-appels', methods=['POST'])

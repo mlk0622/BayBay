@@ -1,5 +1,5 @@
 // =====================================================
-// GestLoc - Application JavaScript
+// BayBay - Application JavaScript
 // =====================================================
 
 // Modal functions
@@ -17,6 +17,22 @@ function closeModal(modalId) {
         modal.classList.add('hidden');
         modal.style.display = 'none';
     }
+}
+
+function closeEmailPreviewModal() {
+    closeModal('emailPreviewModal');
+}
+
+function openEmailPreviewModal(title, subject, bodyHtml) {
+    const modalTitle = document.getElementById('emailPreviewTitle');
+    const modalSubject = document.getElementById('emailPreviewSubject');
+    const previewFrame = document.getElementById('emailPreviewFrame');
+
+    if (modalTitle) modalTitle.textContent = title || 'Aperçu du mail';
+    if (modalSubject) modalSubject.textContent = subject || '';
+    if (previewFrame) previewFrame.srcdoc = bodyHtml || '<html><body style="font-family:Arial,sans-serif;padding:24px;">Aucun contenu à afficher.</body></html>';
+
+    openModal('emailPreviewModal');
 }
 
 // Fonction pour ouvrir le modal d'édition de SCI
@@ -92,6 +108,114 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
+let quittanceSignaturePad = null;
+
+function initQuittanceSignaturePad() {
+    const canvas = document.getElementById('quittanceSignatureCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    const resizeCanvas = () => {
+        const ratio = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#111827';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, rect.width, rect.height);
+        if (quittanceSignaturePad) {
+            quittanceSignaturePad.hasDrawing = false;
+        }
+    };
+
+    const getPos = (event) => {
+        const rect = canvas.getBoundingClientRect();
+        if (event.touches && event.touches[0]) {
+            return {
+                x: event.touches[0].clientX - rect.left,
+                y: event.touches[0].clientY - rect.top,
+            };
+        }
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+        };
+    };
+
+    const start = (event) => {
+        event.preventDefault();
+        const pos = getPos(event);
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    };
+
+    const move = (event) => {
+        if (!drawing) return;
+        event.preventDefault();
+        const pos = getPos(event);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        if (quittanceSignaturePad) {
+            quittanceSignaturePad.hasDrawing = true;
+        }
+    };
+
+    const end = (event) => {
+        if (event) event.preventDefault();
+        drawing = false;
+        ctx.closePath();
+    };
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', end);
+
+    canvas.addEventListener('touchstart', start, { passive: false });
+    canvas.addEventListener('touchmove', move, { passive: false });
+    canvas.addEventListener('touchend', end, { passive: false });
+
+    quittanceSignaturePad = {
+        canvas,
+        ctx,
+        hasDrawing: false,
+        clear: () => {
+            resizeCanvas();
+            const signatureField = document.getElementById('quittanceSignatureData');
+            if (signatureField) signatureField.value = '';
+        },
+        getDataUrl: () => {
+            if (!quittanceSignaturePad || !quittanceSignaturePad.hasDrawing) return '';
+            return canvas.toDataURL('image/png');
+        }
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+        if (!quittanceSignaturePad || !quittanceSignaturePad.canvas) return;
+        if (!document.getElementById('quittanceModal')) return;
+        if (document.getElementById('quittanceModal').classList.contains('hidden')) return;
+        resizeCanvas();
+    });
+}
+
+window.resetQuittanceSignaturePad = function() {
+    if (quittanceSignaturePad) {
+        quittanceSignaturePad.clear();
+    }
+};
+
+window.captureQuittanceSignatureData = function() {
+    if (!quittanceSignaturePad) return '';
+    return quittanceSignaturePad.getDataUrl();
+};
+
 // Bien modal
 function openBienModal(sciId) {
     const title = document.getElementById('bienModalTitle');
@@ -166,6 +290,8 @@ async function confirmDelete() {
 
 // Close modal when clicking outside
 document.addEventListener('DOMContentLoaded', function() {
+    initQuittanceSignaturePad();
+
     document.querySelectorAll('[class*="modal"], [id*="Modal"]').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -331,6 +457,8 @@ document.getElementById('appelLoyerForm')?.addEventListener('submit', async (e) 
 document.getElementById('quittanceForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const signatureData = window.captureQuittanceSignatureData ? window.captureQuittanceSignatureData() : '';
+    formData.set('signature_data', signatureData);
     const data = Object.fromEntries(formData.entries());
 
     const response = await fetch('/api/quittance', {

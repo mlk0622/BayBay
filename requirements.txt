@@ -15,7 +15,9 @@ MarkupSafe>=2.1.0
 SQLAlchemy>=2.0.0
 
 # PDF
+xhtml2pdf>=0.2.11
 PyMuPDF==1.25.5
+qrcode[pil]==7.4.2
 
 # Pour le build (optionnel)
-# pyinstaller>=6.0.0
+pyinstaller>=6.0.0

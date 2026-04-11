@@ -15,7 +15,7 @@ import ctypes
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "2.6.0.0"
+VERSION = "2.5.9"
 PORT = 5001
 HOST = "127.0.0.1"
 
@@ -131,6 +131,8 @@ def setup_environment():
 
     # Définir la variable d'environnement pour app.py
     os.environ['BAYBAY_DATA_DIR'] = get_data_path()
+    # Partager la version runtime avec auto_updater.py
+    os.environ['BAYBAY_VERSION'] = VERSION
 
 
 def open_browser():
