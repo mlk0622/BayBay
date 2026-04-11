@@ -1,7 +1,7 @@
 ﻿;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "2.6.0.0"
-!define APP_VERSION_WIN "2.6.0.0"
+!define APP_VERSION "2.7"
+!define APP_VERSION_WIN "2.7.0.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -30,7 +30,7 @@ RequestExecutionLevel user
 VIProductVersion "${APP_VERSION_WIN}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "ProductName" "${APP_NAME}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "CompanyName" "${APP_PUBLISHER}"
-VIAddVersionKey /LANG=${LANG_FRENCH} "LegalCopyright" "© ${APP_PUBLISHER}"
+VIAddVersionKey /LANG=${LANG_FRENCH} "LegalCopyright" "� ${APP_PUBLISHER}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "FileDescription" "${APP_NAME} Setup"
 VIAddVersionKey /LANG=${LANG_FRENCH} "FileVersion" "${APP_VERSION_WIN}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "ProductVersion" "${APP_VERSION_WIN}"
@@ -43,7 +43,7 @@ Section "MainSection" SEC01
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
   CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe"
   CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe"
-  CreateShortCut "$SMPROGRAMS\${APP_NAME}\Désinstaller.lnk" "$INSTDIR\uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\${APP_NAME}\D�sinstaller.lnk" "$INSTDIR\uninstall.exe"
 SectionEnd
 
 Section -AdditionalIcons
@@ -73,7 +73,7 @@ Section Uninstall
 
   Delete "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"
   Delete "$SMPROGRAMS\${APP_NAME}\Site Web.lnk"
-  Delete "$SMPROGRAMS\${APP_NAME}\Désinstaller.lnk"
+  Delete "$SMPROGRAMS\${APP_NAME}\D�sinstaller.lnk"
   Delete "$DESKTOP\${APP_NAME}.lnk"
 
   RMDir "$SMPROGRAMS\${APP_NAME}"
