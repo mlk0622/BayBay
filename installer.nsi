@@ -1,6 +1,7 @@
 ﻿;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "2.4.6"
+!define APP_VERSION "2.6.0.0"
+!define APP_VERSION_WIN "2.6.0.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -26,13 +27,13 @@ RequestExecutionLevel user
 
 !insertmacro MUI_LANGUAGE "French"
 
-VIProductVersion "${APP_VERSION}.0"
+VIProductVersion "${APP_VERSION_WIN}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "ProductName" "${APP_NAME}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "CompanyName" "${APP_PUBLISHER}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "LegalCopyright" "© ${APP_PUBLISHER}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "FileDescription" "${APP_NAME} Setup"
-VIAddVersionKey /LANG=${LANG_FRENCH} "FileVersion" "${APP_VERSION}"
-VIAddVersionKey /LANG=${LANG_FRENCH} "ProductVersion" "${APP_VERSION}"
+VIAddVersionKey /LANG=${LANG_FRENCH} "FileVersion" "${APP_VERSION_WIN}"
+VIAddVersionKey /LANG=${LANG_FRENCH} "ProductVersion" "${APP_VERSION_WIN}"
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
