@@ -15,7 +15,7 @@ import ctypes
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "2.7.9"
+VERSION = "2.3"
 PORT = 5001
 HOST = "127.0.0.1"
 
@@ -105,6 +105,8 @@ def setup_directories():
         os.path.join(base, "uploads", "assurances"),
         os.path.join(base, "uploads", "etats_lieux"),
         os.path.join(base, "uploads", "etats_lieux", "photos"),
+        os.path.join(base, "uploads", "etats_lieux", "drafts"),
+        os.path.join(base, "uploads", "etats_lieux", "generated"),
         os.path.join(base, "uploads", "photos"),
         os.path.join(base, "uploads", "quittances"),
         os.path.join(base, "uploads", "appels_loyer"),
