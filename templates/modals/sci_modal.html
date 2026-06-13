@@ -1,0 +1,66 @@
+<div id="sciModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 id="sciModalTitle" class="text-lg font-semibold text-slate-900">
+                <i class="fas fa-building text-primary mr-2"></i>Nouvelle SCI
+            </h3>
+            <button onclick="closeModal('sciModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="sciForm">
+            <input type="hidden" id="sciId" name="sci_id">
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Nom de la SCI *</label>
+                    <input type="text" id="sciNom" name="nom" required
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="Ex: SCI Immobilier">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Adresse</label>
+                    <input type="text" id="sciAdresse" name="adresse"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="Adresse du siège social">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Code postal</label>
+                        <input type="text" id="sciCodePostal" name="code_postal"
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="75001">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Ville *</label>
+                        <input type="text" id="sciVille" name="ville" required
+                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                               placeholder="Paris">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">SIRET</label>
+                    <input type="text" id="sciSiret" name="siret" maxlength="14"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="Optionnel">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Email de la SCI</label>
+                    <input type="email" id="sciEmail" name="email"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           placeholder="contact@sci-exemple.fr">
+                    <p class="text-slate-400 text-xs mt-1">Utilisé pour l'envoi des documents</p>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('sciModal')"
+                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit" id="sciSubmitBtn"
+                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
+                    <i class="fas fa-check mr-2"></i>Créer la SCI
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

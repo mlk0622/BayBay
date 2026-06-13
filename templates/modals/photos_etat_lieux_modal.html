@@ -1,0 +1,280 @@
+<!-- Modal Galerie Photos État des Lieux -->
+<div id="photosEtatModal" class="fixed inset-0 modal-overlay hidden items-center justify-center z-50">
+    <div class="modal-content p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-white">
+                <i class="fas fa-images text-indigo-400 mr-2"></i>
+                Photos - État des lieux <span id="photosEtatTitle"></span>
+            </h3>
+            <button onclick="closeModal('photosEtatModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all">
+                <i class="fas fa-times text-white/70"></i>
+            </button>
+        </div>
+
+        <!-- Zone d'upload -->
+        <div class="glass-light rounded-2xl p-4 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="text-white font-semibold flex items-center">
+                    <svg class="w-5 h-5 text-indigo-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                    Ajouter des photos
+                </h4>
+                <span class="text-white/50 text-sm">JPG, PNG, GIF, WebP - Max 10MB</span>
+            </div>
+
+            <div class="border-2 border-dashed border-white/20 rounded-xl p-6 text-center hover:border-indigo-400/50 hover:bg-indigo-400/5 transition-all cursor-pointer"
+                 id="photosEtatDropZone"
+                 onclick="document.getElementById('photosEtatInput').click()">
+                <svg class="w-12 h-12 text-white/30 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-white/70">Glissez vos photos ici ou cliquez pour parcourir</p>
+                <p class="text-white/40 text-sm mt-1">Vous pouvez sélectionner plusieurs photos</p>
+            </div>
+
+            <input type="file" id="photosEtatInput" accept="image/*" multiple class="hidden" onchange="uploadPhotosEtat(event)">
+
+            <!-- Barre de progression -->
+            <div id="photosEtatProgress" class="mt-4 hidden">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-white">Upload en cours...</span>
+                    <span class="text-sm text-white/60" id="photosEtatPercent">0%</span>
+                </div>
+                <div class="w-full bg-white/10 rounded-full h-2">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all" id="photosEtatProgressBar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Galerie de photos -->
+        <div id="photosEtatGallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <!-- Les photos seront chargées ici dynamiquement -->
+        </div>
+
+        <!-- Message si pas de photos -->
+        <div id="photosEtatEmpty" class="text-center py-12 hidden">
+            <svg class="w-16 h-16 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="text-white/50">Aucune photo pour cet état des lieux</p>
+            <p class="text-white/30 text-sm mt-1">Ajoutez des photos en utilisant la zone ci-dessus</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Visualisation Photo (Lightbox) -->
+<div id="photoLightbox" class="fixed inset-0 bg-black/90 hidden items-center justify-center z-[60]" onclick="closeLightbox()">
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all z-10">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+    <img id="lightboxImage" src="" alt="Photo" class="max-w-[90vw] max-h-[90vh] object-contain" onclick="event.stopPropagation()">
+</div>
+
+<script>
+let currentEtatId = null;
+
+function openPhotosEtatModal(etatId, typeEtat, dateEtat) {
+    currentEtatId = etatId;
+    document.getElementById('photosEtatTitle').textContent = `${typeEtat} - ${dateEtat}`;
+    document.getElementById('photosEtatModal').classList.remove('hidden');
+    document.getElementById('photosEtatModal').classList.add('flex');
+
+    // Charger les photos
+    loadPhotosEtat(etatId);
+
+    // Setup drag & drop
+    setupPhotosDragDrop();
+}
+
+function setupPhotosDragDrop() {
+    const dropZone = document.getElementById('photosEtatDropZone');
+
+    dropZone.ondragover = (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-indigo-400', 'bg-indigo-400/10');
+    };
+
+    dropZone.ondragleave = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-indigo-400', 'bg-indigo-400/10');
+    };
+
+    dropZone.ondrop = (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-indigo-400', 'bg-indigo-400/10');
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            uploadPhotosEtatFiles(files);
+        }
+    };
+}
+
+function loadPhotosEtat(etatId) {
+    const gallery = document.getElementById('photosEtatGallery');
+    const empty = document.getElementById('photosEtatEmpty');
+
+    gallery.innerHTML = '<div class="col-span-full text-center py-8"><div class="animate-spin w-8 h-8 border-2 border-indigo-400 border-t-transparent rounded-full mx-auto"></div></div>';
+    empty.classList.add('hidden');
+
+    fetch(`/api/etat-lieux/${etatId}/photos`)
+        .then(r => r.json())
+        .then(photos => {
+            if (photos.length === 0) {
+                gallery.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            gallery.innerHTML = photos.map(photo => `
+                <div class="relative group">
+                    <img src="${photo.url}"
+                         alt="${photo.description || 'Photo'}"
+                         class="w-full h-40 object-cover rounded-xl cursor-pointer hover:opacity-90 transition-all"
+                         onclick="openLightbox('${photo.url}')">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all rounded-xl flex items-center justify-center space-x-2">
+                        <button onclick="event.stopPropagation(); openLightbox('${photo.url}')"
+                                class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 transition-all">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                            </svg>
+                        </button>
+                        <button onclick="event.stopPropagation(); deletePhotoEtat(${photo.id})"
+                                class="w-10 h-10 bg-red-500/50 rounded-full flex items-center justify-center hover:bg-red-500/70 transition-all">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                    ${photo.description ? `<p class="text-white/60 text-xs mt-1 truncate">${photo.description}</p>` : ''}
+                </div>
+            `).join('');
+
+            // Mettre à jour le compteur dans la liste principale
+            const countEl = document.querySelector('.photos-count-' + etatId);
+            if (countEl) {
+                countEl.textContent = photos.length + ' photo(s)';
+            }
+        })
+        .catch(err => {
+            console.error('Erreur chargement photos:', err);
+            gallery.innerHTML = '<div class="col-span-full text-center py-8 text-red-400">Erreur lors du chargement des photos</div>';
+        });
+}
+
+function uploadPhotosEtat(event) {
+    const files = event.target.files;
+    if (files.length > 0) {
+        uploadPhotosEtatFiles(files);
+    }
+}
+
+function uploadPhotosEtatFiles(files) {
+    if (!currentEtatId) {
+        showNotification('Erreur: État des lieux non défini', 'error');
+        return;
+    }
+
+    const progressDiv = document.getElementById('photosEtatProgress');
+    const progressBar = document.getElementById('photosEtatProgressBar');
+    const percentText = document.getElementById('photosEtatPercent');
+
+    progressDiv.classList.remove('hidden');
+    progressBar.style.width = '0%';
+    percentText.textContent = '0%';
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            progressBar.style.width = percent + '%';
+            percentText.textContent = percent + '%';
+        }
+    };
+
+    xhr.onload = function() {
+        progressDiv.classList.add('hidden');
+
+        if (xhr.status === 200) {
+            const result = JSON.parse(xhr.responseText);
+            if (result.success) {
+                showNotification(`${result.count} photo(s) uploadée(s) avec succès`, 'success');
+                loadPhotosEtat(currentEtatId);
+            } else {
+                showNotification('Erreur: ' + (result.errors?.join(', ') || 'Erreur inconnue'), 'error');
+            }
+        } else {
+            showNotification('Erreur lors de l\'upload', 'error');
+        }
+
+        // Reset input
+        document.getElementById('photosEtatInput').value = '';
+    };
+
+    xhr.onerror = function() {
+        progressDiv.classList.add('hidden');
+        showNotification('Erreur de connexion', 'error');
+    };
+
+    xhr.open('POST', `/api/etat-lieux/${currentEtatId}/photos`);
+    xhr.send(formData);
+}
+
+function deletePhotoEtat(photoId) {
+    if (!confirm('Supprimer cette photo ?')) return;
+
+    fetch(`/api/etat-lieux/photo/${photoId}`, {
+        method: 'DELETE'
+    })
+    .then(r => r.json())
+    .then(result => {
+        if (result.success) {
+            showNotification('Photo supprimée', 'success');
+            loadPhotosEtat(currentEtatId);
+        } else {
+            showNotification('Erreur lors de la suppression', 'error');
+        }
+    })
+    .catch(() => {
+        showNotification('Erreur de connexion', 'error');
+    });
+}
+
+function openLightbox(imageUrl) {
+    const lightbox = document.getElementById('photoLightbox');
+    const img = document.getElementById('lightboxImage');
+
+    img.src = imageUrl;
+    lightbox.classList.remove('hidden');
+    lightbox.classList.add('flex');
+
+    // Bloquer le scroll du body
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lightbox = document.getElementById('photoLightbox');
+    lightbox.classList.add('hidden');
+    lightbox.classList.remove('flex');
+
+    // Rétablir le scroll
+    document.body.style.overflow = '';
+}
+
+// Fermer lightbox avec Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
+</script>

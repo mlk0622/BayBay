@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>État des lieux</title>
+    <style>
+        @page { size: A4; margin: 16mm; }
+        body { font-family: Arial, sans-serif; font-size: 10pt; color: #111; line-height: 1.35; }
+        h1 { margin: 0 0 6px 0; text-align: center; letter-spacing: 2px; font-size: 16pt; }
+        .top-note { font-size: 8.5pt; color: #333; border: 1px solid #bbb; padding: 8px; margin-bottom: 10px; }
+        .section { margin-top: 10px; }
+        .title { font-weight: bold; background: #efefef; border-left: 4px solid #333; padding: 5px 8px; margin-bottom: 6px; }
+        .grid-2 { width: 100%; border-collapse: collapse; }
+        .grid-2 td { border: 1px solid #cfcfcf; padding: 6px; vertical-align: top; }
+        .label { font-weight: bold; width: 28%; }
+        .line { border-bottom: 1px dotted #555; min-height: 14px; display: inline-block; width: 100%; }
+        .tiny { font-size: 8.5pt; color: #444; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { border: 1px solid #cfcfcf; padding: 5px; font-size: 9pt; }
+        .table th { background: #f6f6f6; text-align: left; }
+        .state-col { width: 50px; text-align: center; }
+        .room-title { margin-top: 8px; font-weight: bold; }
+        .sig-wrap { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .sig-wrap td { width: 50%; vertical-align: top; padding: 8px; }
+        .sig-box { border: 1px solid #cfcfcf; min-height: 90px; padding: 8px; }
+    </style>
+</head>
+<body>
+    {% set type_value = etat.type_etat.value if etat.type_etat is defined and etat.type_etat.value is defined else etat.type_etat %}
+    {% set is_entree = type_value in ['entree', 'Entrée', 'ENTREE', 'ENTRÉE'] %}
+    {% set bailleur = bailleur_pdf if bailleur_pdf is defined else sci %}
+
+    <h1>ÉTAT DES LIEUX</h1>
+
+    <table class="grid-2">
+        <tr>
+            <td><span class="label">Type :</span> {% if is_entree %}ENTRÉE{% else %}SORTIE{% endif %}</td>
+            <td><span class="label">Date d'état des lieux :</span> {{ etat.date_etat.strftime('%d/%m/%Y') }}</td>
+            <td><span class="label">Adresse du logement :</span> {{ bien.adresse if bien and bien.adresse else '' }}</td>
+        </tr>
+    </table>
+
+    <p class="top-note">
+        L'état des lieux est établi contradictoirement entre les parties lors de la remise ou restitution des clés.
+        Ce document fait partie du contrat de location et peut être complété conformément aux dispositions légales.
+    </p>
+
+    <div class="section">
+        <div class="title">Identification</div>
+        <table class="grid-2">
+            <tr>
+                <td class="label">Nom (bailleur)</td>
+                <td>{{ bailleur.nom if bailleur and bailleur.nom else '' }}</td>
+                <td class="label">Nom (locataire)</td>
+                <td>{{ locataire.nom }} {{ locataire.prenom }}</td>
+            </tr>
+            <tr>
+                <td class="label">Domicile / siège social</td>
+                <td>{{ bailleur.adresse if bailleur and bailleur.adresse else '' }}</td>
+                <td class="label">Nouvelle adresse (si sortie)</td>
+                <td>{{ locataire.adresse_precedente if (not is_entree and locataire.adresse_precedente) else '' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Date d'entrée (bail)</td>
+                <td>{{ locataire.date_debut_bail.strftime('%d/%m/%Y') if locataire.date_debut_bail else '' }}</td>
+                <td class="label">Date de sortie (bail)</td>
+                <td>{{ locataire.date_fin_bail.strftime('%d/%m/%Y') if locataire.date_fin_bail else '' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Email bailleur</td>
+                <td>{{ bailleur.email if bailleur and bailleur.email else '' }}</td>
+                <td class="label">Téléphone locataire</td>
+                <td>{{ locataire.telephone or '' }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="title">Équipements généraux</div>
+        <table class="grid-2">
+            <tr>
+                <td class="label">Eau chaude sanitaire</td>
+                <td>collectif / individuel / électrique / gaz / fioul / autre</td>
+                <td class="label">Chauffage</td>
+                <td>collectif / individuel / électrique / gaz / fioul / autre</td>
+            </tr>
+            <tr>
+                <td class="label">Nombre de radiateurs</td>
+                <td><span class="line"></span></td>
+                <td class="label">Chaudière / Chauffe-eau</td>
+                <td><span class="line"></span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="title">Clés et accès</div>
+        <table class="table">
+            <tr>
+                <th>Type de clé / accès</th>
+                <th class="state-col">Entrée</th>
+                <th class="state-col">Sortie</th>
+                <th>Commentaires</th>
+            </tr>
+            <tr><td>Clés d'immeuble</td><td></td><td></td><td></td></tr>
+            <tr><td>Badge ou clé portail</td><td></td><td></td><td></td></tr>
+            <tr><td>Clés cave</td><td></td><td></td><td></td></tr>
+            <tr><td>Clés porte d'entrée</td><td></td><td></td><td></td></tr>
+            <tr><td>Boîte aux lettres</td><td></td><td></td><td></td></tr>
+            <tr><td>Parking</td><td></td><td></td><td></td></tr>
+            <tr><td>Sonnette / interphone</td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="title">État des pièces (M / P / B / TB)</div>
+        <div class="room-title">Entrée / Séjour</div>
+        <table class="table">
+            <tr><th>Élément</th><th class="state-col">État entrée</th><th class="state-col">État sortie</th><th>Description / détails</th></tr>
+            <tr><td>Mur</td><td></td><td></td><td></td></tr>
+            <tr><td>Plafond</td><td></td><td></td><td></td></tr>
+            <tr><td>Sol</td><td></td><td></td><td></td></tr>
+            <tr><td>Porte</td><td></td><td></td><td></td></tr>
+            <tr><td>Vitrage / volets</td><td></td><td></td><td></td></tr>
+            <tr><td>Éclairage / interrupteurs</td><td></td><td></td><td></td></tr>
+            <tr><td>Prises électriques (nombre: {{ appartement.nb_pieces if appartement and appartement.nb_pieces else '' }})</td><td></td><td></td><td></td></tr>
+        </table>
+
+        <div class="room-title">Cuisine</div>
+        <table class="table">
+            <tr><th>Élément</th><th class="state-col">État entrée</th><th class="state-col">État sortie</th><th>Description / détails</th></tr>
+            <tr><td>Mur / Plafond / Sol</td><td></td><td></td><td></td></tr>
+            <tr><td>Évier et robinetterie</td><td></td><td></td><td></td></tr>
+            <tr><td>Plaques de cuisson et four</td><td></td><td></td><td></td></tr>
+            <tr><td>Hotte</td><td></td><td></td><td></td></tr>
+            <tr><td>Placards et tiroirs</td><td></td><td></td><td></td></tr>
+            <tr><td>Électroménager</td><td></td><td></td><td></td></tr>
+        </table>
+
+        <div class="room-title">Salle de bain / WC / Chambres</div>
+        <table class="table">
+            <tr><th>Élément</th><th class="state-col">État entrée</th><th class="state-col">État sortie</th><th>Description / détails</th></tr>
+            <tr><td>Mur / Plafond / Sol</td><td></td><td></td><td></td></tr>
+            <tr><td>Lavabo et robinetterie</td><td></td><td></td><td></td></tr>
+            <tr><td>Baignoire / douche</td><td></td><td></td><td></td></tr>
+            <tr><td>WC</td><td></td><td></td><td></td></tr>
+            <tr><td>Vitrage / volets</td><td></td><td></td><td></td></tr>
+            <tr><td>Éclairage / interrupteurs / prises</td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="title">Compteurs et relevés</div>
+        <table class="table">
+            <tr><th>Service</th><th>Identification compteur</th><th>Relève entrée</th><th>Relève sortie</th></tr>
+            <tr><td>Électricité</td><td></td><td></td><td></td></tr>
+            <tr><td>Gaz</td><td></td><td></td><td></td></tr>
+            <tr><td>Eau froide</td><td></td><td></td><td></td></tr>
+            <tr><td>Eau chaude</td><td></td><td></td><td></td></tr>
+            <tr><td>Internet</td><td></td><td></td><td></td></tr>
+        </table>
+        <p class="tiny">Ancien occupant : <span class="line"></span></p>
+    </div>
+
+    <div class="section">
+        <div class="title">Observations ou réserves</div>
+        <div style="border:1px solid #cfcfcf; min-height:100px; padding:8px;">{{ etat.observations or '' }}</div>
+    </div>
+
+    <table class="sig-wrap">
+        <tr>
+            <td>
+                <div class="sig-box">
+                    <strong>Entrée</strong><br>
+                    Le ....../....../...... à ........................................<br><br>
+                    Nom et signature du bailleur (ou mandataire)<br><br><br>
+                    Nom et signature du locataire (ou mandataire)
+                </div>
+            </td>
+            <td>
+                <div class="sig-box">
+                    <strong>Sortie</strong><br>
+                    Le ....../....../...... à ........................................<br><br>
+                    Nom et signature du bailleur (ou mandataire)<br><br><br>
+                    Nom et signature du locataire (ou mandataire)
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <p class="tiny" style="text-align:center; margin-top:8px;">Document généré le {{ now.strftime('%d/%m/%Y à %H:%M') }}</p>
+</body>
+</html>

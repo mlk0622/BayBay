@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TEST LOCATAIRE</title>
+    <style>
+        body {
+            background: red;
+            color: white;
+            font-size: 24px;
+            padding: 50px;
+            font-family: Arial;
+        }
+        .test-section {
+            background: blue;
+            border: 5px solid yellow;
+            padding: 30px;
+            margin: 20px;
+            text-align: center;
+        }
+        .bouton-test {
+            background: lime;
+            color: black;
+            padding: 20px 40px;
+            border: 3px solid purple;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 TEST LOCATAIRE - {{ locataire.nom }} {{ locataire.prenom }} 🔥</h1>
+
+    <div class="test-section">
+        <h2>SECTION ÉTATS DES LIEUX</h2>
+        <p>Si vous voyez cette page, c'est que le template locataire_detail.html est bien chargé !</p>
+
+        <button class="bouton-test" onclick="alert('Upload PDF')">Upload PDF</button>
+        <button class="bouton-test" onclick="alert('Générer Complet')">Générer Complet</button>
+        <button class="bouton-test" onclick="alert('Rapide')">Rapide</button>
+    </div>
+
+    <div class="test-section">
+        <h2>INFORMATIONS DEBUG</h2>
+        <p>Locataire ID: {{ locataire.id }}</p>
+        <p>Nom: {{ locataire.nom }} {{ locataire.prenom }}</p>
+        <p>Nombre d'états des lieux: {{ etats_lieux|length }}</p>
+        {% if locataire.appartement %}
+        <p>Appartement: {{ locataire.appartement.numero_porte }}</p>
+        <p>Adresse: {{ locataire.appartement.bien.adresse }}</p>
+        {% endif %}
+    </div>
+
+    <div class="test-section">
+        <h2>URL TESTÉES</h2>
+        <p>Cette page devrait être accessible via:</p>
+        <ul style="text-align: left;">
+            <li>http://127.0.0.1:5000/locataire/1</li>
+            <li>Menu Locataires → Clic sur "{{ locataire.nom }} {{ locataire.prenom }}"</li>
+        </ul>
+    </div>
+</body>
+</html>

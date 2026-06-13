@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Vérification quittance{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <div class="glass-card p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Vérification de quittance</h1>
+                <p class="text-white/70 mt-1">Document généré par l'entreprise via le logiciel {{ logiciel }}.</p>
+            </div>
+            <div class="px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-semibold">
+                Statut: {{ statut_validation }}
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-white">Informations essentielles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">Référence publique</div>
+                <div class="text-white font-semibold">{{ quittance.public_ref }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">ID de vérification</div>
+                <div class="text-white font-semibold">{{ verification_id }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">Locataire</div>
+                <div class="text-white font-semibold">{{ locataire.nom_complet if locataire else '-' }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">Période</div>
+                <div class="text-white font-semibold">{{ MOIS_FR[quittance.mois] }} {{ quittance.annee }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">Montant payé</div>
+                <div class="text-white font-semibold">{{ quittance.montant_paye|currency }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3">
+                <div class="text-white/60">Date émission</div>
+                <div class="text-white font-semibold">{{ quittance.date_emission|date_fr if quittance.date_emission else '-' }}</div>
+            </div>
+            <div class="rounded-lg bg-black/20 border border-white/10 p-3 md:col-span-2">
+                <div class="text-white/60">Empreinte SHA-256</div>
+                <div class="text-white font-mono text-xs break-all">{{ integrity_hash }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card p-6">
+        <p class="text-white/80 text-sm">
+            Cette quittance a été générée par l'entreprise
+            <strong>{{ sci.nom if sci else 'Bailleur' }}</strong>
+            via le logiciel <strong>{{ logiciel }}</strong>
+            le <strong>{{ generated_at }}</strong>.
+            {% if signature_present %}
+            Une signature graphique était associée à la génération du document.
+            {% else %}
+            Aucune signature graphique n'était associée à ce document.
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="flex justify-end">
+        <a href="/quittance/document/{{ quittance.public_ref }}/pdf" target="_blank" class="ios-button text-white px-4 py-2">
+            <i class="fas fa-file-pdf mr-2"></i>Ouvrir le PDF
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+<!-- Modal d'upload d'état des lieux -->
+<div id="uploadEtatModal" class="modal-overlay hidden">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Uploader un état des lieux</h3>
+            <button onclick="closeModal('uploadEtatModal')" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <form id="uploadEtatForm" enctype="multipart/form-data">
+            <div class="modal-body space-y-6">
+                <div class="form-group">
+                    <label class="form-label">Type d'état des lieux *</label>
+                    <select name="type_etat" class="form-input" required>
+                        <option value="">Sélectionnez le type</option>
+                        <option value="entree">État d'entrée</option>
+                        <option value="sortie">État de sortie</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date de l'état des lieux *</label>
+                    <input type="date" name="date_etat" class="form-input" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fichier PDF *</label>
+                    <div class="file-upload-area">
+                        <input type="file" name="file" id="uploadEtatFile" accept=".pdf" required class="file-input" />
+                        <div class="file-upload-content">
+                            <svg class="w-12 h-12 text-white/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                            <p class="text-white/70 font-medium">Glissez votre fichier PDF ici</p>
+                            <p class="text-white/50 text-sm">ou cliquez pour parcourir</p>
+                        </div>
+                        <div class="file-selected hidden">
+                            <svg class="w-8 h-8 text-green-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="file-name text-white font-medium"></p>
+                            <p class="text-white/50 text-sm">Fichier sélectionné</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" onclick="closeModal('uploadEtatModal')" class="btn btn-secondary">
+                    Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    Uploader
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let uploadEtatLocataireId = null;
+
+function openUploadEtatModal(locataireId) {
+    uploadEtatLocataireId = locataireId;
+    document.getElementById('uploadEtatModal').classList.remove('hidden');
+
+    // Réinitialiser le formulaire
+    document.getElementById('uploadEtatForm').reset();
+    resetFileUpload();
+}
+
+function resetFileUpload() {
+    const fileInput = document.getElementById('uploadEtatFile');
+    const uploadContent = document.querySelector('#uploadEtatModal .file-upload-content');
+    const selectedContent = document.querySelector('#uploadEtatModal .file-selected');
+
+    fileInput.value = '';
+    uploadContent.classList.remove('hidden');
+    selectedContent.classList.add('hidden');
+}
+
+// Gestion du file upload
+document.getElementById('uploadEtatFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const uploadContent = document.querySelector('#uploadEtatModal .file-upload-content');
+        const selectedContent = document.querySelector('#uploadEtatModal .file-selected');
+        const fileName = document.querySelector('#uploadEtatModal .file-name');
+
+        uploadContent.classList.add('hidden');
+        selectedContent.classList.remove('hidden');
+        fileName.textContent = file.name;
+    }
+});
+
+// Soumission du formulaire
+document.getElementById('uploadEtatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    if (!uploadEtatLocataireId) {
+        showNotification('Erreur: Locataire non défini', 'error');
+        return;
+    }
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(`/api/locataire/${uploadEtatLocataireId}/etat-lieux/upload`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showNotification('État des lieux uploadé avec succès', 'success');
+            closeModal('uploadEtatModal');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification('Erreur: ' + result.error, 'error');
+        }
+    } catch (error) {
+        showNotification('Erreur lors de l\'upload', 'error');
+    }
+});
+</script>
