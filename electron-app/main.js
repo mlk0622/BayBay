@@ -69,7 +69,10 @@ function createMainWindow() {
     });
 
     console.log(`Chargement de l'URL : ${CLOUD_URL}`);
-    mainWindow.loadURL(CLOUD_URL);
+    mainWindow.webContents.session.clearCache().then(() => {
+        console.log("Cache Electron effacé pour éviter l'ancien thème/code");
+        mainWindow.loadURL(CLOUD_URL);
+    });
 
     // Repli automatique sur localhost en cas de problème de connexion au serveur cloud distant
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {

@@ -155,12 +155,7 @@
         };
 
         (function initTheme() {
-            const savedTheme = localStorage.getItem('baybay-theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                return;
-            }
-            // Mode clair par défaut
+            // Force light theme and reset any stored dark theme
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('baybay-theme', 'light');
         })();
@@ -204,6 +199,7 @@
     </script>
 
     <!-- Navigation -->
+    {% if current_user.is_authenticated %}
     <nav class="app-nav sticky top-0 z-50 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
@@ -218,7 +214,6 @@
                 </div>
 
                 <!-- Navigation Desktop -->
-                {% if current_user.is_authenticated %}
                 <div class="hidden lg:flex items-center gap-1 relative nav-pill-container">
                     <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 6px 16px rgba(96, 165, 250, 0.35); pointer-events: none; opacity: 0;"></div>
                     <a href="{{ url_for('dashboard') }}"
@@ -262,26 +257,16 @@
                         <i class="fas fa-cog"></i>
                     </a>
                 </div>
-                {% endif %}
 
                 <div class="flex items-center gap-2">
-                    <!-- <button id="themeToggle" type="button"
-                            class="px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-                            title="Changer le thème"
-                            aria-label="Changer le thème">
-                        <i class="fas fa-moon text-lg" id="themeIcon"></i>
-                    </button> -->
-                    {% if current_user.is_authenticated %}
                     <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
                         <i class="fas fa-sign-out-alt mr-1"></i>Se deconnecter
                     </a>
-                    {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Navigation Mobile -->
-        {% if current_user.is_authenticated %}
         <div class="lg:hidden border-t border-slate-200 overflow-x-auto bg-white">
             <div class="flex px-4 py-2 gap-2">
                 <a href="{{ url_for('dashboard') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Dashboard</a>
@@ -293,8 +278,8 @@
                 <a href="{{ url_for('logout') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50">Deconnexion</a>
             </div>
         </div>
-        {% endif %}
     </nav>
+    {% endif %}
 
     <!-- Contenu principal -->
     <div id="app-content-wrapper" class="relative w-full overflow-hidden min-h-[80vh]">
