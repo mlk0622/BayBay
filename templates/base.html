@@ -185,6 +185,7 @@
         // Affiche la barre de titre personnalisée si on tourne dans Electron
         if (window.electronAPI) {
             document.getElementById('electron-titlebar').style.display = 'flex';
+            document.body.classList.add('has-electron-titlebar');
         }
         
         // Supprime l'effet de flou de chargement une fois le DOM chargé
