@@ -6,7 +6,7 @@
     <title>{% block title %}BayBay{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}?v=3.3.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}?v={{ app_version }}">
     <style>
         .rich-editor-shell {
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -325,7 +325,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/app.js') }}?v=3.3.3"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v={{ app_version }}"></script>
     <script>
         function emailVariable(name) {
             return String.fromCharCode(123, 123) + name + String.fromCharCode(125, 125);
