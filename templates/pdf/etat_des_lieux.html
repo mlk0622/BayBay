@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>État des Lieux</title>
+  <style>
+    @page { size: A4; margin: 1.5cm 1.5cm 1.5cm 1.5cm; }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      color: #1e1e2a;
+      background: #ffffff;
+      line-height: 1.4;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 17pt;
+      font-weight: bold;
+      color: #3a7bc8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+    }
+
+    .center { text-align: center; }
+
+    .section-hdr {
+      background: #4a90d9;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 9pt;
+      padding: 4px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-top: 8px;
+    }
+
+    .legal {
+      font-size: 7.5pt;
+      color: #555;
+      text-align: justify;
+      border: 1px solid #b0b8c8;
+      padding: 4px 6px;
+      margin-bottom: 6px;
+      margin-top: 4px;
+    }
+
+    /* ── Tableaux de données ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+    }
+
+    /* Tableau générique section-body */
+    table.data td {
+      padding: 3px 6px;
+      border: 1px solid #b0b8c8;
+      vertical-align: middle;
+    }
+    table.data tr:nth-child(even) td { background: #f4f7fb; }
+    table.data td.lbl {
+      font-weight: bold;
+      background: #f0f4f9;
+    }
+
+    /* En-têtes bleues */
+    table.rooms th, table.cles th, table.counters th {
+      background: #4a90d9;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 4px 6px;
+      text-align: left;
+      font-size: 8.5pt;
+      text-transform: uppercase;
+    }
+    table.rooms th.center { text-align: center; }
+
+    /* Lignes état des pièces */
+    table.rooms td {
+      padding: 3px 6px;
+      border: 1px solid #b0b8c8;
+      vertical-align: middle;
+      font-size: 9pt;
+    }
+    table.rooms tr:nth-child(even) td { background: #f4f7fb; }
+    table.rooms td.lbl {
+      font-weight: bold;
+      white-space: nowrap;
+      width: 150px;
+      background: #f0f4f9;
+    }
+    table.rooms td.etat {
+      width: 36px;
+      text-align: center;
+    }
+
+    /* Clés */
+    table.cles td {
+      padding: 3px 6px;
+      border: 1px solid #b0b8c8;
+    }
+    table.cles tr:nth-child(even) td { background: #f4f7fb; }
+    table.cles td.lbl {
+      font-weight: bold;
+      width: 155px;
+      background: #f0f4f9;
+    }
+
+    /* Compteurs */
+    table.counters td {
+      width: 25%;
+      vertical-align: top;
+      padding: 5px 7px;
+      border: 1px solid #b0b8c8;
+      font-size: 9pt;
+    }
+    .c-title {
+      font-weight: bold;
+      font-size: 9.5pt;
+      text-align: center;
+      color: #3a7bc8;
+      margin-bottom: 3px;
+    }
+
+    /* Bloc signatures */
+    table.sigs td {
+      width: 33%;
+      vertical-align: top;
+      padding: 8px 10px;
+      border: 1px solid #b0b8c8;
+      font-size: 9pt;
+    }
+    .sig-title { font-weight: bold; font-size: 9pt; margin-bottom: 2px; text-align: center; }
+    .sig-sub { font-size: 8pt; font-style: italic; color: #6b6b85; margin-bottom: 28px; text-align: center; }
+    .sig-line { border-top: 1px solid #b0b8c8; margin: 0 14px; }
+
+    .obs-box {
+      border: 1px solid #b0b8c8;
+      min-height: 45px;
+      padding: 5px;
+      margin-bottom: 10px;
+      font-size: 9pt;
+    }
+
+    .page-break { page-break-before: always; }
+    .mt6 { margin-top: 6px; }
+    .mt8 { margin-top: 8px; }
+    .sub-hdr { background: #dde7f4; color: #1e1e2a; text-align: center; font-weight: bold; font-size: 8.5pt; }
+  </style>
+</head>
+<body>
+
+<h1>État des Lieux</h1>
+
+<p class="center" style="font-size:11pt; font-weight:bold; color:#3a7bc8; margin:2px 0;">
+  {% if type_entree_checked %}[X] ENTRÉE &nbsp;&nbsp;&nbsp; [ ] SORTIE{% else %}[ ] ENTRÉE &nbsp;&nbsp;&nbsp; [X] SORTIE{% endif %}
+</p>
+
+<p class="center" style="font-size:9.5pt; margin:2px 0 6px 0;">
+  <b>Date d'entrée :</b> {{ date_entree or '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' }}
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Date de sortie :</b> {{ date_sortie or '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' }}
+</p>
+
+<table class="data">
+  <tr><td class="lbl" style="width:170px;">Adresse du logement</td><td>{{ adresse_logement or '' }}</td></tr>
+</table>
+
+<div class="legal">
+  L'état des lieux doit être établi de façon contradictoire entre les deux parties lors de la remise des clés au locataire et lors de leur restitution en fin de bail, conformément à l'article 3 de la Loi n°89-462 du 6 juillet 1989. Il fait partie du contrat de location, dont il ne peut être dissocié. L'état des lieux d'entrée peut être complété par le locataire dans les 10 jours suivant sa tenue (et pendant le 1er mois de chauffe pour les éléments de chauffage).
+</div>
+
+<!-- IDENTIFICATION -->
+<div class="section-hdr">Identification</div>
+<table class="data">
+  <tr>
+    <td class="lbl" style="width:30%; background:#dde7f4; font-size:9pt;" colspan="2">Le bailleur (ou son mandataire)</td>
+    <td class="lbl" style="width:30%; background:#dde7f4; font-size:9pt;" colspan="2">Le locataire</td>
+  </tr>
+  <tr>
+    <td class="lbl" style="width:150px;">Nom / Dénomination</td>
+    <td>{{ bailleur_nom or '' }}</td>
+    <td class="lbl" style="width:100px;">Nom</td>
+    <td>{{ locataire_nom or '' }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Domicile / Siège social</td>
+    <td>{{ bailleur_adresse or '' }}</td>
+    <td class="lbl">Si sortie, nouvelle adresse</td>
+    <td>{{ locataire_nouvelle_adresse or '' }}</td>
+  </tr>
+  <tr>
+    <td class="lbl" colspan="1">Ancien occupant</td>
+    <td colspan="3"></td>
+  </tr>
+  <tr>
+    <td class="lbl">Eau chaude sanitaire</td>
+    <td>[ ] collectif &nbsp; [ ] individuel &nbsp; [ ] électrique &nbsp; [ ] gaz &nbsp; [ ] fioul &nbsp; [ ] autre</td>
+    <td class="lbl">Chauffage</td>
+    <td>[ ] collectif &nbsp; [ ] individuel &nbsp; [ ] électrique &nbsp; [ ] gaz &nbsp; [ ] fioul &nbsp; [ ] autre</td>
+  </tr>
+  <tr>
+    <td class="lbl">Nombre de radiateurs</td>
+    <td></td>
+    <td class="lbl">Chaudière / Chauffe-eau</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="lbl">Sonnette ou interphone</td>
+    <td colspan="3"></td>
+  </tr>
+</table>
+
+<!-- CLÉS -->
+<div class="section-hdr mt6">Clés</div>
+<table class="cles">
+  <thead>
+    <tr>
+      <th style="width:150px;"></th>
+      <th>Type de clé</th>
+      <th>Nbre et Commentaires</th>
+      <th>Type de clé</th>
+      <th>Nbre et Commentaires</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="lbl">Clés porte d'entrée</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="lbl">Clés d'immeuble</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="lbl">Boîtes aux lettres</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="lbl">Badge ou clé portail</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="lbl">Clés cave / Parking</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="lbl">Autre</td><td></td><td></td><td></td><td></td></tr>
+  </tbody>
+</table>
+
+<!-- COMPTEURS -->
+<div class="section-hdr mt6">Identification compteurs et relevés</div>
+<table class="counters">
+  <thead>
+    <tr>
+      <th>Électricité</th>
+      <th>Gaz</th>
+      <th>Eau</th>
+      <th>Internet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="c-title"></div>
+        N° compteur :<br><br>
+        Relevé HP :<br><br>
+        Relevé HC :<br>
+      </td>
+      <td>
+        <div class="c-title"></div>
+        N° compteur :<br><br>
+        Relevé :<br>
+      </td>
+      <td>
+        <div class="c-title"></div>
+        Eau froide :<br><br>
+        Eau chaude :<br>
+      </td>
+      <td>
+        <div class="c-title"></div>
+        Éligibilité fibre :<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ÉTAT DES PIÈCES -->
+<div class="section-hdr mt6">État des pièces — M = mauvais &nbsp; P = passable &nbsp; B = bon &nbsp; TB = très bon</div>
+
+<table class="rooms mt6">
+  <thead><tr><th colspan="2">Entrée</th><th>Description / détails</th><th class="center">État</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">Sol</td><td>[ ] parquet &nbsp; [ ] moquette &nbsp; [ ] carrelage &nbsp; [ ] lino</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture &nbsp; [ ] papier peint &nbsp; [ ] crépi &nbsp; [ ] faïence</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple &nbsp; [ ] double &nbsp; volets: [ ] PVC [ ] alu [ ] bois</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Porte</td><td>[ ] bois &nbsp; [ ] métal &nbsp; [ ] PVC</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage / inter.</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Prises (nb :&nbsp;&nbsp;&nbsp;&nbsp; )</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<table class="rooms mt6">
+  <thead><tr><th colspan="2">Séjour – Salle à manger</th><th>Description / détails</th><th class="center">État</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">Sol</td><td>[ ] parquet &nbsp; [ ] moquette &nbsp; [ ] carrelage &nbsp; [ ] lino</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture &nbsp; [ ] papier peint &nbsp; [ ] crépi &nbsp; [ ] faïence</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple &nbsp; [ ] double &nbsp; volets: [ ] PVC [ ] alu [ ] bois</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage / inter.</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Prises (nb :&nbsp;&nbsp;&nbsp;&nbsp; )</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<table class="rooms mt6">
+  <thead><tr><th colspan="2">Cuisine</th><th>Description / détails</th><th class="center">État</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">Sol</td><td>[ ] parquet &nbsp; [ ] moquette &nbsp; [ ] carrelage &nbsp; [ ] lino</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture &nbsp; [ ] papier peint &nbsp; [ ] crépi &nbsp; [ ] faïence</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple &nbsp; [ ] double &nbsp; volets: [ ] PVC [ ] alu [ ] bois</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage / inter.</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Prises (nb :&nbsp;&nbsp;&nbsp;&nbsp; )</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Placards / tiroirs</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Évier + robinetterie</td><td>[ ] inox &nbsp; [ ] émail</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plaques / four</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Hotte</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Électroménager</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════ PAGE 2 ═══════════════ -->
+<div class="page-break"></div>
+
+<table class="rooms">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:140px;">Chambres</th>
+      <th class="center" colspan="3">Description / détails</th>
+      <th class="center" colspan="3" style="width:90px;">État</th>
+    </tr>
+    <tr>
+      <th class="sub-hdr">Chambre 1</th>
+      <th class="sub-hdr">Chambre 2</th>
+      <th class="sub-hdr">Chambre 3</th>
+      <th class="sub-hdr center" style="width:30px;">1</th>
+      <th class="sub-hdr center" style="width:30px;">2</th>
+      <th class="sub-hdr center" style="width:30px;">3</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture [ ] papier peint</td><td>[ ] peinture [ ] papier peint</td><td>[ ] peinture [ ] papier peint</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Sol</td><td>[ ] parquet [ ] moquette [ ] carrelage</td><td>[ ] parquet [ ] moquette [ ] carrelage</td><td>[ ] parquet [ ] moquette [ ] carrelage</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple [ ] double</td><td>[ ] simple [ ] double</td><td>[ ] simple [ ] double</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Prises</td><td>(nb:&nbsp;&nbsp;&nbsp;&nbsp;)</td><td>(nb:&nbsp;&nbsp;&nbsp;&nbsp;)</td><td>(nb:&nbsp;&nbsp;&nbsp;&nbsp;)</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<table class="rooms mt8">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:140px;">Salle de bain</th>
+      <th class="center" colspan="2">Description / détails</th>
+      <th class="center" colspan="2" style="width:60px;">État</th>
+    </tr>
+    <tr>
+      <th class="sub-hdr">Salle de bain 1</th>
+      <th class="sub-hdr">Salle de bain 2</th>
+      <th class="sub-hdr center" style="width:30px;">1</th>
+      <th class="sub-hdr center" style="width:30px;">2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture [ ] faïence [ ] crépi</td><td>[ ] peinture [ ] faïence [ ] crépi</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Sol</td><td>[ ] carrelage [ ] lino [ ] autre</td><td>[ ] carrelage [ ] lino [ ] autre</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple [ ] double</td><td>[ ] simple [ ] double</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Lavabo + robinetterie</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Baignoire / douche</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">WC</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<table class="rooms mt8">
+  <thead>
+    <tr>
+      <th rowspan="2" style="width:140px;">WC</th>
+      <th class="center" colspan="2">Description / détails</th>
+      <th class="center" colspan="2" style="width:60px;">État</th>
+    </tr>
+    <tr>
+      <th class="sub-hdr">WC 1</th>
+      <th class="sub-hdr">WC 2</th>
+      <th class="sub-hdr center" style="width:30px;">1</th>
+      <th class="sub-hdr center" style="width:30px;">2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture [ ] faïence [ ] crépi</td><td>[ ] peinture [ ] faïence [ ] crépi</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Sol</td><td>[ ] carrelage [ ] lino [ ] autre</td><td>[ ] carrelage [ ] lino [ ] autre</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Lavabo + robinetterie</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">WC (cuvette, chasse)</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<table class="rooms mt8">
+  <thead><tr><th colspan="2">Autre pièce</th><th>Description / détails</th><th class="center">État</th></tr></thead>
+  <tbody>
+    <tr><td class="lbl">Mur</td><td>[ ] peinture &nbsp; [ ] papier peint &nbsp; [ ] crépi &nbsp; [ ] faïence</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Sol</td><td>[ ] parquet &nbsp; [ ] moquette &nbsp; [ ] carrelage &nbsp; [ ] lino</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Vitrage / volets</td><td>[ ] simple &nbsp; [ ] double &nbsp; volets: [ ] PVC [ ] alu [ ] bois</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Plafond</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Éclairage</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+    <tr><td class="lbl">Prises (nb :&nbsp;&nbsp;&nbsp;&nbsp; )</td><td>&nbsp;</td><td>&nbsp;</td><td class="etat">&nbsp;</td></tr>
+  </tbody>
+</table>
+
+<p style="font-weight:bold; font-size:11pt; margin:8px 0 3px 0;">Observations ou réserves :</p>
+<div class="obs-box">{{ observations or '&nbsp;' }}</div>
+
+<!-- SIGNATURES -->
+<table class="sigs">
+  <tbody>
+    <tr>
+      <td style="width:22%;">
+        <p style="font-style:italic; margin:0 0 8px 0;">Le&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+        <p style="font-style:italic; margin:0;">à&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+      </td>
+      <td>
+        <p class="sig-title">Nom et signature du bailleur<br>(ou de son mandataire)</p>
+        <p class="sig-sub">« Lu et approuvé » :</p>
+        <div class="sig-line"></div>
+      </td>
+      <td>
+        <p class="sig-title">Nom et signature du locataire</p>
+        <p class="sig-sub">« Lu et approuvé » :</p>
+        <div class="sig-line"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

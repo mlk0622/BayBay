@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Créer un compte - BayBay{% endblock %}
+
+{% block content %}
+<div class="glass-container" style="max-width: 400px; margin: 50px auto; padding: 30px; text-align: center;">
+    <h2>Créer un compte</h2>
+    <p>Rejoignez le Cloud BayBay</p>
+
+    <form method="POST" action="{{ url_for('register') }}">
+        <div style="margin-bottom: 20px;">
+            <input type="email" name="email" placeholder="Adresse email" required
+                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <input type="password" name="password" placeholder="Mot de passe robuste" required
+                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+        </div>
+        <button type="submit" class="btn-glass" style="width: 100%; cursor: pointer;">Créer mon compte</button>
+    </form>
+
+    <p style="margin-top: 20px; font-size: 0.9em;">
+        Déjà inscrit ? <a href="{{ url_for('login') }}" style="color: #fff;">Se connecter</a>
+    </p>
+</div>
+{% endblock %}

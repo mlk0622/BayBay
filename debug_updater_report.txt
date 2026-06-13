@@ -1,0 +1,124 @@
+======================================================================
+    DEBUG AUTO-UPDATER - RAPPORT COMPLET
+======================================================================
+Date: 2026-04-08 15:16:17
+Python: 3.14.3 (tags/v3.14.3:323c59a, Feb  3 2026, 16:04:56) [MSC v.1944 64 bit (AMD64)]
+OS: win32
+======================================================================
+
+[ETAPE 1] VERSION ACTUELLE
+----------------------------------------
+CURRENT_VERSION dans le code: 2.3.3.2
+Version tuple: (2, 3, 3, 2)
+
+[ETAPE 2] VERIFICATION DE auto_updater.py
+----------------------------------------
+Version dans auto_updater.py: 2.3.3.2
+
+[ETAPE 3] REQUETE GITHUB API
+----------------------------------------
+URL: https://api.github.com/repos/mlk0622/BayBay/releases
+Headers: {'User-Agent': 'BayBay/2.3.3.2', 'Accept': 'application/vnd.github.v3+json'}
+Status HTTP: 200
+Nombre de releases: 10
+
+[ETAPE 4] ANALYSE DES RELEASES
+----------------------------------------
+
+Release #1:
+  Tag: v2.3.3.2
+  Version tuple: (2, 3, 3, 2)
+  Draft: False
+  Prerelease: False
+  Published: 2026-04-08T13:10:57Z
+  Assets (2):
+    - Bay.Bay.Setup.2.3.3.2.exe (164.42 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3.2/Bay.Bay.Setup.2.3.3.2.exe
+    - latest.yml (0.00 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3.2/latest.yml
+
+Release #2:
+  Tag: v2.3.3.1
+  Version tuple: (2, 3, 3, 1)
+  Draft: False
+  Prerelease: False
+  Published: 2026-04-08T13:00:27Z
+  Assets (2):
+    - Bay.Bay.Setup.2.3.3.1.exe (164.42 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3.1/Bay.Bay.Setup.2.3.3.1.exe
+    - latest.yml (0.00 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3.1/latest.yml
+
+Release #3:
+  Tag: v2.3.3
+  Version tuple: (2, 3, 3, 0)
+  Draft: False
+  Prerelease: False
+  Published: 2026-04-08T12:55:48Z
+  Assets (2):
+    - Bay.Bay.Setup.2.3.3.exe (164.42 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3/Bay.Bay.Setup.2.3.3.exe
+    - latest.yml (0.00 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3/latest.yml
+
+Release #4:
+  Tag: v2.3.2
+  Version tuple: (2, 3, 2, 0)
+  Draft: False
+  Prerelease: False
+  Published: 2026-04-08T12:26:53Z
+  Assets (2):
+    - Bay.Bay.Setup.2.3.2.exe (164.80 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.2/Bay.Bay.Setup.2.3.2.exe
+    - latest.yml (0.00 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.2/latest.yml
+
+Release #5:
+  Tag: v2.3.1
+  Version tuple: (2, 3, 1, 0)
+  Draft: False
+  Prerelease: False
+  Published: 2026-04-08T12:21:34Z
+  Assets (2):
+    - Bay.Bay.Setup.2.3.1.exe (164.80 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.1/Bay.Bay.Setup.2.3.1.exe
+    - latest.yml (0.00 MB)
+      URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.1/latest.yml
+
+[ETAPE 5] RECHERCHE DE LA LATEST RELEASE
+----------------------------------------
+Latest release tag: v2.3.3.2
+Latest version tuple: (2, 3, 3, 2)
+
+[ETAPE 6] COMPARAISON DE VERSION
+----------------------------------------
+Version actuelle: 2.3.3.2 -> (2, 3, 3, 2)
+Version distante: v2.3.3.2 -> (2, 3, 3, 2)
+
+Comparaison: (2, 3, 3, 2) > (2, 3, 3, 2) ?
+Resultat: False
+
+>>> APPLICATION A JOUR <<<
+
+[ETAPE 7] RECHERCHE DU FICHIER SETUP.EXE
+----------------------------------------
+Setup trouve: Bay.Bay.Setup.2.3.3.2.exe
+URL: https://github.com/mlk0622/BayBay/releases/download/v2.3.3.2/Bay.Bay.Setup.2.3.3.2.exe
+
+[ETAPE 8] TEST DE L'API FLASK LOCALE
+----------------------------------------
+Test de: http://127.0.0.1:5001/api/updates/check
+Reponse API:
+  available: False
+  current_version: 2.3.3.1
+  error: Impossible de vérifier les mises à jour
+
+======================================================================
+    RESUME
+======================================================================
+Version actuelle: 2.3.3.2
+Derniere version: v2.3.3.2
+Mise a jour disponible: NON
+
+Rapport sauvegarde dans: C:\Users\PC\OneDrive\Documents\PythonProject\gestion-locative\debug_updater_report.txt
+======================================================================

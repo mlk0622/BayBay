@@ -118,7 +118,7 @@ document.getElementById('uploadEtatForm').addEventListener('submit', async funct
         if (response.ok) {
             showNotification('État des lieux uploadé avec succès', 'success');
             closeModal('uploadEtatModal');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
         } else {
             showNotification('Erreur: ' + result.error, 'error');
         }

@@ -1,4 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, after_this_request, has_request_context
+import os
+import sys
+import smtplib
+import calendar
+import subprocess
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, \
+    after_this_request, has_request_context, abort
 import json
 import re
 import html
@@ -7,70 +13,66 @@ import hashlib
 import io
 import secrets
 from decimal import Decimal
-from datetime import datetime, date
-import os
-import sys
-import smtplib
+from datetime import datetime, date, timedelta
 from types import SimpleNamespace
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from werkzeug.utils import secure_filename
-from sqlalchemy import text
+from sqlalchemy import text, inspect
+from sqlalchemy.exc import IntegrityError
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_bcrypt import Bcrypt
 
+from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, \
+    ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
+    StatutPaiement, StatutLocataire, TypeEtatLieux
 
+VERSION = "3.3.1"
 def get_user_data_dir():
-    """
-    Retourne le dossier de données utilisateur.
-    Utilise la variable d'environnement si définie par launcher.py,
-    sinon utilise %APPDATA%/BayBay.
-    """
-    # Vérifier si launcher.py a défini le chemin
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
         return data_dir
-
-    # Sinon, calculer le chemin
     if sys.platform == 'win32':
         appdata = os.environ.get('APPDATA', os.path.expanduser('~'))
         data_dir = os.path.join(appdata, 'BayBay')
     else:
         data_dir = os.path.join(os.path.expanduser('~'), '.baybay')
-
     return data_dir
 
 
-# Déterminer les chemins selon le mode d'exécution
 if getattr(sys, 'frozen', False):
-    # Mode PyInstaller (.exe)
     INTERNAL_DIR = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
 else:
-    # Mode développement
     INTERNAL_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Dossier des données utilisateur (base de données, uploads, etc.)
 USER_DATA_DIR = get_user_data_dir()
 os.makedirs(USER_DATA_DIR, exist_ok=True)
 
-# Configuration des chemins
 TEMPLATE_FOLDER = os.path.join(INTERNAL_DIR, 'templates')
 STATIC_FOLDER = os.path.join(INTERNAL_DIR, 'static')
 UPLOAD_FOLDER = os.path.join(USER_DATA_DIR, 'uploads')
 DATABASE_PATH = os.path.join(USER_DATA_DIR, 'baybay.db')
 
-# Importer models
-from models import db, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, StatutPaiement, StatutLocataire, TypeEtatLieux
+from dotenv import load_dotenv
 
-app = Flask(__name__,
-            template_folder=TEMPLATE_FOLDER,
-            static_folder=STATIC_FOLDER)
-app.config['SECRET_KEY'] = 'baybay-secret-key-2024'
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+# Charger les variables d'environnement
+# 1. Depuis le dossier du projet/exécutable
+load_dotenv(os.path.join(INTERNAL_DIR, '.env'))
+# 2. Depuis le dossier de données de l'utilisateur (%APPDATA%/BayBay/.env)
+load_dotenv(os.path.join(USER_DATA_DIR, '.env'))
+
+app = Flask(__name__, template_folder=TEMPLATE_FOLDER, static_folder=STATIC_FOLDER)
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'baybay-cloud-secure-key-2026')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{DATABASE_PATH}')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
+app.config['REMEMBER_COOKIE_HTTPONLY'] = True
+app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
 
-# Créer le dossier uploads s'il n'existe pas
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'assurances'), exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux'), exist_ok=True)
@@ -78,8 +80,24 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'photos'), 
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'photos'), exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'quittances'), exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'appels_loyer'), exist_ok=True)
+os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'drafts'), exist_ok=True)
+os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'generated'), exist_ok=True)
+os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'uploaded'), exist_ok=True)
+os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'attached'), exist_ok=True)
 
 db.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        user_id_int = int(user_id)
+    except (TypeError, ValueError):
+        return None
+    return db.session.get(User, user_id_int)
 
 
 def _generate_quittance_public_ref():
@@ -87,16 +105,24 @@ def _generate_quittance_public_ref():
 
 
 def _ensure_quittance_public_ref_schema():
-    columns = db.session.execute(text('PRAGMA table_info(quittance)')).fetchall()
-    column_names = {row[1] for row in columns}
+    inspector = inspect(db.engine)
+    if not inspector.has_table('quittance'):
+        return
+    columns = inspector.get_columns('quittance')
+    column_names = {col['name'] for col in columns}
     if 'public_ref' not in column_names:
         db.session.execute(text('ALTER TABLE quittance ADD COLUMN public_ref VARCHAR(24)'))
-    db.session.execute(text('CREATE UNIQUE INDEX IF NOT EXISTS idx_quittance_public_ref ON quittance(public_ref)'))
+
+    indexes = inspector.get_indexes('quittance')
+    index_names = {idx['name'] for idx in indexes}
+    if 'idx_quittance_public_ref' not in index_names:
+        db.session.execute(text('CREATE UNIQUE INDEX idx_quittance_public_ref ON quittance(public_ref)'))
     db.session.commit()
 
 
 def _backfill_quittance_public_refs():
-    existing_refs = {ref for (ref,) in db.session.query(Quittance.public_ref).filter(Quittance.public_ref.isnot(None)).all()}
+    existing_refs = {ref for (ref,) in
+                     db.session.query(Quittance.public_ref).filter(Quittance.public_ref.isnot(None)).all()}
     pending = Quittance.query.filter((Quittance.public_ref.is_(None)) | (Quittance.public_ref == '')).all()
     if not pending:
         return
@@ -110,23 +136,193 @@ def _backfill_quittance_public_refs():
 
     db.session.commit()
 
+
 def _ensure_programmation_schema():
-    columns = db.session.execute(text('PRAGMA table_info(programmation_appel)')).fetchall()
-    column_names = {row[1] for row in columns}
+    inspector = inspect(db.engine)
+    if not inspector.has_table('programmation_appel'):
+        return
+    columns = inspector.get_columns('programmation_appel')
+    column_names = {col['name'] for col in columns}
     if 'sujet' not in column_names:
         db.session.execute(text('ALTER TABLE programmation_appel ADD COLUMN sujet TEXT'))
         db.session.commit()
 
+
+def _ensure_sci_and_bien_schema():
+    inspector = inspect(db.engine)
+
+    if inspector.has_table('sci'):
+        sci_columns = inspector.get_columns('sci')
+        sci_column_names = {col['name'] for col in sci_columns}
+        if 'type_sci' not in sci_column_names:
+            db.session.execute(text("ALTER TABLE sci ADD COLUMN type_sci VARCHAR(20) NOT NULL DEFAULT 'Immeuble'"))
+            db.session.commit()
+
+    if inspector.has_table('bien_immobilier'):
+        bien_columns = inspector.get_columns('bien_immobilier')
+        bien_column_names = {col['name'] for col in bien_columns}
+        if 'charges_json' not in bien_column_names:
+            db.session.execute(text('ALTER TABLE bien_immobilier ADD COLUMN charges_json TEXT'))
+            db.session.commit()
+
+
+def _ensure_appartement_schema():
+    inspector = inspect(db.engine)
+    if not inspector.has_table('appartement'):
+        return
+    columns = inspector.get_columns('appartement')
+    column_names = {col['name'] for col in columns}
+    if 'nom_entreprise' not in column_names:
+        db.session.execute(text('ALTER TABLE appartement ADD COLUMN nom_entreprise VARCHAR(200)'))
+        db.session.commit()
+    if 'charges_json' not in column_names:
+        db.session.execute(text('ALTER TABLE appartement ADD COLUMN charges_json TEXT'))
+        db.session.commit()
+
+
+def _ensure_proprietaire_schema():
+    inspector = inspect(db.engine)
+    if inspector.has_table('user'):
+        columns = inspector.get_columns('user')
+        col_names = {c['name'] for c in columns}
+        for col, defn in [
+            ('nom_proprietaire', 'VARCHAR(100)'),
+            ('prenom_proprietaire', 'VARCHAR(100)'),
+            ('adresse_proprietaire', 'VARCHAR(300)'),
+            ('code_postal_proprietaire', 'VARCHAR(10)'),
+            ('ville_proprietaire', 'VARCHAR(100)'),
+        ]:
+            if col not in col_names:
+                db.session.execute(text(f'ALTER TABLE `user` ADD COLUMN {col} {defn}'))
+        db.session.commit()
+    if inspector.has_table('bien_immobilier'):
+        columns = inspector.get_columns('bien_immobilier')
+        col_names = {c['name'] for c in columns}
+        if 'user_id' not in col_names:
+            db.session.execute(text('ALTER TABLE bien_immobilier ADD COLUMN user_id INTEGER'))
+            db.session.commit()
+        # Rendre sci_id nullable dans MySQL
+        if 'sci_id' in col_names:
+            try:
+                db.session.execute(text('ALTER TABLE bien_immobilier MODIFY COLUMN sci_id INTEGER NULL'))
+                db.session.commit()
+            except Exception:
+                pass
+
+
+def _is_valid_email(value):
+    return bool(value and re.match(r'^[^@\s]+@[^@\s]+\.[^@\s]+$', value))
+
+
+def _ensure_user_email_schema():
+    inspector = inspect(db.engine)
+    if not inspector.has_table('user'):
+        return
+
+    columns = inspector.get_columns('user')
+    column_names = {col['name'] for col in columns}
+    if 'email' not in column_names:
+        db.session.execute(text('ALTER TABLE `user` ADD COLUMN email VARCHAR(200)'))
+        db.session.commit()
+
+    users = User.query.order_by(User.id.asc()).all()
+    used_emails = set()
+
+    for user in users:
+        candidate = (user.email or '').strip().lower()
+        if not _is_valid_email(candidate):
+            pseudo_candidate = (user.pseudo or '').strip().lower()
+            if _is_valid_email(pseudo_candidate):
+                candidate = pseudo_candidate
+            else:
+                candidate = f'user{user.id}@baybay.local'
+
+        base_candidate = candidate
+        suffix = 1
+        while candidate in used_emails:
+            local, domain = base_candidate.split('@', 1)
+            candidate = f'{local}+{suffix}@{domain}'
+            suffix += 1
+
+        user.email = candidate
+        used_emails.add(candidate)
+
+    db.session.commit()
+
+    indexes = inspector.get_indexes('user')
+    index_names = {idx['name'] for idx in indexes}
+    if 'idx_user_email' not in index_names:
+        db.session.execute(text('CREATE UNIQUE INDEX idx_user_email ON `user`(email)'))
+        db.session.commit()
+
+
+def _ensure_config_email_schema():
+    inspector = inspect(db.engine)
+    if not inspector.has_table('config_email'):
+        return
+
+    columns = inspector.get_columns('config_email')
+    column_names = {col['name'] for col in columns}
+
+    if 'user_id' not in column_names:
+        db.session.execute(text('ALTER TABLE config_email ADD COLUMN user_id INTEGER'))
+        db.session.commit()
+
+    if 'signature_data' not in column_names:
+        db.session.execute(text('ALTER TABLE config_email ADD COLUMN signature_data TEXT'))
+        db.session.commit()
+
+    first_user = User.query.order_by(User.id.asc()).first()
+    if first_user:
+        db.session.execute(text('UPDATE config_email SET user_id = :uid WHERE user_id IS NULL'), {'uid': first_user.id})
+        db.session.commit()
+
+
 with app.app_context():
     db.create_all()
+    _ensure_proprietaire_schema()
+    _ensure_user_email_schema()
+    _ensure_config_email_schema()
     _ensure_quittance_public_ref_schema()
     _backfill_quittance_public_refs()
     _ensure_programmation_schema()
+    _ensure_sci_and_bien_schema()
+    _ensure_appartement_schema()
+
+
+def _get_bailleur_info(bien):
+    """Retourne les infos du bailleur: depuis la SCI si elle existe, sinon depuis le propriétaire direct."""
+    if bien and bien.sci_id and bien.sci:
+        sci = bien.sci
+        return {
+            'nom': sci.nom or '',
+            'adresse': sci.adresse or '',
+            'code_postal': sci.code_postal or '',
+            'ville': sci.ville or '',
+            'siret': sci.siret or '',
+            'is_sci': True,
+        }
+    if bien and bien.user_id:
+        owner = db.session.get(User, bien.user_id)
+        if owner:
+            nom_parts = [p for p in [owner.prenom_proprietaire, owner.nom_proprietaire] if p]
+            nom = ' '.join(nom_parts) if nom_parts else (owner.pseudo or owner.email or '')
+            return {
+                'nom': nom,
+                'adresse': owner.adresse_proprietaire or '',
+                'code_postal': owner.code_postal_proprietaire or '',
+                'ville': owner.ville_proprietaire or '',
+                'siret': '',
+                'is_sci': False,
+            }
+    return {'nom': '', 'adresse': '', 'code_postal': '', 'ville': '', 'siret': '', 'is_sci': False}
+
 
 def format_currency(value):
     if value is None:
         return "0,00 €"
     return f"{float(value):,.2f} €".replace(",", " ").replace(".", ",")
+
 
 def format_date(value):
     if value is None:
@@ -135,6 +331,7 @@ def format_date(value):
         return value
     return value.strftime('%d/%m/%Y')
 
+
 def format_datetime(value):
     if value is None:
         return ""
@@ -142,48 +339,44 @@ def format_datetime(value):
         return value
     return value.strftime('%d/%m/%Y à %H:%M')
 
+
 app.jinja_env.filters['currency'] = format_currency
 app.jinja_env.filters['date_fr'] = format_date
 app.jinja_env.filters['datetime_fr'] = format_datetime
 
 MOIS_FR = {
-    1: 'Janvier', 2: 'Février', 3: 'Mars', 4: 'Avril',
-    5: 'Mai', 6: 'Juin', 7: 'Juillet', 8: 'Août',
-    9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Décembre'
+    1: 'Janvier', 2: 'Fevrier', 3: 'Mars', 4: 'Avril',
+    5: 'Mai', 6: 'Juin', 7: 'Juillet', 8: 'Aout',
+    9: 'Septembre', 10: 'Octobre', 11: 'Novembre', 12: 'Decembre'
 }
-
 app.jinja_env.globals['MOIS_FR'] = MOIS_FR
 
-# Fonction de génération HTML vers PDF
+SCI_TYPES_ALLOWED = {'Immeuble', 'Entrepot'}
+BIEN_TYPES_ALLOWED = {'Immeuble', 'Entrepot'}
+APPART_TYPES_ALLOWED = {'Appartement', 'Box', 'Local Commerciale', 'Entrepot'}
+
+
 def _postprocess_pdf_rounded_borders(pdf_path):
-    """Remplace les bordures rectilignes vertes (#059669) par des rectangles arrondis."""
     try:
         import fitz
-        GREEN = (5 / 255, 150 / 255, 105 / 255)  # #059669
+        GREEN = (5 / 255, 150 / 255, 105 / 255)
 
         doc = fitz.open(pdf_path)
         for page in doc:
             drawings = page.get_drawings()
-            # Collecter les lignes vertes qui forment un rectangle (bordure attestation)
-            # On distingue les simples border-bottom (horizontaux) des bordures
-            # de rectangle (qui ont aussi des segments verticaux).
             green_all = []
             for d in drawings:
                 c = d.get("color")
                 if c and len(c) >= 3 and c[1] > 0.5 and c[0] < 0.1 and c[2] > 0.3:
                     green_all.append(d["rect"])
 
-            # Segments verticaux = lignes où la largeur est quasi nulle
             has_vertical = any(abs(r.x1 - r.x0) < 1 for r in green_all)
             if not has_vertical:
-                continue  # Pas de rectangle fermé, seulement des border-bottom
+                continue
 
-            # Ne garder que les lignes qui font partie du rectangle
-            # (segments verticaux + segments horizontaux à la même hauteur)
             vertical = [r for r in green_all if abs(r.x1 - r.x0) < 1]
             vy_min = min(min(r.y0, r.y1) for r in vertical)
             vy_max = max(max(r.y0, r.y1) for r in vertical)
-            # Garder les horizontaux dont le y est dans la zone du rectangle
             green_rects = []
             for r in green_all:
                 is_vertical = abs(r.x1 - r.x0) < 1
@@ -194,14 +387,12 @@ def _postprocess_pdf_rounded_borders(pdf_path):
             if not green_rects:
                 continue
 
-            # Calculer la bounding box globale de toutes les lignes vertes
             x0 = min(r.x0 for r in green_rects)
             y0 = min(r.y0 for r in green_rects)
             x1 = max(r.x1 for r in green_rects)
             y1 = max(r.y1 for r in green_rects)
             bbox = fitz.Rect(x0, y0, x1, y1)
 
-            # Effacer chaque ligne verte individuellement (fine bande blanche)
             radius = 8
             shape = page.new_shape()
             for gr in green_rects:
@@ -210,7 +401,6 @@ def _postprocess_pdf_rounded_borders(pdf_path):
                 shape.finish(color=(1, 1, 1), fill=(1, 1, 1), width=0)
             shape.commit()
 
-            # Dessiner le rectangle arrondi
             shape = page.new_shape()
             radius = 8
             r = bbox
@@ -232,45 +422,8 @@ def _postprocess_pdf_rounded_borders(pdf_path):
 
 
 def html_to_pdf(html_content, output_path):
-    """Convertit HTML en PDF et sauvegarde le fichier"""
+    xhtml2pdf_error = pdfkit_error = weasy_error = 'non tenté'
 
-    # 1) Priorité à xhtml2pdf (pure Python, fonctionne sans dépendances externes)
-    try:
-        from xhtml2pdf import pisa
-        with open(output_path, "wb") as pdf_file:
-            pisa_status = pisa.CreatePDF(html_content, dest=pdf_file)
-            if not pisa_status.err:
-                return True, None
-            xhtml2pdf_error = f"xhtml2pdf error code: {pisa_status.err}"
-    except Exception as e:
-        xhtml2pdf_error = str(e)
-
-    # 2) Fallback pdfkit/wkhtmltopdf
-    try:
-        import pdfkit
-        options = {
-            'page-size': 'A4',
-            'margin-top': '0.6in',
-            'margin-right': '0.6in',
-            'margin-bottom': '0.6in',
-            'margin-left': '0.6in',
-            'encoding': 'UTF-8',
-            'quiet': ''
-        }
-        pdfkit.from_string(html_content, output_path, options=options)
-        return True, None
-    except Exception as e:
-        pdfkit_error = str(e)
-
-    # 3) Fallback WeasyPrint
-    try:
-        from weasyprint import HTML, CSS
-        HTML(string=html_content).write_pdf(output_path)
-        return True, None
-    except Exception as e:
-        weasy_error = str(e)
-
-    # 4) Fallback robuste: produit un PDF texte basique
     def _extract_text_lines(source_html):
         text = re.sub(r'(?is)<(script|style).*?>.*?</\1>', ' ', source_html)
         text = re.sub(r'(?i)<br\s*/?>', '\n', text)
@@ -299,7 +452,8 @@ def html_to_pdf(html_content, output_path):
             b"<< /Type /Catalog /Pages 2 0 R >>",
             b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
             b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>",
-            b"<< /Length " + str(len(content_stream)).encode('ascii') + b" >>\nstream\n" + content_stream + b"\nendstream",
+            b"<< /Length " + str(len(content_stream)).encode(
+                'ascii') + b" >>\nstream\n" + content_stream + b"\nendstream",
             b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"
         ]
 
@@ -325,15 +479,240 @@ def html_to_pdf(html_content, output_path):
             pdf_file.write(pdf_data)
 
     try:
+        from weasyprint import HTML
+        HTML(string=html_content).write_pdf(output_path)
+        print("[PDF] weasyprint: succès")
+        return True, None
+    except Exception as e:
+        weasy_error = str(e)
+        print(f"[PDF] weasyprint échoué: {weasy_error}")
+
+    try:
+        import pdfkit
+        options = {
+            'page-size': 'A4',
+            'margin-top': '0.6in',
+            'margin-right': '0.6in',
+            'margin-bottom': '0.6in',
+            'margin-left': '0.6in',
+            'encoding': 'UTF-8',
+            'quiet': ''
+        }
+        pdfkit.from_string(html_content, output_path, options=options)
+        print("[PDF] pdfkit: succès")
+        return True, None
+    except Exception as e:
+        pdfkit_error = str(e)
+        print(f"[PDF] pdfkit échoué: {pdfkit_error}")
+
+    try:
+        from xhtml2pdf import pisa
+        with open(output_path, "wb") as pdf_file:
+            pisa_status = pisa.CreatePDF(
+                html_content.encode('utf-8') if isinstance(html_content, str) else html_content,
+                dest=pdf_file,
+                encoding='utf-8'
+            )
+            if not pisa_status.err:
+                print("[PDF] xhtml2pdf: succès")
+                return True, None
+            xhtml2pdf_error = f"xhtml2pdf error code: {pisa_status.err}"
+            print(f"[PDF] xhtml2pdf échoué: {xhtml2pdf_error}")
+    except Exception as e:
+        xhtml2pdf_error = str(e)
+        print(f"[PDF] xhtml2pdf exception: {xhtml2pdf_error}")
+
+    try:
         fallback_lines = _extract_text_lines(html_content)
         _write_basic_pdf(fallback_lines, output_path)
+        print("[PDF] fallback texte: succès")
         return True, None
     except Exception as fallback_error:
-        return False, f"xhtml2pdf: {xhtml2pdf_error}; pdfkit: {pdfkit_error}; WeasyPrint: {weasy_error}; Fallback: {fallback_error}"
+        return False, f"weasyprint: {weasy_error}; pdfkit: {pdfkit_error}; xhtml2pdf: {xhtml2pdf_error}; Fallback: {fallback_error}"
+
+
+def _preprocess_css_vars(html_content):
+    """Remplace les variables CSS par leurs valeurs littérales (compatibilité xhtml2pdf/pdfkit)."""
+    css_vars = {}
+    for match in re.finditer(r'--([a-zA-Z0-9-]+)\s*:\s*([^;}\n]+)', html_content):
+        css_vars[match.group(1).strip()] = match.group(2).strip()
+
+    def replace_var(m):
+        var_name = m.group(1).strip()
+        default = (m.group(2) or '').strip()
+        return css_vars.get(var_name, default or 'inherit')
+
+    result = re.sub(r'var\(--([a-zA-Z0-9-]+)(?:\s*,\s*([^)]+))?\)', replace_var, html_content)
+    # Supprimer les imports Google Fonts (non récupérables en mode PDF offline)
+    result = re.sub(
+        r"@import\s+url\(['\"]?https://fonts\.googleapis\.com[^'\")\n]*['\"]?\)\s*;?",
+        '', result
+    )
+    return result
+
+
+def _get_chrome_paths():
+    """Retourne la liste des chemins Chrome/Edge possibles selon la plateforme/utilisateur."""
+    paths = [
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    ]
+    # Chemin utilisateur courant (LOCALAPPDATA) — fonctionne sur toutes les machines
+    local_app = os.environ.get('LOCALAPPDATA', '')
+    if local_app:
+        paths.append(os.path.join(local_app, 'Google', 'Chrome', 'Application', 'chrome.exe'))
+    # Microsoft Edge (Chromium) — intégré à Windows 10/11, toujours disponible
+    paths += [
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+    ]
+    if local_app:
+        paths.append(os.path.join(local_app, 'Microsoft', 'Edge', 'Application', 'msedge.exe'))
+    # Linux / macOS
+    paths += [
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium-browser',
+        '/usr/bin/chromium',
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    ]
+    return paths
+
+
+def _find_chrome():
+    for p in _get_chrome_paths():
+        if p and os.path.isfile(p):
+            return p
+    return None
+
+
+def _inject_a4_page(html_content):
+    """Injecte @page A4 et supprime Google Fonts pour le rendu Chrome/PDF."""
+    a4_style = (
+        '<style>'
+        '@page { size: A4; margin: 10mm 12mm; }'
+        'body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }'
+        '</style>'
+    )
+    # Supprimer les imports Google Fonts (inutiles en headless offline)
+    html = re.sub(
+        r"@import\s+url\(['\"]?https://fonts\.googleapis\.com[^'\")\n]*['\"]?\)\s*;?",
+        '', html_content
+    )
+    # Injecter juste avant </head> ou au début
+    if '</head>' in html:
+        html = html.replace('</head>', a4_style + '</head>', 1)
+    else:
+        html = a4_style + html
+    return html
+
+
+def _html_to_pdf_chrome(html_content, output_path):
+    """Génère un PDF via Chrome headless — rendu fidèle au template HTML."""
+    chrome = _find_chrome()
+    if not chrome:
+        return False, "Chrome introuvable"
+
+    import tempfile
+    prepared = _inject_a4_page(html_content)
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', encoding='utf-8',
+                                     delete=False) as tmp:
+        tmp.write(prepared)
+        tmp_path = tmp.name
+
+    abs_out = os.path.abspath(output_path)
+    file_url = 'file:///' + tmp_path.replace(os.sep, '/')
+
+    def _run(headless_flag):
+        kwargs = dict(capture_output=True, text=True, timeout=30)
+        if sys.platform == 'win32':
+            kwargs['creationflags'] = subprocess.CREATE_NO_WINDOW
+        return subprocess.run(
+            [
+                chrome,
+                headless_flag,
+                '--disable-gpu',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--run-all-compositor-stages-before-draw',
+                f'--print-to-pdf={abs_out}',
+                '--print-to-pdf-no-header',
+                file_url,
+            ],
+            **kwargs,
+        )
+
+    try:
+        # Chrome 112+ utilise --headless=new ; anciennes versions utilisent --headless
+        result = _run('--headless=new')
+        if not (os.path.isfile(abs_out) and os.path.getsize(abs_out) > 1000):
+            result = _run('--headless')
+        if os.path.isfile(abs_out) and os.path.getsize(abs_out) > 1000:
+            print("[PDF][EDL] Chrome headless: succes")
+            return True, None
+        return False, f"Chrome n'a pas produit de PDF (exit={result.returncode})"
+    except Exception as e:
+        return False, f"Chrome erreur: {e}"
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+
+
+def html_to_pdf_strict_weasy(html_content_rich, html_content_simple, output_path):
+    """Génère le PDF EDL en essayant les moteurs du meilleur au moins bon.
+
+    html_content_rich  : rendu du template HTML interactif (CSS complet)
+    html_content_simple: rendu du template PDF simplifié (compatible xhtml2pdf)
+    """
+    # 1) WeasyPrint — rendu parfait si GTK disponible
+    try:
+        from weasyprint import HTML
+        HTML(string=html_content_rich).write_pdf(output_path)
+        print("[PDF][EDL] weasyprint: succes")
+        return True, None
+    except Exception as e:
+        print(f"[PDF][EDL] weasyprint échoué: {e}")
+
+    # 2) Chrome headless — rendu fidèle au template, sans dépendances natives
+    ok, err = _html_to_pdf_chrome(html_content_rich, output_path)
+    if ok:
+        return True, None
+    print(f"[PDF][EDL] Chrome échoué: {err}")
+
+    # 3) pdfkit / wkhtmltopdf
+    try:
+        import pdfkit
+        pdfkit.from_string(html_content_rich, output_path, options={
+            'page-size': 'A4', 'encoding': 'UTF-8', 'quiet': '',
+            'margin-top': '10mm', 'margin-bottom': '10mm',
+            'margin-left': '10mm', 'margin-right': '10mm',
+        })
+        if os.path.isfile(output_path) and os.path.getsize(output_path) > 1000:
+            print("[PDF][EDL] pdfkit: succes")
+            return True, None
+    except Exception as e:
+        print(f"[PDF][EDL] pdfkit échoué: {e}")
+
+    # 4) xhtml2pdf avec le template simplifié (fallback de dernier recours)
+    try:
+        from xhtml2pdf import pisa
+        with open(output_path, "wb") as f:
+            status = pisa.CreatePDF(
+                html_content_simple.encode('utf-8')
+                if isinstance(html_content_simple, str) else html_content_simple,
+                dest=f, encoding='utf-8'
+            )
+        if not status.err:
+            print("[PDF][EDL] xhtml2pdf: succes")
+            return True, None
+        return False, f"xhtml2pdf erreur: {status.err}"
+    except Exception as e:
+        return False, f"Tous les moteurs ont échoué. Dernière erreur: {e}"
 
 
 def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
-    """Remplit un PDF modele via coordonnees avec PyMuPDF (fitz)."""
     try:
         import fitz
     except Exception as e:
@@ -363,7 +742,6 @@ def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
         return True
 
     def _insert_checkbox(page, labels, x_offset=-12, y_offset=-1, fontsize=12):
-        """Insert a checkmark before the label (checkbox style)."""
         rect = _find_anchor_rect(page, labels, 0)
         if not rect:
             return False
@@ -379,7 +757,6 @@ def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
     try:
         doc = fitz.open(pdf_modele_path)
 
-        # Compatibilite: remplissage brut par coordonnees si present.
         for page_key, champs in donnees.get("page_coords", {}).items():
             if not page_key.startswith("page_"):
                 continue
@@ -405,19 +782,21 @@ def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
                     color=champ.get("color", (0, 0, 0))
                 )
 
-        # Mode recommande: ancrage sur libelles du modele.
         page = doc[0]
         anchors = donnees.get("anchors", {})
 
         _insert_near_anchor(page, ["Adresse du logement :"], anchors.get("adresse_logement"), x_offset=1, y_offset=-2)
-        _insert_near_anchor(page, ["Nom (ou denomination) :", "Nom (ou dénomination) :"], anchors.get("bailleur_nom"), x_offset=1, y_offset=-2)
-        _insert_near_anchor(page, ["Domicile (ou siege social) :", "Domicile (ou siège social) :"], anchors.get("bailleur_adresse"), x_offset=1, y_offset=-2)
-        _insert_near_anchor(page, ["Date d’entree :", "Date d’entrée :"], anchors.get("date_entree"), x_offset=1, y_offset=-2)
+        _insert_near_anchor(page, ["Nom (ou denomination) :", "Nom (ou dénomination) :"], anchors.get("bailleur_nom"),
+                            x_offset=1, y_offset=-2)
+        _insert_near_anchor(page, ["Domicile (ou siege social) :", "Domicile (ou siège social) :"],
+                            anchors.get("bailleur_adresse"), x_offset=1, y_offset=-2)
+        _insert_near_anchor(page, ["Date d’entree :", "Date d’entrée :"], anchors.get("date_entree"), x_offset=1,
+                            y_offset=-2)
         _insert_near_anchor(page, ["Sortie :"], anchors.get("date_sortie"), x_offset=1, y_offset=-2)
         _insert_near_anchor(page, ["Le locataire :"], anchors.get("locataire_nom"), x_offset=1, y_offset=-2)
-        _insert_near_anchor(page, ["Observations ou reserves :", "Observations ou réserves :"], anchors.get("observations"), x_offset=0, y_offset=12)
+        _insert_near_anchor(page, ["Observations ou reserves :", "Observations ou réserves :"],
+                            anchors.get("observations"), x_offset=0, y_offset=12)
 
-        # Cocher la case appropriee (entree ou sortie)
         if anchors.get("is_entree"):
             _insert_checkbox(page, ["ENTREE", "ENTRÉE", "Entree", "Entrée"])
         else:
@@ -429,13 +808,10 @@ def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
     except Exception as e:
         return False, str(e)
 
-# Fonction d'envoi d'email
-def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jointe=None, serveur='smtp.gmail.com', port=587, use_tls=True):
-    try:
-        print(f"[DEBUG] Tentative de connexion a {serveur}:{port}")
-        print(f"[DEBUG] Expediteur: {expediteur}")
-        print(f"[DEBUG] Destinataire: {destinataire}")
 
+def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jointe=None, serveur='smtp.gmail.com',
+                  port=587, use_tls=True):
+    try:
         msg = MIMEMultipart()
         msg['From'] = expediteur
         msg['To'] = destinataire
@@ -449,43 +825,29 @@ def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jo
                 part['Content-Disposition'] = f'attachment; filename="{os.path.basename(piece_jointe)}"'
                 msg.attach(part)
 
-        print("[DEBUG] Creation du serveur SMTP...")
         if use_tls:
             server = smtplib.SMTP(serveur, port)
-            print("[DEBUG] Activation TLS...")
             server.starttls()
         elif int(port) == 465:
             server = smtplib.SMTP_SSL(serveur, port)
         else:
             server = smtplib.SMTP(serveur, port)
-        print("[DEBUG] Tentative de connexion...")
+
         server.login(expediteur, mot_de_passe)
-        print("[DEBUG] Envoi du message...")
         server.send_message(msg)
         server.quit()
-        print("[OK] Email envoye avec succes")
         return True, "Email envoyé avec succès"
     except smtplib.SMTPAuthenticationError as e:
         error_msg = f"ERREUR D'AUTHENTIFICATION: {str(e)}"
-        if 'gmail.com' in expediteur.lower():
-            error_msg += "\n\nSOLUTION POUR GMAIL:\n"
-            error_msg += "1. Activez la validation en 2 étapes sur votre compte Google\n"
-            error_msg += "2. Générez un 'Mot de passe d'application' spécifique\n"
-            error_msg += "3. Utilisez ce mot de passe d'application au lieu de votre mot de passe habituel\n"
-            error_msg += "4. Guide: https://support.google.com/accounts/answer/185833"
-        print(f"[ERROR] {error_msg}")
         return False, error_msg
     except smtplib.SMTPConnectError as e:
-        error_msg = f"ERREUR DE CONNEXION au serveur {serveur}:{port} - {str(e)}"
-        print(f"[ERROR] {error_msg}")
+        error_msg = f"ERREUR DE CONNEXION: {str(e)}"
         return False, error_msg
     except smtplib.SMTPServerDisconnected as e:
-        error_msg = f"CONNEXION FERMÉE par le serveur - {str(e)}"
-        print(f"[ERROR] {error_msg}")
+        error_msg = f"CONNEXION FERMÉE: {str(e)}"
         return False, error_msg
     except Exception as e:
         error_msg = f"ERREUR GÉNÉRALE: {str(e)}"
-        print(f"[ERROR] {error_msg}")
         return False, error_msg
 
 
@@ -694,6 +1056,28 @@ def _as_bool(value, default=True):
     return bool(value)
 
 
+def _compute_next_month_schedule(current_date_envoi, current_mois, current_annee):
+    next_mois = current_mois + 1
+    next_annee = current_annee
+    if next_mois > 12:
+        next_mois = 1
+        next_annee += 1
+
+    target_day = current_date_envoi.day if current_date_envoi else 1
+    last_day = calendar.monthrange(next_annee, next_mois)[1]
+    safe_day = min(target_day, last_day)
+
+    next_date_envoi = datetime(
+        next_annee,
+        next_mois,
+        safe_day,
+        current_date_envoi.hour if current_date_envoi else 9,
+        current_date_envoi.minute if current_date_envoi else 0,
+        current_date_envoi.second if current_date_envoi else 0,
+    )
+    return next_mois, next_annee, next_date_envoi
+
+
 def _quittance_signature_path(quittance_id):
     signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'quittances', 'signatures')
     os.makedirs(signatures_dir, exist_ok=True)
@@ -731,13 +1115,7 @@ def _load_quittance_signature_data(quittance_id):
     return f'data:image/png;base64,{encoded}', hashlib.sha256(image_bytes).hexdigest()
 
 
-def _decorative_signature_path():
-    signatures_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'signatures')
-    os.makedirs(signatures_dir, exist_ok=True)
-    return os.path.join(signatures_dir, 'decorative_signature.png')
-
-
-def _save_decorative_signature_data(signature_data_url):
+def _save_decorative_signature_data(config_email, signature_data_url):
     if not signature_data_url:
         return False, None
 
@@ -746,29 +1124,26 @@ def _save_decorative_signature_data(signature_data_url):
 
     encoded = signature_data_url.split(',', 1)[1]
     try:
-        image_bytes = base64.b64decode(encoded)
+        base64.b64decode(encoded)
     except Exception:
         return False, 'Signature décorative non décodable.'
 
-    with open(_decorative_signature_path(), 'wb') as output:
-        output.write(image_bytes)
+    if not config_email:
+        return False, 'Configuration email introuvable.'
+
+    config_email.signature_data = signature_data_url
     return True, None
 
 
-def _load_decorative_signature_data():
-    path = _decorative_signature_path()
-    if not os.path.exists(path):
+def _load_decorative_signature_data(config_email=None):
+    if not config_email:
         return None
-    with open(path, 'rb') as image_file:
-        image_bytes = image_file.read()
-    encoded = base64.b64encode(image_bytes).decode('ascii')
-    return f'data:image/png;base64,{encoded}'
+    return config_email.signature_data or None
 
 
-def _clear_decorative_signature_data():
-    path = _decorative_signature_path()
-    if os.path.exists(path):
-        os.remove(path)
+def _clear_decorative_signature_data(config_email):
+    if config_email:
+        config_email.signature_data = None
 
 
 def _quittance_integrity_payload(quittance, signature_hash=''):
@@ -816,8 +1191,16 @@ def _build_quittance_pdf_context(quittance):
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    bailleur = _get_bailleur_info(bien)
+    # Pour la config email, chercher via sci ou direct_owner
+    if sci:
+        config_email = ConfigEmail.query.filter_by(user_id=sci.user_id).first()
+    elif bien and bien.user_id:
+        config_email = ConfigEmail.query.filter_by(user_id=bien.user_id).first()
+    else:
+        config_email = None
     signature_data_url, signature_hash = _load_quittance_signature_data(quittance.id)
-    decorative_signature_data_url = _load_decorative_signature_data()
+    decorative_signature_data_url = _load_decorative_signature_data(config_email)
     displayed_signature_data_url = signature_data_url or decorative_signature_data_url
     verification_id, integrity_hash = _quittance_integrity_payload(quittance, signature_hash=signature_hash or '')
 
@@ -834,6 +1217,11 @@ def _build_quittance_pdf_context(quittance):
         'appartement': appartement,
         'bien': bien,
         'sci': sci,
+        'bailleur_nom': bailleur['nom'],
+        'bailleur_adresse': bailleur['adresse'],
+        'bailleur_code_postal': bailleur['code_postal'],
+        'bailleur_ville': bailleur['ville'],
+        'bailleur_siret': bailleur['siret'],
         'mois_fr': MOIS_FR,
         'signature_data_url': displayed_signature_data_url,
         'has_approval_signature': bool(signature_data_url),
@@ -872,6 +1260,7 @@ def _generate_appel_pdf_file(appel, force_regenerate=False):
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    bailleur = _get_bailleur_info(bien)
 
     html_content = render_template(
         'pdf/appel_loyer.html',
@@ -880,6 +1269,11 @@ def _generate_appel_pdf_file(appel, force_regenerate=False):
         appartement=appartement,
         bien=bien,
         sci=sci,
+        bailleur_nom=bailleur['nom'],
+        bailleur_adresse=bailleur['adresse'],
+        bailleur_code_postal=bailleur['code_postal'],
+        bailleur_ville=bailleur['ville'],
+        bailleur_siret=bailleur['siret'],
         mois_fr=MOIS_FR
     )
 
@@ -898,116 +1292,160 @@ def _generate_appel_pdf_file(appel, force_regenerate=False):
 
     return pdf_path, None
 
-@app.route('/')
-def dashboard():
-    scis = SCI.query.all()
-    locataires_actifs = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
 
-    mois_actuel = date.today().month
-    annee_actuelle = date.today().year
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = (request.form.get('email') or '').strip().lower()
+        password = (request.form.get('password') or '').strip()
 
-    total_attendu = Decimal('0.00')
-    total_encaisse = Decimal('0.00')
+        if not _is_valid_email(email):
+            flash('Adresse email invalide')
+            return redirect(url_for('register'))
+
+        if len(password) < 6:
+            flash('Le mot de passe doit contenir au moins 6 caracteres')
+            return redirect(url_for('register'))
+
+        # Le pseudo est base sur l'email pour conserver le comportement actuel.
+        pseudo = email
+
+        if User.query.filter_by(email=email).first():
+            flash('Cette adresse email est déjà utilisée')
+            return redirect(url_for('register'))
+
+        if User.query.filter_by(pseudo=pseudo).first():
+            flash('Ce pseudo est déjà utilisé')
+            return redirect(url_for('register'))
+
+        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
+        new_user = User(pseudo=pseudo, email=email, password=hashed_pw)
+        db.session.add(new_user)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash('Impossible de creer le compte: adresse deja utilisee')
+            return redirect(url_for('register'))
+        except Exception:
+            db.session.rollback()
+            flash('Erreur interne lors de la creation du compte')
+            return redirect(url_for('register'))
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = (request.form.get('email') or '').strip().lower()
+        password = request.form.get('password')
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            # Session persistante pour rester connecte entre les redemarrages de l'application.
+            login_user(user, remember=True, duration=timedelta(days=30))
+            return redirect(url_for('dashboard'))
+        flash('Identifiants incorrects')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+@app.route('/switch-account')
+@login_required
+def switch_account():
+    logout_user()
+    flash('Connectez-vous avec un autre compte')
+    return redirect(url_for('login'))
+
+
+def get_consolidated_context(nb_mois=6):
+    from decimal import Decimal
+    from datetime import date, datetime
+    from sqlalchemy import or_
+    
+    # 1. SCIs & Biens
+    scis = SCI.query.filter_by(user_id=current_user.id).all()
+    biens_via_sci = BienImmobilier.query.join(SCI).filter(SCI.user_id == current_user.id).all()
+    biens_directs = BienImmobilier.query.filter_by(user_id=current_user.id).all()
+    
+    # 2. Appartements
+    apparts_sci = Appartement.query.join(BienImmobilier).join(SCI).filter(SCI.user_id == current_user.id).all()
+    apparts_direct = Appartement.query.join(BienImmobilier).filter(BienImmobilier.user_id == current_user.id).all()
+    appartements = list({a.id: a for a in apparts_sci + apparts_direct}.values())
+    
+    # 3. Locataires
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id).all()
+    all_locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
+    all_locataires.sort(key=lambda x: x.nom)
+    
+    locataires_actifs = [l for l in all_locataires if l.statut == StatutLocataire.ACTIF]
+    
+    # 4. Email Config
+    config_email = ConfigEmail.query.filter_by(user_id=current_user.id).first()
+    email_config_missing = not (
+        config_email
+        and (config_email.email_expediteur or '').strip()
+        and (config_email.mot_de_passe or '').strip()
+        and (config_email.serveur_smtp or '').strip()
+        and config_email.port_smtp
+    )
+    decorative_signature_data_url = _load_decorative_signature_data(config_email)
+    
+    # 5. Dashboard computations
+    mois_actuel, annee_actuelle = date.today().month, date.today().year
+    total_attendu, total_encaisse = Decimal('0.00'), Decimal('0.00')
 
     for loc in locataires_actifs:
         if loc.appartement:
             total_attendu += loc.total_mensuel
-            paiement = loc.get_paiement_mois(mois_actuel, annee_actuelle)
-            if paiement:
-                total_encaisse += Decimal(str(paiement.montant_paye))
-
-    reste_global = total_attendu - total_encaisse
+            p = loc.get_paiement_mois(mois_actuel, annee_actuelle)
+            if p: total_encaisse += Decimal(str(p.montant_paye))
 
     impayes = []
     for loc in locataires_actifs:
         if loc.appartement:
-            paiement = loc.get_paiement_mois(mois_actuel, annee_actuelle)
-            montant_paye = Decimal(str(paiement.montant_paye)) if paiement else Decimal('0.00')
-            reste = loc.total_mensuel - montant_paye
+            p = loc.get_paiement_mois(mois_actuel, annee_actuelle)
+            paye = Decimal(str(p.montant_paye)) if p else Decimal('0.00')
+            reste = loc.total_mensuel - paye
             if reste > 0:
-                statut = "Partiel" if montant_paye > 0 else "Impayé"
+                sci_nom = loc.appartement.bien.sci.nom if loc.appartement.bien and loc.appartement.bien.sci else 'Direct'
                 impayes.append({
-                    'sci': loc.appartement.bien.sci.nom,
-                    'bien': loc.appartement.bien.adresse,
+                    'sci': sci_nom,
+                    'bien': loc.appartement.bien.adresse if loc.appartement.bien else '',
                     'appartement': loc.appartement.numero_porte,
                     'locataire': loc.nom_complet,
                     'locataire_id': loc.id,
                     'reste': float(reste),
-                    'statut': statut
+                    'statut': "Partiel" if paye > 0 else "Impayé"
                 })
 
     impayes.sort(key=lambda x: x['reste'], reverse=True)
-
-    return render_template('dashboard.html',
-                         scis=scis,
-                         total_attendu=total_attendu,
-                         total_encaisse=total_encaisse,
-                         reste_global=reste_global,
-                         impayes=impayes[:10],
-                         mois_actuel=MOIS_FR[mois_actuel],
-                         annee_actuelle=annee_actuelle)
-
-@app.route('/sci/<int:sci_id>')
-def vue_sci(sci_id):
-    sci = SCI.query.get_or_404(sci_id)
-    return render_template('sci_detail.html', sci=sci)
-
-@app.route('/biens')
-def liste_biens():
-    biens = BienImmobilier.query.all()
-    scis = SCI.query.all()
-    return render_template('biens.html', biens=biens, scis=scis)
-
-@app.route('/bien/<int:bien_id>')
-def vue_bien(bien_id):
-    bien = BienImmobilier.query.get_or_404(bien_id)
-    return render_template('bien_detail.html', bien=bien)
-
-@app.route('/locataires')
-def liste_locataires():
-    locataires = Locataire.query.order_by(Locataire.nom).all()
-    appartements = Appartement.query.all()
-    return render_template('locataires.html', locataires=locataires, appartements=appartements)
-
-@app.route('/locataire/<int:locataire_id>/resume')
-def vue_locataire(locataire_id):
-    # Route legacy: redirige vers la fiche complète pour conserver les anciens liens.
-    return redirect(url_for('locataire_detail', id=locataire_id))
-
-@app.route('/appels-loyer')
-def appels_loyer():
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
-    appels = AppelLoyer.query.order_by(AppelLoyer.annee.desc(), AppelLoyer.mois.desc()).all()
-    config_email = ConfigEmail.query.first()
-    mois_actuel = date.today().month
-    annee_actuelle = date.today().year
-    return render_template('appels_loyer.html',
-                         locataires=locataires,
-                         appels=appels,
-                         config_email=config_email,
-                         mois_actuel=mois_actuel,
-                         annee_actuelle=annee_actuelle)
-
-@app.route('/quittances')
-def quittances():
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
-    quittances_list = Quittance.query.order_by(Quittance.annee.desc(), Quittance.mois.desc()).all()
-    mois_actuel = date.today().month
-    annee_actuelle = date.today().year
-    return render_template('quittances.html',
-                         locataires=locataires,
-                         quittances=quittances_list,
-                         mois_actuel=mois_actuel,
-                         annee_actuelle=annee_actuelle)
-
-@app.route('/resume-loyers')
-def resume_loyers():
-    # Récupérer les paramètres ou utiliser les valeurs par défaut
-    nb_mois = request.args.get('nb_mois', 6, type=int)  # Nombre de mois à afficher
-
-    locataires_actifs = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
-
-    # Générer la liste des mois à afficher (du plus récent au plus ancien)
+    
+    # 6. Appels & Quittances
+    appels_sci = AppelLoyer.query.join(Locataire).join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id).all()
+    appels_direct = AppelLoyer.query.join(Locataire).join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id).all()
+    appels = list({a.id: a for a in appels_sci + appels_direct}.values())
+    appels.sort(key=lambda a: (a.annee, a.mois), reverse=True)
+    
+    quitt_sci = Quittance.query.join(Locataire).join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id).all()
+    quitt_direct = Quittance.query.join(Locataire).join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id).all()
+    quittances_list = list({q.id: q for q in quitt_sci + quitt_direct}.values())
+    quittances_list.sort(key=lambda q: (q.annee, q.mois), reverse=True)
+    
+    # 7. Resume Loyers (6 months)
     mois_liste = []
     mois_courant = date.today().month
     annee_courante = date.today().year
@@ -1019,7 +1457,6 @@ def resume_loyers():
             mois_courant = 12
             annee_courante -= 1
 
-    # Calculer les données par mois
     donnees_par_mois = []
     total_global_attendu = Decimal('0.00')
     total_global_encaisse = Decimal('0.00')
@@ -1035,17 +1472,12 @@ def resume_loyers():
 
         for loc in locataires_actifs:
             if loc.appartement and loc.date_debut_bail:
-                # Vérifier si le bail était actif pendant ce mois
                 date_mois = date(a, m, 1)
 
-                # Le bail doit avoir commencé avant ou pendant le mois
                 if loc.date_debut_bail > date_mois:
-                    # Le bail n'avait pas encore commencé ce mois-là
                     continue
 
-                # Si date_fin_bail existe, vérifier qu'elle n'est pas avant le mois
                 if loc.date_fin_bail and loc.date_fin_bail < date_mois:
-                    # Le bail était déjà terminé ce mois-là
                     continue
 
                 paiement = loc.get_paiement_mois(m, a)
@@ -1091,47 +1523,16 @@ def resume_loyers():
 
         total_global_attendu += total_attendu_mois
         total_global_encaisse += total_encaisse_mois
-
-    return render_template('resume_loyers.html',
-                         donnees_par_mois=donnees_par_mois,
-                         total_global_attendu=total_global_attendu,
-                         total_global_encaisse=total_global_encaisse,
-                         reste_global=total_global_attendu - total_global_encaisse,
-                         nb_mois=nb_mois)
-
-@app.route('/compte-locatif/<int:locataire_id>')
-def compte_locatif(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
-
-    # Utiliser l'historique complet qui inclut tous les mois depuis le début du bail
-    historique = locataire.get_historique_complet()
-
-    # Calculer les totaux
-    total_du = sum(h['total'] for h in historique)
-    total_paye = sum(h['paye'] for h in historique)
-    solde_global = sum(h['reste'] for h in historique)
-
-    return render_template('compte_locatif.html',
-                          locataire=locataire,
-                          historique=historique,
-                          total_du=total_du,
-                          total_paye=total_paye,
-                          solde_global=solde_global)
-
-@app.route('/comptes-locatifs')
-def comptes_locatifs():
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).order_by(Locataire.nom).all()
-    mois_actuel = date.today().month
-    annee_actuelle = date.today().year
-
-    donnees = []
-    for loc in locataires:
+        
+    # 8. Comptes Locatifs
+    donnees_comptes = []
+    for loc in locataires_actifs:
         if loc.appartement:
             paiement = loc.get_paiement_mois(mois_actuel, annee_actuelle)
             montant_paye = Decimal(str(paiement.montant_paye)) if paiement else Decimal('0.00')
             date_paiement = paiement.date_paiement if paiement else None
 
-            donnees.append({
+            donnees_comptes.append({
                 'locataire': loc,
                 'loyer': loc.loyer_actuel,
                 'charges': loc.charges_actuelles,
@@ -1141,80 +1542,215 @@ def comptes_locatifs():
                 'date_paiement': date_paiement
             })
 
-    return render_template('comptes_locatifs.html', donnees=donnees, mois=mois_actuel, annee=annee_actuelle)
+    return {
+        'scis': scis,
+        'biens': biens_via_sci,
+        'biens_directs': biens_directs,
+        'config_email': config_email,
+        'email_config_missing': email_config_missing,
+        'total_attendu': total_attendu,
+        'total_encaisse': total_encaisse,
+        'reste_global': total_attendu - total_encaisse,
+        'impayes': impayes[:10],
+        'mois_actuel': MOIS_FR[mois_actuel],
+        'annee_actuelle': annee_actuelle,
+        'locataires': all_locataires,
+        'appartements': appartements,
+        'appels': appels,
+        'quittances': quittances_list,
+        'donnees_par_mois': donnees_par_mois,
+        'total_global_attendu': total_global_attendu,
+        'total_global_encaisse': total_global_encaisse,
+        'nb_mois': nb_mois,
+        'donnees': donnees_comptes,
+        'mois': mois_actuel,
+        'annee': annee_actuelle,
+        'decorative_signature_data_url': decorative_signature_data_url
+    }
+
+
+def render_app_consolidated(active_tab):
+    nb_mois = request.args.get('nb_mois', 6, type=int)
+    context = get_consolidated_context(nb_mois=nb_mois)
+    return render_template('app.html', active_tab=active_tab, is_consolidated_app=True, **context)
+
+
+@app.route('/')
+@login_required
+def dashboard():
+    return render_app_consolidated('dashboard')
+
+
+@app.route('/sci/<int:sci_id>')
+@login_required
+def vue_sci(sci_id):
+    sci = SCI.query.filter_by(id=sci_id, user_id=current_user.id).first_or_404()
+    return render_template('sci_detail.html', sci=sci)
+
+
+@app.route('/biens')
+@login_required
+def liste_biens():
+    return render_app_consolidated('biens')
+
+
+@app.route('/bien/<int:bien_id>')
+@login_required
+def vue_bien(bien_id):
+    from sqlalchemy import or_
+    bien = BienImmobilier.query.filter(
+        BienImmobilier.id == bien_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(
+                db.session.query(SCI.id).filter(SCI.user_id == current_user.id)
+            )
+        )
+    ).first_or_404()
+    return render_template('bien_detail.html', bien=bien)
+
+
+@app.route('/locataires')
+@login_required
+def liste_locataires():
+    return render_app_consolidated('locataires')
+
+
+@app.route('/locataire/<int:locataire_id>/resume')
+@login_required
+def vue_locataire(locataire_id):
+    return redirect(url_for('locataire_detail', id=locataire_id))
+
+
+@app.route('/appels-loyer')
+@login_required
+def appels_loyer():
+    return render_app_consolidated('appels')
+
+
+@app.route('/quittances')
+@login_required
+def quittances():
+    return render_app_consolidated('quittances')
+
+
+@app.route('/resume-loyers')
+@login_required
+def resume_loyers():
+    return render_app_consolidated('resume')
+
+
+@app.route('/compte-locatif/<int:locataire_id>')
+@login_required
+def compte_locatif(locataire_id):
+    from sqlalchemy import or_
+    locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
+    historique = locataire.get_historique_complet()
+    total_du = sum(h['total'] for h in historique)
+    total_paye = sum(h['paye'] for h in historique)
+    solde_global = sum(h['reste'] for h in historique)
+
+    return render_template('compte_locatif.html', locataire=locataire, historique=historique, total_du=total_du,
+                           total_paye=total_paye, solde_global=solde_global)
+
+
+@app.route('/comptes-locatifs')
+@login_required
+def comptes_locatifs():
+    return render_app_consolidated('comptes')
+
 
 @app.route('/locataire/<int:id>')
+@login_required
 def locataire_detail(id):
-    locataire = Locataire.query.get_or_404(id)
+    from sqlalchemy import or_
+    locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
     etats_lieux = EtatDesLieux.query.filter_by(locataire_id=id).order_by(EtatDesLieux.date_etat.desc()).all()
     assurance = DocumentLocataire.query.filter_by(locataire_id=id, type_document='assurance').first()
     bail = DocumentLocataire.query.filter_by(locataire_id=id, type_document='bail').first()
-    photo = DocumentLocataire.query.filter_by(locataire_id=id, type_document='photo')\
-        .order_by(DocumentLocataire.created_at.desc()).first()
+    photo = DocumentLocataire.query.filter_by(locataire_id=id, type_document='photo').order_by(
+        DocumentLocataire.created_at.desc()).first()
     photo_token = int(photo.created_at.timestamp()) if photo and photo.created_at else int(datetime.now().timestamp())
 
-    return render_template('locataire_detail.html',
-                         locataire=locataire,
-                         etats_lieux=etats_lieux,
-                         assurance=assurance,
-                         bail=bail,
-                         photo=photo,
-                         photo_token=photo_token,
-                         now=datetime.now())
+    return render_template('locataire_detail.html', locataire=locataire, etats_lieux=etats_lieux, assurance=assurance,
+                           bail=bail, photo=photo, photo_token=photo_token, now=datetime.now())
 
-# Programmation des appels de loyer
+
 @app.route('/programmation')
+@login_required
 def programmation():
-    programmations = ProgrammationAppel.query.order_by(ProgrammationAppel.date_envoi.desc()).all()
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
-    config_email = ConfigEmail.query.first()
+    programmations = ProgrammationAppel.query.filter_by(user_id=current_user.id).order_by(ProgrammationAppel.date_envoi.desc()).all()
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
+    config_email = ConfigEmail.query.filter_by(user_id=current_user.id).first()
+    return render_template('programmation.html', programmations=programmations, locataires=locataires,
+                           config_email=config_email)
 
-    return render_template('programmation.html',
-                         programmations=programmations,
-                         locataires=locataires,
-                         config_email=config_email)
 
-# Page de gestion des documents
 @app.route('/documents')
+@login_required
 def documents():
-    # Récupérer tous les locataires avec leurs documents
-    locataires = Locataire.query.all()
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id).all()
+    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
 
-    # Statistiques générales
-    total_etats_lieux = EtatDesLieux.query.count()
-    etats_avec_pdf = EtatDesLieux.query.filter(EtatDesLieux.chemin_fichier.isnot(None)).count()
-    total_assurances = DocumentLocataire.query.filter_by(type_document='assurance').count()
-    total_photos = DocumentLocataire.query.filter_by(type_document='photo').count()
+    locataires_ids = [loc.id for loc in locataires]
 
-    # États des lieux récents
-    etats_recents = EtatDesLieux.query.order_by(EtatDesLieux.created_at.desc()).limit(10).all()
+    total_etats_lieux = EtatDesLieux.query.filter(
+        EtatDesLieux.locataire_id.in_(locataires_ids)).count() if locataires_ids else 0
+    etats_avec_pdf = EtatDesLieux.query.filter(EtatDesLieux.locataire_id.in_(locataires_ids),
+                                               EtatDesLieux.chemin_fichier.isnot(None)).count() if locataires_ids else 0
+    total_assurances = DocumentLocataire.query.filter(DocumentLocataire.locataire_id.in_(locataires_ids),
+                                                      DocumentLocataire.type_document == 'assurance').count() if locataires_ids else 0
+    total_photos = DocumentLocataire.query.filter(DocumentLocataire.locataire_id.in_(locataires_ids),
+                                                  DocumentLocataire.type_document == 'photo').count() if locataires_ids else 0
 
-    # Documents d'assurance récents
-    assurances_recentes = DocumentLocataire.query.filter_by(type_document='assurance')\
-                         .order_by(DocumentLocataire.created_at.desc()).limit(10).all()
+    etats_recents = EtatDesLieux.query.filter(EtatDesLieux.locataire_id.in_(locataires_ids)).order_by(
+        EtatDesLieux.created_at.desc()).limit(10).all() if locataires_ids else []
+    assurances_recentes = DocumentLocataire.query.filter(DocumentLocataire.locataire_id.in_(locataires_ids),
+                                                         DocumentLocataire.type_document == 'assurance').order_by(
+        DocumentLocataire.created_at.desc()).limit(10).all() if locataires_ids else []
+    photos_recentes = DocumentLocataire.query.filter(DocumentLocataire.locataire_id.in_(locataires_ids),
+                                                     DocumentLocataire.type_document == 'photo').order_by(
+        DocumentLocataire.created_at.desc()).limit(10).all() if locataires_ids else []
 
-    # Photos récentes
-    photos_recentes = DocumentLocataire.query.filter_by(type_document='photo')\
-                     .order_by(DocumentLocataire.created_at.desc()).limit(10).all()
+    return render_template('documents.html', locataires=locataires, total_etats_lieux=total_etats_lieux,
+                           etats_avec_pdf=etats_avec_pdf, total_assurances=total_assurances, total_photos=total_photos,
+                           etats_recents=etats_recents, assurances_recentes=assurances_recentes,
+                           photos_recentes=photos_recentes)
 
-    return render_template('documents.html',
-                         locataires=locataires,
-                         total_etats_lieux=total_etats_lieux,
-                         etats_avec_pdf=etats_avec_pdf,
-                         total_assurances=total_assurances,
-                         total_photos=total_photos,
-                         etats_recents=etats_recents,
-                         assurances_recentes=assurances_recentes,
-                         photos_recentes=photos_recentes)
 
-# Page États des lieux (nouvel onglet)
 @app.route('/etats-lieux')
+@login_required
 def etats_lieux():
-    # Récupérer tous les états des lieux
-    all_etats = EtatDesLieux.query.order_by(EtatDesLieux.date_etat.desc()).all()
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).order_by(Locataire.nom).all()
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
+    locataires.sort(key=lambda x: x.nom)
+    locataires_ids = [loc.id for loc in locataires]
 
-    # Statistiques
+    all_etats = EtatDesLieux.query.filter(EtatDesLieux.locataire_id.in_(locataires_ids)).order_by(
+        EtatDesLieux.date_etat.desc()).all() if locataires_ids else []
+
     stats = {
         'total': len(all_etats),
         'entrees': sum(1 for e in all_etats if e.type_etat == TypeEtatLieux.ENTREE),
@@ -1222,28 +1758,32 @@ def etats_lieux():
         'avec_pdf': sum(1 for e in all_etats if e.chemin_fichier)
     }
 
-    prefill_history = PrefillPdfHistorique.query.order_by(PrefillPdfHistorique.created_at.desc()).limit(10).all()
+    prefill_history = PrefillPdfHistorique.query.filter(PrefillPdfHistorique.locataire_id.in_(locataires_ids)).order_by(
+        PrefillPdfHistorique.created_at.desc()).limit(10).all() if locataires_ids else []
 
-    return render_template('etats_lieux.html',
-                         etats_lieux=all_etats,
-                         locataires=locataires,
-                         stats=stats,
-                         prefill_history=prefill_history)
+    return render_template('etats_lieux.html', etats_lieux=all_etats, locataires=locataires, stats=stats,
+                           prefill_history=prefill_history)
 
-# Configuration email
+
 @app.route('/parametres')
+@login_required
 def parametres():
-    config_email = ConfigEmail.query.first()
-    decorative_signature_data_url = _load_decorative_signature_data()
-    return render_template('parametres.html', config_email=config_email, decorative_signature_data_url=decorative_signature_data_url)
+    return render_app_consolidated('parametres')
 
-# API Routes
+
 @app.route('/api/sci', methods=['POST'])
+@login_required
 def create_sci():
     data = request.json
+    sci_type = (data.get('type_sci') or 'Immeuble').strip()
+    if sci_type not in SCI_TYPES_ALLOWED:
+        return jsonify({'error': 'Type de SCI invalide'}), 400
+
     sci = SCI(
         nom=data['nom'],
+        type_sci=sci_type,
         ville=data['ville'],
+        user_id=current_user.id,
         siret=data.get('siret'),
         adresse=data.get('adresse'),
         code_postal=data.get('code_postal'),
@@ -1253,13 +1793,15 @@ def create_sci():
     db.session.commit()
     return jsonify({'success': True, 'id': sci.id})
 
+
 @app.route('/api/sci/<int:sci_id>', methods=['GET'])
+@login_required
 def get_sci(sci_id):
-    """Récupérer les données d'une SCI"""
-    sci = SCI.query.get_or_404(sci_id)
+    sci = SCI.query.filter_by(id=sci_id, user_id=current_user.id).first_or_404()
     return jsonify({
         'id': sci.id,
         'nom': sci.nom,
+        'type_sci': sci.type_sci,
         'ville': sci.ville,
         'siret': sci.siret,
         'adresse': sci.adresse,
@@ -1267,12 +1809,19 @@ def get_sci(sci_id):
         'email': sci.email
     })
 
+
 @app.route('/api/sci/<int:sci_id>', methods=['PUT'])
+@login_required
 def update_sci(sci_id):
-    sci = SCI.query.get_or_404(sci_id)
+    sci = SCI.query.filter_by(id=sci_id, user_id=current_user.id).first_or_404()
     data = request.json
     if 'nom' in data:
         sci.nom = data['nom']
+    if 'type_sci' in data:
+        sci_type = (data['type_sci'] or '').strip()
+        if sci_type not in SCI_TYPES_ALLOWED:
+            return jsonify({'error': 'Type de SCI invalide'}), 400
+        sci.type_sci = sci_type
     if 'ville' in data:
         sci.ville = data['ville']
     if 'siret' in data:
@@ -1286,31 +1835,103 @@ def update_sci(sci_id):
     db.session.commit()
     return jsonify({'success': True})
 
+
 @app.route('/api/sci/<int:sci_id>', methods=['DELETE'])
+@login_required
 def delete_sci(sci_id):
-    sci = SCI.query.get_or_404(sci_id)
+    sci = SCI.query.filter_by(id=sci_id, user_id=current_user.id).first_or_404()
     db.session.delete(sci)
     db.session.commit()
     return jsonify({'success': True})
 
+
+@app.route('/api/proprietaire', methods=['GET'])
+@login_required
+def get_proprietaire():
+    return jsonify({
+        'nom': current_user.nom_proprietaire or '',
+        'prenom': current_user.prenom_proprietaire or '',
+        'adresse': current_user.adresse_proprietaire or '',
+        'code_postal': current_user.code_postal_proprietaire or '',
+        'ville': current_user.ville_proprietaire or '',
+    })
+
+
+@app.route('/api/proprietaire', methods=['PUT'])
+@login_required
+def update_proprietaire():
+    data = request.json or {}
+    if 'nom' in data: current_user.nom_proprietaire = data['nom'] or None
+    if 'prenom' in data: current_user.prenom_proprietaire = data['prenom'] or None
+    if 'adresse' in data: current_user.adresse_proprietaire = data['adresse'] or None
+    if 'code_postal' in data: current_user.code_postal_proprietaire = data['code_postal'] or None
+    if 'ville' in data: current_user.ville_proprietaire = data['ville'] or None
+    db.session.commit()
+    return jsonify({'success': True})
+
+
 @app.route('/api/bien', methods=['POST'])
+@login_required
 def create_bien():
-    data = request.json
+    data = request.json or {}
+    sci_id = data.get('sci_id') or None
+    if sci_id:
+        sci_id = int(sci_id)
+        sci = SCI.query.filter_by(id=sci_id, user_id=current_user.id).first_or_404()
+    else:
+        sci = None
+
+    type_bien = (data.get('type_bien') or '').strip()
+    if type_bien not in BIEN_TYPES_ALLOWED:
+        return jsonify({'error': 'Type de bien invalide'}), 400
+
+    if sci and sci.type_sci == 'Entrepot' and type_bien != 'Entrepot':
+        return jsonify({'error': 'Cette SCI est de type Entrepot: seul le type Entrepot est autorise'}), 400
+
+    charges = []
+    for item in (data.get('charges') or []):
+        if not isinstance(item, dict):
+            continue
+        libelle = str(item.get('libelle') or '').strip()
+        try:
+            montant = Decimal(str(item.get('montant') or 0))
+        except Exception:
+            montant = Decimal('0')
+        if libelle and montant >= 0:
+            charges.append({'libelle': libelle, 'montant': f"{montant.quantize(Decimal('0.01'))}"})
+
     bien = BienImmobilier(
-        adresse=data['adresse'],
-        code_postal=data.get('code_postal'),
-        ville=data.get('ville'),
-        type_bien=data['type_bien'],
-        sci_id=data['sci_id']
+        adresse=(data.get('adresse') or type_bien).strip(),
+        code_postal=data.get('code_postal') or None,
+        ville=data.get('ville') or None,
+        type_bien=type_bien,
+        charges_json=json.dumps(charges, ensure_ascii=False) if charges else None,
+        sci_id=sci_id,
+        user_id=current_user.id if not sci_id else None
     )
+    if bien.sci_id:
+        bien.user_id = None
+    elif not bien.user_id:
+        bien.user_id = current_user.id
     db.session.add(bien)
     db.session.commit()
     return jsonify({'success': True, 'id': bien.id})
 
+
 @app.route('/api/bien/<int:bien_id>', methods=['PUT'])
+@login_required
 def update_bien(bien_id):
-    bien = BienImmobilier.query.get_or_404(bien_id)
-    data = request.json
+    from sqlalchemy import or_
+    bien = BienImmobilier.query.filter(
+        BienImmobilier.id == bien_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(
+                db.session.query(SCI.id).filter(SCI.user_id == current_user.id)
+            )
+        )
+    ).first_or_404()
+    data = request.json or {}
     if 'adresse' in data:
         bien.adresse = data['adresse']
     if 'code_postal' in data:
@@ -1318,65 +1939,254 @@ def update_bien(bien_id):
     if 'ville' in data:
         bien.ville = data['ville']
     if 'type_bien' in data:
-        bien.type_bien = data['type_bien']
+        type_bien = (data['type_bien'] or '').strip()
+        if type_bien not in BIEN_TYPES_ALLOWED:
+            return jsonify({'error': 'Type de bien invalide'}), 400
+        if bien.sci and bien.sci.type_sci == 'Entrepot' and type_bien != 'Entrepot':
+            return jsonify({'error': 'Cette SCI est de type Entrepot: seul le type Entrepot est autorise'}), 400
+        bien.type_bien = type_bien
+
+    if 'charges' in data and isinstance(data['charges'], list):
+        charges = []
+        for item in data['charges']:
+            if not isinstance(item, dict):
+                continue
+            libelle = str(item.get('libelle') or '').strip()
+            try:
+                montant = Decimal(str(item.get('montant') or 0))
+            except Exception:
+                montant = Decimal('0')
+            if libelle and montant >= 0:
+                charges.append({'libelle': libelle, 'montant': f"{montant.quantize(Decimal('0.01'))}"})
+        bien.charges_json = json.dumps(charges, ensure_ascii=False) if charges else None
+
+    # Un bien est soit rattaché à une SCI, soit au propriétaire direct, jamais les deux.
+    if bien.sci_id:
+        bien.user_id = None
+    elif not bien.user_id:
+        bien.user_id = current_user.id
+
     db.session.commit()
     return jsonify({'success': True})
+
 
 @app.route('/api/bien/<int:bien_id>', methods=['DELETE'])
+@login_required
 def delete_bien(bien_id):
-    bien = BienImmobilier.query.get_or_404(bien_id)
-    db.session.delete(bien)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        from sqlalchemy import or_
+        bien = BienImmobilier.query.filter(
+            BienImmobilier.id == bien_id,
+            or_(
+                BienImmobilier.user_id == current_user.id,
+                BienImmobilier.sci_id.in_(
+                    db.session.query(SCI.id).filter(SCI.user_id == current_user.id)
+                )
+            )
+        ).first_or_404()
+        db.session.delete(bien)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def _get_locataire_for_user(locataire_id, user_id):
+    """Retourne un locataire appartenant à l'utilisateur (via SCI ou bien direct), ou None."""
+    from sqlalchemy import or_
+    return Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == user_id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == user_id))
+        )
+    ).first()
+
+
+def _parse_appart_charges(charges_data):
+    items = []
+    for item in (charges_data or []):
+        if not isinstance(item, dict):
+            continue
+        libelle = str(item.get('libelle') or '').strip()
+        try:
+            montant = Decimal(str(item.get('montant') or 0))
+        except Exception:
+            montant = Decimal('0')
+        if libelle and montant >= 0:
+            items.append({'libelle': libelle, 'montant': f"{montant.quantize(Decimal('0.01'))}"})
+    return items
+
 
 @app.route('/api/appartement', methods=['POST'])
+@login_required
 def create_appartement():
+    from sqlalchemy import or_
     data = request.json
+    BienImmobilier.query.filter(
+        BienImmobilier.id == data['bien_id'],
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
+
+    type_appartement = (data.get('type_appartement') or '').strip()
+    if type_appartement not in APPART_TYPES_ALLOWED:
+        return jsonify({'error': 'Type invalide'}), 400
+
+    numero_porte = (data.get('numero_porte') or '').strip()
+    numero_box = (data.get('numero_box') or '').strip()
+    etage = (data.get('etage') or '').strip()
+    nom_entreprise = None
+    charges_json_val = None
+    charges_total = None
+
+    if type_appartement == 'Appartement':
+        if not numero_porte:
+            return jsonify({'error': 'Numero de porte requis pour un appartement'}), 400
+        charges_items = _parse_appart_charges(data.get('charges_json'))
+        charges_json_val = json.dumps(charges_items, ensure_ascii=False) if charges_items else None
+        charges_total = sum(Decimal(c['montant']) for c in charges_items) if charges_items else Decimal('0')
+    elif type_appartement == 'Box':
+        if not numero_box:
+            return jsonify({'error': 'Numero de box requis'}), 400
+        numero_porte = numero_box
+        etage = ''
+    elif type_appartement == 'Local Commerciale':
+        nom_entreprise = (data.get('nom_entreprise') or '').strip() or None
+        numero_porte = type_appartement
+        etage = ''
+        charges_items = _parse_appart_charges(data.get('charges_json'))
+        charges_json_val = json.dumps(charges_items, ensure_ascii=False) if charges_items else None
+        charges_total = sum(Decimal(c['montant']) for c in charges_items) if charges_items else Decimal('0')
+    else:
+        numero_porte = type_appartement
+        etage = ''
+
     appart = Appartement(
-        numero_porte=data['numero_porte'],
-        type_appartement=data['type_appartement'],
+        numero_porte=numero_porte,
+        type_appartement=type_appartement,
         surface=Decimal(str(data.get('surface', 0))) if data.get('surface') else None,
         loyer_mensuel=Decimal(str(data.get('loyer_mensuel', 0))) if data.get('loyer_mensuel') else None,
-        charges=Decimal(str(data.get('charges', 0))) if data.get('charges') else None,
+        charges=charges_total if charges_total is not None else (Decimal(str(data.get('charges', 0))) if data.get('charges') else None),
         nb_pieces=int(data.get('nb_pieces')) if data.get('nb_pieces') else None,
-        etage=data.get('etage'),
-        bien_id=data['bien_id']
+        etage=etage or None,
+        bien_id=data['bien_id'],
+        nom_entreprise=nom_entreprise,
+        charges_json=charges_json_val
     )
     db.session.add(appart)
     db.session.commit()
     return jsonify({'success': True, 'id': appart.id})
 
+
 @app.route('/api/appartement/<int:appart_id>', methods=['PUT'])
+@login_required
 def update_appartement(appart_id):
-    appart = Appartement.query.get_or_404(appart_id)
+    from sqlalchemy import or_
+    appart = Appartement.query.join(BienImmobilier).filter(
+        Appartement.id == appart_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
     data = request.json
-    if 'numero_porte' in data:
-        appart.numero_porte = data['numero_porte']
+
     if 'type_appartement' in data:
-        appart.type_appartement = data['type_appartement']
+        next_type = (data['type_appartement'] or '').strip()
+        if next_type not in APPART_TYPES_ALLOWED:
+            return jsonify({'error': 'Type invalide'}), 400
+        appart.type_appartement = next_type
+
+    type_effectif = appart.type_appartement
+    numero_porte_input = (data.get('numero_porte') or '').strip() if 'numero_porte' in data else (appart.numero_porte or '')
+    numero_box_input = (data.get('numero_box') or '').strip()
+
+    if type_effectif == 'Appartement':
+        if 'numero_porte' in data:
+            if not numero_porte_input:
+                return jsonify({'error': 'Numero de porte requis pour un appartement'}), 400
+            appart.numero_porte = numero_porte_input
+        if 'etage' in data:
+            appart.etage = data['etage'] or None
+        appart.nom_entreprise = None
+        if 'charges_json' in data:
+            charges_items = _parse_appart_charges(data['charges_json'])
+            appart.charges_json = json.dumps(charges_items, ensure_ascii=False) if charges_items else None
+            appart.charges = sum(Decimal(c['montant']) for c in charges_items) if charges_items else Decimal('0')
+    elif type_effectif == 'Box':
+        if numero_box_input:
+            appart.numero_porte = numero_box_input
+        elif 'numero_porte' in data and numero_porte_input:
+            appart.numero_porte = numero_porte_input
+        elif not appart.numero_porte:
+            return jsonify({'error': 'Numero de box requis'}), 400
+        appart.etage = None
+        appart.nom_entreprise = None
+        appart.charges_json = None
+    elif type_effectif == 'Local Commerciale':
+        appart.numero_porte = type_effectif
+        appart.etage = None
+        if 'nom_entreprise' in data:
+            appart.nom_entreprise = (data['nom_entreprise'] or '').strip() or None
+        if 'charges_json' in data:
+            charges_items = _parse_appart_charges(data['charges_json'])
+            appart.charges_json = json.dumps(charges_items, ensure_ascii=False) if charges_items else None
+            appart.charges = sum(Decimal(c['montant']) for c in charges_items) if charges_items else Decimal('0')
+    else:
+        appart.numero_porte = type_effectif
+        appart.etage = None
+        appart.nom_entreprise = None
+        appart.charges_json = None
+
     if 'surface' in data:
         appart.surface = Decimal(str(data['surface'])) if data['surface'] else None
     if 'loyer_mensuel' in data:
         appart.loyer_mensuel = Decimal(str(data['loyer_mensuel'])) if data['loyer_mensuel'] else None
-    if 'charges' in data:
-        appart.charges = Decimal(str(data['charges'])) if data['charges'] else None
     if 'nb_pieces' in data:
         appart.nb_pieces = int(data['nb_pieces']) if data['nb_pieces'] else None
-    if 'etage' in data:
-        appart.etage = data['etage']
+
     db.session.commit()
     return jsonify({'success': True})
+
 
 @app.route('/api/appartement/<int:appart_id>', methods=['DELETE'])
+@login_required
 def delete_appartement(appart_id):
-    appart = Appartement.query.get_or_404(appart_id)
-    db.session.delete(appart)
-    db.session.commit()
-    return jsonify({'success': True})
+    try:
+        from sqlalchemy import or_
+        appart = Appartement.query.join(BienImmobilier).filter(
+            Appartement.id == appart_id,
+            or_(
+                BienImmobilier.user_id == current_user.id,
+                BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+            )
+        ).first_or_404()
+        db.session.delete(appart)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 @app.route('/api/locataire', methods=['POST'])
+@login_required
 def create_locataire():
+    from sqlalchemy import or_
     data = request.json
+    if data.get('appartement_id'):
+        Appartement.query.join(BienImmobilier).filter(
+            Appartement.id == data['appartement_id'],
+            or_(
+                BienImmobilier.user_id == current_user.id,
+                BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+            )
+        ).first_or_404()
+
     locataire = Locataire(
         nom=data['nom'],
         prenom=data['prenom'],
@@ -1384,8 +2194,10 @@ def create_locataire():
         telephone=data.get('telephone'),
         adresse_precedente=data.get('adresse_precedente'),
         depot_garantie=Decimal(str(data.get('depot_garantie', 0))) if data.get('depot_garantie') else None,
-        date_debut_bail=datetime.strptime(data['date_debut_bail'], '%Y-%m-%d').date() if data.get('date_debut_bail') else None,
-        date_fin_bail=datetime.strptime(data['date_fin_bail'], '%Y-%m-%d').date() if data.get('date_fin_bail') else None,
+        date_debut_bail=datetime.strptime(data['date_debut_bail'], '%Y-%m-%d').date() if data.get(
+            'date_debut_bail') else None,
+        date_fin_bail=datetime.strptime(data['date_fin_bail'], '%Y-%m-%d').date() if data.get(
+            'date_fin_bail') else None,
         statut=StatutLocataire.ACTIF if data.get('statut', 'Actif') == 'Actif' else StatutLocataire.INACTIF,
         appartement_id=data.get('appartement_id')
     )
@@ -1393,9 +2205,18 @@ def create_locataire():
     db.session.commit()
     return jsonify({'success': True, 'id': locataire.id})
 
+
 @app.route('/api/locataire/<int:locataire_id>', methods=['PUT'])
+@login_required
 def update_locataire(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    from sqlalchemy import or_
+    locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
     data = request.json
     if 'nom' in data:
         locataire.nom = data['nom']
@@ -1410,27 +2231,59 @@ def update_locataire(locataire_id):
     if 'depot_garantie' in data:
         locataire.depot_garantie = Decimal(str(data['depot_garantie'])) if data['depot_garantie'] else None
     if 'date_debut_bail' in data:
-        locataire.date_debut_bail = datetime.strptime(data['date_debut_bail'], '%Y-%m-%d').date() if data['date_debut_bail'] else None
+        locataire.date_debut_bail = datetime.strptime(data['date_debut_bail'], '%Y-%m-%d').date() if data[
+            'date_debut_bail'] else None
     if 'date_fin_bail' in data:
-        locataire.date_fin_bail = datetime.strptime(data['date_fin_bail'], '%Y-%m-%d').date() if data['date_fin_bail'] else None
+        locataire.date_fin_bail = datetime.strptime(data['date_fin_bail'], '%Y-%m-%d').date() if data[
+            'date_fin_bail'] else None
     if 'statut' in data:
         locataire.statut = StatutLocataire.ACTIF if data['statut'] == 'Actif' else StatutLocataire.INACTIF
     if 'appartement_id' in data:
+        if data['appartement_id']:
+            from sqlalchemy import or_
+            Appartement.query.join(BienImmobilier).filter(
+                Appartement.id == data['appartement_id'],
+                or_(
+                    BienImmobilier.user_id == current_user.id,
+                    BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+                )
+            ).first_or_404()
         locataire.appartement_id = data['appartement_id'] if data['appartement_id'] else None
     db.session.commit()
     return jsonify({'success': True})
 
-@app.route('/api/locataire/<int:locataire_id>', methods=['DELETE'])
-def delete_locataire(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
-    db.session.delete(locataire)
-    db.session.commit()
-    return jsonify({'success': True})
 
-# Upload attestation assurance
+@app.route('/api/locataire/<int:locataire_id>', methods=['DELETE'])
+@login_required
+def delete_locataire(locataire_id):
+    try:
+        from sqlalchemy import or_
+        locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+            Locataire.id == locataire_id,
+            or_(
+                BienImmobilier.user_id == current_user.id,
+                BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+            )
+        ).first_or_404()
+        db.session.delete(locataire)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/locataire/<int:locataire_id>/assurance', methods=['POST'])
+@login_required
 def upload_assurance(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    from sqlalchemy import or_
+    locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -1444,20 +2297,19 @@ def upload_assurance(locataire_id):
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances', filename)
         file.save(filepath)
 
-        # Supprimer l'ancien document si existe
         old_doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='assurance').first()
         if old_doc:
             if os.path.exists(old_doc.chemin_fichier):
                 os.remove(old_doc.chemin_fichier)
             db.session.delete(old_doc)
 
-        # Créer nouveau document
         doc = DocumentLocataire(
             locataire_id=locataire_id,
             type_document='assurance',
             nom_fichier=filename,
             chemin_fichier=filepath,
-            date_validite=datetime.strptime(request.form.get('date_validite'), '%Y-%m-%d').date() if request.form.get('date_validite') else None
+            date_validite=datetime.strptime(request.form.get('date_validite'), '%Y-%m-%d').date() if request.form.get(
+                'date_validite') else None
         )
         db.session.add(doc)
         db.session.commit()
@@ -1466,8 +2318,18 @@ def upload_assurance(locataire_id):
 
     return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
 
+
 @app.route('/api/locataire/<int:locataire_id>/assurance', methods=['GET'])
+@login_required
 def get_assurance(locataire_id):
+    from sqlalchemy import or_
+    Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
     doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='assurance').first()
     if doc and os.path.exists(doc.chemin_fichier):
         return send_file(doc.chemin_fichier, as_attachment=True, download_name=doc.nom_fichier)
@@ -1475,15 +2337,21 @@ def get_assurance(locataire_id):
 
 
 @app.route('/api/locataire/<int:locataire_id>/assurance', methods=['DELETE'])
+@login_required
 def delete_assurance(locataire_id):
-    """Supprimer l'attestation d'assurance d'un locataire"""
     try:
+        from sqlalchemy import or_
+        Locataire.query.join(Appartement).join(BienImmobilier).filter(
+            Locataire.id == locataire_id,
+            or_(
+                BienImmobilier.user_id == current_user.id,
+                BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+            )
+        ).first_or_404()
         doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='assurance').first()
         if doc:
-            # Supprimer le fichier physique
             if os.path.exists(doc.chemin_fichier):
                 os.remove(doc.chemin_fichier)
-            # Supprimer l'entrée en base
             db.session.delete(doc)
             db.session.commit()
             return jsonify({'success': True, 'message': 'Assurance supprimée'})
@@ -1494,8 +2362,16 @@ def delete_assurance(locataire_id):
 
 
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['POST'])
+@login_required
 def upload_bail(locataire_id):
-    Locataire.query.get_or_404(locataire_id)
+    from sqlalchemy import or_
+    Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        Locataire.id == locataire_id,
+        or_(
+            BienImmobilier.user_id == current_user.id,
+            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
+        )
+    ).first_or_404()
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -1530,7 +2406,9 @@ def upload_bail(locataire_id):
 
 
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['GET'])
+@login_required
 def get_bail(locataire_id):
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
     doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').first()
     if doc and os.path.exists(doc.chemin_fichier):
         return send_file(doc.chemin_fichier, as_attachment=True, download_name=doc.nom_fichier)
@@ -1538,15 +2416,14 @@ def get_bail(locataire_id):
 
 
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['DELETE'])
+@login_required
 def delete_bail(locataire_id):
-    """Supprimer le document de bail d'un locataire"""
     try:
+        _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
         doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').first()
         if doc:
-            # Supprimer le fichier physique
             if os.path.exists(doc.chemin_fichier):
                 os.remove(doc.chemin_fichier)
-            # Supprimer l'entrée en base
             db.session.delete(doc)
             db.session.commit()
             return jsonify({'success': True, 'message': 'Bail supprimé'})
@@ -1555,10 +2432,11 @@ def delete_bail(locataire_id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
-# Upload photo de locataire
+
 @app.route('/api/locataire/<int:locataire_id>/photo', methods=['POST'])
+@login_required
 def upload_photo(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    locataire = _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -1567,26 +2445,23 @@ def upload_photo(locataire_id):
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
-    # Vérifier que c'est une image
     allowed_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
     if file and any(file.filename.lower().endswith(ext) for ext in allowed_extensions):
-        filename = secure_filename(f"photo_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file.filename.rsplit('.', 1)[1].lower()}")
+        filename = secure_filename(
+            f"photo_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file.filename.rsplit('.', 1)[1].lower()}")
 
-        # Créer le dossier photos si nécessaire
         upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'photos')
         os.makedirs(upload_dir, exist_ok=True)
 
         filepath = os.path.join(upload_dir, filename)
         file.save(filepath)
 
-        # Supprimer l'ancienne photo si elle existe
         old_doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='photo').first()
         if old_doc:
             if os.path.exists(old_doc.chemin_fichier):
                 os.remove(old_doc.chemin_fichier)
             db.session.delete(old_doc)
 
-        # Créer l'enregistrement
         doc = DocumentLocataire(
             locataire_id=locataire_id,
             type_document='photo',
@@ -1600,17 +2475,84 @@ def upload_photo(locataire_id):
 
     return jsonify({'success': False, 'error': 'Format non supporté (images uniquement)'}), 400
 
-# Récupérer photo de locataire
+
 @app.route('/api/locataire/<int:locataire_id>/photo', methods=['GET'])
+@login_required
 def get_photo(locataire_id):
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
     doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='photo').first()
     if doc and os.path.exists(doc.chemin_fichier):
         return send_file(doc.chemin_fichier, as_attachment=False)
     return jsonify({'success': False, 'error': 'Photo non trouvée'}), 404
 
+
+def _get_edl_context(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='', locataire_nom=''):
+    """Construit le contexte commun pour les templates état des lieux (web et PDF)."""
+    appartement = locataire.appartement
+    bien = appartement.bien if appartement and appartement.bien else None
+
+    type_str = str(type_etat or '').strip().lower()
+    type_norm = 'sortie' if 'sort' in type_str else 'entree'
+    date_formatee = date_etat.strftime('%d/%m/%Y') if isinstance(date_etat, (date, datetime)) else ''
+
+    # Adresse du logement
+    adresse_logement = ''
+    if bien:
+        adresse_logement = getattr(bien, 'adresse_complete', None) or getattr(bien, 'adresse', '') or ''
+
+    # Bailleur depuis la source unique (SCI sinon propriétaire direct)
+    bailleur = _get_bailleur_info(bien)
+    if not bailleur_nom:
+        bailleur_nom = bailleur.get('nom', '')
+    if not bailleur_adresse:
+        parts = [bailleur.get('adresse', ''), bailleur.get('code_postal', ''), bailleur.get('ville', '')]
+        bailleur_adresse = ', '.join([p for p in parts if p])
+
+    # Nom locataire depuis le modèle si non fourni
+    if not locataire_nom:
+        locataire_nom = locataire.nom_complet
+
+    # Préremplissage strict: seule la date correspondant au type est renseignée.
+    date_entree_val = ''
+    date_sortie_val = ''
+    if type_norm == 'entree':
+        date_entree_val = date_formatee
+    else:
+        date_sortie_val = date_formatee
+
+    return dict(
+        type_etat=type_norm,
+        type_entree_checked=(type_norm == 'entree'),
+        type_sortie_checked=(type_norm == 'sortie'),
+        date_entree=date_entree_val,
+        date_sortie=date_sortie_val,
+        adresse_logement=adresse_logement.strip(),
+        bailleur_nom=bailleur_nom.strip(),
+        bailleur_adresse=bailleur_adresse.strip(),
+        locataire_nom=locataire_nom.strip(),
+        locataire_nouvelle_adresse='',
+        observations='',
+        signature_date=''
+    )
+
+
+def _render_etat_des_lieux_template_html(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='',
+                                         locataire_nom=''):
+    ctx = _get_edl_context(locataire, type_etat, date_etat, bailleur_nom, bailleur_adresse, locataire_nom)
+    return render_template('modals/etat_des_lieux_template.html', **ctx)
+
+
+def _render_etat_des_lieux_pdf_html(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='',
+                                    locataire_nom=''):
+    """Rendu avec le template PDF dédié (compatible xhtml2pdf, pas de CSS modernes)."""
+    ctx = _get_edl_context(locataire, type_etat, date_etat, bailleur_nom, bailleur_adresse, locataire_nom)
+    return render_template('pdf/etat_des_lieux.html', **ctx)
+
+
 @app.route('/api/locataire/<int:locataire_id>/etat-lieux', methods=['POST'])
+@login_required
 def create_etat_lieux(locataire_id):
-    Locataire.query.get_or_404(locataire_id)
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
     data = request.get_json(silent=True) or {}
 
     if not data.get('date_etat'):
@@ -1629,7 +2571,6 @@ def create_etat_lieux(locataire_id):
     except ValueError:
         return jsonify({'success': False, 'error': 'Format de date invalide'}), 400
 
-    # Créer l'enregistrement
     etat = EtatDesLieux(
         locataire_id=locataire_id,
         type_etat=type_etat,
@@ -1646,8 +2587,9 @@ def create_etat_lieux(locataire_id):
 
 
 @app.route('/api/locataire/<int:locataire_id>/etat-lieux/prefill-pdf', methods=['POST'])
+@login_required
 def prefill_etat_lieux_pdf(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    locataire = _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
 
     data = request.get_json(silent=True) or {}
     raw_type = (data.get('type_etat') or 'entree').strip().lower()
@@ -1659,31 +2601,9 @@ def prefill_etat_lieux_pdf(locataire_id):
     except ValueError:
         return jsonify({'success': False, 'error': 'Format de date invalide'}), 400
 
-    appartement = locataire.appartement
-    bien = appartement.bien if appartement and appartement.bien else SimpleNamespace(adresse='Adresse non renseignée')
-    sci = bien.sci if getattr(bien, 'sci', None) else SimpleNamespace(nom='Bailleur non renseigné', adresse=None, email=None)
-
-    bailleur_pdf = SimpleNamespace(
-        nom=(data.get('bailleur_nom') or getattr(sci, 'nom', None) or 'Bailleur non renseigné').strip(),
-        adresse=(data.get('bailleur_adresse') or getattr(sci, 'adresse', None) or '').strip(),
-        email=(data.get('bailleur_email') or getattr(sci, 'email', None) or '').strip(),
-        representant=(data.get('bailleur_representant') or '').strip(),
-        telephone=(data.get('bailleur_telephone') or '').strip()
-    )
-
-    if not appartement:
-        appartement = SimpleNamespace(numero_porte='-', nb_pieces=None, etage=None, surface=None)
-
-    # Objet temporaire pour fallback HTML si besoin.
-    etat_temp = SimpleNamespace(
-        type_etat=type_etat,
-        date_etat=date_etat,
-        releve_electricite=None,
-        releve_gaz=None,
-        releve_eau_froide=None,
-        releve_eau_chaude=None,
-        observations=data.get('observations') or ''
-    )
+    bailleur_nom = (data.get('bailleur_nom') or '').strip()
+    bailleur_adresse = (data.get('bailleur_adresse') or '').strip()
+    locataire_nom = (data.get('locataire_nom') or '').strip()
 
     drafts_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'drafts')
     os.makedirs(drafts_dir, exist_ok=True)
@@ -1692,36 +2612,12 @@ def prefill_etat_lieux_pdf(locataire_id):
     filename = secure_filename(f"prefill_etat_lieux_{type_etat}_{locataire_id}_{timestamp}.pdf")
     filepath = os.path.join(drafts_dir, filename)
 
-    # Priorité: remplissage du PDF modèle par coordonnées (PyMuPDF).
-    pdf_modele = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'etatdeslieux.pdf')
-    donnees_formulaire = {
-        'anchors': {
-            'adresse_logement': bien.adresse if bien and getattr(bien, 'adresse', None) else '',
-            'bailleur_nom': bailleur_pdf.nom,
-            'bailleur_adresse': bailleur_pdf.adresse,
-            'date_entree': locataire.date_debut_bail.strftime('%d/%m/%Y') if locataire.date_debut_bail else date_etat.strftime('%d/%m/%Y'),
-            'date_sortie': locataire.date_fin_bail.strftime('%d/%m/%Y') if locataire.date_fin_bail else '',
-            'is_entree': type_etat == 'entree',
-            'locataire_nom': f"{locataire.prenom} {locataire.nom}",
-            'observations': data.get('observations') or ''
-        }
-    }
-
-    if os.path.exists(pdf_modele):
-        success, error = remplir_etat_des_lieux_modele(pdf_modele, filepath, donnees_formulaire)
-    else:
-        # Fallback: génération HTML/PDF si le modèle n'est pas disponible.
-        html_content = render_template(
-            'pdf/etat_lieux.html',
-            etat=etat_temp,
-            locataire=locataire,
-            appartement=appartement,
-            bien=bien,
-            sci=sci,
-            bailleur_pdf=bailleur_pdf,
-            now=datetime.now()
-        )
-        success, error = html_to_pdf(html_content, filepath)
+    kwargs = dict(locataire=locataire, type_etat=type_etat, date_etat=date_etat,
+                  bailleur_nom=bailleur_nom, bailleur_adresse=bailleur_adresse,
+                  locataire_nom=locataire_nom)
+    html_rich = _render_etat_des_lieux_template_html(**kwargs)
+    html_simple = _render_etat_des_lieux_pdf_html(**kwargs)
+    success, error = html_to_pdf_strict_weasy(html_rich, html_simple, filepath)
 
     if not success:
         return jsonify({
@@ -1749,9 +2645,12 @@ def prefill_etat_lieux_pdf(locataire_id):
         'filename': filename
     })
 
+
 @app.route('/api/etat-lieux/prefill/<int:prefill_id>/download', methods=['GET'])
+@login_required
 def download_prefill_pdf(prefill_id):
     prefill = PrefillPdfHistorique.query.get_or_404(prefill_id)
+    _get_locataire_for_user(prefill.locataire_id, current_user.id) or abort(404)
 
     if not prefill.chemin_fichier or not os.path.exists(prefill.chemin_fichier):
         return jsonify({'success': False, 'error': 'Fichier introuvable, regénérez le PDF'}), 404
@@ -1760,8 +2659,10 @@ def download_prefill_pdf(prefill_id):
 
 
 @app.route('/api/etat-lieux/prefill/<int:prefill_id>', methods=['DELETE'])
+@login_required
 def delete_prefill_pdf(prefill_id):
     prefill = PrefillPdfHistorique.query.get_or_404(prefill_id)
+    _get_locataire_for_user(prefill.locataire_id, current_user.id) or abort(404)
 
     if prefill.chemin_fichier and os.path.exists(prefill.chemin_fichier):
         try:
@@ -1773,13 +2674,13 @@ def delete_prefill_pdf(prefill_id):
     db.session.commit()
     return jsonify({'success': True, 'message': 'PDF généré supprimé'})
 
-# Génération avancée d'état des lieux avec template complet
+
 @app.route('/api/locataire/<int:locataire_id>/etat-lieux/generate', methods=['POST'])
+@login_required
 def generate_etat_lieux_avance(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    locataire = _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
     data = request.json
 
-    # Créer l'enregistrement
     etat = EtatDesLieux(
         locataire_id=locataire_id,
         type_etat=TypeEtatLieux.ENTREE if data['type_etat'] == 'Entrée' else TypeEtatLieux.SORTIE,
@@ -1791,42 +2692,29 @@ def generate_etat_lieux_avance(locataire_id):
         observations=data.get('observations')
     )
     db.session.add(etat)
-    db.session.flush()  # Pour obtenir l'ID
+    db.session.flush()
 
-    # Générer le PDF avec le template complet
     try:
-        # Récupérer les données nécessaires
-        appartement = locataire.appartement
-        bien = appartement.bien if appartement else None
-        sci = bien.sci if bien else None
+        kwargs = dict(
+            locataire=locataire,
+            type_etat=etat.type_etat.value,
+            date_etat=etat.date_etat,
+            bailleur_nom=(data.get('bailleur_nom') or ''),
+            bailleur_adresse=(data.get('bailleur_adresse') or ''),
+            locataire_nom=(data.get('locataire_nom') or '')
+        )
+        html_rich = _render_etat_des_lieux_template_html(**kwargs)
+        html_simple = _render_etat_des_lieux_pdf_html(**kwargs)
 
-        # Choisir le template selon les options
-        template_name = 'pdf/etat_lieux_complet.html'
-        if not data.get('format_detaille', True):
-            template_name = 'pdf/etat_lieux.html'
-
-        # Générer le HTML depuis le template
-        html_content = render_template(template_name,
-                                     etat=etat,
-                                     locataire=locataire,
-                                     appartement=appartement,
-                                     bien=bien,
-                                     sci=sci,
-                                     now=datetime.now(),
-                                     options=data)  # Passer les options au template
-
-        # Créer le dossier de destination
         generated_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'generated')
         os.makedirs(generated_dir, exist_ok=True)
 
-        # Nom du fichier
         type_str = etat.type_etat.value.lower()
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         filename = f"etat_lieux_{type_str}_{locataire.nom}_{locataire.prenom}_{timestamp}.pdf"
         filepath = os.path.join(generated_dir, filename)
 
-        # Convertir en PDF
-        success, error = html_to_pdf(html_content, filepath)
+        success, error = html_to_pdf_strict_weasy(html_rich, html_simple, filepath)
 
         if success:
             etat.chemin_fichier = filepath
@@ -1846,44 +2734,26 @@ def generate_etat_lieux_avance(locataire_id):
         db.session.commit()
         return jsonify({'success': True, 'id': etat.id, 'pdf_generated': False, 'pdf_error': str(e)})
 
-# Aperçu HTML d'un état des lieux (sans sauvegarde)
+
 @app.route('/api/locataire/<int:locataire_id>/etat-lieux/preview', methods=['GET'])
+@login_required
 def preview_etat_lieux(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    locataire = _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
 
-    # Créer un objet temporaire pour l'aperçu
-    class PreviewEtat:
-        def __init__(self):
-            self.type_etat = TypeEtatLieux.ENTREE
-            self.date_etat = date.today()
-            self.releve_electricite = ""
-            self.releve_gaz = ""
-            self.releve_eau_froide = ""
-            self.releve_eau_chaude = ""
-            self.observations = "Aperçu de l'état des lieux - les champs seront remplis lors de la génération finale."
+    return _render_etat_des_lieux_template_html(
+        locataire=locataire,
+        type_etat='entree',
+        date_etat=date.today(),
+        bailleur_nom='',
+        bailleur_adresse='',
+        locataire_nom=''
+    )
 
-    etat = PreviewEtat()
 
-    # Récupérer les données nécessaires
-    appartement = locataire.appartement
-    bien = appartement.bien if appartement else None
-    sci = bien.sci if bien else None
-
-    # Générer l'HTML pour aperçu
-    html_content = render_template('pdf/etat_lieux_complet.html',
-                                 etat=etat,
-                                 locataire=locataire,
-                                 appartement=appartement,
-                                 bien=bien,
-                                 sci=sci,
-                                 now=datetime.now())
-
-    return html_content
-
-# Upload état des lieux PDF
 @app.route('/api/locataire/<int:locataire_id>/etat-lieux/upload', methods=['POST'])
+@login_required
 def upload_etat_lieux(locataire_id):
-    locataire = Locataire.query.get_or_404(locataire_id)
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -1892,8 +2762,7 @@ def upload_etat_lieux(locataire_id):
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
-    # Récupérer les métadonnées du formulaire
-    type_etat = (request.form.get('type_etat', 'entree') or 'entree').strip().lower()  # 'entree' ou 'sortie'
+    type_etat = (request.form.get('type_etat', 'entree') or 'entree').strip().lower()
     date_etat = request.form.get('date_etat')
 
     if not date_etat:
@@ -1908,18 +2777,15 @@ def upload_etat_lieux(locataire_id):
         return jsonify({'success': False, 'error': 'Format de date invalide'}), 400
 
     if file and file.filename.lower().endswith('.pdf'):
-        # Générer nom de fichier unique
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         filename = secure_filename(f"etat_lieux_{type_etat}_{locataire_id}_{timestamp}.pdf")
 
-        # Créer le dossier si nécessaire
         upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'uploaded')
         os.makedirs(upload_dir, exist_ok=True)
 
         filepath = os.path.join(upload_dir, filename)
         file.save(filepath)
 
-        # Créer l'enregistrement dans la base
         etat = EtatDesLieux(
             locataire_id=locataire_id,
             type_etat=TypeEtatLieux.ENTREE if type_etat in ('entree', 'entrée') else TypeEtatLieux.SORTIE,
@@ -1935,8 +2801,10 @@ def upload_etat_lieux(locataire_id):
 
 
 @app.route('/api/etat-lieux/<int:etat_id>/attach-pdf', methods=['POST'])
+@login_required
 def attach_pdf_to_etat(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -1967,9 +2835,11 @@ def attach_pdf_to_etat(etat_id):
 
     return jsonify({'success': True, 'id': etat.id, 'message': 'PDF rattaché avec succès'})
 
-# Lister les états des lieux d'un locataire
+
 @app.route('/api/locataire/<int:locataire_id>/etats-lieux', methods=['GET'])
+@login_required
 def get_etats_lieux(locataire_id):
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
     etats = EtatDesLieux.query.filter_by(locataire_id=locataire_id).order_by(EtatDesLieux.created_at.desc()).all()
 
     result = []
@@ -1985,15 +2855,16 @@ def get_etats_lieux(locataire_id):
 
     return jsonify(result)
 
-# Télécharger un état des lieux
+
 @app.route('/api/etat-lieux/<int:etat_id>/download', methods=['GET'])
+@login_required
 def download_etat_lieux(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
     if not etat.chemin_fichier or not os.path.exists(etat.chemin_fichier):
         return jsonify({'success': False, 'error': 'Fichier non trouvé'}), 404
 
-    # Générer nom de fichier pour le téléchargement
     type_str = etat.type_etat.value.lower()
     date_str = etat.date_etat.strftime('%Y%m%d')
     locataire = etat.locataire
@@ -2001,54 +2872,51 @@ def download_etat_lieux(etat_id):
 
     return send_file(etat.chemin_fichier, as_attachment=True, download_name=nom_fichier)
 
-# Supprimer un état des lieux
+
 @app.route('/api/etat-lieux/<int:etat_id>', methods=['DELETE'])
+@login_required
 def delete_etat_lieux(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
-    # Supprimer le fichier si il existe
     if etat.chemin_fichier and os.path.exists(etat.chemin_fichier):
         try:
             os.remove(etat.chemin_fichier)
         except OSError:
-            pass  # Ignore les erreurs de suppression de fichier
+            pass
 
-    # Supprimer l'enregistrement
     db.session.delete(etat)
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'État des lieux supprimé'})
 
+
 @app.route('/api/etat-lieux/<int:etat_id>/pdf')
+@login_required
 def pdf_etat_lieux(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
+
     locataire = etat.locataire
-    appartement = locataire.appartement
-    bien = appartement.bien if appartement else None
-    sci = bien.sci if bien else None
+    return _render_etat_des_lieux_template_html(
+        locataire=locataire,
+        type_etat=etat.type_etat.value,
+        date_etat=etat.date_etat,
+        bailleur_nom='',
+        bailleur_adresse='',
+        locataire_nom=''
+    )
 
-    html = render_template('pdf/etat_lieux.html',
-                          etat=etat,
-                          locataire=locataire,
-                          appartement=appartement,
-                          bien=bien,
-                          sci=sci,
-                          mois_fr=MOIS_FR)
-    return html
 
-# ============================================
-# API Photos d'états des lieux
-# ============================================
-
-# Upload de photos pour un état des lieux (multiple)
 @app.route('/api/etat-lieux/<int:etat_id>/photos', methods=['POST'])
+@login_required
 def upload_photos_etat_lieux(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
     if 'files' not in request.files and 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
 
-    # Supporter à la fois 'files' (multiple) et 'file' (single)
     files = request.files.getlist('files') or [request.files.get('file')]
     files = [f for f in files if f and f.filename]
 
@@ -2059,7 +2927,6 @@ def upload_photos_etat_lieux(etat_id):
     uploaded = []
     errors = []
 
-    # Créer le dossier pour cet état des lieux
     upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'photos', str(etat_id))
     os.makedirs(upload_dir, exist_ok=True)
 
@@ -2070,7 +2937,6 @@ def upload_photos_etat_lieux(etat_id):
             errors.append(f"Format non supporté: {file.filename}")
             continue
 
-        # Générer nom unique
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S%f')
         ext = file.filename.rsplit('.', 1)[1].lower()
         filename = secure_filename(f"photo_{etat_id}_{timestamp}.{ext}")
@@ -2078,7 +2944,6 @@ def upload_photos_etat_lieux(etat_id):
 
         file.save(filepath)
 
-        # Créer l'enregistrement
         description = descriptions[i] if i < len(descriptions) else None
         photo = PhotoEtatLieux(
             etat_lieux_id=etat_id,
@@ -2098,10 +2963,13 @@ def upload_photos_etat_lieux(etat_id):
         'count': len(uploaded)
     })
 
-# Lister les photos d'un état des lieux
+
 @app.route('/api/etat-lieux/<int:etat_id>/photos', methods=['GET'])
+@login_required
 def get_photos_etat_lieux(etat_id):
     etat = EtatDesLieux.query.get_or_404(etat_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
+
     photos = PhotoEtatLieux.query.filter_by(etat_lieux_id=etat_id).order_by(PhotoEtatLieux.created_at.asc()).all()
 
     result = []
@@ -2116,38 +2984,46 @@ def get_photos_etat_lieux(etat_id):
 
     return jsonify(result)
 
-# Récupérer une photo spécifique
+
 @app.route('/api/etat-lieux/photo/<int:photo_id>', methods=['GET'])
+@login_required
 def get_photo_etat_lieux(photo_id):
     photo = PhotoEtatLieux.query.get_or_404(photo_id)
+    etat = EtatDesLieux.query.get_or_404(photo.etat_lieux_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
     if not os.path.exists(photo.chemin_fichier):
         return jsonify({'success': False, 'error': 'Fichier non trouvé'}), 404
 
     return send_file(photo.chemin_fichier, as_attachment=False)
 
-# Supprimer une photo
+
 @app.route('/api/etat-lieux/photo/<int:photo_id>', methods=['DELETE'])
+@login_required
 def delete_photo_etat_lieux(photo_id):
     photo = PhotoEtatLieux.query.get_or_404(photo_id)
+    etat = EtatDesLieux.query.get_or_404(photo.etat_lieux_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
 
-    # Supprimer le fichier physique
     if os.path.exists(photo.chemin_fichier):
         try:
             os.remove(photo.chemin_fichier)
         except OSError:
             pass
 
-    # Supprimer l'enregistrement
     db.session.delete(photo)
     db.session.commit()
 
     return jsonify({'success': True, 'message': 'Photo supprimée'})
 
-# Mettre à jour la description d'une photo
+
 @app.route('/api/etat-lieux/photo/<int:photo_id>', methods=['PUT'])
+@login_required
 def update_photo_etat_lieux(photo_id):
     photo = PhotoEtatLieux.query.get_or_404(photo_id)
+    etat = EtatDesLieux.query.get_or_404(photo.etat_lieux_id)
+    _get_locataire_for_user(etat.locataire_id, current_user.id) or abort(404)
+
     data = request.json
 
     if 'description' in data:
@@ -2156,10 +3032,13 @@ def update_photo_etat_lieux(photo_id):
     db.session.commit()
     return jsonify({'success': True})
 
-# Paiements
+
 @app.route('/api/paiement', methods=['POST'])
+@login_required
 def create_paiement():
     data = request.json
+    _get_locataire_for_user(data['locataire_id'], current_user.id) or abort(404)
+
     paiement = Paiement.query.filter_by(
         locataire_id=data['locataire_id'],
         mois=data['mois'],
@@ -2167,18 +3046,15 @@ def create_paiement():
     ).first()
 
     nouveau_montant = Decimal(str(data['montant_paye']))
-
-    # Si add_to_existing est True, on additionne au montant existant
     add_to_existing = data.get('add_to_existing', False)
 
     if paiement:
         if add_to_existing:
-            # Ajouter le nouveau versement au montant existant
             paiement.montant_paye = Decimal(str(paiement.montant_paye or 0)) + nouveau_montant
         else:
-            # Remplacer le montant (comportement par défaut)
             paiement.montant_paye = nouveau_montant
-        paiement.date_paiement = datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get('date_paiement') else paiement.date_paiement
+        paiement.date_paiement = datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get(
+            'date_paiement') else paiement.date_paiement
         paiement.mode_paiement = data.get('mode_paiement') or paiement.mode_paiement
     else:
         paiement = Paiement(
@@ -2186,8 +3062,10 @@ def create_paiement():
             mois=data['mois'],
             annee=data['annee'],
             montant_paye=nouveau_montant,
-            date_paiement=datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get('date_paiement') else None,
-            mode_paiement=data.get('mode_paiement')
+            date_paiement=datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get(
+                'date_paiement') else None,
+            mode_paiement=data.get('mode_paiement'),
+            notes="Paiement créé via quittance"
         )
         db.session.add(paiement)
 
@@ -2199,22 +3077,26 @@ def create_paiement():
         'reste_a_payer': float(paiement.reste_a_payer)
     })
 
+
 @app.route('/api/paiement/<int:paiement_id>', methods=['DELETE'])
+@login_required
 def delete_paiement(paiement_id):
     paiement = Paiement.query.get_or_404(paiement_id)
+    _get_locataire_for_user(paiement.locataire_id, current_user.id) or abort(404)
     db.session.delete(paiement)
     db.session.commit()
     return jsonify({'success': True})
 
-# Appels de loyer
+
 @app.route('/api/appel-loyer', methods=['POST'])
+@login_required
 def create_appel_loyer():
     data = request.json
-    locataire = Locataire.query.get_or_404(data['locataire_id'])
+    locataire = _get_locataire_for_user(data['locataire_id'], current_user.id) or abort(404)
+
     mois = int(data['mois'])
     annee = int(data['annee'])
 
-    # Calculer les arriérés des mois précédents
     arrieres = locataire.get_arrieres(mois, annee)
 
     appel = AppelLoyer(
@@ -2229,40 +3111,55 @@ def create_appel_loyer():
     db.session.add(appel)
     db.session.commit()
 
-    # Genere le PDF local en arriere-plan applicatif des la creation.
     _generate_appel_pdf_file(appel, force_regenerate=True)
 
     return jsonify({'success': True, 'id': appel.id, 'arrieres': float(arrieres)})
 
+
 @app.route('/api/appel-loyer/<int:appel_id>/pdf')
+@login_required
 def pdf_appel_loyer(appel_id):
     appel = AppelLoyer.query.get_or_404(appel_id)
+    _get_locataire_for_user(appel.locataire_id, current_user.id) or abort(404)
+
     locataire = appel.locataire
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
+    bailleur = _get_bailleur_info(bien)
 
     html = render_template('pdf/appel_loyer.html',
-                          appel=appel,
-                          locataire=locataire,
-                          appartement=appartement,
-                          bien=bien,
-                          sci=sci,
-                          mois_fr=MOIS_FR)
+                           appel=appel,
+                           locataire=locataire,
+                           appartement=appartement,
+                           bien=bien,
+                           sci=sci,
+                           bailleur_nom=bailleur['nom'],
+                           bailleur_adresse=bailleur['adresse'],
+                           bailleur_code_postal=bailleur['code_postal'],
+                           bailleur_ville=bailleur['ville'],
+                           bailleur_siret=bailleur['siret'],
+                           mois_fr=MOIS_FR)
     return html
 
+
 @app.route('/api/appel-loyer/<int:appel_id>', methods=['DELETE'])
+@login_required
 def delete_appel_loyer(appel_id):
     appel = AppelLoyer.query.get_or_404(appel_id)
+    _get_locataire_for_user(appel.locataire_id, current_user.id) or abort(404)
+
     db.session.delete(appel)
     db.session.commit()
     return jsonify({'success': True})
 
-# Quittances
+
 @app.route('/api/quittance', methods=['POST'])
+@login_required
 def create_quittance():
     data = request.json
-    locataire = Locataire.query.get_or_404(data['locataire_id'])
+    locataire = _get_locataire_for_user(data['locataire_id'], current_user.id) or abort(404)
+
     mois = int(data['mois'])
     annee = int(data['annee'])
 
@@ -2270,16 +3167,15 @@ def create_quittance():
     loyer_hc = Decimal(str(data.get('loyer_hc', locataire.loyer_actuel or 0)))
     charges = Decimal(str(data.get('charges', locataire.charges_actuelles or 0)))
     total_attendu = loyer_hc + charges
-    date_paiement = datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get('date_paiement') else date.today()
+    date_paiement = datetime.strptime(data['date_paiement'], '%Y-%m-%d').date() if data.get(
+        'date_paiement') else date.today()
 
-    # Vérifier que le montant payé couvre l'intégralité du loyer
     if montant_paye < total_attendu:
         return jsonify({
             'success': False,
             'error': f"Impossible de générer la quittance : le montant payé ({float(montant_paye):.2f} €) est inférieur au loyer dû ({float(total_attendu):.2f} €)"
         }), 400
 
-    # Vérifier si une quittance existe déjà pour ce mois
     existing_quittance = Quittance.query.filter_by(
         locataire_id=data['locataire_id'],
         mois=mois,
@@ -2292,7 +3188,6 @@ def create_quittance():
             'error': f"Une quittance existe déjà pour {MOIS_FR[mois]} {annee}"
         }), 400
 
-    # Créer ou mettre à jour le paiement correspondant dans le compte locatif
     paiement = Paiement.query.filter_by(
         locataire_id=data['locataire_id'],
         mois=mois,
@@ -2300,12 +3195,10 @@ def create_quittance():
     ).first()
 
     if paiement:
-        # Mettre à jour le paiement existant
         paiement.montant_paye = montant_paye
         paiement.date_paiement = date_paiement
         paiement.mode_paiement = data.get('mode_paiement', paiement.mode_paiement)
     else:
-        # Créer un nouveau paiement
         paiement = Paiement(
             locataire_id=data['locataire_id'],
             mois=mois,
@@ -2317,7 +3210,6 @@ def create_quittance():
         )
         db.session.add(paiement)
 
-    # Créer la quittance
     quittance = Quittance(
         locataire_id=data['locataire_id'],
         mois=mois,
@@ -2335,13 +3227,7 @@ def create_quittance():
     db.session.add(quittance)
     db.session.commit()
 
-    signature_data = (data.get('signature_data') or '').strip()
-    if signature_data:
-        saved, signature_error = _save_quittance_signature_data(quittance.id, signature_data)
-        if not saved:
-            return jsonify({'success': False, 'error': signature_error or 'Signature invalide'}), 400
 
-    # Genere le PDF local en arriere-plan applicatif des la creation.
     _generate_quittance_pdf_file(quittance, force_regenerate=True)
 
     return jsonify({
@@ -2351,7 +3237,9 @@ def create_quittance():
         'message': 'Quittance créée et paiement enregistré dans le compte locatif'
     })
 
+
 @app.route('/api/quittance/<int:quittance_id>/pdf')
+@login_required
 def pdf_quittance(quittance_id):
     return jsonify({
         'success': False,
@@ -2369,6 +3257,8 @@ def pdf_quittance_public(public_ref):
 @app.route('/api/quittance/<int:quittance_id>/verify', methods=['GET'])
 def verify_quittance_integrity(quittance_id):
     quittance = Quittance.query.get_or_404(quittance_id)
+    _get_locataire_for_user(quittance.locataire_id, current_user.id) or abort(404)
+
     return redirect(url_for('verify_quittance_page', public_ref=quittance.public_ref))
 
 
@@ -2398,26 +3288,33 @@ def verify_quittance_page(public_ref):
         statut_validation='VALIDEE'
     )
 
+
 @app.route('/api/quittance/<int:quittance_id>', methods=['DELETE'])
+@login_required
 def delete_quittance(quittance_id):
     quittance = Quittance.query.get_or_404(quittance_id)
+    _get_locataire_for_user(quittance.locataire_id, current_user.id) or abort(404)
+
     db.session.delete(quittance)
     db.session.commit()
     return jsonify({'success': True})
 
+
 @app.route('/api/quittance/<int:quittance_id>/envoyer', methods=['POST'])
+@login_required
 def envoyer_quittance_email(quittance_id):
-    """Envoyer une quittance par email au locataire"""
     data = request.get_json(silent=True) or {}
     quittance = Quittance.query.get_or_404(quittance_id)
+    _get_locataire_for_user(quittance.locataire_id, current_user.id) or abort(404)
+
     locataire = quittance.locataire
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=current_user.id).first()
 
     if not config:
-        return jsonify({'success': False, 'error': 'Configuration email non définie'}), 400
+        return jsonify({'success': False, 'message': 'Configuration email non définie'}), 400
 
     if not locataire.email:
-        return jsonify({'success': False, 'error': 'Le locataire n\'a pas d\'adresse email'}), 400
+        return jsonify({'success': False, 'message': 'Le locataire n\'a pas d\'adresse email'}), 400
 
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
@@ -2426,7 +3323,6 @@ def envoyer_quittance_email(quittance_id):
     include_pdf = _as_bool(data.get('include_pdf'), default=True)
     pdf_path = None
     if include_pdf:
-        # Toujours régénérer le PDF pour utiliser le template actuel
         pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
         if not pdf_path:
             return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
@@ -2442,7 +3338,6 @@ def envoyer_quittance_email(quittance_id):
     sujet = _render_email_template(sujet, email_context)
     corps = _render_email_template(corps, email_context)
 
-    # Envoyer l'email
     success, message = envoyer_email(
         config.email_expediteur,
         config.mot_de_passe,
@@ -2455,15 +3350,12 @@ def envoyer_quittance_email(quittance_id):
         use_tls=bool(config.use_tls)
     )
 
-    # On garde le fichier local pour les prochains envois.
-
     if success:
         message = 'Quittance envoyée par email'
         if include_pdf:
             message += ' avec PDF joint'
         return jsonify({'success': True, 'message': message})
-    else:
-        return jsonify({'success': False, 'error': message}), 500
+    return jsonify({'success': False, 'error': message}), 500
 
 
 @app.route('/api/quittance/<int:quittance_id>/preview-email', methods=['POST'])
@@ -2474,7 +3366,7 @@ def preview_quittance_email(quittance_id):
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=getattr(current_user, 'id', None)).first()
 
     modele_email = _normalize_modele_email(data.get('modele_email'))
     sujet, corps = _build_email_quittance(locataire, quittance, sci=sci, modele_email=modele_email)
@@ -2486,11 +3378,12 @@ def preview_quittance_email(quittance_id):
     email_context = _build_email_variable_context(locataire=locataire, quittance=quittance, sci=sci, config=config)
     return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
-# Configuration email
+
 @app.route('/api/config-email', methods=['POST'])
+@login_required
 def save_config_email():
     data = request.json
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=current_user.id).first()
 
     email_expediteur = data.get('email_expediteur') or data.get('email_address')
     mot_de_passe = data.get('mot_de_passe') or data.get('email_password')
@@ -2511,6 +3404,7 @@ def save_config_email():
         config.use_tls = data.get('use_tls', True)
     else:
         config = ConfigEmail(
+            user_id=current_user.id,
             email_expediteur=email_expediteur,
             mot_de_passe=mot_de_passe,
             serveur_smtp=serveur_smtp,
@@ -2519,18 +3413,20 @@ def save_config_email():
         )
         db.session.add(config)
 
-    db.session.commit()
-
     if clear_signature:
-        _clear_decorative_signature_data()
+        _clear_decorative_signature_data(config)
     elif signature_data:
-        saved, signature_error = _save_decorative_signature_data(signature_data)
+        saved, signature_error = _save_decorative_signature_data(config, signature_data)
         if not saved:
             return jsonify({'success': False, 'message': signature_error or 'Signature décorative invalide'}), 400
 
+    db.session.commit()
+
     return jsonify({'success': True})
 
+
 @app.route('/api/test-email', methods=['POST'])
+@login_required
 def test_email():
     try:
         data = request.get_json(silent=True) or {}
@@ -2584,8 +3480,9 @@ def test_email():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Erreur interne test email: {str(e)}'}), 500
 
-# Programmation des appels de loyer
+
 @app.route('/api/programmation-appel', methods=['POST'])
+@login_required
 def create_programmation_appel():
     data = request.json
 
@@ -2595,12 +3492,12 @@ def create_programmation_appel():
     else:
         locataires_ids_json = json.dumps([])
 
-    # Parser la date et l'heure
     date_envoi_str = data['date_envoi']
     heure_envoi = data.get('heure_envoi', '09:00')
     date_envoi = datetime.strptime(f"{date_envoi_str} {heure_envoi}", '%Y-%m-%d %H:%M')
 
     prog = ProgrammationAppel(
+        user_id=current_user.id,
         mois=int(data['mois']),
         annee=int(data['annee']),
         date_envoi=date_envoi,
@@ -2615,19 +3512,23 @@ def create_programmation_appel():
     db.session.commit()
     return jsonify({'success': True, 'id': prog.id})
 
+
 @app.route('/api/programmation-appel/<int:prog_id>', methods=['DELETE'])
+@login_required
 def delete_programmation_appel(prog_id):
-    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    prog = ProgrammationAppel.query.filter_by(id=prog_id, user_id=current_user.id).first_or_404()
     db.session.delete(prog)
     db.session.commit()
     return jsonify({'success': True})
 
+
 @app.route('/api/programmation-appel/<int:prog_id>/send', methods=['POST'])
+@login_required
 def send_programmation_now(prog_id):
-    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    prog = ProgrammationAppel.query.filter_by(id=prog_id, user_id=current_user.id).first_or_404()
     data = request.get_json(silent=True) or {}
     locataires = prog.get_locataires()
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=current_user.id).first()
 
     if not config:
         return jsonify({'success': False, 'message': 'Configuration email non définie'}), 400
@@ -2635,7 +3536,6 @@ def send_programmation_now(prog_id):
     if not locataires:
         return jsonify({'success': False, 'message': 'Aucun locataire trouvé pour cette programmation'}), 400
 
-    # Utiliser le mois/année de la programmation
     mois = prog.mois
     annee = prog.annee
     include_pdf = _as_bool(data.get('include_pdf'), default=True)
@@ -2644,6 +3544,10 @@ def send_programmation_now(prog_id):
     echecs = []
 
     for locataire in locataires:
+        loc_validation = _get_locataire_for_user(locataire.id, current_user.id)
+        if not loc_validation:
+            continue
+
         if not locataire.email:
             echecs.append(f"Pas d'email pour {locataire.nom_complet}")
             continue
@@ -2652,7 +3556,6 @@ def send_programmation_now(prog_id):
             echecs.append(f"Pas d'appartement pour {locataire.nom_complet}")
             continue
 
-        # Créer ou récupérer l'appel de loyer pour ce locataire
         appel = AppelLoyer.query.filter_by(
             locataire_id=locataire.id,
             mois=mois,
@@ -2660,7 +3563,6 @@ def send_programmation_now(prog_id):
         ).first()
 
         if not appel:
-            # Calculer les arriérés pour ce locataire
             arrieres = locataire.get_arrieres(mois, annee)
             appel = AppelLoyer(
                 locataire_id=locataire.id,
@@ -2676,13 +3578,11 @@ def send_programmation_now(prog_id):
 
         pdf_path = None
         if include_pdf:
-            # Générer le PDF avec le template (toujours régénérer pour utiliser le template actuel)
             pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
             if not pdf_path:
                 echecs.append(f"Erreur PDF pour {locataire.nom_complet}: {pdf_error}")
                 continue
 
-        # Récupérer les infos pour l'email
         appartement = locataire.appartement
         bien = appartement.bien if appartement else None
         sci = bien.sci if bien else None
@@ -2700,7 +3600,6 @@ def send_programmation_now(prog_id):
         sujet = _render_email_template(sujet, email_context)
         corps = _render_email_template(corps, email_context)
 
-        # Envoyer l'email avec le PDF en pièce jointe
         success, message = envoyer_email(
             prog.email_expediteur or config.email_expediteur,
             config.mot_de_passe,
@@ -2718,7 +3617,6 @@ def send_programmation_now(prog_id):
         else:
             echecs.append(f"Erreur pour {locataire.nom_complet}: {message}")
 
-    # Mettre à jour le statut de la programmation
     if echecs and not resultats:
         prog.statut = 'erreur'
         message_final = f"Tous les envois ont échoué: {'; '.join(echecs)}"
@@ -2729,8 +3627,41 @@ def send_programmation_now(prog_id):
         prog.statut = 'envoye'
         message_final = f"Tous les emails envoyés avec succès ({len(resultats)} destinataires)"
 
+    recurrence_created = False
+    if prog.recurrent and len(resultats) > 0:
+        next_mois, next_annee, next_date_envoi = _compute_next_month_schedule(prog.date_envoi, mois, annee)
+
+        existing_next = ProgrammationAppel.query.filter_by(
+            user_id=prog.user_id,
+            mois=next_mois,
+            annee=next_annee,
+            tous_locataires=prog.tous_locataires,
+            locataires_ids=prog.locataires_ids,
+            recurrent=True,
+            statut='en_attente'
+        ).first()
+
+        if not existing_next:
+            next_prog = ProgrammationAppel(
+                user_id=prog.user_id,
+                mois=next_mois,
+                annee=next_annee,
+                date_envoi=next_date_envoi,
+                tous_locataires=prog.tous_locataires,
+                locataires_ids=prog.locataires_ids,
+                recurrent=True,
+                email_expediteur=prog.email_expediteur,
+                sujet=prog.sujet,
+                statut='en_attente'
+            )
+            db.session.add(next_prog)
+            recurrence_created = True
+
     prog.date_envoi = datetime.now()
     db.session.commit()
+
+    if recurrence_created:
+        message_final += " | Récurrence mensuelle reprogrammée pour le mois suivant"
 
     return jsonify({
         'success': len(resultats) > 0,
@@ -2744,8 +3675,9 @@ def send_programmation_now(prog_id):
 
 @app.route('/api/programmation-appel/<int:prog_id>/preview-email', methods=['POST'])
 def preview_programmation_email(prog_id):
+    
     data = request.get_json(silent=True) or {}
-    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    prog = ProgrammationAppel.query.filter_by(id=prog_id, user_id=getattr(current_user, 'id', None)).first_or_404()
     locataires = prog.get_locataires()
 
     if not locataires:
@@ -2758,7 +3690,7 @@ def preview_programmation_email(prog_id):
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=getattr(current_user, 'id', None)).first()
 
     mois = prog.mois
     annee = prog.annee
@@ -2766,17 +3698,17 @@ def preview_programmation_email(prog_id):
 
     if not appel:
         arrieres = locataire.get_arrieres(mois, annee)
-        appel = SimpleNamespace(
+        appel = AppelLoyer(
+            locataire_id=locataire.id,
             mois=mois,
             annee=annee,
             loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
             charges=locataire.charges_actuelles or Decimal('0.00'),
             arrieres=arrieres,
-            date_echeance=date(annee, mois, 5),
-            date_emission=date.today(),
-            total=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')),
-            total_avec_arrieres=(locataire.loyer_actuel or Decimal('0.00')) + (locataire.charges_actuelles or Decimal('0.00')) + arrieres,
+            date_echeance=date(annee, mois, 5)
         )
+        db.session.add(appel)
+        db.session.commit()
 
     modele_email = _normalize_modele_email(data.get('modele_email'))
     sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
@@ -2791,7 +3723,7 @@ def preview_programmation_email(prog_id):
 
 @app.route('/api/programmation-appel/<int:prog_id>/linked-pdf', methods=['GET'])
 def linked_programmation_pdf(prog_id):
-    prog = ProgrammationAppel.query.get_or_404(prog_id)
+    prog = ProgrammationAppel.query.filter_by(id=prog_id, user_id=getattr(current_user, 'id', None)).first_or_404()
     locataires = prog.get_locataires()
 
     if not locataires:
@@ -2820,13 +3752,16 @@ def linked_programmation_pdf(prog_id):
 
     return jsonify({'success': True, 'pdf_url': f'/api/appel-loyer/{appel.id}/pdf'})
 
-# Envoyer appel par email
+
 @app.route('/api/appel-loyer/<int:appel_id>/envoyer', methods=['POST'])
+@login_required
 def envoyer_appel_email(appel_id):
     data = request.get_json(silent=True) or {}
     appel = AppelLoyer.query.get_or_404(appel_id)
+    _get_locataire_for_user(appel.locataire_id, current_user.id) or abort(404)
+
     locataire = appel.locataire
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=current_user.id).first()
 
     if not config:
         return jsonify({'success': False, 'error': 'Configuration email non définie'}), 400
@@ -2834,7 +3769,6 @@ def envoyer_appel_email(appel_id):
     if not locataire.email:
         return jsonify({'success': False, 'error': 'Le locataire n\'a pas d\'adresse email'}), 400
 
-    # Générer le contenu de l'email
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
@@ -2842,7 +3776,6 @@ def envoyer_appel_email(appel_id):
     include_pdf = _as_bool(data.get('include_pdf'), default=True)
     pdf_path = None
     if include_pdf:
-        # Toujours régénérer le PDF pour utiliser le template actuel
         pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
         if not pdf_path:
             return jsonify({'success': False, 'error': f'Erreur génération PDF: {pdf_error}'}), 500
@@ -2870,8 +3803,6 @@ def envoyer_appel_email(appel_id):
         use_tls=bool(config.use_tls)
     )
 
-    # On garde le fichier local pour les prochains envois.
-
     if success:
         message = 'Appel de loyer envoyé par email'
         if include_pdf:
@@ -2888,7 +3819,7 @@ def preview_appel_email(appel_id):
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
-    config = ConfigEmail.query.first()
+    config = ConfigEmail.query.filter_by(user_id=getattr(current_user, 'id', None)).first()
 
     modele_email = _normalize_modele_email(data.get('modele_email'))
     sujet, corps = _build_email_appel(locataire, appel, sci=sci, modele_email=modele_email)
@@ -2900,10 +3831,15 @@ def preview_appel_email(appel_id):
     email_context = _build_email_variable_context(locataire=locataire, appel=appel, sci=sci, config=config)
     return jsonify(_render_email_preview_payload(sujet, corps, email_context))
 
-# Generate all appels for current month
+
 @app.route('/api/generate-all-appels', methods=['POST'])
+@login_required
 def generate_all_appels():
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
     mois = date.today().month
     annee = date.today().year
     count = 0
@@ -2918,15 +3854,14 @@ def generate_all_appels():
             ).first()
 
             if not existing:
-                # Calculer les arriérés des mois précédents
                 arrieres = loc.get_arrieres(mois, annee)
 
                 appel = AppelLoyer(
                     locataire_id=loc.id,
                     mois=mois,
                     annee=annee,
-                    loyer_hc=loc.loyer_actuel or Decimal('0.00'),
-                    charges=loc.charges_actuelles or Decimal('0.00'),
+                    loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+                    charges=locataire.charges_actuelles or Decimal('0.00'),
                     arrieres=arrieres,
                     date_echeance=date(annee, mois, 5)
                 )
@@ -2941,10 +3876,15 @@ def generate_all_appels():
 
     return jsonify({'success': True, 'count': count})
 
-# Generate all quittances for payments received
+
 @app.route('/api/generate-all-quittances', methods=['POST'])
+@login_required
 def generate_all_quittances():
-    locataires = Locataire.query.filter_by(statut=StatutLocataire.ACTIF).all()
+    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
+        SCI.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
+        BienImmobilier.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
+    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
     mois = date.today().month
     annee = date.today().year
     count = 0
@@ -2965,8 +3905,8 @@ def generate_all_quittances():
                         locataire_id=loc.id,
                         mois=mois,
                         annee=annee,
-                        loyer_hc=loc.loyer_actuel or Decimal('0.00'),
-                        charges=loc.charges_actuelles or Decimal('0.00'),
+                        loyer_hc=locataire.loyer_actuel or Decimal('0.00'),
+                        charges=locataire.charges_actuelles or Decimal('0.00'),
                         montant_paye=paiement.montant_paye,
                         date_paiement=paiement.date_paiement
                     )
@@ -2981,9 +3921,11 @@ def generate_all_quittances():
 
     return jsonify({'success': True, 'count': count})
 
+
 @app.route('/api/stats')
+@login_required
 def get_stats():
-    scis = SCI.query.all()
+    scis = SCI.query.filter_by(user_id=current_user.id).all()
     stats = []
     for sci in scis:
         stats.append({
@@ -2995,5 +3937,7 @@ def get_stats():
         })
     return jsonify(stats)
 
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+

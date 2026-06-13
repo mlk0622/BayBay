@@ -304,7 +304,7 @@ async function submitAddPayment(e) {
         if (data.success) {
             showNotification('Versement ajouté avec succès. Total payé: ' + data.montant_total.toFixed(2) + ' €', 'success');
             closeModal('addPaymentModal');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
         } else {
             showNotification(data.error || 'Erreur lors de l\'ajout du versement', 'error');
         }
@@ -334,7 +334,7 @@ async function createQuittanceForMonth(mois, annee, montant) {
         const data = await response.json();
         if (data.success) {
             showNotification('Quittance créée avec succès', 'success');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
         } else {
             showNotification(data.error || 'Erreur lors de la création', 'error');
         }
@@ -359,7 +359,7 @@ async function deletePaiement(paiementId, periode) {
 
         if (response.ok) {
             showNotification('Paiement supprimé avec succès', 'success');
-            setTimeout(() => location.reload(), 500);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500);
         } else {
             const data = await response.json();
             showNotification(data.error || 'Erreur lors de la suppression', 'error');

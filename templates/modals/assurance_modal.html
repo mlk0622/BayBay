@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     showNotification('Attestation d\'assurance enregistrée', 'success');
                     closeModal('assuranceModal');
-                    setTimeout(() => location.reload(), 1000);
+                    setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
                 } else {
                     showNotification('Erreur: ' + (result.error || 'Erreur inconnue'), 'error');
                 }

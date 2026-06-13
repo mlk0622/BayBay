@@ -1,10 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Connexion - BayBay{% endblock %}
+
+{% block content %}
+<div class="glass-container" style="max-width: 400px; margin: 50px auto; padding: 30px; text-align: center;">
+    <h2>Connexion BayBay</h2>
+    <p>Gérez vos biens en toute sécurité</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div style="color: #ff4d4d; margin-bottom: 15px;">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+        <div style="margin-bottom: 20px;">
+            <input type="email" name="email" placeholder="Adresse email" required
+                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <input type="password" name="password" placeholder="Mot de passe" required
+                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+        </div>
+        <button type="submit" class="btn-glass" style="width: 100%; cursor: pointer;">Se connecter</button>
+    </form>
+
+    <p style="margin-top: 20px; font-size: 0.9em;">
+        Pas encore de compte ? <a href="{{ url_for('register') }}" style="color: #fff;">S'inscrire</a>
+    </p>
+</div>
+{% endblock %}

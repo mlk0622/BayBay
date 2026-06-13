@@ -13,9 +13,15 @@ MarkupSafe>=2.1.0
 
 # Base de données
 SQLAlchemy>=2.0.0
+pymysql
+cryptography
+flask-login
+flask-bcrypt
 
 # PDF
 xhtml2pdf>=0.2.11
+reportlab>=4.0.0
+html5lib>=1.1
 PyMuPDF==1.25.5
 qrcode[pil]==7.4.2
 

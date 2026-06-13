@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if active_tab == 'dashboard' %}Dashboard
+    {% elif active_tab == 'biens' %}Biens
+    {% elif active_tab == 'locataires' %}Locataires
+    {% elif active_tab == 'appels' %}Appels de Loyer
+    {% elif active_tab == 'quittances' %}Quittances
+    {% elif active_tab == 'resume' %}Résumé des Loyers
+    {% elif active_tab == 'comptes' %}Comptes Locatifs
+    {% elif active_tab == 'parametres' %}Paramètres
+    {% endif %} - BayBay
+{% endblock %}
+
+{% block content %}
+<div class="app-view {% if active_tab == 'dashboard' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/" id="view-dashboard">
+    {% include 'dashboard.html' %}
+</div>
+<div class="app-view {% if active_tab == 'biens' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/biens" id="view-biens">
+    {% include 'biens.html' %}
+</div>
+<div class="app-view {% if active_tab == 'locataires' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/locataires" id="view-locataires">
+    {% include 'locataires.html' %}
+</div>
+<div class="app-view {% if active_tab == 'appels' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/appels-loyer" id="view-appels">
+    {% include 'appels_loyer.html' %}
+</div>
+<div class="app-view {% if active_tab == 'quittances' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/quittances" id="view-quittances">
+    {% include 'quittances.html' %}
+</div>
+<div class="app-view {% if active_tab == 'resume' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/resume-loyers" id="view-resume">
+    {% include 'resume_loyers.html' %}
+</div>
+<div class="app-view {% if active_tab == 'comptes' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/comptes-locatifs" id="view-comptes">
+    {% include 'comptes_locatifs.html' %}
+</div>
+<div class="app-view {% if active_tab == 'parametres' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/parametres" id="view-parametres">
+    {% include 'parametres.html' %}
+</div>
+{% endblock %}

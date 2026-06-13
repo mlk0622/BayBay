@@ -21,7 +21,7 @@
         <button onclick="openBienModal({{ sci.id }})" class="ios-button-success text-white px-4 py-2">
             <i class="fas fa-plus mr-2"></i>Ajouter un bien
         </button>
-        <button onclick="showDeleteModal('sci', {{ sci.id }}, '{{ sci.nom }}')" class="ios-button-danger text-white px-4 py-2">
+        <button onclick='showDeleteModal("sci", {{ sci.id }}, {{ sci.nom|tojson }})' class="ios-button-danger text-white px-4 py-2">
             <i class="fas fa-trash mr-2"></i>Supprimer SCI
         </button>
     </div>
@@ -126,7 +126,7 @@
                             <a href="{{ url_for('vue_bien', bien_id=bien.id) }}" class="action-btn view" title="Voir">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <button onclick="showDeleteModal('bien', {{ bien.id }}, '{{ bien.adresse }}')" class="action-btn delete" title="Supprimer">
+                            <button onclick='showDeleteModal("bien", {{ bien.id }}, {{ bien.adresse|tojson }})' class="action-btn delete" title="Supprimer">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

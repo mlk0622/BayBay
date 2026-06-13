@@ -25,11 +25,11 @@
             <tr>
                 <td style="vertical-align: top; width: 50%; padding-right: 20px;">
                     <div style="font-size: 14px; color: #2563eb; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px;">BAILLEUR</div>
-                    {% if sci %}
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">{{ sci.nom }}</div>
-                    {% if sci.adresse %}<div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">{{ sci.adresse }}</div>{% endif %}
-                    {% if sci.code_postal or sci.ville %}<div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">{{ sci.code_postal or '' }} {{ sci.ville }}</div>{% endif %}
-                    {% if sci.siret %}<div style="font-size: 12px; color: #666; margin-bottom: 2px;">SIRET: {{ sci.siret }}</div>{% endif %}
+                    {% if bailleur_nom %}
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">{{ bailleur_nom }}</div>
+                    {% if bailleur_adresse %}<div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">{{ bailleur_adresse }}</div>{% endif %}
+                    {% if bailleur_code_postal or bailleur_ville %}<div style="font-size: 14px; font-weight: bold; margin-bottom: 10px;">{{ bailleur_code_postal or '' }} {{ bailleur_ville or '' }}</div>{% endif %}
+                    {% if bailleur_siret %}<div style="font-size: 12px; color: #666; margin-bottom: 2px;">SIRET: {{ bailleur_siret }}</div>{% endif %}
                     {% endif %}
                 </td>
                 <td style="vertical-align: top; width: 50%; padding-left: 20px;">

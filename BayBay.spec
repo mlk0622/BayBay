@@ -36,8 +36,12 @@ web_files = [
     ('static', 'static'),
 ]
 
+# Données des bibliothèques PDF (polices, ressources internes)
+pdf_datas = collect_data_files('xhtml2pdf')
+pdf_datas += collect_data_files('reportlab')
+
 # Combiner toutes les données
-datas = app_files + web_files
+datas = app_files + web_files + pdf_datas
 
 # Ajouter les fichiers optionnels s'ils existent
 optional_files = [
@@ -54,21 +58,21 @@ for src, dst in optional_files:
 
 hiddenimports = []
 
-# Flask et extensions
 hiddenimports += collect_submodules('flask')
 hiddenimports += collect_submodules('flask_sqlalchemy')
+hiddenimports += collect_submodules('flask_login')
+hiddenimports += collect_submodules('flask_bcrypt')
 hiddenimports += collect_submodules('werkzeug')
 hiddenimports += collect_submodules('jinja2')
 
-# SQLAlchemy
 hiddenimports += collect_submodules('sqlalchemy')
 hiddenimports += [
     'sqlalchemy.sql.default_comparator',
+    'sqlalchemy.dialects.mysql',
     'sqlalchemy.dialects.sqlite',
     'sqlalchemy.ext.declarative',
 ]
 
-# Autres dépendances
 hiddenimports += [
     'markupsafe',
     'itsdangerous',
@@ -77,9 +81,10 @@ hiddenimports += [
     'dotenv',
     'fitz',
     'pymupdf',
+    'pymysql',
+    'cryptography',
 ]
 
-# Modules standard pour l'auto-updater
 hiddenimports += [
     'urllib.request',
     'urllib.error',
@@ -88,7 +93,6 @@ hiddenimports += [
     'hashlib',
 ]
 
-# Autres modules standard
 hiddenimports += [
     'email',
     'email.mime',
@@ -109,9 +113,39 @@ hiddenimports += [
     'subprocess',
 ]
 
-# Modules locaux
-hiddenimports += ['models', 'auto_updater']
+# QR Code
+hiddenimports += [
+    'qrcode',
+    'qrcode.main',
+    'qrcode.image.base',
+    'qrcode.image.pure',
+    'qrcode.image.pil',
+    'qrcode.constants',
+    'qrcode.exceptions',
+    'qrcode.util',
+]
 
+hiddenimports += collect_submodules('xhtml2pdf')
+hiddenimports += collect_submodules('reportlab')
+hiddenimports += [
+    'reportlab.graphics.barcode',
+    'reportlab.graphics.barcode.code39',
+    'reportlab.graphics.barcode.code93',
+    'reportlab.graphics.barcode.code128',
+    'reportlab.graphics.barcode.usps',
+    'reportlab.graphics.barcode.eanbc',
+    'reportlab.graphics.barcode.qr',
+    'reportlab.graphics.barcode.widgets',
+    'html5lib',
+    'PIL',
+    'PIL.Image',
+    'svglib',
+    'lxml',
+    'lxml.etree',
+    'lxml.html',
+]
+
+hiddenimports += ['models', 'auto_updater']
 # ========== ANALYSE ==========
 
 a = Analysis(

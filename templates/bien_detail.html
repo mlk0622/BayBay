@@ -121,7 +121,7 @@
                                 <a href="{{ url_for('compte_locatif', locataire_id=appart.locataire_actif.id) }}" class="action-btn view" title="Voir compte">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <button onclick="editAppart({{ appart.id }}, '{{ appart.numero_porte }}', '{{ appart.type_appartement }}', '{{ appart.surface or '' }}', '{{ appart.loyer_mensuel or '' }}', '{{ appart.charges or '' }}')" class="action-btn" style="background: rgba(255, 149, 0, 0.1); color: #ff9500;" title="Modifier">
+                                <button onclick='editAppart({{ appart.id }}, {{ appart.numero_porte|tojson }}, {{ appart.type_appartement|tojson }}, {{ (appart.surface or "")|string|tojson }}, {{ (appart.loyer_mensuel or "")|string|tojson }}, {{ (appart.nom_entreprise or "")|tojson }}, {{ appart.charges_liste|tojson }})' class="action-btn" style="background: rgba(255, 149, 0, 0.1); color: #ff9500;" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>
@@ -134,7 +134,7 @@
                         </td>
                         <td class="text-right">
                             <div class="flex justify-end gap-2">
-                                <button onclick="editAppart({{ appart.id }}, '{{ appart.numero_porte }}', '{{ appart.type_appartement }}', '{{ appart.surface or '' }}', '{{ appart.loyer_mensuel or '' }}', '{{ appart.charges or '' }}')" class="action-btn" style="background: rgba(255, 149, 0, 0.1); color: #ff9500;" title="Modifier">
+                                <button onclick='editAppart({{ appart.id }}, {{ appart.numero_porte|tojson }}, {{ appart.type_appartement|tojson }}, {{ (appart.surface or "")|string|tojson }}, {{ (appart.loyer_mensuel or "")|string|tojson }}, {{ (appart.nom_entreprise or "")|tojson }}, {{ appart.charges_liste|tojson }})' class="action-btn" style="background: rgba(255, 149, 0, 0.1); color: #ff9500;" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button onclick="showDeleteModal('appartement', {{ appart.id }}, '{{ appart.numero_porte }}')" class="action-btn delete" title="Supprimer">
@@ -161,15 +161,32 @@
 </div>
 
 <script>
-function editAppart(id, numero, type, surface, loyer, charges) {
-    document.getElementById('appartModalTitle').innerHTML = '<i class="fas fa-door-open text-purple-400 mr-2"></i>Modifier l\'Appartement';
+function editAppart(id, numero, type, surface, loyer, nomEntreprise, chargesListe) {
+    document.getElementById('appartModalTitle').innerHTML = '<i class="fas fa-door-open text-purple-400 mr-2"></i>Modifier le lot';
     document.getElementById('appartEditId').value = id;
     document.getElementById('appartBienId').value = {{ bien.id }};
-    document.getElementById('appartNumero').value = numero;
     document.getElementById('appartType').value = type;
+    if (type === 'Box') {
+        document.getElementById('appartNumeroBox').value = numero;
+        document.getElementById('appartNumero').value = '';
+        document.getElementById('appartEtage').value = '';
+    } else if (type === 'Appartement') {
+        document.getElementById('appartNumero').value = numero;
+        document.getElementById('appartNumeroBox').value = '';
+    } else {
+        document.getElementById('appartNumero').value = '';
+        document.getElementById('appartNumeroBox').value = '';
+    }
+    const nomEntrepriseField = document.getElementById('appartNomEntreprise');
+    if (nomEntrepriseField) nomEntrepriseField.value = nomEntreprise || '';
     document.getElementById('appartSurface').value = surface;
     document.getElementById('appartLoyer').value = loyer;
-    document.getElementById('appartCharges').value = charges;
+    if (typeof setAppartCharges === 'function') {
+        setAppartCharges(chargesListe || []);
+    }
+    if (typeof toggleAppartFields === 'function') {
+        toggleAppartFields();
+    }
     openModal('appartModal');
 }
 </script>

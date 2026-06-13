@@ -6,16 +6,24 @@
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.remove('hidden');
         modal.style.display = 'flex';
+        // Force reflow
+        modal.offsetHeight;
+        modal.classList.add('active-modal');
+        modal.classList.remove('hidden');
     }
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
+        modal.classList.remove('active-modal');
+        setTimeout(() => {
+            if (!modal.classList.contains('active-modal')) {
+                modal.style.display = 'none';
+                modal.classList.add('hidden');
+            }
+        }, 250);
     }
 }
 
@@ -51,6 +59,7 @@ async function openEditSciModal(sciId) {
         document.getElementById('sciVille').value = sci.ville || '';
         document.getElementById('sciSiret').value = sci.siret || '';
         document.getElementById('sciEmail').value = sci.email || '';
+        document.getElementById('sciType').value = sci.type_sci || 'Immeuble';
 
         // Changer le titre et le bouton
         document.getElementById('sciModalTitle').innerHTML = '<i class="fas fa-building text-primary mr-2"></i>Modifier la SCI';
@@ -85,7 +94,7 @@ function showNotification(message, type = 'info') {
         'info': 'fa-info'
     };
 
-    notification.className = `fixed top-4 right-4 z-[100] ${colors[type] || colors['info']} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-3 transform transition-all duration-300 translate-x-full`;
+    notification.className = `fixed top-4 right-4 z-[100] ${colors[type] || colors['info']} text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-3 transition-opacity duration-300 opacity-0`;
 
     notification.innerHTML = `
         <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
@@ -98,126 +107,28 @@ function showNotification(message, type = 'info') {
 
     // Animate in
     setTimeout(() => {
-        notification.classList.remove('translate-x-full');
+        notification.classList.remove('opacity-0');
+        notification.classList.add('opacity-100');
     }, 10);
 
     // Auto remove after 3 seconds
     setTimeout(() => {
-        notification.classList.add('translate-x-full');
+        notification.classList.remove('opacity-100');
+        notification.classList.add('opacity-0');
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-let quittanceSignaturePad = null;
-
-function initQuittanceSignaturePad() {
-    const canvas = document.getElementById('quittanceSignatureCanvas');
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-
-    const resizeCanvas = () => {
-        const ratio = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#111827';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, rect.width, rect.height);
-        if (quittanceSignaturePad) {
-            quittanceSignaturePad.hasDrawing = false;
-        }
-    };
-
-    const getPos = (event) => {
-        const rect = canvas.getBoundingClientRect();
-        if (event.touches && event.touches[0]) {
-            return {
-                x: event.touches[0].clientX - rect.left,
-                y: event.touches[0].clientY - rect.top,
-            };
-        }
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        };
-    };
-
-    const start = (event) => {
-        event.preventDefault();
-        const pos = getPos(event);
-        drawing = true;
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    };
-
-    const move = (event) => {
-        if (!drawing) return;
-        event.preventDefault();
-        const pos = getPos(event);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-        if (quittanceSignaturePad) {
-            quittanceSignaturePad.hasDrawing = true;
-        }
-    };
-
-    const end = (event) => {
-        if (event) event.preventDefault();
-        drawing = false;
-        ctx.closePath();
-    };
-
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', end);
-
-    canvas.addEventListener('touchstart', start, { passive: false });
-    canvas.addEventListener('touchmove', move, { passive: false });
-    canvas.addEventListener('touchend', end, { passive: false });
-
-    quittanceSignaturePad = {
-        canvas,
-        ctx,
-        hasDrawing: false,
-        clear: () => {
-            resizeCanvas();
-            const signatureField = document.getElementById('quittanceSignatureData');
-            if (signatureField) signatureField.value = '';
-        },
-        getDataUrl: () => {
-            if (!quittanceSignaturePad || !quittanceSignaturePad.hasDrawing) return '';
-            return canvas.toDataURL('image/png');
-        }
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', () => {
-        if (!quittanceSignaturePad || !quittanceSignaturePad.canvas) return;
-        if (!document.getElementById('quittanceModal')) return;
-        if (document.getElementById('quittanceModal').classList.contains('hidden')) return;
-        resizeCanvas();
+// Bien modal
+function resetBienTypeOptions() {
+    const typeSelect = document.getElementById('bienType');
+    if (!typeSelect) return;
+    Array.from(typeSelect.options).forEach((opt) => {
+        opt.disabled = false;
     });
 }
 
-window.resetQuittanceSignaturePad = function() {
-    if (quittanceSignaturePad) {
-        quittanceSignaturePad.clear();
-    }
-};
-
-window.captureQuittanceSignatureData = function() {
-    if (!quittanceSignaturePad) return '';
-    return quittanceSignaturePad.getDataUrl();
-};
-
-// Bien modal
-function openBienModal(sciId) {
+async function openBienModal(sciId) {
     const title = document.getElementById('bienModalTitle');
     const form = document.getElementById('bienForm');
     const editId = document.getElementById('bienEditId');
@@ -226,9 +137,26 @@ function openBienModal(sciId) {
     if (title) title.innerHTML = '<i class="fas fa-home text-green-500 mr-2"></i>Nouveau Bien';
     if (form) form.reset();
     if (editId) editId.value = '';
-    if (sciIdField) sciIdField.value = sciId;
+    if (sciIdField) sciIdField.value = sciId || '';
+    resetBienTypeOptions();
+    setBienCharges([]);
+    if (sciId) {
+        await syncBienTypeWithSci(sciId);
+    } else {
+        const typeSelect = document.getElementById('bienType');
+        if (typeSelect) typeSelect.value = 'Immeuble';
+    }
 
     openModal('bienModal');
+}
+
+function openSciChoiceModal() {
+    openModal('choixSciModal');
+}
+
+function selectSciForNewBien(sciId) {
+    closeModal('choixSciModal');
+    openBienModal(sciId);
 }
 
 // Appartement modal
@@ -238,10 +166,12 @@ function openAppartModal(bienId) {
     const editId = document.getElementById('appartEditId');
     const bienIdField = document.getElementById('appartBienId');
 
-    if (title) title.innerHTML = '<i class="fas fa-door-open text-purple-500 mr-2"></i>Nouvel Appartement';
+    if (title) title.innerHTML = '<i class="fas fa-door-open text-purple-500 mr-2"></i>Nouveau Lot';
     if (form) form.reset();
     if (editId) editId.value = '';
     if (bienIdField) bienIdField.value = bienId;
+    setAppartCharges([]);
+    toggleAppartFields();
 
     openModal('appartModal');
 }
@@ -279,7 +209,7 @@ async function confirmDelete() {
         if (response.ok) {
             closeModal('deleteModal');
             showNotification('Supprimé avec succès', 'success');
-            setTimeout(() => window.location.reload(), 500);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
         } else {
             showNotification('Erreur lors de la suppression', 'error');
         }
@@ -290,16 +220,44 @@ async function confirmDelete() {
 
 // Close modal when clicking outside
 document.addEventListener('DOMContentLoaded', function() {
-    initQuittanceSignaturePad();
-
     document.querySelectorAll('[class*="modal"], [id*="Modal"]').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
+                closeModal(modal.id);
             }
         });
     });
+
+    const sciType = document.getElementById('sciType');
+    if (sciType && !sciType.value) {
+        sciType.value = 'Immeuble';
+    }
+
+    const addChargeBtn = document.getElementById('addBienChargeBtn');
+    if (addChargeBtn) {
+        addChargeBtn.addEventListener('click', () => {
+            const container = document.getElementById('bienChargesContainer');
+            if (!container) return;
+            container.appendChild(renderBienChargeRow());
+        });
+    }
+    setBienCharges([]);
+
+    const addAppartChargeBtn = document.getElementById('addAppartChargeBtn');
+    if (addAppartChargeBtn) {
+        addAppartChargeBtn.addEventListener('click', () => {
+            const container = document.getElementById('appartChargesContainer');
+            if (!container) return;
+            container.appendChild(renderAppartChargeRow());
+        });
+    }
+    setAppartCharges([]);
+
+    const appartType = document.getElementById('appartType');
+    if (appartType) {
+        appartType.addEventListener('change', toggleAppartFields);
+        toggleAppartFields();
+    }
 
     // Schedule destinataires change
     const scheduleDestinataires = document.getElementById('scheduleDestinataires');
@@ -335,8 +293,18 @@ document.getElementById('sciForm')?.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-        showNotification(sciId ? 'SCI modifiée' : 'SCI créée', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        const payload = await response.json().catch(() => ({}));
+        const newSciId = payload.id;
+
+        if (!sciId && newSciId) {
+            closeModal('sciModal');
+            showNotification('SCI creee. Ajoutez maintenant un bien dans cette SCI.', 'success');
+            setTimeout(() => openBienModal(newSciId), 250);
+            return;
+        }
+
+        showNotification(sciId ? 'SCI modifiee' : 'SCI creee', 'success');
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
     }
@@ -349,6 +317,8 @@ document.getElementById('bienForm')?.addEventListener('submit', async (e) => {
     const bienId = data.bien_id;
     delete data.bien_id;
 
+    data.charges = collectBienCharges();
+
     const url = bienId ? `/api/bien/${bienId}` : '/api/bien';
     const method = bienId ? 'PUT' : 'POST';
 
@@ -359,10 +329,11 @@ document.getElementById('bienForm')?.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-        showNotification(bienId ? 'Bien modifié' : 'Bien créé', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        showNotification(bienId ? 'Bien modifie' : 'Bien cree', 'success');
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
-        showNotification('Erreur', 'error');
+        const payload = await response.json().catch(() => ({}));
+        showNotification(payload.error || 'Erreur', 'error');
     }
 });
 
@@ -372,6 +343,25 @@ document.getElementById('appartForm')?.addEventListener('submit', async (e) => {
     const data = Object.fromEntries(formData.entries());
     const appartId = data.appart_id;
     delete data.appart_id;
+
+    const type = data.type_appartement;
+
+    if (type !== 'Appartement') {
+        data.etage = '';
+        data.numero_porte = '';
+    }
+    if (type !== 'Box') {
+        data.numero_box = '';
+    }
+    if (type !== 'Local Commerciale') {
+        data.nom_entreprise = '';
+    }
+
+    if (type === 'Appartement' || type === 'Local Commerciale') {
+        data.charges_json = collectAppartCharges();
+    } else {
+        data.charges_json = [];
+    }
 
     const url = appartId ? `/api/appartement/${appartId}` : '/api/appartement';
     const method = appartId ? 'PUT' : 'POST';
@@ -383,10 +373,11 @@ document.getElementById('appartForm')?.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-        showNotification(appartId ? 'Appartement modifié' : 'Appartement créé', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        showNotification(appartId ? 'Lot modifié' : 'Lot créé', 'success');
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
-        showNotification('Erreur', 'error');
+        const payload = await response.json().catch(() => ({}));
+        showNotification(payload.error || 'Erreur', 'error');
     }
 });
 
@@ -410,7 +401,7 @@ document.getElementById('locataireForm')?.addEventListener('submit', async (e) =
 
     if (response.ok) {
         showNotification(locataireId ? 'Locataire modifié' : 'Locataire créé', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
     }
@@ -429,7 +420,7 @@ document.getElementById('paiementForm')?.addEventListener('submit', async (e) =>
 
     if (response.ok) {
         showNotification('Paiement enregistré', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
     }
@@ -448,7 +439,7 @@ document.getElementById('appelLoyerForm')?.addEventListener('submit', async (e) 
 
     if (response.ok) {
         showNotification('Appel de loyer créé', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
     }
@@ -457,8 +448,6 @@ document.getElementById('appelLoyerForm')?.addEventListener('submit', async (e) 
 document.getElementById('quittanceForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const signatureData = window.captureQuittanceSignatureData ? window.captureQuittanceSignatureData() : '';
-    formData.set('signature_data', signatureData);
     const data = Object.fromEntries(formData.entries());
 
     const response = await fetch('/api/quittance', {
@@ -469,36 +458,12 @@ document.getElementById('quittanceForm')?.addEventListener('submit', async (e) =
 
     if (response.ok) {
         showNotification('Quittance créée', 'success');
-        setTimeout(() => window.location.reload(), 500);
+        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
     }
 });
 
-document.getElementById('scheduleForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData.entries());
-
-    const checkboxes = document.querySelectorAll('input[name="locataires_ids"]:checked');
-    data.locataires_ids = Array.from(checkboxes).map(cb => cb.value);
-    data.tous_locataires = data.destinataires === 'tous';
-    data.recurrent = document.getElementById('scheduleRecurrent')?.checked || false;
-
-    const response = await fetch('/api/programmation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    });
-
-    if (response.ok) {
-        closeModal('scheduleModal');
-        showNotification('Programmation créée', 'success');
-        setTimeout(() => window.location.reload(), 500);
-    } else {
-        showNotification('Erreur', 'error');
-    }
-});
 
 // Fonction pour ouvrir le modal de paiement (utilisée depuis comptes_locatifs.html)
 function openPaiementModal(locataireId) {
@@ -520,3 +485,136 @@ function openPaiementModal(locataireId) {
     dateField.value = today.toISOString().split('T')[0];
     openModal('paiementModal');
 }
+
+// Charges functions
+function renderBienChargeRow(charge = { libelle: '', montant: '' }) {
+    const row = document.createElement('div');
+    row.className = 'grid grid-cols-[1fr_140px_auto] gap-2 items-center';
+    row.innerHTML = `
+        <input type="text" class="bien-charge-libelle w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Libelle" value="${charge.libelle || ''}">
+        <input type="number" min="0" step="0.01" class="bien-charge-montant w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="0.00" value="${charge.montant || ''}">
+        <button type="button" class="bien-charge-remove w-9 h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-100"><i class="fas fa-trash"></i></button>
+    `;
+    row.querySelector('.bien-charge-remove')?.addEventListener('click', () => row.remove());
+    return row;
+}
+
+function setBienCharges(charges = []) {
+    const container = document.getElementById('bienChargesContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    (charges || []).forEach((charge) => container.appendChild(renderBienChargeRow(charge)));
+    if (!container.children.length) {
+        container.appendChild(renderBienChargeRow());
+    }
+}
+
+function collectBienCharges() {
+    const rows = document.querySelectorAll('#bienChargesContainer > div');
+    const charges = [];
+    rows.forEach((row) => {
+        const libelle = row.querySelector('.bien-charge-libelle')?.value?.trim();
+        const montant = row.querySelector('.bien-charge-montant')?.value;
+        if (libelle) {
+            charges.push({ libelle, montant: montant || 0 });
+        }
+    });
+    return charges;
+}
+
+async function syncBienTypeWithSci(sciId) {
+    const typeSelect = document.getElementById('bienType');
+    if (!typeSelect || !sciId) return;
+
+    try {
+        const response = await fetch(`/api/sci/${sciId}`);
+        if (!response.ok) return;
+        const sci = await response.json();
+        const isEntrepotSci = (sci.type_sci || '') === 'Entrepot';
+
+        Array.from(typeSelect.options).forEach((opt) => {
+            opt.disabled = isEntrepotSci && opt.value !== 'Entrepot';
+        });
+
+        if (isEntrepotSci) {
+            typeSelect.value = 'Entrepot';
+        }
+    } catch (_) {
+        // Ne bloque pas l'ouverture du modal si le chargement echoue.
+    }
+}
+
+function renderAppartChargeRow(charge = { libelle: '', montant: '' }) {
+    const row = document.createElement('div');
+    row.className = 'grid grid-cols-[1fr_140px_auto] gap-2 items-center';
+    row.innerHTML = `
+        <input type="text" class="appart-charge-libelle w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="Libellé" value="${charge.libelle || ''}">
+        <input type="number" min="0" step="0.01" class="appart-charge-montant w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="0.00" value="${charge.montant || ''}">
+        <button type="button" class="appart-charge-remove w-9 h-9 rounded-lg bg-red-50 text-red-500 hover:bg-red-100"><i class="fas fa-trash"></i></button>
+    `;
+    row.querySelector('.appart-charge-remove')?.addEventListener('click', () => row.remove());
+    return row;
+}
+
+function setAppartCharges(charges = []) {
+    const container = document.getElementById('appartChargesContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    (charges || []).forEach((charge) => container.appendChild(renderAppartChargeRow(charge)));
+    if (!container.children.length) {
+        container.appendChild(renderAppartChargeRow());
+    }
+}
+
+function collectAppartCharges() {
+    const rows = document.querySelectorAll('#appartChargesContainer > div');
+    const charges = [];
+    rows.forEach((row) => {
+        const libelle = row.querySelector('.appart-charge-libelle')?.value?.trim();
+        const montant = row.querySelector('.appart-charge-montant')?.value;
+        if (libelle) {
+            charges.push({ libelle, montant: montant || 0 });
+        }
+    });
+    return charges;
+}
+
+function toggleAppartFields() {
+    const type = document.getElementById('appartType')?.value;
+    const porteGroup = document.getElementById('appartNumeroPorteGroup');
+    const boxGroup = document.getElementById('appartNumeroBoxGroup');
+    const nomEntrepriseGroup = document.getElementById('appartNomEntrepriseGroup');
+    const chargesGroup = document.getElementById('appartChargesGroup');
+    const porteInput = document.getElementById('appartNumero');
+    const etageInput = document.getElementById('appartEtage');
+    const boxInput = document.getElementById('appartNumeroBox');
+
+    // Masquer tous les groupes
+    [porteGroup, boxGroup, nomEntrepriseGroup, chargesGroup].forEach(g => g?.classList.add('hidden'));
+    if (porteInput) porteInput.required = false;
+    if (boxInput) boxInput.required = false;
+
+    if (!type) return;
+
+    if (type === 'Appartement') {
+        porteGroup?.classList.remove('hidden');
+        chargesGroup?.classList.remove('hidden');
+        if (porteInput) porteInput.required = true;
+        if (etageInput) etageInput.value = etageInput.value || '';
+    } else if (type === 'Box') {
+        boxGroup?.classList.remove('hidden');
+        if (boxInput) boxInput.required = true;
+        if (etageInput) etageInput.value = '';
+        if (porteInput) porteInput.value = '';
+    } else if (type === 'Local Commerciale') {
+        nomEntrepriseGroup?.classList.remove('hidden');
+        chargesGroup?.classList.remove('hidden');
+    } else {
+        // Entrepôt
+        if (porteInput) porteInput.value = '';
+        if (etageInput) etageInput.value = '';
+        if (boxInput) boxInput.value = '';
+    }
+}
+
+//# sourceMappingURL=app.js.map

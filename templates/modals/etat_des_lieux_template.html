@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>État des Lieux</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --ink: #1e1e2a;
+      --muted: #6b6b85;
+      --border: #b0b8c8;
+      --header-bg: #3a7bc8;
+      --header-text: #ffffff;
+      --section-header: #4a90d9;
+      --row-alt: #f4f7fb;
+      --input-bg: #fafbfe;
+      --check-accent: #3a7bc8;
+      --page-bg: #ffffff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 11px;
+      color: var(--ink);
+      background: #e8ecf0;
+      line-height: 1.4;
+    }
+
+    .page {
+      max-width: 210mm;
+      background: var(--page-bg);
+      margin: 16px auto;
+      padding: 24px 28px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+    }
+
+    .main-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--header-bg);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .type-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .type-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+    .date-row {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+    .date-row label { font-weight: 600; }
+    .date-input {
+      display: inline-flex; gap: 2px; align-items: center;
+    }
+    .date-input input {
+      width: 22px; text-align: center;
+      border: none; border-bottom: 1px solid var(--border);
+      font-family: inherit; font-size: 11px;
+      background: transparent; outline: none;
+    }
+    .date-input input.year { width: 76px; }
+
+    .legal-text {
+      font-size: 9px;
+      color: var(--muted);
+      text-align: justify;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 5px;
+      gap: 6px;
+    }
+    .field-label {
+      font-weight: 600;
+      font-size: 11px;
+      white-space: nowrap;
+      min-width: 160px;
+    }
+    .field-label.short { min-width: auto; }
+    .field-input {
+      flex: 1;
+      border: none;
+      border-bottom: 1px dotted var(--border);
+      font-family: inherit;
+      font-size: 11px;
+      padding: 2px 4px;
+      background: transparent;
+      outline: none;
+      color: var(--ink);
+    }
+    .field-input:focus { border-bottom-color: var(--header-bg); }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24px;
+    }
+
+    .section-header {
+      background: var(--section-header);
+      color: var(--header-text);
+      font-weight: 700;
+      font-size: 11px;
+      padding: 5px 10px;
+      margin-top: 12px;
+      margin-bottom: 0;
+      border-radius: 3px 3px 0 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    table th {
+      background: var(--section-header);
+      color: var(--header-text);
+      font-weight: 600;
+      padding: 5px 8px;
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    table td {
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    table tr:nth-child(even) td { background: var(--row-alt); }
+
+    .td-label {
+      font-weight: 600;
+      white-space: nowrap;
+      width: 180px;
+    }
+    .td-input {
+      width: 100%;
+      border: none;
+      font-family: inherit;
+      font-size: 11px;
+      background: transparent;
+      outline: none;
+      padding: 2px;
+    }
+    .td-etat {
+      width: 40px;
+      text-align: center;
+    }
+    .td-etat input {
+      width: 28px;
+      text-align: center;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 11px;
+      background: transparent;
+      outline: none;
+      font-weight: 600;
+    }
+
+    .cb-group {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 2px 10px;
+      align-items: center;
+    }
+    .cb-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 400;
+    }
+    .cb-group input[type="checkbox"] {
+      width: 12px;
+      height: 12px;
+      accent-color: var(--check-accent);
+      cursor: pointer;
+    }
+
+    .cles-table td { padding: 3px 8px; }
+
+    .compteurs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+    .compteur-box {
+      border-right: 1px solid var(--border);
+      padding: 8px;
+      font-size: 10px;
+    }
+    .compteur-box:last-child { border-right: none; }
+    .compteur-box .c-title {
+      font-weight: 700;
+      font-size: 11px;
+      text-align: center;
+      margin-bottom: 4px;
+      color: var(--header-bg);
+    }
+    .compteur-box .c-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3px;
+    }
+    .compteur-box .c-row input {
+      width: 70px;
+      border: none;
+      border-bottom: 1px dotted var(--border);
+      font-family: inherit;
+      font-size: 10px;
+      text-align: right;
+      outline: none;
+      background: transparent;
+    }
+
+    .piece-multi-table th.col-etat { width: 32px; text-align: center; }
+    .piece-multi-table .sub-header {
+      background: #e9eff7;
+      font-weight: 700;
+      text-align: center;
+      color: var(--ink);
+      font-size: 10px;
+    }
+
+    .observations-box {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      min-height: 50px;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+    .observations-box textarea {
+      width: 100%;
+      min-height: 40px;
+      border: none;
+      font-family: inherit;
+      font-size: 11px;
+      resize: vertical;
+      outline: none;
+      background: transparent;
+    }
+
+    .signatures {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      font-size: 11px;
+    }
+    .sig-date {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .sig-block { text-align: center; }
+    .sig-block .sig-title {
+      font-weight: 700;
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+    .sig-block .sig-sub {
+      font-size: 9px;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 30px;
+    }
+    .sig-line {
+      border-top: 1px solid var(--border);
+      margin: 0 20px;
+    }
+
+    .page-break { page-break-before: always; }
+    .sep { height: 8px; }
+    .sep-sm { height: 4px; }
+
+    @media print {
+      body { background: white; }
+      .page { box-shadow: none; margin: 0; padding: 16px 20px; }
+      input, textarea { border-color: #ccc !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ PAGE 1 ═══════════════ -->
+<div class="page">
+
+  <div class="main-title">État des Lieux</div>
+
+  <div class="type-row">
+    <label><input type="checkbox" name="type_entree" {% if type_entree_checked %}checked{% endif %}> ENTRÉE</label>
+    <label><input type="checkbox" name="type_sortie" {% if type_sortie_checked %}checked{% endif %}> SORTIE</label>
+  </div>
+
+  <div class="date-row">
+    <div>
+      <label>Date d'entrée :</label>
+      <span class="date-input">
+        <input type="text" class="year" value="{{ date_entree or '' }}">
+      </span>
+    </div>
+    <div>
+      <label>Sortie :</label>
+      <span class="date-input">
+        <input type="text" class="year" value="{{ date_sortie or '' }}">
+      </span>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <span class="field-label">Adresse du logement :</span>
+    <input class="field-input" type="text" value="{{ adresse_logement or '' }}">
+  </div>
+
+  <div class="legal-text">
+    L'état des lieux doit être établi de façon contradictoire entre les deux parties lors de la remise des clés au locataire et lors de leur restitution en fin de bail, conformément à l'article 3 de la Loi n°89-462 du 6 juillet 1989. Il fait partie du contrat de location, dont il ne peut être dissocié. L'état des lieux d'entrée peut être complété par le locataire dans les 10 jours suivant sa tenue (et pendant le 1er mois de chauffe pour les éléments de chauffage).
+  </div>
+
+  <!-- IDENTIFICATION -->
+  <div class="section-header">Identification</div>
+  <div style="border:1px solid var(--border); border-top:none; padding:10px; margin-bottom:8px;">
+    <div class="fields-grid">
+      <div>
+        <div style="font-weight:700; margin-bottom:4px; color:var(--header-bg);">Le bailleur (ou son mandataire) :</div>
+        <div class="field-row"><span class="field-label short">Nom (ou dénomination) :</span><input class="field-input" type="text" value="{{ bailleur_nom or '' }}"></div>
+        <div class="field-row"><span class="field-label short">Domicile (ou siège social) :</span><input class="field-input" type="text" value="{{ bailleur_adresse or '' }}"></div>
+      </div>
+      <div>
+        <div style="font-weight:700; margin-bottom:4px; color:var(--header-bg);">Le locataire :</div>
+        <div class="field-row"><span class="field-label short">Nom :</span><input class="field-input" type="text" value="{{ locataire_nom or '' }}"></div>
+        <div class="field-row"><span class="field-label short">Si sortie, nouvelle adresse :</span><input class="field-input" type="text" placeholder="{{locataire_nouvelle_adresse}}"></div>
+      </div>
+    </div>
+    <div class="sep-sm"></div>
+    <div class="field-row"><span class="field-label short">Ancien occupant :</span><input class="field-input" type="text" placeholder="{{ancien_occupant}}"></div>
+    <div class="sep-sm"></div>
+    <div class="fields-grid">
+      <div class="field-row">
+        <span class="field-label short">Eau chaude sanitaire :</span>
+        <span class="cb-group">
+          <label><input type="checkbox"> collectif</label>
+          <label><input type="checkbox"> individuel</label>
+          <label><input type="checkbox"> électrique</label>
+          <label><input type="checkbox"> gaz</label>
+          <label><input type="checkbox"> fioul</label>
+          <label><input type="checkbox"> autre</label>
+        </span>
+      </div>
+      <div class="field-row">
+        <span class="field-label short">Chauffage :</span>
+        <span class="cb-group">
+          <label><input type="checkbox"> collectif</label>
+          <label><input type="checkbox"> individuel</label>
+          <label><input type="checkbox"> électrique</label>
+          <label><input type="checkbox"> gaz</label>
+          <label><input type="checkbox"> fioul</label>
+          <label><input type="checkbox"> autre</label>
+        </span>
+      </div>
+    </div>
+    <div class="fields-grid">
+      <div class="field-row"><span class="field-label short">Nombre de radiateurs :</span><input class="field-input" type="text" placeholder="{{nb_radiateurs}}"></div>
+      <div style="display:flex; gap:12px;">
+        <div class="field-row" style="flex:1;"><span class="field-label short">Chaudière :</span><input class="field-input" type="text" placeholder="{{chaudiere}}"></div>
+        <div class="field-row" style="flex:1;"><span class="field-label short">Chauffe-eau :</span><input class="field-input" type="text" placeholder="{{chauffe_eau}}"></div>
+      </div>
+    </div>
+    <div class="field-row"><span class="field-label short">Sonnette ou interphone :</span><input class="field-input" type="text" placeholder="{{sonnette}}"></div>
+  </div>
+
+  <!-- CLÉS -->
+  <div class="section-header">Clés</div>
+  <table class="cles-table" style="border:1px solid var(--border); border-top:none;">
+    <thead>
+      <tr><th></th><th>Type de clé</th><th>Nbre et Commentaires</th><th>Type de clé</th><th>Nbre et Commentaires</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="td-label">Clés porte d'entrée</td><td><input class="td-input" type="text" placeholder="{{cle_entree_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_entree_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_entree_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_entree_nbre2}}"></td></tr>
+      <tr><td class="td-label">Clés d'immeuble</td><td><input class="td-input" type="text" placeholder="{{cle_immeuble_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_immeuble_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_immeuble_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_immeuble_nbre2}}"></td></tr>
+      <tr><td class="td-label">Boîtes aux lettres</td><td><input class="td-input" type="text" placeholder="{{cle_bal_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_bal_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_bal_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_bal_nbre2}}"></td></tr>
+      <tr><td class="td-label">Badge ou clé portail</td><td><input class="td-input" type="text" placeholder="{{cle_portail_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_portail_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_portail_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_portail_nbre2}}"></td></tr>
+      <tr><td class="td-label">Clés cave</td><td><input class="td-input" type="text" placeholder="{{cle_cave_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_cave_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_cave_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_cave_nbre2}}"></td></tr>
+      <tr><td class="td-label">Parking</td><td><input class="td-input" type="text" placeholder="{{cle_parking_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_parking_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_parking_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_parking_nbre2}}"></td></tr>
+      <tr><td class="td-label">Autre</td><td><input class="td-input" type="text" placeholder="{{cle_autre_type1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_autre_nbre1}}"></td><td><input class="td-input" type="text" placeholder="{{cle_autre_type2}}"></td><td><input class="td-input" type="text" placeholder="{{cle_autre_nbre2}}"></td></tr>
+    </tbody>
+  </table>
+
+  <!-- COMPTEURS -->
+  <div class="section-header">Identification compteurs et relevés</div>
+  <div class="compteurs-grid">
+    <div class="compteur-box">
+      <div class="c-title">Électricité</div>
+      <div class="c-row"><span>N° compteur :</span><input type="text" placeholder="{{elec_compteur}}"></div>
+      <div class="c-row"><span>Relevé HP :</span><input type="text" placeholder="{{elec_hp}}"></div>
+      <div class="c-row"><span>Relevé HC :</span><input type="text" placeholder="{{elec_hc}}"></div>
+    </div>
+    <div class="compteur-box">
+      <div class="c-title">Gaz</div>
+      <div class="c-row"><span>N° compteur :</span><input type="text" placeholder="{{gaz_compteur}}"></div>
+      <div class="c-row"><span>Relevé :</span><input type="text" placeholder="{{gaz_releve}}"></div>
+    </div>
+    <div class="compteur-box">
+      <div class="c-title">Eau</div>
+      <div class="c-row"><span>Relevé eau froide :</span><input type="text" placeholder="{{eau_froide}}"></div>
+      <div class="c-row"><span>Relevé eau chaude :</span><input type="text" placeholder="{{eau_chaude}}"></div>
+    </div>
+    <div class="compteur-box">
+      <div class="c-title">Internet</div>
+      <div class="c-row"><span>Éligibilité fibre :</span><input type="text" placeholder="{{internet_fibre}}"></div>
+    </div>
+  </div>
+
+  <!-- ÉTAT DES PIÈCES -->
+  <div class="section-header">État des pièces — M (mauvais), P (passable), B (bon), TB (très bon)</div>
+
+  <!-- ENTRÉE -->
+  <table>
+    <thead><tr><th colspan="2">Entrée</th><th>Description / détails</th><th class="td-etat">État</th></tr></thead>
+    <tbody>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><input class="td-input" type="text" placeholder="{{entree_sol_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><input class="td-input" type="text" placeholder="{{entree_mur_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><input class="td-input" type="text" placeholder="{{entree_vitrage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Porte</td><td><span class="cb-group"><label><input type="checkbox"> bois</label><label><input type="checkbox"> métal</label><label><input type="checkbox"> PVC</label></span></td><td><input class="td-input" type="text" placeholder="{{entree_porte_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td></td><td><input class="td-input" type="text" placeholder="{{entree_plafond_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td></td><td><input class="td-input" type="text" placeholder="{{entree_eclairage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nombre : <input style="width:30px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:11px; font-family:inherit;" type="text">)</td><td><input class="td-input" type="text" placeholder="{{entree_prises_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- SÉJOUR -->
+  <table>
+    <thead><tr><th colspan="2">Séjour – Salle à manger</th><th>Description / détails</th><th class="td-etat">État</th></tr></thead>
+    <tbody>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><input class="td-input" type="text" placeholder="{{sejour_sol_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><input class="td-input" type="text" placeholder="{{sejour_mur_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><input class="td-input" type="text" placeholder="{{sejour_vitrage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td></td><td><input class="td-input" type="text" placeholder="{{sejour_plafond_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td></td><td><input class="td-input" type="text" placeholder="{{sejour_eclairage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nombre : <input style="width:30px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:11px; font-family:inherit;" type="text">)</td><td><input class="td-input" type="text" placeholder="{{sejour_prises_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- CUISINE -->
+  <table>
+    <thead><tr><th colspan="2">Cuisine</th><th>Description / détails</th><th class="td-etat">État</th></tr></thead>
+    <tbody>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><input class="td-input" type="text" placeholder="{{cuisine_sol_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><input class="td-input" type="text" placeholder="{{cuisine_mur_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><input class="td-input" type="text" placeholder="{{cuisine_vitrage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_plafond_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_eclairage_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nombre : <input style="width:30px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:11px; font-family:inherit;" type="text">)</td><td><input class="td-input" type="text" placeholder="{{cuisine_prises_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Placards et tiroirs</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_placards_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Évier (et robinetterie)</td><td><span class="cb-group"><label><input type="checkbox"> inox</label><label><input type="checkbox"> émail</label></span></td><td><input class="td-input" type="text" placeholder="{{cuisine_evier_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plaques de cuisson et four</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_plaques_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Hotte</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_hotte_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Électroménager</td><td></td><td><input class="td-input" type="text" placeholder="{{cuisine_electromenager_details}}"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ═══════════════ PAGE 2 ═══════════════ -->
+<div class="page page-break">
+
+  <!-- CHAMBRES -->
+  <table class="piece-multi-table">
+    <thead>
+      <tr><th rowspan="2" style="width:160px;">Chambres</th><th colspan="3" style="text-align:center;">Description / détails</th><th colspan="3" style="text-align:center; width:96px;">État</th></tr>
+      <tr><th class="sub-header" style="background:#e9eff7; color:var(--ink);">Chambre 1</th><th class="sub-header" style="background:#e9eff7; color:var(--ink);">Chambre 2</th><th class="sub-header" style="background:#e9eff7; color:var(--ink);">Chambre 3</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">1</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">2</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">3</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- SALLE DE BAIN -->
+  <table class="piece-multi-table">
+    <thead>
+      <tr><th rowspan="2" style="width:160px;">Salle de bain</th><th colspan="2" style="text-align:center;">Description / détails</th><th colspan="2" style="text-align:center; width:64px;">État</th></tr>
+      <tr><th class="sub-header" style="background:#e9eff7; color:var(--ink);">Salle de bain 1</th><th class="sub-header" style="background:#e9eff7; color:var(--ink);">Salle de bain 2</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">1</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">2</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Lavabo et robinetterie</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Baignoire / douche</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">WC</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- WC -->
+  <table class="piece-multi-table">
+    <thead>
+      <tr><th rowspan="2" style="width:160px;">WC</th><th colspan="2" style="text-align:center;">Description / détails</th><th colspan="2" style="text-align:center; width:64px;">État</th></tr>
+      <tr><th class="sub-header" style="background:#e9eff7; color:var(--ink);">WC 1</th><th class="sub-header" style="background:#e9eff7; color:var(--ink);">WC 2</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">1</th><th class="sub-header col-etat" style="background:#e9eff7; color:var(--ink);">2</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td>(nb : <input style="width:28px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Lavabo et robinetterie</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">WC</td><td><input class="td-input" type="text"></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- AUTRE PIÈCE -->
+  <table>
+    <thead><tr><th colspan="2">Autre pièce : <input style="width:180px; border:none; border-bottom:1px solid rgba(255,255,255,0.5); background:transparent; color:white; font-family:inherit; font-size:11px; outline:none;" type="text" placeholder="{{autre_piece_nom}}"></th><th>Description / détails</th><th class="td-etat">État</th></tr></thead>
+    <tbody>
+      <tr><td class="td-label">Mur</td><td><span class="cb-group"><label><input type="checkbox"> peinture</label><label><input type="checkbox"> papier peint</label><label><input type="checkbox"> crépi</label><label><input type="checkbox"> faïence</label></span></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Sol</td><td><span class="cb-group"><label><input type="checkbox"> parquet</label><label><input type="checkbox"> moquette</label><label><input type="checkbox"> carrelage</label><label><input type="checkbox"> lino</label></span></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Vitrage et volets</td><td><span class="cb-group"><label><input type="checkbox"> simple</label><label><input type="checkbox"> double</label> volets <label><input type="checkbox"> PVC</label><label><input type="checkbox"> alu</label><label><input type="checkbox"> bois</label></span></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Plafond</td><td></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Éclairage et interrupteurs</td><td></td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+      <tr><td class="td-label">Prises électriques</td><td>(nombre : <input style="width:30px; border:none; border-bottom:1px dotted var(--border); text-align:center; font-size:10px;" type="text">)</td><td><input class="td-input" type="text"></td><td class="td-etat"><input type="text"></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sep"></div>
+
+  <!-- OBSERVATIONS -->
+  <div style="font-weight:700; font-size:12px; margin-bottom:4px;">Observations ou réserves :</div>
+  <div class="observations-box">
+    <textarea>{{ observations or '' }}</textarea>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="signatures">
+    <div class="sig-date">
+      <div class="field-row" style="margin-bottom:8px;">
+        <span style="font-style:italic;">Le</span>
+        <input class="field-input" type="text" placeholder="{{signature_date}}" style="width:120px;">
+      </div>
+      <div class="field-row">
+        <span style="font-style:italic;">à</span>
+        <input class="field-input" type="text" placeholder="{{signature_lieu}}" style="width:120px;">
+      </div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-title">Nom et signature du bailleur (ou de son mandataire)</div>
+      <div class="sig-sub">Signature(s) précédée(s) de la mention « Lu et approuvé » :</div>
+      <div class="sig-line"></div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-title">Nom et signature du locataire</div>
+      <div class="sig-sub">Signature(s) précédée(s) de la mention « Lu et approuvé » :</div>
+      <div class="sig-line"></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

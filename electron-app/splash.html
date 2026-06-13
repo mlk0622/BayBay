@@ -85,17 +85,103 @@
             gap: 12px;
         }
 
-        .icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            border-radius: 20px;
+        .animation-container {
+            width: 160px;
+            height: 160px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 8px 24px rgba(100, 116, 139, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .splash-svg {
+            overflow: visible;
+        }
+
+        .house {
+            transform-origin: 100px 30px;
+            opacity: 0;
+            transform: translate(0px, -50px) scale(0.6);
+        }
+
+        @keyframes fall-in {
+            0% {
+                opacity: 0;
+                transform: translate(0px, -50px) scale(0.5) rotate(0deg);
+            }
+            15% {
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+                transform: translate(0px, 60px) scale(0.5) rotate(45deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0px, 95px) scale(0.05) rotate(90deg);
+            }
+        }
+
+        .house-1 {
+            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
+            animation-delay: 0s;
+        }
+
+        .house-2 {
+            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
+            animation-delay: 0.8s;
+        }
+
+        .house-3 {
+            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
+            animation-delay: 1.6s;
+        }
+
+        .bag-group {
+            transform-origin: 100px 150px;
+            animation: bag-bounce 2.4s ease-in-out infinite;
+        }
+
+        @keyframes bag-bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            42% {
+                transform: scale(1);
+            }
+            46% {
+                transform: scale(1.08, 0.92);
+            }
+            50% {
+                transform: scale(0.95, 1.05);
+            }
+            54% {
+                transform: scale(1);
+            }
+            75% {
+                transform: scale(1);
+            }
+            79% {
+                transform: scale(1.08, 0.92);
+            }
+            83% {
+                transform: scale(0.95, 1.05);
+            }
+            87% {
+                transform: scale(1);
+            }
+            8% {
+                transform: scale(1);
+            }
+            12% {
+                transform: scale(1.08, 0.92);
+            }
+            16% {
+                transform: scale(0.95, 1.05);
+            }
+            20% {
+                transform: scale(1);
+            }
         }
 
         .title {
@@ -182,13 +268,162 @@
             50% { content: '..'; }
             75%, 100% { content: '...'; }
         }
+
+        /* Liquid Glass Update Modal */
+        .glass-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(1, 4, 53, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .glass-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(210, 233, 243, 0.12) 0%, rgba(155, 212, 236, 0.04) 100%);
+            border: 1px solid rgba(155, 212, 236, 0.22);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 50px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 750;
+            color: #d2e9f3;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-version {
+            font-size: 14px;
+            color: #4fafd9;
+            font-weight: 600;
+            background: rgba(79, 175, 217, 0.1);
+            padding: 4px 12px;
+            border-radius: 99px;
+            align-self: center;
+        }
+
+        .modal-notes {
+            font-size: 13px;
+            color: #9bd4ec;
+            background: rgba(1, 4, 53, 0.3);
+            border: 1px solid rgba(155, 212, 236, 0.08);
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-glass {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-glass-primary {
+            background: linear-gradient(135deg, #4fafd9 0%, #1f5fb6 100%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(31, 95, 182, 0.4);
+        }
+
+        .btn-glass-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(31, 95, 182, 0.6);
+            filter: brightness(1.1);
+        }
+
+        .btn-glass-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(155, 212, 236, 0.15);
+            color: #9bd4ec;
+        }
+
+        .btn-glass-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #d2e9f3;
+        }
     </style>
 </head>
 <body>
     <div class="splash-shell">
         <div class="splash-container">
             <div class="logo-container">
-                <div class="icon">🏠</div>
+                <div class="animation-container">
+                    <svg class="splash-svg" viewBox="0 0 200 200" width="160" height="160">
+                        <!-- Houses falling -->
+                        <g class="house house-1">
+                            <polygon points="100,5 80,25 120,25" fill="#38bdf8" />
+                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#38bdf8" />
+                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
+                        </g>
+                        <g class="house house-2">
+                            <polygon points="100,5 80,25 120,25" fill="#60a5fa" />
+                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#60a5fa" />
+                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
+                        </g>
+                        <g class="house house-3">
+                            <polygon points="100,5 80,25 120,25" fill="#0284c7" />
+                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#0284c7" />
+                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
+                        </g>
+
+                        <!-- The bag (sac) -->
+                        <g class="bag-group">
+                            <!-- Drawstring Ties -->
+                            <path d="M 90,80 C 85,76 75,76 70,82 C 67,86 70,92 75,92 C 82,92 87,85 90,80 Z" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" />
+                            <path d="M 110,80 C 115,76 125,76 130,82 C 133,86 130,92 125,92 C 118,92 113,85 110,80 Z" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" />
+                            <!-- Drawstring Knot -->
+                            <circle cx="100" cy="80" r="6" fill="#38bdf8" stroke="#0284c7" stroke-width="2" />
+                            <!-- Main Pouch Body -->
+                            <path d="M 85,83 C 70,83 45,95 45,130 C 45,165 70,175 100,175 C 130,175 155,165 155,130 C 155,95 130,83 115,83 Z" 
+                                  fill="rgba(14, 165, 233, 0.18)" 
+                                  stroke="#0284c7" 
+                                  stroke-width="4.5" 
+                                  stroke-linejoin="round" />
+                            <!-- Drawstring Collar -->
+                            <path d="M 80,78 C 85,82 92,84 100,84 C 108,84 115,82 120,78 C 123,73 120,68 115,68 C 108,68 104,73 100,73 C 96,73 92,68 85,68 C 80,68 77,73 80,78 Z" 
+                                  fill="rgba(56, 189, 248, 0.3)" 
+                                  stroke="#0284c7" 
+                                  stroke-width="3.5" />
+                        </g>
+                    </svg>
+                </div>
                 <div class="title">Bay Bay</div>
                 <div class="version"></div>
             </div>
@@ -196,7 +431,19 @@
                 <div class="progress-container">
                     <div class="progress-bar"></div>
                 </div>
-                <div class="loading-text">Chargement<span class="dots"></span></div>
+            </div>
+        </div>
+
+        <!-- Liquid Glass Update Modal -->
+        <div id="update-modal" class="glass-modal">
+            <div class="modal-content">
+                <div class="modal-title">Mise à jour disponible</div>
+                <div id="update-version" class="modal-version">v0.0.0</div>
+                <div id="update-notes" class="modal-notes">Notes de version...</div>
+                <div class="modal-buttons">
+                    <div class="btn-glass btn-glass-primary" onclick="acceptUpdate()">Télécharger & Installer</div>
+                    <div class="btn-glass btn-glass-secondary" onclick="declineUpdate()">Plus tard</div>
+                </div>
             </div>
         </div>
     </div>
@@ -205,6 +452,22 @@
         const params = new URLSearchParams(window.location.search);
         const version = params.get('version') || 'inconnue';
         document.querySelector('.version').textContent = `Version ${version}`;
+
+        function acceptUpdate() {
+            document.title = 'update-accept';
+            document.getElementById('update-modal').classList.remove('active');
+        }
+
+        function declineUpdate() {
+            document.title = 'update-decline';
+            document.getElementById('update-modal').classList.remove('active');
+        }
+
+        window.showUpdateModal = function(ver, notes) {
+            document.getElementById('update-version').textContent = 'v' + ver;
+            document.getElementById('update-notes').innerHTML = notes.replace(/\n/g, '<br>');
+            document.getElementById('update-modal').classList.add('active');
+        };
     </script>
 </body>
 </html>

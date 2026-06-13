@@ -1,8 +1,3 @@
-{% extends "base.html" %}
-
-{% block title %}Locataires - BayBay{% endblock %}
-
-{% block content %}
 <div class="space-y-8">
     <div class="flex justify-between items-center">
         <div>
@@ -78,10 +73,10 @@
                                 <button onclick="openPaiementModal({{ loc.id }})" class="action-btn" style="background: rgba(52, 199, 89, 0.1); color: #34c759;" title="Paiement">
                                     <i class="fas fa-euro-sign"></i>
                                 </button>
-                                <button onclick="editLocataire({{ loc.id }}, '{{ loc.nom }}', '{{ loc.prenom }}', '{{ loc.email or '' }}', '{{ loc.telephone or '' }}', '{{ loc.adresse_precedente or '' }}', '{{ loc.depot_garantie or '' }}', '{{ loc.date_debut_bail or '' }}', '{{ loc.date_fin_bail or '' }}', '{{ loc.statut.value }}', '{{ loc.appartement_id or '' }}')" class="action-btn edit" title="Modifier">
+                                <button onclick="editLocataire({{ loc.id }}, '{{ loc.nom|e }}', '{{ loc.prenom|e }}', '{{ (loc.email or '')|e }}', '{{ (loc.telephone or '')|e }}', '{{ (loc.adresse_precedente or '')|e }}', '{{ loc.depot_garantie or '' }}', '{{ loc.date_debut_bail or '' }}', '{{ loc.date_fin_bail or '' }}', '{{ loc.statut.value }}', '{{ loc.appartement_id or '' }}')" class="action-btn edit" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button onclick="showDeleteModal('locataire', {{ loc.id }}, '{{ loc.nom_complet }}')" class="action-btn delete" title="Supprimer">
+                                <button onclick="showDeleteModal('locataire', {{ loc.id }}, '{{ loc.nom_complet|e }}')" class="action-btn delete" title="Supprimer">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -156,4 +151,3 @@ function openPaiementModal(locataireId) {
     openModal('paiementModal');
 }
 </script>
-{% endblock %}

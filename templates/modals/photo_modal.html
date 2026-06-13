@@ -129,7 +129,7 @@ document.getElementById('photoForm').addEventListener('submit', async function(e
         if (response.ok) {
             showNotification('Photo uploadée avec succès', 'success');
             closeModal('photoModal');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
         } else {
             showNotification('Erreur: ' + result.error, 'error');
         }

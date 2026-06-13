@@ -1,8 +1,3 @@
-{% extends "base.html" %}
-
-{% block title %}Paramètres{% endblock %}
-
-{% block content %}
 <div class="container mx-auto px-4 py-8">
     <!-- En-tête -->
     <div class="mb-8">
@@ -21,7 +16,7 @@
     </div>
 
     <!-- Configuration Email -->
-    <div class="glass-card p-8">
+    <div id="email-config-section" class="glass-card p-8">
         <div class="flex items-center space-x-3 mb-6">
             <div class="w-10 h-10 rounded-xl bg-blue-400/20 flex items-center justify-center">
                 <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +26,7 @@
             <h2 class="text-2xl font-semibold text-white">Configuration Email</h2>
         </div>
 
-        <form id="emailConfigForm" class="space-y-6">
+        <form id="emailConfigForm" class="space-y-6" autocomplete="off">
             <!-- Serveur SMTP -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -44,7 +39,6 @@
                         </div>
                     </label>
                     <input type="text" id="smtp_server" name="smtp_server"
-                        value="{{ config_email.serveur_smtp if config_email else '' }}"
                         class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
                         placeholder="smtp.gmail.com" required>
                     <p class="mt-2 text-sm text-white/50">Gmail: smtp.gmail.com, Outlook: smtp-mail.outlook.com</p>
@@ -60,7 +54,6 @@
                         </div>
                     </label>
                     <input type="number" id="smtp_port" name="smtp_port"
-                        value="{{ config_email.port_smtp if config_email else '587' }}"
                         class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-purple-400/50 transition-all"
                         placeholder="587" required>
                     <p class="mt-2 text-sm text-white/50">TLS: 587, SSL: 465</p>
@@ -79,7 +72,6 @@
                         </div>
                     </label>
                     <input type="email" id="email_address" name="email_address"
-                        value="{{ config_email.email_expediteur if config_email else '' }}"
                         class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
                         placeholder="votre.email@example.com" required>
                 </div>
@@ -93,8 +85,7 @@
                             <span>Mot de passe / Mot de passe d'application</span>
                         </div>
                     </label>
-                    <input type="password" id="email_password" name="email_password"
-                        value="{{ config_email.mot_de_passe if config_email else '' }}"
+                    <input type="password" id="email_password" name="email_password" autocomplete="new-password"
                         class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-pink-400/50 transition-all"
                         placeholder="••••••••" required>
                     <p class="mt-2 text-sm text-white/50">Pour Gmail, utilisez un mot de passe d'application</p>
@@ -112,7 +103,6 @@
                     </div>
                 </label>
                 <input type="email" id="default_sender" name="default_sender"
-                    value="{{ config_email.email_expediteur if config_email else '' }}"
                     class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 transition-all"
                     placeholder="gestion@votresci.com">
                 <p class="mt-2 text-sm text-white/50">Email utilisé par défaut pour l'envoi des appels de loyer</p>
@@ -190,6 +180,66 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                     <span>Tester la configuration</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Informations propriétaire (biens sans SCI) -->
+    <div id="proprietaire-section" class="glass-card p-8 mt-6">
+        <div class="flex items-center space-x-3 mb-6">
+            <div class="w-10 h-10 rounded-xl bg-green-400/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-2xl font-semibold text-white">Informations propriétaire</h2>
+                <p class="text-sm text-white/50">Utilisées comme bailleur sur les PDFs des biens sans SCI</p>
+            </div>
+        </div>
+        <form id="proprietaireForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Prénom</label>
+                    <input type="text" id="prop_prenom" name="prenom"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                        placeholder="Jean">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Nom</label>
+                    <input type="text" id="prop_nom" name="nom"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                        placeholder="Dupont">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-white/70 mb-2">Adresse</label>
+                <input type="text" id="prop_adresse" name="adresse"
+                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                    placeholder="12 rue de la Paix">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Code postal</label>
+                    <input type="text" id="prop_code_postal" name="code_postal"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                        placeholder="75001">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white/70 mb-2">Ville</label>
+                    <input type="text" id="prop_ville" name="ville"
+                        class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-green-400/50 transition-all"
+                        placeholder="Paris">
+                </div>
+            </div>
+            <div class="pt-4">
+                <button type="submit"
+                    class="px-8 py-3 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded-xl font-medium transition-all duration-200 shadow-lg flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span>Enregistrer</span>
                 </button>
             </div>
         </form>
@@ -409,5 +459,40 @@ async function testEmailConfig() {
 
     setupCanvas();
 })();
+
+// Propriétaire section
+(async function() {
+    try {
+        const resp = await fetch('/api/proprietaire');
+        if (resp.ok) {
+            const data = await resp.json();
+            document.getElementById('prop_prenom').value = data.prenom || '';
+            document.getElementById('prop_nom').value = data.nom || '';
+            document.getElementById('prop_adresse').value = data.adresse || '';
+            document.getElementById('prop_code_postal').value = data.code_postal || '';
+            document.getElementById('prop_ville').value = data.ville || '';
+        }
+    } catch(e) {}
+})();
+
+document.getElementById('proprietaireForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+        prenom: document.getElementById('prop_prenom').value,
+        nom: document.getElementById('prop_nom').value,
+        adresse: document.getElementById('prop_adresse').value,
+        code_postal: document.getElementById('prop_code_postal').value,
+        ville: document.getElementById('prop_ville').value,
+    };
+    const resp = await fetch('/api/proprietaire', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    if (resp.ok) {
+        if (typeof showNotification === 'function') showNotification('Informations propriétaire enregistrées', 'success');
+    } else {
+        if (typeof showNotification === 'function') showNotification('Erreur lors de l\'enregistrement', 'error');
+    }
+});
 </script>
-{% endblock %}

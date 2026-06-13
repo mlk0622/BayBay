@@ -1,14 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pyinstaller GestionLocative.spec --noconfirm)",
-      "Bash(dir /b)",
+      "Bash(cmd.exe /c test_version.bat)",
+      "Bash(powershell -Command \"\\(Get-Content ''launcher.py''\\) -replace ''VERSION = \"\".*\"\"'', ''VERSION = \"\"TEST123\"\"'' | Set-Content ''launcher-test.py''\")",
       "Bash(cd:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run:*)",
-      "Bash(timeout 15 npm start)",
-      "Bash(timeout 20 \"./Gestion Locative.exe\")",
-      "Bash(timeout 15 \"./Gestion Locative.exe\")",
+      "Bash(\"C:/Program Files \\(x86\\)/NSIS/makensis.exe\" /VERSION)",
+      "Bash(mkdir -p \"electron-app/dist-simple/BayBay-win32-x64/resources/backend\")",
+      "Bash(cp -r \"dist/BayBay/\"* \"electron-app/dist-simple/BayBay-win32-x64/resources/backend/\")",
+      "Bash(\"C:/Program Files \\(x86\\)/NSIS/makensis.exe\" installer.nsi)",
+      "Read(//c/Users/PC/Desktop/**)",
+      "Read(//c/Users/**)",
+      "Bash(\"C:\\\\Program Files \\(x86\\)\\\\NSIS\\\\makensis.exe\" /VERSION)",
       "Bash(ls:*)",
       "Bash(pyinstaller BayBay.spec --noconfirm)",
       "Bash(timeout 10 \"./Bay Bay.exe\")",
@@ -58,6 +60,18 @@
       "Bash(pip install:*)",
       "Bash(python:*)",
       "Bash(where wkhtmltopdf:*)"
+      "Bash(rm -rf \"electron-app/dist-simple/BayBay-win32-x64/resources/backend\")",
+      "Bash(cp -r dist/BayBay/* \"electron-app/dist-simple/BayBay-win32-x64/resources/backend/\")",
+      "Bash(\"C:/Program Files \\(x86\\)/NSIS/makensis.exe\" /V2 installer.nsi)",
+      "Bash(grep -n \"\\\\\\\\api\\\\\\\\locataire\" \"C:\\\\Users\\\\PC\\\\OneDrive\\\\Documents\\\\PythonProject\\\\gestion-locative\\\\app.py\")",
+      "Bash(gh api:*)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(dir \"C:\\\\Users\\\\PC\\\\OneDrive\\\\Documents\\\\PythonProject\\\\gestion-locative\\\\electron-app\\\\release\")",
+      "Bash(python debug_updater.py)",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" release list --repo mlk0622/BayBay --limit 5)",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" release view v2.2.3.8 --repo mlk0622/BayBay 2>&1)",
+      "Bash(curl -s -H \"Accept: application/vnd.github.v3+json\" \"https://api.github.com/repos/mlk0622/BayBay/releases/latest\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f''''Latest: {d.get\\(\"\"tag_name\"\", \"\"N/A\"\"\\)}''''\\)\")"
     ]
   }
 }
