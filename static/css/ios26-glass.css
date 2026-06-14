@@ -37,35 +37,47 @@
     --table-header-bg: rgba(255, 255, 255, 0.02);
     --row-hover-bg: rgba(255, 255, 255, 0.04);
     --modal-border-color: rgba(255, 255, 255, 0.1);
+
+    --scrollbar-thumb: rgba(79, 175, 217, 0.15);
+    --scrollbar-thumb-hover: rgba(79, 175, 217, 0.45);
+    --blob-1: rgba(96, 165, 250, 0.25);
+    --blob-2: rgba(56, 189, 248, 0.22);
+    --blob-3: rgba(129, 140, 248, 0.12);
 }
 
 html[data-theme="light"] {
-    --bg-1: #f0f9ff;
-    --bg-2: #e2f3fc;
-    --bg-3: #bce2f1;
-    --text-main: #021d83;
-    --text-muted: #398bc8;
+    --bg-1: #a3bfcc;              /* Soft blue-grey background, much less bright */
+    --bg-2: #b4c9d4;              /* Soft grey-blue */
+    --bg-3: #95afbf;              /* Dim slate-blue */
+    --text-main: #021d83;         /* Dark blue for text */
+    --text-muted: #1e40af;        /* Royal blue for muted text */
     
-    --border-glass: rgba(31, 95, 182, 0.25);
-    --surface-glass: rgba(255, 255, 255, 0.5);
-    --surface-glass-strong: rgba(255, 255, 255, 0.75);
-    --surface-nav: rgba(226, 243, 252, 0.8);
+    --border-glass: rgba(2, 29, 131, 0.2);
+    --surface-glass: rgba(255, 255, 255, 0.35);
+    --surface-glass-strong: rgba(255, 255, 255, 0.65);
+    --surface-nav: rgba(180, 201, 212, 0.65);
     
-    --shadow-soft: 0 20px 50px -12px rgba(31, 95, 182, 0.15);
+    --shadow-soft: 0 20px 50px -12px rgba(2, 29, 131, 0.15);
 
-    /* Dynamic Theme Variables - Light Ice Blue Glass */
-    --modal-bg-end: rgba(226, 243, 252, 0.96);
-    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 45%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.65) 100%);
-    --input-bg: rgba(255, 255, 255, 0.85);
-    --input-border: rgba(31, 95, 182, 0.25);
+    /* Dynamic Theme Variables - Dimmed Ice Blue Glass */
+    --modal-bg-end: rgba(180, 201, 212, 0.96);
+    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 45%, rgba(255, 255, 255, 0.1) 70%, rgba(255, 255, 255, 0.4) 100%);
+    --input-bg: rgba(255, 255, 255, 0.6);
+    --input-border: rgba(2, 29, 131, 0.25);
     --select-bg: #ffffff;
     --select-scheme: light;
-    --titlebar-bg: rgba(226, 243, 252, 0.7);
+    --titlebar-bg: rgba(180, 201, 212, 0.7);
     --titlebar-text: #021d83;
-    --titlebar-border: rgba(31, 95, 182, 0.15);
-    --table-header-bg: rgba(31, 95, 182, 0.05);
-    --row-hover-bg: rgba(31, 95, 182, 0.04);
-    --modal-border-color: rgba(31, 95, 182, 0.15);
+    --titlebar-border: rgba(2, 29, 131, 0.15);
+    --table-header-bg: rgba(2, 29, 131, 0.05);
+    --row-hover-bg: rgba(2, 29, 131, 0.04);
+    --modal-border-color: rgba(2, 29, 131, 0.15);
+
+    --scrollbar-thumb: rgba(2, 29, 131, 0.15);
+    --scrollbar-thumb-hover: rgba(2, 29, 131, 0.45);
+    --blob-1: rgba(2, 29, 131, 0.06);
+    --blob-2: rgba(30, 64, 175, 0.05);
+    --blob-3: rgba(59, 130, 246, 0.03);
 }
 
 /* Animations de vagues liquides en arrière-plan */
@@ -92,9 +104,9 @@ body.app-shell {
     position: relative;
     color: var(--text-main);
     background: 
-        radial-gradient(circle at 75% 25%, rgba(96, 165, 250, 0.25) 0%, transparent 45%),
-        radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.22) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 75% 25%, var(--blob-1) 0%, transparent 45%),
+        radial-gradient(circle at 20% 80%, var(--blob-2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, var(--blob-3) 0%, transparent 60%),
         linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3)) !important;
     background-attachment: fixed !important;
     overflow-x: hidden;
@@ -577,18 +589,15 @@ body.app-shell.app-loading-blur {
     color: var(--titlebar-text);
     user-select: none;
     z-index: 9999;
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
 }
 
-body.has-electron-titlebar {
-    padding-top: 38px;
-}
-
 body.has-electron-titlebar .app-nav {
+    position: sticky !important;
     top: 38px !important;
 }
 
@@ -639,7 +648,26 @@ html[data-theme="light"] .text-white:not(.ios-button *):not(.bg-primary *):not(.
 html[data-theme="light"] .text-white\/90:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
 html[data-theme="light"] .text-white\/80:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
 html[data-theme="light"] .text-white\/70:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-white\/60:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *) {
+html[data-theme="light"] .text-white\/60:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] .text-slate-100,
+html[data-theme="light"] .text-slate-200,
+html[data-theme="light"] .text-slate-300,
+html[data-theme="light"] .text-slate-450,
+html[data-theme="light"] .text-slate-400,
+html[data-theme="light"] .text-blue-100,
+html[data-theme="light"] .text-blue-200,
+html[data-theme="light"] .text-blue-300,
+html[data-theme="light"] .text-gray-100,
+html[data-theme="light"] .text-gray-200,
+html[data-theme="light"] .text-gray-300,
+html[data-theme="light"] .text-slate-50,
+html[data-theme="light"] .text-zinc-100,
+html[data-theme="light"] .text-zinc-200,
+html[data-theme="light"] .text-zinc-300,
+html[data-theme="light"] .text-slate-900,
+html[data-theme="light"] .text-slate-700,
+html[data-theme="light"] .text-slate-600,
+html[data-theme="light"] .text-slate-500 {
     color: var(--text-main) !important;
 }
 

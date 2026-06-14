@@ -4,17 +4,17 @@
 
 {% block content %}
 <style>
-    .locataire-dark .bg-white {
+    html[data-theme="dark"] .locataire-dark .bg-white {
         background: rgba(18, 24, 38, 0.72) !important;
         border-color: rgba(255, 255, 255, 0.16) !important;
         backdrop-filter: blur(14px);
     }
-    .locataire-dark .bg-slate-50 { background: rgba(255, 255, 255, 0.06) !important; }
-    .locataire-dark .text-slate-900 { color: #f4f7ff !important; }
-    .locataire-dark .text-slate-700,
-    .locataire-dark .text-slate-600,
-    .locataire-dark .text-slate-500,
-    .locataire-dark .text-slate-400 { color: rgba(221, 231, 255, 0.82) !important; }
+    html[data-theme="dark"] .locataire-dark .bg-slate-50 { background: rgba(255, 255, 255, 0.06) !important; }
+    html[data-theme="dark"] .locataire-dark .text-slate-900 { color: #f4f7ff !important; }
+    html[data-theme="dark"] .locataire-dark .text-slate-700,
+    html[data-theme="dark"] .locataire-dark .text-slate-600,
+    html[data-theme="dark"] .locataire-dark .text-slate-500,
+    html[data-theme="dark"] .locataire-dark .text-slate-400 { color: rgba(221, 231, 255, 0.82) !important; }
 
     /* Icônes des sections - TOUJOURS NOIRES */
     .fa-shield-alt { color: #111827 !important; }
