@@ -1,7 +1,7 @@
 ;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.4.0"
-!define APP_VERSION_WIN "3.4.0.0"
+!define APP_VERSION "3.4.1"
+!define APP_VERSION_WIN "3.4.1.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -12,8 +12,8 @@ InstallDir "$LOCALAPPDATA\${APP_NAME}"
 InstallDirRegKey HKCU "Software\${APP_NAME}" ""
 RequestExecutionLevel user
 
-!define MUI_BGCOLOR "4A5C6E"
-!define MUI_TEXTCOLOR "010C2D"
+!define MUI_BGCOLOR "F2EFF6"
+!define MUI_TEXTCOLOR "121214"
 !define MUI_HEADERIMAGE
 !define MUI_HEADERIMAGE_BITMAP "installer_header.bmp"
 !define MUI_HEADERIMAGE_RIGHT
