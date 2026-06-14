@@ -17,7 +17,7 @@
                 {% if biens_directs %}+ {{ biens_directs|length }} bien{% if biens_directs|length > 1 %}s{% endif %}{% endif %}
             </span>
             <button onclick="openModal('choixAjoutModal')"
-                    class="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 transition-all">
+                    class="ios-button text-white w-10 h-10 flex items-center justify-center">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
@@ -208,7 +208,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
             </svg>
             <p class="text-white/50 mb-4">Aucun bien enregistré</p>
-            <button onclick="openModal('choixAjoutModal')" class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl transition-all shadow-lg shadow-purple-500/30 inline-flex items-center justify-center" aria-label="Ajouter">
+            <button onclick="openModal('choixAjoutModal')" class="ios-button text-white w-12 h-12 inline-flex items-center justify-center" aria-label="Ajouter">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
