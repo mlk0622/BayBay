@@ -1,6 +1,6 @@
 {
   "name": "baybay",
-  "version": "3.4.3",
+  "version": "3.4.4",
   "description": "Bay Bay - Application de gestion immobilière multi-niveaux",
   "main": "main.js",
   "author": "Bay Bay",
@@ -35,19 +35,18 @@
       }
     ],
     "win": {
-      "target": {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      }
+      "target": "nsis",
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": true,
       "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "runAfterFinish": false
+      "installerHeaderIcon": "build/icon.ico",
+      "shortcutName": "Bay Bay",
+      "runAfterFinish": true
     },
     "publish": {
       "provider": "github",

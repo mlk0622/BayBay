@@ -1049,30 +1049,4 @@ body.has-electron-titlebar .app-nav ~ #app-content-wrapper {
     margin-top: 64px !important;
 }
 
-/* Force all status fonts/labels to be dark (primary text) in light theme */
-html[data-theme="light"] .text-green-400:not(.ios-button *):not(.bg-green-600 *):not(.action-btn *),
-html[data-theme="light"] .text-green-500:not(.ios-button *):not(.bg-green-600 *):not(.action-btn *),
-html[data-theme="light"] .text-green-600:not(.ios-button *):not(.bg-green-600 *):not(.action-btn *),
-html[data-theme="light"] .text-red-400:not(.ios-button *):not(.bg-red-600 *):not(.action-btn *),
-html[data-theme="light"] .text-red-500:not(.ios-button *):not(.bg-red-600 *):not(.action-btn *),
-html[data-theme="light"] .text-red-600:not(.ios-button *):not(.bg-red-600 *):not(.action-btn *),
-html[data-theme="light"] .text-orange-400:not(.ios-button *):not(.bg-orange-600 *):not(.action-btn *),
-html[data-theme="light"] .text-orange-500:not(.ios-button *):not(.bg-orange-600 *):not(.action-btn *),
-html[data-theme="light"] .text-orange-600:not(.ios-button *):not(.bg-orange-600 *):not(.action-btn *),
-html[data-theme="light"] .text-yellow-400:not(.ios-button *):not(.bg-yellow-600 *):not(.action-btn *),
-html[data-theme="light"] .text-yellow-500:not(.ios-button *):not(.bg-yellow-600 *):not(.action-btn *),
-html[data-theme="light"] .text-yellow-600:not(.ios-button *):not(.bg-yellow-600 *):not(.action-btn *),
-html[data-theme="light"] .text-blue-400:not(.ios-button *):not(.bg-blue-600 *):not(.action-btn *),
-html[data-theme="light"] .text-blue-500:not(.ios-button *):not(.bg-blue-600 *):not(.action-btn *),
-html[data-theme="light"] .text-blue-600:not(.ios-button *):not(.bg-blue-600 *):not(.action-btn *),
-html[data-theme="light"] .text-purple-400:not(.ios-button *):not(.bg-purple-600 *):not(.action-btn *),
-html[data-theme="light"] .text-purple-500:not(.ios-button *):not(.bg-purple-600 *):not(.action-btn *),
-html[data-theme="light"] .text-purple-600:not(.ios-button *):not(.bg-purple-600 *):not(.action-btn *),
-html[data-theme="light"] .text-cyan-400:not(.ios-button *):not(.bg-cyan-600 *):not(.action-btn *),
-html[data-theme="light"] .text-cyan-500:not(.ios-button *):not(.bg-cyan-600 *):not(.action-btn *),
-html[data-theme="light"] .text-cyan-600:not(.ios-button *):not(.bg-cyan-600 *):not(.action-btn *),
-html[data-theme="light"] .text-sky-400:not(.ios-button *):not(.bg-sky-600 *):not(.action-btn *),
-html[data-theme="light"] .text-sky-500:not(.ios-button *):not(.bg-sky-600 *):not(.action-btn *),
-html[data-theme="light"] .text-sky-600:not(.ios-button *):not(.bg-sky-600 *):not(.action-btn *) {
-    color: var(--text-main) !important;
-}
+

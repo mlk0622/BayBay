@@ -1,7 +1,7 @@
 ;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.4.3"
-!define APP_VERSION_WIN "3.4.3.0"
+!define APP_VERSION "3.4.4"
+!define APP_VERSION_WIN "3.4.4.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -11,6 +11,7 @@ OutFile "Bay.Bay.Setup.${APP_VERSION}.exe"
 InstallDir "$LOCALAPPDATA\${APP_NAME}"
 InstallDirRegKey HKCU "Software\${APP_NAME}" ""
 RequestExecutionLevel user
+AutoCloseWindow true
 
 !define MUI_BGCOLOR "F2EFF6"
 !define MUI_TEXTCOLOR "121214"
@@ -26,10 +27,7 @@ RequestExecutionLevel user
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
-!insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
-!define MUI_FINISHPAGE_BUTTON "Lancer"
-!insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -72,6 +70,9 @@ Section -Post
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion" "${APP_VERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "URLInfoAbout" "${APP_URL}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${APP_PUBLISHER}"
+
+  ; Run app immediately after install finishes (One-Click behavior)
+  ExecShell "" "$INSTDIR\BayBay.exe"
 SectionEnd
 
 Section Uninstall
