@@ -618,11 +618,6 @@ body.has-electron-titlebar {
     padding-top: 42px !important;
 }
 
-body.has-electron-titlebar .app-nav {
-    position: sticky !important;
-    top: 42px !important;
-}
-
 .window-controls {
     display: flex;
     height: 100%;
@@ -1036,7 +1031,7 @@ body.has-electron-titlebar.app-shell {
 
 body.has-electron-titlebar nav.app-nav,
 body.has-electron-titlebar .app-nav {
-    position: fixed !important;
+    position: sticky !important;
     top: 42px !important;
     left: 0 !important;
     right: 0 !important;
@@ -1046,7 +1041,28 @@ body.has-electron-titlebar .app-nav {
 
 body.has-electron-titlebar nav.app-nav ~ #app-content-wrapper,
 body.has-electron-titlebar .app-nav ~ #app-content-wrapper {
-    margin-top: 64px !important;
+    margin-top: 0 !important;
 }
+
+/* Specificity override to ensure themed buttons and their elements keep white text in light theme */
+html[data-theme="light"] #app-body .ios-button,
+html[data-theme="light"] #app-body .ios-button *,
+html[data-theme="light"] #app-body .ios-button-success,
+html[data-theme="light"] #app-body .ios-button-success *,
+html[data-theme="light"] #app-body .ios-button-danger,
+html[data-theme="light"] #app-body .ios-button-danger *,
+html[data-theme="light"] #app-body button[type="submit"],
+html[data-theme="light"] #app-body button[type="submit"] *,
+html[data-theme="light"] #app-body .bg-primary,
+html[data-theme="light"] #app-body .bg-primary *,
+html[data-theme="light"] #app-body .bg-blue-600,
+html[data-theme="light"] #app-body .bg-blue-600 *,
+html[data-theme="light"] #app-body .bg-green-600,
+html[data-theme="light"] #app-body .bg-green-600 *,
+html[data-theme="light"] #app-body .bg-red-600,
+html[data-theme="light"] #app-body .bg-red-600 * {
+    color: #ffffff !important;
+}
+
 
 
