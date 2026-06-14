@@ -1,7 +1,7 @@
-﻿;Bay Bay Installer Script
+;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.3.9"
-!define APP_VERSION_WIN "3.3.9.0"
+!define APP_VERSION "3.4.0"
+!define APP_VERSION_WIN "3.4.0.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -12,18 +12,30 @@ InstallDir "$LOCALAPPDATA\${APP_NAME}"
 InstallDirRegKey HKCU "Software\${APP_NAME}" ""
 RequestExecutionLevel user
 
+!define MUI_BGCOLOR "4A5C6E"
+!define MUI_TEXTCOLOR "010C2D"
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_BITMAP "installer_header.bmp"
+!define MUI_HEADERIMAGE_RIGHT
+!define MUI_WELCOMEFINISHPAGE_BITMAP "installer_welcome.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "installer_welcome.bmp"
+
 !include MUI2.nsh
 
 !define MUI_ABORTWARNING
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
+!insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "license.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
 
+!insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
 
 !insertmacro MUI_LANGUAGE "French"
 

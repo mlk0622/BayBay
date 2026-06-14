@@ -21,6 +21,20 @@ try {
     console.error('Erreur chargement config.json:', e.message);
 }
 
+// Charger theme_config.json pour mémoriser le thème de l'application
+let appTheme = 'light';
+const themeConfigPath = path.join(app.getPath('userData'), 'theme_config.json');
+try {
+    if (fs.existsSync(themeConfigPath)) {
+        const data = JSON.parse(fs.readFileSync(themeConfigPath, 'utf8'));
+        if (data.theme) {
+            appTheme = data.theme;
+        }
+    }
+} catch (e) {
+    console.error('Erreur chargement theme_config.json:', e.message);
+}
+
 let mainWindow;
 let windowLoaded = false;
 let minTimePassed = false;
@@ -141,7 +155,7 @@ function createSplashWindow() {
     });
 
     const version = app.getVersion();
-    splashWindow.loadFile(path.join(__dirname, 'splash.html'), { query: { version } });
+    splashWindow.loadFile(path.join(__dirname, 'splash.html'), { query: { version, theme: appTheme } });
 
     splashWindow.on('closed', () => {
         splashWindow = null;
@@ -374,6 +388,16 @@ ipcMain.on('window-maximize', () => {
 
 ipcMain.on('window-close', () => {
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+});
+
+ipcMain.on('set-theme', (event, theme) => {
+    appTheme = theme;
+    try {
+        fs.writeFileSync(themeConfigPath, JSON.stringify({ theme }), 'utf8');
+        console.log(`[Main] Thème enregistré: ${theme}`);
+    } catch (e) {
+        console.error('[Main] Impossible d\'enregistrer le thème:', e.message);
+    }
 });
 
 app.whenReady().then(() => {
