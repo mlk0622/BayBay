@@ -3,10 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const { spawn } = require('child_process');
+const net = require('net');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
 let CLOUD_URL = 'http://88.190.118.23:33081'; // URL par défaut du serveur Cloud
+let BACKEND_PORT = 5001;
+let BACKEND_HOST = 'localhost';
 
 // Charger config.json s'il existe pour pouvoir écraser l'URL si besoin
 try {
@@ -15,6 +18,12 @@ try {
         const configData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         if (configData.CLOUD_URL) {
             CLOUD_URL = configData.CLOUD_URL;
+        }
+        if (configData.BACKEND_PORT) {
+            BACKEND_PORT = configData.BACKEND_PORT;
+        }
+        if (configData.BACKEND_HOST) {
+            BACKEND_HOST = configData.BACKEND_HOST;
         }
     }
 } catch (e) {
@@ -51,6 +60,50 @@ function checkAndShow() {
     }
 }
 
+// Fonction utilitaire pour tester si le serveur Cloud est joignable de manière asynchrone rapide
+function checkUrlReachable(urlStr, timeoutMs) {
+    return new Promise((resolve) => {
+        try {
+            const parsed = new URL(urlStr);
+            const port = parsed.port || (parsed.protocol === 'https:' ? 443 : 80);
+            const host = parsed.hostname;
+            
+            const socket = new net.Socket();
+            let resolved = false;
+            
+            socket.setTimeout(timeoutMs);
+            
+            socket.on('connect', () => {
+                socket.destroy();
+                if (!resolved) {
+                    resolved = true;
+                    resolve(true);
+                }
+            });
+            
+            socket.on('timeout', () => {
+                socket.destroy();
+                if (!resolved) {
+                    resolved = true;
+                    resolve(false);
+                }
+            });
+            
+            socket.on('error', () => {
+                socket.destroy();
+                if (!resolved) {
+                    resolved = true;
+                    resolve(false);
+                }
+            });
+            
+            socket.connect(port, host);
+        } catch (e) {
+            resolve(false);
+        }
+    });
+}
+
 function createMainWindow() {
     if (mainWindow) return mainWindow;
     mainWindow = new BrowserWindow({
@@ -82,21 +135,35 @@ function createMainWindow() {
         }
     });
 
-    console.log(`Chargement de l'URL : ${CLOUD_URL}`);
-    mainWindow.webContents.session.clearCache().then(() => {
-        console.log("Cache Electron effacé pour éviter l'ancien thème/code");
-        mainWindow.loadURL(CLOUD_URL);
+    console.log(`Vérification de la disponibilité du serveur Cloud : ${CLOUD_URL}...`);
+    checkUrlReachable(CLOUD_URL, 1500).then((isReachable) => {
+        mainWindow.webContents.session.clearCache().then(() => {
+            console.log("Cache Electron effacé pour éviter l'ancien thème/code");
+            if (isReachable) {
+                console.log(`Le serveur Cloud est en ligne. Chargement de : ${CLOUD_URL}`);
+                mainWindow.loadURL(CLOUD_URL);
+            } else {
+                const localUrl = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+                console.log(`Le serveur Cloud est hors ligne ou inaccessible. Repli immédiat sur le serveur local : ${localUrl}`);
+                mainWindow.loadURL(localUrl);
+            }
+        });
     });
 
-    // Repli automatique sur localhost en cas de problème de connexion au serveur cloud distant
+    // Repli automatique en cas de problème de connexion
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
         console.log(`Échec du chargement de l'URL : ${validatedURL} (Erreur ${errorCode}: ${errorDescription})`);
-        if (validatedURL.includes('88.190.118.23')) {
-            console.log("Serveur distant inaccessible (ERR_CONNECTION_REFUSED ?). Repli sur http://localhost:5000...");
-            mainWindow.loadURL('http://localhost:5000');
-        } else if (validatedURL.includes('localhost:5000')) {
-            console.log("Flask local sur 5000 inaccessible. Tentative sur http://localhost:5001...");
-            mainWindow.loadURL('http://localhost:5001');
+        
+        const localUrl = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+        
+        if (validatedURL === CLOUD_URL) {
+            console.log(`Serveur Cloud inaccessible lors du chargement. Repli sur le serveur local : ${localUrl}...`);
+            mainWindow.loadURL(localUrl);
+        } else if (validatedURL === localUrl) {
+            const fallbackPort = BACKEND_PORT === 5001 ? 5000 : 5001;
+            const fallbackUrl = `http://${BACKEND_HOST}:${fallbackPort}`;
+            console.log(`Serveur local sur le port ${BACKEND_PORT} inaccessible. Tentative de repli sur : ${fallbackUrl}...`);
+            mainWindow.loadURL(fallbackUrl);
         }
     });
 
