@@ -1,7 +1,7 @@
 ;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.4.1"
-!define APP_VERSION_WIN "3.4.1.0"
+!define APP_VERSION "3.4.2"
+!define APP_VERSION_WIN "3.4.2.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -26,16 +26,16 @@ RequestExecutionLevel user
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
-!insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "license.txt"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_FINISHPAGE_BUTTON "Lancer"
 !insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
+
 
 !insertmacro MUI_LANGUAGE "French"
 

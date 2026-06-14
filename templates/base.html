@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}?v={{ app_version }}">
     <style>
         .rich-editor-shell {
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: 1px solid var(--editor-border);
             border-radius: 14px;
             overflow: hidden;
-            background: rgba(0, 0, 0, 0.35);
+            background: var(--editor-bg);
         }
 
         .rich-editor-toolbar {
@@ -20,8 +20,8 @@
             flex-wrap: wrap;
             gap: 6px;
             padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid var(--editor-border);
+            background: var(--editor-toolbar-bg);
         }
 
         .rich-editor-toolbar button,
@@ -33,9 +33,9 @@
             min-width: 32px;
             padding: 0 10px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            border: 1px solid var(--editor-border);
+            background: var(--editor-btn-bg);
+            color: var(--editor-btn-text);
             font-size: 13px;
             cursor: pointer;
         }
@@ -43,6 +43,11 @@
         .rich-editor-toolbar button:hover,
         .rich-editor-toolbar label:hover {
             background: rgba(255, 255, 255, 0.12);
+        }
+        
+        html[data-theme="light"] .rich-editor-toolbar button:hover,
+        html[data-theme="light"] .rich-editor-toolbar label:hover {
+            background: rgba(18, 18, 20, 0.08);
         }
 
         .rich-editor-toolbar input[type="color"] {
@@ -57,9 +62,9 @@
         .rich-editor-toolbar select {
             height: 32px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            border: 1px solid var(--editor-border);
+            background: var(--editor-btn-bg);
+            color: var(--editor-btn-text);
             padding: 0 10px;
             font-size: 13px;
             max-width: 100%;
@@ -71,9 +76,9 @@
             padding: 14px;
             font-size: 16px;
             font-family: Arial, sans-serif;
-            color: #fff;
+            color: var(--editor-text);
             outline: none;
-            background: rgba(0, 0, 0, 0.22);
+            background: var(--editor-bg);
             line-height: 1.6;
             white-space: normal;
             overflow-y: auto;
@@ -81,14 +86,14 @@
 
         .rich-editor-area:empty:before {
             content: attr(data-placeholder);
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--editor-placeholder);
         }
 
         .rich-editor-area ul,
         .rich-editor-area ol {
             padding-left: 2rem;
             margin: 0.5rem 0;
-            color: #fff;
+            color: var(--editor-text);
             list-style-position: outside;
         }
 
@@ -101,12 +106,12 @@
         }
 
         .rich-editor-area li {
-            color: #fff !important;
+            color: var(--editor-text) !important;
             display: list-item;
         }
 
         .rich-editor-area li::marker {
-            color: #fff !important;
+            color: var(--editor-text) !important;
         }
 
         .rich-editor-area p {

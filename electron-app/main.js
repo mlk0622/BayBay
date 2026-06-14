@@ -60,7 +60,7 @@ function createMainWindow() {
         minHeight: 600,
         show: false,
         frame: false,
-        backgroundColor: '#0b131a',
+        backgroundColor: appTheme === 'light' ? '#F2EFF6' : '#0b131a',
         autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false,
@@ -395,6 +395,9 @@ ipcMain.on('set-theme', (event, theme) => {
     try {
         fs.writeFileSync(themeConfigPath, JSON.stringify({ theme }), 'utf8');
         console.log(`[Main] Thème enregistré: ${theme}`);
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.setBackgroundColor(theme === 'light' ? '#F2EFF6' : '#0b131a');
+        }
     } catch (e) {
         console.error('[Main] Impossible d\'enregistrer le thème:', e.message);
     }
