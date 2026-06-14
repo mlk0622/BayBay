@@ -2,32 +2,30 @@
 {% block title %}Connexion - BayBay{% endblock %}
 
 {% block content %}
-<div class="glass-container" style="max-width: 400px; margin: 50px auto; padding: 30px; text-align: center;">
-    <h2>Connexion BayBay</h2>
-    <p>Gérez vos biens en toute sécurité</p>
+<div class="glass-card max-w-[420px] mx-auto my-[80px] p-8 text-center">
+    <h2 class="text-2xl font-bold mb-2">Connexion BayBay</h2>
+    <p class="text-sm opacity-85 mb-6">Gérez vos biens en toute sécurité</p>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
-          <div style="color: #ff4d4d; margin-bottom: 15px;">{{ message }}</div>
+          <div class="text-red-500 mb-4 text-sm font-medium">{{ message }}</div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('login') }}">
-        <div style="margin-bottom: 20px;">
-            <input type="email" name="email" placeholder="Adresse email" required
-                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+    <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
+        <div>
+            <input type="email" name="email" placeholder="Adresse email" required class="w-full">
         </div>
-        <div style="margin-bottom: 20px;">
-            <input type="password" name="password" placeholder="Mot de passe" required
-                   style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: rgba(255,255,255,0.2);">
+        <div>
+            <input type="password" name="password" placeholder="Mot de passe" required class="w-full">
         </div>
-        <button type="submit" class="btn-glass" style="width: 100%; cursor: pointer;">Se connecter</button>
+        <button type="submit" class="w-full cursor-pointer mt-2">Se connecter</button>
     </form>
 
-    <p style="margin-top: 20px; font-size: 0.9em;">
-        Pas encore de compte ? <a href="{{ url_for('register') }}" style="color: #fff;">S'inscrire</a>
+    <p class="mt-6 text-sm opacity-80">
+        Pas encore de compte ? <a href="{{ url_for('register') }}" class="text-primary hover:underline font-semibold">S'inscrire</a>
     </p>
 </div>
 {% endblock %}

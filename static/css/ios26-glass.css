@@ -46,38 +46,38 @@
 }
 
 html[data-theme="light"] {
-    --bg-1: #a3bfcc;              /* Soft blue-grey background, much less bright */
-    --bg-2: #b4c9d4;              /* Soft grey-blue */
-    --bg-3: #95afbf;              /* Dim slate-blue */
-    --text-main: #021d83;         /* Dark blue for text */
-    --text-muted: #1e40af;        /* Royal blue for muted text */
+    --bg-1: #4a5c6e;              /* Muted dusky slate-blue */
+    --bg-2: #52677a;              /* Medium dusky slate-blue */
+    --bg-3: #3f4e5e;              /* Darker slate-blue */
+    --text-main: #010c2d;         /* Deepest dark blue for strong contrast and high readability */
+    --text-muted: #0d1e4a;        /* Muted dark indigo blue */
     
-    --border-glass: rgba(2, 29, 131, 0.2);
-    --surface-glass: rgba(255, 255, 255, 0.35);
-    --surface-glass-strong: rgba(255, 255, 255, 0.65);
-    --surface-nav: rgba(180, 201, 212, 0.65);
+    --border-glass: rgba(1, 12, 45, 0.22);
+    --surface-glass: rgba(255, 255, 255, 0.18);
+    --surface-glass-strong: rgba(255, 255, 255, 0.35);
+    --surface-nav: rgba(82, 103, 122, 0.7);
     
-    --shadow-soft: 0 20px 50px -12px rgba(2, 29, 131, 0.15);
+    --shadow-soft: 0 20px 50px -12px rgba(1, 12, 45, 0.25);
 
-    /* Dynamic Theme Variables - Dimmed Ice Blue Glass */
-    --modal-bg-end: rgba(180, 201, 212, 0.96);
-    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 45%, rgba(255, 255, 255, 0.1) 70%, rgba(255, 255, 255, 0.4) 100%);
-    --input-bg: rgba(255, 255, 255, 0.6);
-    --input-border: rgba(2, 29, 131, 0.25);
-    --select-bg: #ffffff;
+    /* Dynamic Theme Variables - Comfortably Dimmed Slate-Blue Glass */
+    --modal-bg-end: rgba(63, 78, 94, 0.98);
+    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0.02) 70%, rgba(255, 255, 255, 0.18) 100%);
+    --input-bg: rgba(255, 255, 255, 0.28);
+    --input-border: rgba(1, 12, 45, 0.25);
+    --select-bg: #cbd5e1;
     --select-scheme: light;
-    --titlebar-bg: rgba(180, 201, 212, 0.7);
-    --titlebar-text: #021d83;
-    --titlebar-border: rgba(2, 29, 131, 0.15);
-    --table-header-bg: rgba(2, 29, 131, 0.05);
-    --row-hover-bg: rgba(2, 29, 131, 0.04);
-    --modal-border-color: rgba(2, 29, 131, 0.15);
+    --titlebar-bg: rgba(82, 103, 122, 0.85);
+    --titlebar-text: #010c2d;
+    --titlebar-border: rgba(1, 12, 45, 0.2);
+    --table-header-bg: rgba(1, 12, 45, 0.07);
+    --row-hover-bg: rgba(1, 12, 45, 0.05);
+    --modal-border-color: rgba(1, 12, 45, 0.2);
 
-    --scrollbar-thumb: rgba(2, 29, 131, 0.15);
-    --scrollbar-thumb-hover: rgba(2, 29, 131, 0.45);
-    --blob-1: rgba(2, 29, 131, 0.06);
-    --blob-2: rgba(30, 64, 175, 0.05);
-    --blob-3: rgba(59, 130, 246, 0.03);
+    --scrollbar-thumb: rgba(1, 12, 45, 0.2);
+    --scrollbar-thumb-hover: rgba(1, 12, 45, 0.5);
+    --blob-1: rgba(1, 12, 45, 0.08);
+    --blob-2: rgba(13, 30, 74, 0.07);
+    --blob-3: rgba(30, 64, 175, 0.05);
 }
 
 /* Animations de vagues liquides en arrière-plan */
@@ -589,11 +589,15 @@ body.app-shell.app-loading-blur {
     color: var(--titlebar-text);
     user-select: none;
     z-index: 9999;
-    position: sticky;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
+}
+
+body.has-electron-titlebar {
+    padding-top: 38px !important;
 }
 
 body.has-electron-titlebar .app-nav {
@@ -644,69 +648,93 @@ html[data-theme="light"] .window-control-btn:hover {
 }
 
 /* --- Light Mode Specific Fonts and Small Logo/Icon Styling (Dark Blue) --- */
-html[data-theme="light"] .text-white:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-white\/90:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-white\/80:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-white\/70:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-white\/60:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-slate-100,
-html[data-theme="light"] .text-slate-200,
-html[data-theme="light"] .text-slate-300,
-html[data-theme="light"] .text-slate-450,
-html[data-theme="light"] .text-slate-400,
-html[data-theme="light"] .text-blue-100,
-html[data-theme="light"] .text-blue-200,
-html[data-theme="light"] .text-blue-300,
-html[data-theme="light"] .text-gray-100,
-html[data-theme="light"] .text-gray-200,
-html[data-theme="light"] .text-gray-300,
-html[data-theme="light"] .text-slate-50,
-html[data-theme="light"] .text-zinc-100,
-html[data-theme="light"] .text-zinc-200,
-html[data-theme="light"] .text-zinc-300,
+html[data-theme="light"] [class*="text-white"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *):not(.btn *):not(.action-btn *),
+html[data-theme="light"] [class*="text-slate-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-slate-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-slate-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-slate-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-slate-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-gray-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-gray-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-gray-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-gray-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-gray-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-zinc-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-zinc-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-zinc-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-zinc-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-zinc-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-blue-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-blue-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-blue-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-blue-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-blue-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-indigo-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-indigo-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-indigo-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-indigo-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-indigo-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-cyan-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-cyan-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-cyan-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-cyan-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-cyan-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-sky-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-sky-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-sky-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-sky-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
+html[data-theme="light"] [class*="text-sky-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
 html[data-theme="light"] .text-slate-900,
+html[data-theme="light"] .text-slate-800,
 html[data-theme="light"] .text-slate-700,
 html[data-theme="light"] .text-slate-600,
-html[data-theme="light"] .text-slate-500 {
+html[data-theme="light"] .text-slate-500,
+html[data-theme="light"] .text-slate-400,
+html[data-theme="light"] .text-neutral-900,
+html[data-theme="light"] .text-neutral-800,
+html[data-theme="light"] .text-neutral-700,
+html[data-theme="light"] .text-neutral-600,
+html[data-theme="light"] .text-neutral-500,
+html[data-theme="light"] .text-neutral-400 {
     color: var(--text-main) !important;
 }
 
-html[data-theme="light"] i.fas:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] i.far:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] i.fab:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] svg:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.action-btn *):not(.nav-indicator-pill *) {
-    color: #021d83 !important;
+html[data-theme="light"] i.fas:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
+html[data-theme="light"] i.far:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
+html[data-theme="light"] i.fab:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
+html[data-theme="light"] svg:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *) {
+    color: var(--text-main) !important;
 }
 
 /* App Nav Logo box adjustment to look gorgeous in light mode */
 html[data-theme="light"] .app-nav .bg-primary {
-    background: rgba(2, 29, 131, 0.1) !important;
-    border: 1px solid rgba(2, 29, 131, 0.2) !important;
+    background: rgba(1, 12, 45, 0.1) !important;
+    border: 1px solid rgba(1, 12, 45, 0.2) !important;
 }
 html[data-theme="light"] .app-nav .bg-primary i {
-    color: #021d83 !important;
+    color: #010c2d !important;
 }
 
 /* Stat icons highlight colors in light mode (perfect contrast) */
 html[data-theme="light"] .stat-icon.blue {
-    background: rgba(96, 165, 250, 0.2) !important;
-    color: #021d83 !important;
-    border-color: rgba(96, 165, 250, 0.4) !important;
+    background: rgba(96, 165, 250, 0.25) !important;
+    color: #010c2d !important;
+    border-color: rgba(96, 165, 250, 0.45) !important;
 }
 html[data-theme="light"] .stat-icon.purple {
-    background: rgba(168, 85, 247, 0.2) !important;
-    color: #6b21a8 !important;
-    border-color: rgba(168, 85, 247, 0.4) !important;
+    background: rgba(168, 85, 247, 0.25) !important;
+    color: #4c1d95 !important;
+    border-color: rgba(168, 85, 247, 0.45) !important;
 }
 html[data-theme="light"] .stat-icon.green {
-    background: rgba(52, 211, 153, 0.2) !important;
-    color: #065f46 !important;
-    border-color: rgba(52, 211, 153, 0.4) !important;
+    background: rgba(52, 211, 153, 0.25) !important;
+    color: #064e3b !important;
+    border-color: rgba(52, 211, 153, 0.45) !important;
 }
 html[data-theme="light"] .stat-icon.red {
-    background: rgba(248, 113, 113, 0.2) !important;
-    color: #991b1b !important;
-    border-color: rgba(248, 113, 113, 0.4) !important;
+    background: rgba(248, 113, 113, 0.25) !important;
+    color: #7f1d1d !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
 }
 
 /* Custom Webkit Scrollbars - Super discreet version */
