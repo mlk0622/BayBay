@@ -327,9 +327,11 @@ function checkForUpdates(callback) {
     });
 }
 
-function updateDownloadProgress(splashWindow, percent) {
+function updateDownloadProgress(splashWindow, percent, downloadedSize, totalSize) {
     if (!splashWindow || splashWindow.isDestroyed()) return;
-    console.log(`[Updater] Download progress: ${percent}%`);
+    const downloadedMB = (downloadedSize / (1024 * 1024)).toFixed(1);
+    const totalMB = totalSize ? (totalSize / (1024 * 1024)).toFixed(1) : "113.0";
+    console.log(`[Updater] Download progress: ${percent}% (${downloadedMB}MB/${totalMB}MB)`);
     splashWindow.webContents.executeJavaScript(`
         let p = document.querySelector('.progress-bar');
         if (p) {
@@ -342,14 +344,31 @@ function updateDownloadProgress(splashWindow, percent) {
             if (container) {
                 txt = document.createElement('div');
                 txt.className = 'update-txt';
-                txt.style.fontSize = '14px';
-                txt.style.color = '#cbd5e1';
+                txt.style.fontSize = '13px';
+                txt.style.color = 'var(--loading-text)';
                 txt.style.marginTop = '10px';
+                txt.style.fontWeight = '500';
                 container.appendChild(txt);
             }
         }
         if (txt) {
-            txt.textContent = 'Téléchargement de la mise à jour... ${percent}%';
+            txt.textContent = 'Téléchargement de la mise à jour : ${downloadedMB} Mo / ${totalMB} Mo (${percent}%)';
+        }
+    `);
+}
+
+function showInstallingScreen(splashWindow) {
+    if (!splashWindow || splashWindow.isDestroyed()) return;
+    console.log(`[Updater] Showing installing screen...`);
+    splashWindow.webContents.executeJavaScript(`
+        let p = document.querySelector('.progress-bar');
+        if (p) {
+            p.style.width = '100%';
+            p.style.animation = 'loading 1.5s ease-in-out infinite';
+        }
+        let txt = document.querySelector('.update-txt');
+        if (txt) {
+            txt.textContent = 'Installation de la mise à jour en cours...';
         }
     `);
 }
@@ -385,45 +404,70 @@ function downloadAndInstallUpdate(downloadUrl, splashWindow) {
                 return;
             }
 
-            const totalSize = parseInt(response.headers['content-length'], 10);
+            const totalSizeHeader = response.headers['content-length'];
+            const totalSize = totalSizeHeader ? parseInt(totalSizeHeader, 10) : 0;
             let downloadedSize = 0;
             console.log(`[Updater] Total file size: ${(totalSize / (1024 * 1024)).toFixed(2)} MB`);
 
             response.on('data', (chunk) => {
                 downloadedSize += chunk.length;
                 file.write(chunk);
-                if (totalSize) {
-                    const percent = Math.round((downloadedSize / totalSize) * 100);
-                    updateDownloadProgress(splashWindow, percent);
+                
+                let percent = 0;
+                if (totalSize && totalSize > 0) {
+                    percent = Math.round((downloadedSize / totalSize) * 100);
+                } else {
+                    const estimatedTotal = 113 * 1024 * 1024;
+                    percent = Math.min(Math.round((downloadedSize / estimatedTotal) * 100), 99);
                 }
+                updateDownloadProgress(splashWindow, percent, downloadedSize, totalSize);
             });
 
             response.on('end', () => {
                 file.end();
                 console.log('[Updater] Download complete.');
                 
-                if (splashWindow && !splashWindow.isDestroyed()) {
-                    splashWindow.webContents.executeJavaScript(`
-                        let txt = document.querySelector('.update-txt');
-                        if (txt) txt.textContent = 'Lancement de l\\'installation...';
-                    `);
-                }
+                showInstallingScreen(splashWindow);
 
                 setTimeout(() => {
                     try {
-                        console.log('[Updater] Launching installer setup...');
-                        const child = spawn(filePath, [], {
+                        console.log('[Updater] Renaming running executable to avoid file locks...');
+                        const currentExe = process.execPath;
+                        const tempExe = currentExe + '.tmp';
+                        
+                        try {
+                            if (fs.existsSync(tempExe)) {
+                                fs.unlinkSync(tempExe);
+                            }
+                            fs.renameSync(currentExe, tempExe);
+                            console.log('[Updater] Executable successfully renamed.');
+                        } catch (errRename) {
+                            console.error('[Updater] Failed to rename running executable:', errRename);
+                        }
+
+                        console.log('[Updater] Launching installer setup silently...');
+                        const child = spawn(filePath, ['/S'], {
                             detached: true,
                             stdio: 'ignore'
                         });
+                        
+                        child.on('close', (code) => {
+                            console.log('[Updater] Silent installer process completed with code:', code);
+                            app.quit();
+                        });
+
                         child.unref();
-                        app.quit();
+                        
+                        setTimeout(() => {
+                            app.quit();
+                        }, 12000);
+
                     } catch (e) {
                         console.error('[Updater] Error spawning installer:', e);
                         dialog.showErrorBox('Erreur de lancement', `Impossible de lancer l'installateur: ${e.message}`);
                         createMainWindow();
                     }
-                }, 1000);
+                }, 1500);
             });
         });
 
