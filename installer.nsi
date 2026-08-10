@@ -1,7 +1,7 @@
 ;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.4.9"
-!define APP_VERSION_WIN "3.4.9.0"
+!define APP_VERSION "3.5"
+!define APP_VERSION_WIN "3.5.0.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"
@@ -46,6 +46,11 @@ VIAddVersionKey /LANG=${LANG_FRENCH} "FileVersion" "${APP_VERSION_WIN}"
 VIAddVersionKey /LANG=${LANG_FRENCH} "ProductVersion" "${APP_VERSION_WIN}"
 
 Section "MainSection" SEC01
+  ; Terminate any running app processes to prevent file locking
+  nsExec::Exec "taskkill /F /IM BayBay.exe"
+  nsExec::Exec "taskkill /F /IM BayBay.exe.tmp"
+  Sleep 1000 ; Wait for processes to release locks
+
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File /r "electron-app\dist-simple\${APP_DIR}\*.*"

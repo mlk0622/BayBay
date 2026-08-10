@@ -1,5 +1,8 @@
 const { app, BrowserWindow, shell, dialog, ipcMain } = require('electron');
 const path = require('path');
+
+// Disable hardware acceleration to prevent white/black screen rendering bugs on some GPUs
+app.disableHardwareAcceleration();
 const fs = require('fs');
 const https = require('https');
 const { spawn } = require('child_process');
@@ -215,6 +218,7 @@ function createSplashWindow() {
         alwaysOnTop: true,
         resizable: false,
         hasShadow: true,
+        show: false, // Hide initially to prevent a brief white screen flash before content loads
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
@@ -223,6 +227,13 @@ function createSplashWindow() {
 
     const version = app.getVersion();
     splashWindow.loadFile(path.join(__dirname, 'splash.html'), { query: { version, theme: appTheme } });
+
+    // Only show the splash screen once it has fully loaded to prevent white/blank rendering box
+    splashWindow.once('ready-to-show', () => {
+        if (splashWindow && !splashWindow.isDestroyed()) {
+            splashWindow.show();
+        }
+    });
 
     splashWindow.on('closed', () => {
         splashWindow = null;
@@ -423,51 +434,37 @@ function downloadAndInstallUpdate(downloadUrl, splashWindow) {
                 updateDownloadProgress(splashWindow, percent, downloadedSize, totalSize);
             });
 
-            response.on('end', () => {
-                file.end();
-                console.log('[Updater] Download complete.');
-                
+            file.on('finish', () => {
+                console.log('[Updater] File write stream finished. Executable fully written to disk.');
                 showInstallingScreen(splashWindow);
 
                 setTimeout(() => {
                     try {
-                        console.log('[Updater] Renaming running executable to avoid file locks...');
-                        const currentExe = process.execPath;
-                        const tempExe = currentExe + '.tmp';
-                        
-                        try {
-                            if (fs.existsSync(tempExe)) {
-                                fs.unlinkSync(tempExe);
-                            }
-                            fs.renameSync(currentExe, tempExe);
-                            console.log('[Updater] Executable successfully renamed.');
-                        } catch (errRename) {
-                            console.error('[Updater] Failed to rename running executable:', errRename);
-                        }
-
                         console.log('[Updater] Launching installer setup silently...');
                         const child = spawn(filePath, ['/S'], {
                             detached: true,
                             stdio: 'ignore'
                         });
                         
-                        child.on('close', (code) => {
-                            console.log('[Updater] Silent installer process completed with code:', code);
-                            app.quit();
-                        });
-
                         child.unref();
                         
+                        // Quit Electron after 1 second so the installer can overwrite the files
                         setTimeout(() => {
+                            console.log('[Updater] Quitting application to let installer run...');
                             app.quit();
-                        }, 12000);
+                        }, 1000);
 
                     } catch (e) {
                         console.error('[Updater] Error spawning installer:', e);
                         dialog.showErrorBox('Erreur de lancement', `Impossible de lancer l'installateur: ${e.message}`);
                         createMainWindow();
                     }
-                }, 1500);
+                }, 1000);
+            });
+
+            response.on('end', () => {
+                file.end();
+                console.log('[Updater] Response download finished.');
             });
         });
 
