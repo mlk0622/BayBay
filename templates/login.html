@@ -16,7 +16,7 @@
 
     <form method="POST" action="{{ url_for('login') }}" class="space-y-4">
         <div>
-            <input type="email" name="email" placeholder="Adresse email" required class="w-full">
+            <input type="text" name="email" placeholder="Adresse email ou pseudo" required class="w-full" autocomplete="username">
         </div>
         <div>
             <input type="password" name="password" placeholder="Mot de passe" required class="w-full">

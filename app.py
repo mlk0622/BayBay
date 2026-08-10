@@ -1350,8 +1350,9 @@ def register():
 def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
-        password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
+        password = (request.form.get('password') or '').strip()
+        # Permettre la connexion par email ou par pseudo/nom d'utilisateur
+        user = User.query.filter((User.email == email) | (User.pseudo == email)).first()
         if user and bcrypt.check_password_hash(user.password, password):
             # Session persistante pour rester connecte entre les redemarrages de l'application.
             login_user(user, remember=True, duration=timedelta(days=30))
