@@ -7,6 +7,13 @@ const _modalParents = {};
 
 // Modal functions
 function openModal(modalId) {
+    // 1. Close any currently open modals first
+    document.querySelectorAll('.active-modal').forEach(activeModal => {
+        if (activeModal.id !== modalId) {
+            closeModal(activeModal.id);
+        }
+    });
+
     const modal = document.getElementById(modalId);
     if (!modal) return;
 
@@ -66,28 +73,24 @@ function closeModal(modalId) {
         delete modal._backdropHandler;
     }
 
-    setTimeout(() => {
-        if (modal.classList.contains('active-modal')) return; // re-opened
-        modal.style.display = 'none';
-        modal.classList.add('hidden');
+    // Instantly hide the modal
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
 
-        // Restore to original DOM position
-        const orig = _modalParents[modalId];
-        if (orig && orig.parent && document.body.contains(modal)) {
-            if (orig.nextSibling) {
-                orig.parent.insertBefore(modal, orig.nextSibling);
-            } else {
-                orig.parent.appendChild(modal);
-            }
-            delete _modalParents[modalId];
+    // Restore to original DOM position immediately
+    const orig = _modalParents[modalId];
+    if (orig && orig.parent && document.body.contains(modal)) {
+        if (orig.nextSibling) {
+            orig.parent.insertBefore(modal, orig.nextSibling);
+        } else {
+            orig.parent.appendChild(modal);
         }
-    }, 200);
+        delete _modalParents[modalId];
+    }
 
     // Restore body scroll only if no other modal is open
-    setTimeout(() => {
-        const anyOpen = document.querySelector('.active-modal');
-        if (!anyOpen) document.body.style.overflow = '';
-    }, 210);
+    const anyOpen = document.querySelector('.active-modal');
+    if (!anyOpen) document.body.style.overflow = '';
 }
 
 function closeEmailPreviewModal() {
