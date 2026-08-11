@@ -44,15 +44,15 @@
                             <div class="flex items-center justify-end space-x-2">
                                 <button onclick="openQuittanceEmailModal({{ q.id }}, '{{ q.public_ref }}')"
                                     class="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-all shadow-sm" title="Envoyer par email">
-                                    <i class="fas fa-paper-plane text-black text-sm font-bold" style="color: #000000 !important;"></i>
+                                    <i class="fas fa-paper-plane text-white text-sm font-bold"></i>
                                 </button>
                                 <a href="/quittance/document/{{ q.public_ref }}/pdf" target="_blank"
                                     class="p-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 transition-all shadow-sm" title="Télécharger PDF">
-                                    <i class="fas fa-file-pdf text-black text-sm font-bold" style="color: #000000 !important;"></i>
+                                    <i class="fas fa-file-pdf text-white text-sm font-bold"></i>
                                 </a>
                                 <button onclick="showDeleteModal('quittance', {{ q.id }}, 'Quittance {{ MOIS_FR[q.mois] }} {{ q.annee }}')"
                                     class="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 transition-all shadow-sm" title="Supprimer">
-                                    <i class="fas fa-trash-alt text-black text-sm font-bold" style="color: #000000 !important;"></i>
+                                    <i class="fas fa-trash-alt text-white text-sm font-bold"></i>
                                 </button>
                             </div>
                         </td>
@@ -89,7 +89,7 @@
             <div>
                 <label class="block text-sm font-bold text-white mb-1">Locataire *</label>
                 <select id="quittanceLocataire" name="locataire_id" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
-                    <option value="" style="color: #000;">-- Sélectionner un locataire --</option>
+                    <option value="">-- Sélectionner un locataire --</option>
                 </select>
             </div>
 
@@ -97,18 +97,18 @@
                 <div>
                     <label class="block text-sm font-bold text-white mb-1">Mois *</label>
                     <select id="quittanceMois" name="mois" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
-                        <option value="1" style="color: #000;">Janvier</option>
-                        <option value="2" style="color: #000;">Février</option>
-                        <option value="3" style="color: #000;">Mars</option>
-                        <option value="4" style="color: #000;">Avril</option>
-                        <option value="5" style="color: #000;">Mai</option>
-                        <option value="6" style="color: #000;">Juin</option>
-                        <option value="7" style="color: #000;">Juillet</option>
-                        <option value="8" style="color: #000;">Août</option>
-                        <option value="9" style="color: #000;">Septembre</option>
-                        <option value="10" style="color: #000;">Octobre</option>
-                        <option value="11" style="color: #000;">Novembre</option>
-                        <option value="12" style="color: #000;">Décembre</option>
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option>
+                        <option value="7">Juillet</option>
+                        <option value="8">Août</option>
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
                     </select>
                 </div>
                 <div>
@@ -284,7 +284,7 @@ async function submitCreerQuittance(event) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            closeModal('quittanceModal');
+            closeAllModals();
             showNotification(data.message || 'Quittance créée avec succès !', 'success');
             setTimeout(() => {
                 if (window.refreshPage) window.refreshPage();
@@ -314,11 +314,12 @@ function applyQuittanceEmailTemplate() {
     }
 }
 
-function openQuittanceEmailModal(quittanceId, quittanceRef) {
-    currentQuittanceEmailId = quittanceId;
-    currentQuittanceEmailRef = quittanceRef;
-    document.getElementById('quittanceEmailModele').value = 'standard';
-    document.getElementById('quittanceEmailIncludePdf').checked = true;
+function openQuittanceEmailModal(id, publicRef) {
+    currentQuittanceEmailId = id;
+    currentQuittanceEmailRef = publicRef;
+
+    const modele = document.getElementById('quittanceEmailModele');
+    if (modele) modele.value = 'standard';
     applyQuittanceEmailTemplate();
     openModal('quittanceEmailModal');
 }
@@ -348,7 +349,7 @@ async function sendQuittanceEmail() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            closeModal('quittanceEmailModal');
+            closeAllModals();
             showNotification(data.message || 'Email envoyé avec succès', 'success');
         } else {
             showNotification('Erreur: ' + (data.error || data.message || 'Erreur inconnue'), 'error');

@@ -68,14 +68,13 @@ function closeModal(modalId) {
     if (!modal) return;
 
     modal.classList.remove('active-modal');
+    modal.classList.add('hidden');
+    modal.style.cssText = 'display: none !important;';
+
     if (modal._backdropHandler) {
         modal.removeEventListener('click', modal._backdropHandler);
         delete modal._backdropHandler;
     }
-
-    // Instantly hide the modal
-    modal.style.display = 'none';
-    modal.classList.add('hidden');
 
     // Restore to original DOM position immediately
     const orig = _modalParents[modalId];
@@ -89,8 +88,27 @@ function closeModal(modalId) {
     }
 
     // Restore body scroll only if no other modal is open
-    const anyOpen = document.querySelector('.active-modal');
+    const anyOpen = document.querySelector('.active-modal:not(.hidden)');
     if (!anyOpen) document.body.style.overflow = '';
+}
+
+function closeAllModals() {
+    document.querySelectorAll('.active-modal, [id$="Modal"], [id$="modal"]').forEach(modal => {
+        modal.classList.remove('active-modal');
+        modal.classList.add('hidden');
+        modal.style.cssText = 'display: none !important;';
+
+        const orig = _modalParents[modal.id];
+        if (orig && orig.parent && document.body.contains(modal)) {
+            if (orig.nextSibling) {
+                orig.parent.insertBefore(modal, orig.nextSibling);
+            } else {
+                orig.parent.appendChild(modal);
+            }
+            delete _modalParents[modal.id];
+        }
+    });
+    document.body.style.overflow = '';
 }
 
 function closeEmailPreviewModal() {

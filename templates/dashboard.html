@@ -1,22 +1,22 @@
 <div class="container mx-auto px-4 py-8 space-y-8">
     <div class="flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <div class="w-14 h-14 rounded-2xl bg-black/5 border border-black/10 flex items-center justify-center shadow-sm">
-                <i class="fas fa-chart-pie text-black text-2xl" style="color: #000000 !important;"></i>
+            <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shadow-sm">
+                <i class="fas fa-chart-pie text-white text-2xl"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-black text-black" style="color: #000000 !important;">Dashboard</h1>
-                <p class="text-slate-600 mt-1 font-medium">{{ mois_actuel }} {{ annee_actuelle }}</p>
+                <h1 class="text-3xl font-black text-white">Dashboard</h1>
+                <p class="text-white/70 mt-1 font-medium">{{ mois_actuel }} {{ annee_actuelle }}</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <span class="px-4 py-2 rounded-xl bg-black/5 border border-black/10 text-slate-800 font-bold text-sm">
+            <span class="px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white font-bold text-sm">
                 {{ scis|length }} SCI{% if scis|length > 1 %}s{% endif %}
                 {% if biens_directs %}+ {{ biens_directs|length }} bien{% if biens_directs|length > 1 %}s{% endif %}{% endif %}
             </span>
             <button onclick="openModal('choixAjoutModal')"
-                    class="ios-button text-black font-bold w-10 h-10 flex items-center justify-center shadow-sm">
-                <i class="fas fa-plus text-black text-base" style="color: #000000 !important;"></i>
+                    class="ios-button text-white font-bold w-10 h-10 flex items-center justify-center shadow-sm">
+                <i class="fas fa-plus text-white text-base"></i>
             </button>
         </div>
     </div>
@@ -25,11 +25,11 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-semibold text-slate-600">Total Attendu</p>
-                    <p class="text-3xl font-bold text-slate-900 mt-2">{{ total_attendu|currency }}</p>
+                    <p class="text-sm font-semibold text-white/70">Total Attendu</p>
+                    <p class="text-3xl font-bold text-white mt-2">{{ total_attendu|currency }}</p>
                 </div>
                 <div class="stat-icon blue">
-                    <i class="fas fa-wallet text-black text-2xl font-bold" style="color: #000000 !important;"></i>
+                    <i class="fas fa-wallet text-white text-2xl font-bold"></i>
                 </div>
             </div>
         </div>
@@ -37,11 +37,11 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-semibold text-slate-600">Total Encaissé</p>
-                    <p class="text-3xl font-bold text-emerald-600 mt-2">{{ total_encaisse|currency }}</p>
+                    <p class="text-sm font-semibold text-white/70">Total Encaissé</p>
+                    <p class="text-3xl font-bold text-emerald-400 mt-2">{{ total_encaisse|currency }}</p>
                 </div>
                 <div class="stat-icon green">
-                    <i class="fas fa-check-circle text-black text-2xl font-bold" style="color: #000000 !important;"></i>
+                    <i class="fas fa-check-circle text-white text-2xl font-bold"></i>
                 </div>
             </div>
         </div>
@@ -49,11 +49,11 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-semibold text-slate-600">Reste à Percevoir</p>
-                    <p class="text-3xl font-bold text-red-600 mt-2">{{ reste_global|currency }}</p>
+                    <p class="text-sm font-semibold text-white/70">Reste à Percevoir</p>
+                    <p class="text-3xl font-bold text-red-400 mt-2">{{ reste_global|currency }}</p>
                 </div>
                 <div class="stat-icon red">
-                    <i class="fas fa-exclamation-triangle text-black text-2xl font-bold" style="color: #000000 !important;"></i>
+                    <i class="fas fa-exclamation-triangle text-white text-2xl font-bold"></i>
                 </div>
             </div>
         </div>

@@ -1213,11 +1213,22 @@ html[data-theme="light"] #app-body .bg-red-600 * {
     -webkit-backdrop-filter: blur(8px) !important;
 }
 
+[id$="Modal"].hidden,
+[id$="modal"].hidden,
+.fixed.inset-0.hidden,
+div.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 [id$="Modal"].flex,
 [id$="modal"].flex,
-[id$="Modal"]:not(.hidden),
-[id$="modal"]:not(.hidden) {
+[id$="Modal"].active-modal,
+[id$="modal"].active-modal {
     display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 [id$="Modal"] > div,
@@ -1228,6 +1239,56 @@ html[data-theme="light"] #app-body .bg-red-600 * {
     z-index: 100000 !important;
     position: relative !important;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ==========================================================================
+   SUPER FORCED WHITE THEME FOR ALL ICONS, TEXTS, LABELS, BUTTONS & POPUPS
+   ========================================================================== */
+i, svg, .fas, .far, .fab, .fal, .fad {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+[id$="Modal"],
+[id$="modal"],
+.glass-card,
+.modal-content {
+    color: #ffffff !important;
+}
+
+[id$="Modal"] *,
+[id$="modal"] *,
+.glass-card * {
+    color: #ffffff !important;
+}
+
+[id$="Modal"] i,
+[id$="modal"] i,
+[id$="Modal"] svg,
+[id$="modal"] svg,
+.glass-card i,
+.glass-card svg,
+button i,
+a i {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+[id$="Modal"] input,
+[id$="modal"] input,
+[id$="Modal"] select,
+[id$="modal"] select,
+[id$="Modal"] textarea,
+[id$="modal"] textarea {
+    color: #ffffff !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[id$="Modal"] select option,
+[id$="modal"] select option {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
 }
 
 
