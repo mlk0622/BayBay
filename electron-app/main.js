@@ -107,6 +107,38 @@ function checkUrlReachable(urlStr, timeoutMs) {
     });
 }
 
+function getConnectionErrorPage() {
+    const isDark = appTheme !== 'light';
+    const bg = isDark ? '#0b131a' : '#F2EFF6';
+    const cardBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.7)';
+    const cardBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+    const titleColor = isDark ? '#f3f7ff' : '#121214';
+    const textColor = isDark ? 'rgba(203,213,225,0.8)' : '#5C5C64';
+    const btnBg = isDark ? 'linear-gradient(135deg,#4fafd9 0%,#1f5fb6 100%)' : 'linear-gradient(135deg,rgba(168,85,247,0.8) 0%,rgba(192,132,252,0.4) 100%)';
+    const btnShadow = isDark ? 'rgba(31,95,182,0.4)' : 'rgba(168,85,247,0.25)';
+
+    return `data:text/html;charset=utf-8,${encodeURIComponent(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:${bg};display:flex;justify-content:center;align-items:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-app-region:drag}
+.card{background:${cardBg};border:1px solid ${cardBorder};border-radius:20px;padding:40px;max-width:420px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.15);-webkit-app-region:no-drag}
+.icon{font-size:48px;margin-bottom:16px}
+h1{font-size:20px;font-weight:700;color:${titleColor};margin-bottom:8px}
+p{font-size:14px;color:${textColor};line-height:1.6;margin-bottom:24px}
+.btn{display:inline-block;padding:12px 32px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.25);color:#fff;background:${btnBg};box-shadow:0 4px 15px ${btnShadow};text-decoration:none;transition:all 0.2s ease}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.url{font-size:12px;color:${textColor};opacity:0.6;margin-top:16px;word-break:break-all}
+</style></head><body>
+<div class="card">
+<div class="icon">📡</div>
+<h1>Connexion impossible</h1>
+<p>Impossible de se connecter au serveur Bay Bay.<br>Vérifiez votre connexion internet et réessayez.</p>
+<a class="btn" href="javascript:void(0)" onclick="window.location.reload()">Réessayer</a>
+<div class="url">${CLOUD_URL}</div>
+</div>
+</body></html>`)}`;
+}
+
 function createMainWindow() {
     if (mainWindow) return mainWindow;
     mainWindow = new BrowserWindow({
@@ -127,46 +159,80 @@ function createMainWindow() {
         title: APP_NAME
     });
 
-    // Raccourci F8 pour effacer la session (déconnexion forcée)
+    // Track which URLs have already failed to prevent infinite cascade
+    let failedUrls = new Set();
+
+    // Raccourci F8 pour effacer la session (déconnexion forcée), F5 pour recharger
     mainWindow.webContents.on('before-input-event', (event, input) => {
         if (input.key === 'F8') {
             const session = mainWindow.webContents.session;
             session.clearStorageData().then(() => {
                 console.log("Session et cookies effacés.");
-                mainWindow.webContents.reload();
+                failedUrls.clear();
+                mainWindow.loadURL(CLOUD_URL);
             });
+        }
+        if (input.key === 'F5') {
+            console.log("F5 pressed: reloading and retrying Cloud...");
+            failedUrls.clear();
+            mainWindow.loadURL(CLOUD_URL);
         }
     });
 
-    console.log(`Vérification de la disponibilité du serveur Cloud : ${CLOUD_URL}...`);
-    checkUrlReachable(CLOUD_URL, 1500).then((isReachable) => {
-        mainWindow.webContents.session.clearCache().then(() => {
-            console.log("Cache Electron effacé pour éviter l'ancien thème/code");
-            if (isReachable) {
-                console.log(`Le serveur Cloud est en ligne. Chargement de : ${CLOUD_URL}`);
-                mainWindow.loadURL(CLOUD_URL);
-            } else {
-                const localUrl = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
-                console.log(`Le serveur Cloud est hors ligne ou inaccessible. Repli immédiat sur le serveur local : ${localUrl}`);
-                mainWindow.loadURL(localUrl);
-            }
+    function loadCloudOrFallback() {
+        console.log(`Vérification de la disponibilité du serveur Cloud : ${CLOUD_URL}...`);
+        checkUrlReachable(CLOUD_URL, 3000).then((isReachable) => {
+            if (mainWindow.isDestroyed()) return;
+            mainWindow.webContents.session.clearCache().then(() => {
+                if (mainWindow.isDestroyed()) return;
+                console.log("Cache Electron effacé pour éviter l'ancien thème/code");
+                if (isReachable) {
+                    console.log(`Le serveur Cloud est en ligne. Chargement de : ${CLOUD_URL}`);
+                    mainWindow.loadURL(CLOUD_URL);
+                } else {
+                    console.log(`Le serveur Cloud est hors ligne. Affichage de l'écran d'erreur de connexion.`);
+                    showConnectionError();
+                }
+            });
         });
-    });
+    }
+
+    function showConnectionError() {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.loadURL(getConnectionErrorPage());
+        }
+    }
+
+    loadCloudOrFallback();
 
     // Repli automatique en cas de problème de connexion
     mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+        // Ignore aborted loads (e.g. when we navigate away before the page finishes)
+        if (errorCode === -3) return;
+
         console.log(`Échec du chargement de l'URL : ${validatedURL} (Erreur ${errorCode}: ${errorDescription})`);
-        
+        failedUrls.add(validatedURL);
+
+        // If Cloud URL failed, try local backend once
         const localUrl = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
-        
-        if (validatedURL === CLOUD_URL) {
-            console.log(`Serveur Cloud inaccessible lors du chargement. Repli sur le serveur local : ${localUrl}...`);
+        if (validatedURL.startsWith(CLOUD_URL) && !failedUrls.has(localUrl)) {
+            console.log(`Serveur Cloud inaccessible. Repli sur le serveur local : ${localUrl}...`);
             mainWindow.loadURL(localUrl);
-        } else if (validatedURL === localUrl) {
-            const fallbackPort = BACKEND_PORT === 5001 ? 5000 : 5001;
-            const fallbackUrl = `http://${BACKEND_HOST}:${fallbackPort}`;
-            console.log(`Serveur local sur le port ${BACKEND_PORT} inaccessible. Tentative de repli sur : ${fallbackUrl}...`);
-            mainWindow.loadURL(fallbackUrl);
+        } else {
+            // All options exhausted — show styled error page instead of white screen
+            console.log(`Tous les serveurs sont inaccessibles. Affichage de la page d'erreur.`);
+            showConnectionError();
+        }
+    });
+
+    // When user clicks "Réessayer" on the error page, it does a reload which triggers navigation
+    // We intercept will-navigate to clear failedUrls and retry the Cloud
+    mainWindow.webContents.on('will-navigate', (event, url) => {
+        // If we're on the error page and user triggers reload, redirect to Cloud
+        if (url.startsWith('data:')) {
+            event.preventDefault();
+            failedUrls.clear();
+            loadCloudOrFallback();
         }
     });
 
@@ -182,16 +248,16 @@ function createMainWindow() {
     windowLoaded = false;
     minTimePassed = false;
 
-    mainWindow.webContents.once('did-finish-load', () => {
+    mainWindow.webContents.on('did-finish-load', () => {
         console.log("mainWindow: did-finish-load event fired.");
-        // Fallback to show window if frontend-ready is not received within 3.5s of did-finish-load
+        // Always mark as loaded after a short delay to prevent white screen
         setTimeout(() => {
             if (!windowLoaded) {
                 console.log("mainWindow: did-finish-load fallback triggered (no frontend-ready received).");
                 windowLoaded = true;
                 checkAndShow();
             }
-        }, 3500);
+        }, 2000);
     });
 
     setTimeout(() => {
