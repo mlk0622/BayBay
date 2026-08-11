@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux
 
-VERSION = "3.5.3"
+VERSION = "3.5.4"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
