@@ -269,7 +269,7 @@ button[type="submit"],
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* ALL icons inside buttons and badges MUST BE BLACK */
+/* ALL icons inside buttons, stat cards, and badges MUST BE BLACK */
 .ios-button i,
 .ios-button-success i,
 .ios-button-danger i,
@@ -284,12 +284,26 @@ button i,
 .bg-yellow-500 i,
 .bg-purple-600 i,
 .stat-icon i,
+.btn i,
+a.bg-primary i,
+.nav-pill-container i {
+    color: #000000 !important;
+}
+
+/* SVG icons handling: apply black stroke and black color without breaking fill="none" paths */
 .stat-icon svg,
 button svg,
 .ios-button svg,
-.btn i,
-a.bg-primary i {
+.ios-button-success svg,
+.ios-button-danger svg,
+.ios-button-warning svg,
+.ios-button-purple svg {
     color: #000000 !important;
+    stroke: #000000 !important;
+}
+
+.stat-icon svg path[fill]:not([fill="none"]),
+button svg path[fill]:not([fill="none"]) {
     fill: #000000 !important;
 }
 

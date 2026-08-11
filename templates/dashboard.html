@@ -1,26 +1,22 @@
 <div class="container mx-auto px-4 py-8 space-y-8">
     <div class="flex justify-between items-center">
         <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-400/20 to-pink-400/20 flex items-center justify-center">
-                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                </svg>
+            <div class="w-14 h-14 rounded-2xl bg-black/5 border border-black/10 flex items-center justify-center shadow-sm">
+                <i class="fas fa-chart-pie text-black text-2xl" style="color: #000000 !important;"></i>
             </div>
             <div>
-                <h1 class="text-3xl font-bold text-white">Dashboard</h1>
-                <p class="text-white/60 mt-1">{{ mois_actuel }} {{ annee_actuelle }}</p>
+                <h1 class="text-3xl font-black text-black" style="color: #000000 !important;">Dashboard</h1>
+                <p class="text-slate-600 mt-1 font-medium">{{ mois_actuel }} {{ annee_actuelle }}</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <span class="px-4 py-2 rounded-xl bg-blue-400/20 text-blue-400 font-medium">
+            <span class="px-4 py-2 rounded-xl bg-black/5 border border-black/10 text-slate-800 font-bold text-sm">
                 {{ scis|length }} SCI{% if scis|length > 1 %}s{% endif %}
                 {% if biens_directs %}+ {{ biens_directs|length }} bien{% if biens_directs|length > 1 %}s{% endif %}{% endif %}
             </span>
             <button onclick="openModal('choixAjoutModal')"
-                    class="ios-button text-white w-10 h-10 flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                </svg>
+                    class="ios-button text-black font-bold w-10 h-10 flex items-center justify-center shadow-sm">
+                <i class="fas fa-plus text-black text-base" style="color: #000000 !important;"></i>
             </button>
         </div>
     </div>
@@ -29,8 +25,8 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-white/50">Total Attendu</p>
-                    <p class="text-3xl font-bold text-white mt-2">{{ total_attendu|currency }}</p>
+                    <p class="text-sm font-semibold text-slate-600">Total Attendu</p>
+                    <p class="text-3xl font-bold text-slate-900 mt-2">{{ total_attendu|currency }}</p>
                 </div>
                 <div class="stat-icon blue">
                     <i class="fas fa-wallet text-black text-2xl font-bold" style="color: #000000 !important;"></i>
@@ -41,7 +37,7 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-slate-500">Total Encaissé</p>
+                    <p class="text-sm font-semibold text-slate-600">Total Encaissé</p>
                     <p class="text-3xl font-bold text-emerald-600 mt-2">{{ total_encaisse|currency }}</p>
                 </div>
                 <div class="stat-icon green">
@@ -53,7 +49,7 @@
         <div class="stat-card p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-sm font-medium text-slate-500">Reste à Percevoir</p>
+                    <p class="text-sm font-semibold text-slate-600">Reste à Percevoir</p>
                     <p class="text-3xl font-bold text-red-600 mt-2">{{ reste_global|currency }}</p>
                 </div>
                 <div class="stat-icon red">
@@ -65,17 +61,15 @@
 
     {% if impayes %}
     <div class="glass-card">
-        <div class="p-6 border-b border-white/10">
+        <div class="p-6 border-b border-slate-200">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-red-400/20 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+                    <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                        <i class="fas fa-exclamation-circle text-red-600 text-lg"></i>
                     </div>
-                    <h3 class="text-xl font-semibold text-white">Impayés</h3>
+                    <h3 class="text-xl font-bold text-slate-900">Impayés</h3>
                 </div>
-                <span class="px-3 py-1 rounded-lg bg-red-400/20 text-red-400 font-medium">{{ impayes|length }}</span>
+                <span class="px-3 py-1 rounded-lg bg-red-500/10 text-red-600 font-bold text-sm">{{ impayes|length }}</span>
             </div>
         </div>
         <div class="overflow-x-auto">
