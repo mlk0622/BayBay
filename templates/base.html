@@ -998,45 +998,20 @@
                 loadPageViaAjax(window.location.href);
             });
 
-            // Auto-invalidate page cache on any API data change (fetch/XHR modifications)
-            const originalFetch = window.fetch;
-            window.fetch = function(input, init) {
-                const method = (init && init.method) ? init.method.toUpperCase() : 'GET';
-                return originalFetch.apply(this, arguments).then(response => {
-                    if (method !== 'GET' && response.ok) {
-                        invalidateCache();
-                    }
-                    return response;
-                });
-            };
+            // Note: automatic cache invalidation is DISABLED to avoid unwanted navigation.
+            // Each modal/form handles its own refresh after a successful API call.
 
-            const originalOpen = XMLHttpRequest.prototype.open;
-            const originalSend = XMLHttpRequest.prototype.send;
-            XMLHttpRequest.prototype.open = function(method, url) {
-                this._method = method;
-                return originalOpen.apply(this, arguments);
-            };
-            XMLHttpRequest.prototype.send = function() {
-                this.addEventListener('load', () => {
-                    const method = (this._method || 'GET').toUpperCase();
-                    if (method !== 'GET' && this.status >= 200 && this.status < 300) {
-                        invalidateCache();
-                    }
-                });
-                return originalSend.apply(this, arguments);
-            };
-
-            // SPA refresh page instead of hard reload — stays on the currently visible page
+            // SPA refresh: reload the current view's content in-place
             window.refreshPage = function() {
                 const currentPath = window.location.pathname;
-                console.log("SPA: Refreshing page:", currentPath);
-                // Reload just the current view content without navigation
-                fetch(window.location.href)
+                console.log('SPA: refreshPage', currentPath);
+                // Use the originalFetch to avoid triggering any interceptors
+                const fetchFn = window.__originalFetch || fetch;
+                fetchFn('/?_=' + Date.now())
                     .then(res => res.text())
                     .then(htmlText => {
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(htmlText, 'text/html');
-                        // Update all loaded views (main tabs)
                         doc.querySelectorAll('.app-view').forEach(newView => {
                             const path = newView.dataset.path;
                             if (path && loadedViews[path]) {
@@ -1047,19 +1022,9 @@
                                 }
                             }
                         });
-                        // Also try to update current path-specific view
-                        const newView = doc.querySelector('.app-view');
-                        const curView = loadedViews[currentPath];
-                        if (newView && curView && !newView.dataset.path) {
-                            curView.innerHTML = newView.innerHTML;
-                            executeScripts(curView);
-                        }
-                        console.log("SPA: Page refreshed successfully.");
+                        console.log('SPA: refreshPage done, active view preserved.');
                     })
-                    .catch(() => {
-                        // Fallback: full page reload as last resort
-                        location.reload();
-                    });
+                    .catch(() => location.reload());
             };
 
             // Close any open modal with ESC key

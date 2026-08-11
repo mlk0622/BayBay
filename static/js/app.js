@@ -2,33 +2,39 @@
 // BayBay - Application JavaScript
 // =====================================================
 
+// Modal teleportation registry: original parent per modal id
+const _modalParents = {};
+
 // Modal functions
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
 
-    // Full-page overlay setup
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.right = '0';
-    modal.style.bottom = '0';
-    modal.style.width = '100vw';
-    modal.style.height = '100vh';
-    modal.style.zIndex = '99999';
-    modal.style.display = 'flex';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-    modal.style.padding = '1.5rem';
-    modal.style.boxSizing = 'border-box';
-    // Frosted glass full-page blur
-    if (!modal.style.background || modal.style.background === 'none') {
-        modal.style.background = 'rgba(0,0,0,0.65)';
+    // Teleport to <body> to escape CSS transform ancestors (which break position:fixed)
+    if (modal.parentElement !== document.body) {
+        _modalParents[modalId] = { parent: modal.parentElement, nextSibling: modal.nextSibling };
+        document.body.appendChild(modal);
     }
-    modal.style.backdropFilter = 'blur(10px)';
-    modal.style.webkitBackdropFilter = 'blur(10px)';
 
-    // Center the inner content
+    // Full-page overlay styling
+    modal.style.cssText = [
+        'position: fixed',
+        'top: 0',
+        'left: 0',
+        'width: 100vw',
+        'height: 100vh',
+        'display: flex',
+        'align-items: center',
+        'justify-content: center',
+        'padding: 1.5rem',
+        'box-sizing: border-box',
+        'z-index: 99999',
+        'background: rgba(0,0,0,0.65)',
+        'backdrop-filter: blur(12px)',
+        '-webkit-backdrop-filter: blur(12px)'
+    ].join(';');
+
+    // Center the inner card
     const inner = modal.firstElementChild;
     if (inner) {
         inner.style.margin = 'auto';
@@ -36,6 +42,7 @@ function openModal(modalId) {
         inner.style.overflowY = 'auto';
         inner.style.position = 'relative';
         inner.style.zIndex = '100000';
+        inner.style.width = '100%';
     }
 
     modal.classList.remove('hidden');
@@ -52,20 +59,35 @@ function openModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
+
     modal.classList.remove('active-modal');
     if (modal._backdropHandler) {
         modal.removeEventListener('click', modal._backdropHandler);
         delete modal._backdropHandler;
     }
+
     setTimeout(() => {
-        if (!modal.classList.contains('active-modal')) {
-            modal.style.display = 'none';
-            modal.classList.add('hidden');
+        if (modal.classList.contains('active-modal')) return; // re-opened
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+
+        // Restore to original DOM position
+        const orig = _modalParents[modalId];
+        if (orig && orig.parent && document.body.contains(modal)) {
+            if (orig.nextSibling) {
+                orig.parent.insertBefore(modal, orig.nextSibling);
+            } else {
+                orig.parent.appendChild(modal);
+            }
+            delete _modalParents[modalId];
         }
     }, 200);
+
     // Restore body scroll only if no other modal is open
-    const anyOpen = document.querySelector('[id$="Modal"].active-modal, [id$="modal"].active-modal');
-    if (!anyOpen) document.body.style.overflow = '';
+    setTimeout(() => {
+        const anyOpen = document.querySelector('.active-modal');
+        if (!anyOpen) document.body.style.overflow = '';
+    }, 210);
 }
 
 function closeEmailPreviewModal() {
