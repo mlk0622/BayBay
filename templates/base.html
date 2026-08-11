@@ -160,9 +160,7 @@
         };
 
         (function initTheme() {
-            // Load saved theme preference (default to light which is the eye-friendly dimmed theme)
-            const savedTheme = localStorage.getItem('baybay-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.documentElement.setAttribute('data-theme', 'light');
         })();
     </script>
 </head>
@@ -265,9 +263,6 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <button id="themeToggle" class="w-10 h-10 flex items-center justify-center rounded-xl transition-all" title="Changer de thème" style="border: 1px solid var(--border-glass); background: rgba(255,255,255,0.06); color: var(--text-main);">
-                        <i id="themeIcon" class="fas fa-moon text-lg"></i>
-                    </button>
                     <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
                         <i class="fas fa-sign-out-alt mr-1"></i>Se deconnecter
                     </a>
@@ -284,7 +279,6 @@
                 <a href="{{ url_for('appels_loyer') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'appels_loyer' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Appels</a>
                 <a href="{{ url_for('quittances') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'quittances' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Quittances</a>
                 <a href="{{ url_for('parametres') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'parametres' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}"><i class="fas fa-cog"></i></a>
-                <button id="themeToggleMobile" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100"><i class="fas fa-moon"></i></button>
                 <a href="{{ url_for('logout') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50">Deconnexion</a>
             </div>
         </div>

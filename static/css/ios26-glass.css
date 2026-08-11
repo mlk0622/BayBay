@@ -3,99 +3,63 @@
  * ====================================================
  */
 
+/* 
+ * iOS Liquid Glass Design System - Single Off-White / Light Gray Theme
+ * ==================================================================
+ */
+
 :root {
-    --bg-1: #010435;              /* Very dark navy from palette */
-    --bg-2: #0b131a;              /* Very dark slate background from palette */
-    --bg-3: #021d83;              /* Dark blue from palette */
-    --text-main: #d2e9f3;         /* Very light cyan from palette */
-    --text-muted: #9bd4ec;        /* Medium cyan from palette */
+    /* Fond blanc casse / gris tres doux */
+    --bg-1: #F8FAFC;              /* Slate 50 off-white background */
+    --bg-2: #F1F5F9;              /* Slate 100 soft light gray */
+    --bg-3: #E2E8F0;              /* Slate 200 light border tint */
+    --text-main: #0F172A;         /* Slate 900 dark text for optimal contrast */
+    --text-muted: #475569;        /* Slate 600 muted text */
     
-    /* Premium Liquid Glass Effects (Accentuated border & reflections) */
-    --border-glass: rgba(155, 212, 236, 0.22);
-    --surface-glass: rgba(1, 4, 53, 0.45);
-    --surface-glass-strong: rgba(1, 4, 53, 0.65);
-    --surface-nav: rgba(11, 19, 26, 0.65);
+    /* Liquid Glass Effects */
+    --border-glass: rgba(0, 0, 0, 0.08);
+    --surface-glass: rgba(255, 255, 255, 0.75);
+    --surface-glass-strong: rgba(255, 255, 255, 0.9);
+    --surface-nav: rgba(248, 250, 252, 0.85);
     
-    --shadow-soft: 0 24px 60px -15px rgba(0, 0, 0, 0.6);
-    --primary: #4fafd9;           /* Vibrant sky blue from palette */
-    --primary-strong: #1f5fb6;    /* Royal blue from palette */
+    --shadow-soft: 0 12px 32px -8px rgba(0, 0, 0, 0.06);
     
-    --success: #34d399;
-    --danger: #f87171;
-    --warning: #fbbf24;
+    /* Functional Palette Colors */
+    --primary: #3b82f6;           /* Bleu (Actions principales) */
+    --primary-strong: #2563eb;
+    --success: #10b981;           /* Vert (Validation / Ajouter) */
+    --danger: #ef4444;            /* Rouge (Supprimer / Danger) */
+    --warning: #f59e0b;           /* Jaune / Amber (Avertissement / Modifier) */
+    --purple: #8b5cf6;            /* Violet (Options / Filtres / Spécial) */
 
-    /* Dynamic Theme Variables */
-    --modal-bg-end: rgba(10, 16, 32, 0.97);
-    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, rgba(255, 255, 255, 0.0) 60%, rgba(255, 255, 255, 0.05) 100%);
-    --input-bg: rgba(255, 255, 255, 0.04);
-    --input-border: rgba(255, 255, 255, 0.15);
-    --select-bg: #0d172a;
-    --select-scheme: dark;
-    --titlebar-bg: rgba(1, 4, 53, 0.4);
-    --titlebar-text: #9bd4ec;
-    --titlebar-border: rgba(155, 212, 236, 0.1);
-    --table-header-bg: rgba(255, 255, 255, 0.02);
-    --row-hover-bg: rgba(255, 255, 255, 0.04);
-    --modal-border-color: rgba(255, 255, 255, 0.1);
-
-    --scrollbar-thumb: rgba(79, 175, 217, 0.15);
-    --scrollbar-thumb-hover: rgba(79, 175, 217, 0.45);
-    --blob-1: rgba(96, 165, 250, 0.25);
-    --blob-2: rgba(56, 189, 248, 0.22);
-    --blob-3: rgba(129, 140, 248, 0.12);
-
-    /* Rich Text Editor Variables (Dark Theme) */
-    --editor-bg: rgba(0, 0, 0, 0.22);
-    --editor-text: #ffffff;
-    --editor-border: rgba(255, 255, 255, 0.18);
-    --editor-toolbar-bg: rgba(255, 255, 255, 0.04);
-    --editor-btn-bg: rgba(255, 255, 255, 0.05);
-    --editor-btn-text: #ffffff;
-    --editor-placeholder: rgba(255, 255, 255, 0.35);
-}
-
-html[data-theme="light"] {
-    --bg-1: #F2EFF6;              /* Beige/Crème retro-éclairé (starting point) */
-    --bg-2: #EAE5DF;              /* Beige/Crème retro-éclairé (end point) */
-    --bg-3: #F0EBE6;              /* Intermediate crème */
-    --text-main: #121214;         /* Noir profond et pur */
-    --text-muted: #5C5C64;        /* Gris anthracite doux */
-    
-    --border-glass: rgba(255, 255, 255, 0.5);
-    --surface-glass: rgba(255, 255, 255, 0.3);
-    --surface-glass-strong: rgba(255, 255, 255, 0.55);
-    --surface-nav: rgba(242, 239, 246, 0.75);
-    
-    --shadow-soft: 0 24px 60px -15px rgba(0, 0, 0, 0.08);
-
-    /* Dynamic Theme Variables - Comfortably Dimmed Beige/Crème Glass */
-    --modal-bg-end: rgba(234, 229, 223, 0.98);
-    --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(45, 212, 191, 0.05) 100%);
+    /* Dynamic Component Variables */
+    --modal-bg-end: rgba(248, 250, 252, 0.98);
+    --card-bg: #FFFFFF;
     --input-bg: #FFFFFF;
-    --input-border: rgba(92, 92, 100, 0.15);
+    --input-border: rgba(15, 23, 42, 0.15);
     --select-bg: #FFFFFF;
     --select-scheme: light;
-    --titlebar-bg: rgba(242, 239, 246, 0.85);
-    --titlebar-text: #121214;
-    --titlebar-border: rgba(255, 255, 255, 0.5);
-    --table-header-bg: rgba(0, 0, 0, 0.02);
-    --row-hover-bg: rgba(168, 85, 247, 0.04);
-    --modal-border-color: rgba(255, 255, 255, 0.6);
+    --titlebar-bg: rgba(241, 245, 249, 0.95);
+    --titlebar-text: #0F172A;
+    --titlebar-border: rgba(0, 0, 0, 0.08);
+    --table-header-bg: rgba(0, 0, 0, 0.03);
+    --row-hover-bg: rgba(59, 130, 246, 0.04);
+    --modal-border-color: rgba(0, 0, 0, 0.1);
 
-    --scrollbar-thumb: rgba(168, 85, 247, 0.2);
-    --scrollbar-thumb-hover: rgba(168, 85, 247, 0.5);
-    --blob-1: rgba(168, 85, 247, 0.07);
-    --blob-2: rgba(13, 148, 136, 0.06);
-    --blob-3: rgba(192, 132, 252, 0.04);
+    --scrollbar-thumb: rgba(15, 23, 42, 0.2);
+    --scrollbar-thumb-hover: rgba(15, 23, 42, 0.4);
+    --blob-1: rgba(59, 130, 246, 0.05);
+    --blob-2: rgba(139, 92, 246, 0.05);
+    --blob-3: rgba(16, 185, 129, 0.04);
 
-    /* Rich Text Editor Variables (Light Theme) */
+    /* Rich Text Editor Variables */
     --editor-bg: #ffffff;
-    --editor-text: #121214;
-    --editor-border: rgba(18, 18, 20, 0.15);
-    --editor-toolbar-bg: rgba(242, 239, 246, 0.85);
+    --editor-text: #0F172A;
+    --editor-border: rgba(15, 23, 42, 0.15);
+    --editor-toolbar-bg: #F1F5F9;
     --editor-btn-bg: #ffffff;
-    --editor-btn-text: #121214;
-    --editor-placeholder: #5C5C64;
+    --editor-btn-text: #0F172A;
+    --editor-placeholder: #64748B;
 }
 
 /* Animations de vagues liquides en arrière-plan */
@@ -269,84 +233,146 @@ body.app-shell::after {
     box-shadow: 0 0 15px rgba(248, 113, 113, 0.3) !important;
 }
 
-/* Premium Liquid Glass Buttons (Lighter Blue Gradients) */
+/* Functional Button Palette (Blue, Green, Red, Yellow, Purple) */
 .ios-button,
 .ios-button-success,
 .ios-button-danger,
+.ios-button-warning,
+.ios-button-purple,
 button[type="submit"],
 .bg-primary,
-.bg-blue-600 {
+.bg-blue-600,
+.bg-green-600,
+.bg-red-600,
+.bg-yellow-500,
+.bg-purple-600 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-weight: 600;
+    font-weight: 700 !important;
     border-radius: 14px !important;
     padding: 0.7rem 1.4rem !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    color: #000000 !important;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
 }
 
+/* ALL icons inside buttons and badges MUST BE BLACK */
+.ios-button i,
+.ios-button-success i,
+.ios-button-danger i,
+.ios-button-warning i,
+.ios-button-purple i,
+button[type="submit"] i,
+button i,
+.bg-primary i,
+.bg-blue-600 i,
+.bg-green-600 i,
+.bg-red-600 i,
+.bg-yellow-500 i,
+.bg-purple-600 i,
+.stat-icon i,
+.stat-icon svg,
+button svg,
+.ios-button svg,
+.btn i,
+a.bg-primary i {
+    color: #000000 !important;
+    fill: #000000 !important;
+}
+
+/* 1. BLEU - Actions principales / Navigation / Soumission par défaut */
 .ios-button,
-button[type="submit"]:not(.bg-red-600):not(.bg-green-600),
+button[type="submit"]:not(.bg-red-600):not(.bg-green-600):not(.bg-yellow-500):not(.bg-purple-600),
 .bg-primary,
-.bg-blue-600 {
-    background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%) !important;
-    box-shadow: 0 10px 25px -5px rgba(96, 165, 250, 0.4) !important;
+.bg-blue-600,
+.ios-btn-blue {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+    color: #000000 !important;
 }
 
+/* 2. VERT - Validation / Confirmation / Enregistrer / Ajouter */
 .ios-button-success,
-.bg-green-600 {
-    background: linear-gradient(135deg, #34d399 0%, #059669 100%) !important;
-    box-shadow: 0 10px 25px -5px rgba(52, 211, 153, 0.4) !important;
+.bg-green-600,
+.bg-emerald-600,
+.ios-btn-green {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+    color: #000000 !important;
 }
 
+/* 3. ROUGE - Suppression / Annulation / Déconnexion / Danger */
 .ios-button-danger,
-.bg-red-600 {
-    background: linear-gradient(135deg, #f87171 0%, #dc2626 100%) !important;
-    box-shadow: 0 10px 25px -5px rgba(248, 113, 113, 0.4) !important;
+.bg-red-600,
+.ios-btn-red {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+    color: #000000 !important;
+}
+
+/* 4. JAUNE - Avertissement / Attention / Modification / Alertes */
+.ios-button-warning,
+.bg-yellow-500,
+.bg-amber-500,
+.ios-btn-yellow {
+    background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%) !important;
+    color: #000000 !important;
+}
+
+/* 5. VIOLET - Options / Filtres / Actions Spéciales */
+.ios-button-purple,
+.bg-purple-600,
+.bg-indigo-600,
+.ios-btn-purple {
+    background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important;
+    color: #000000 !important;
 }
 
 .ios-button:hover,
 .ios-button-success:hover,
 .ios-button-danger:hover,
+.ios-button-warning:hover,
+.ios-button-purple:hover,
 button[type="submit"]:hover,
 .bg-primary:hover,
-.bg-blue-600:hover {
+.bg-blue-600:hover,
+.bg-green-600:hover,
+.bg-red-600:hover,
+.bg-yellow-500:hover,
+.bg-purple-600:hover {
     transform: translateY(-2px) scale(1.02);
-    filter: brightness(1.15);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
+    filter: brightness(1.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
 }
 
 .ios-button:active,
 .ios-button-success:active,
 .ios-button-danger:active,
+.ios-button-warning:active,
+.ios-button-purple:active,
 button[type="submit"]:active {
     transform: translateY(0) scale(0.98);
 }
 
-/* Secondary Cancel buttons */
+/* Secondary Cancel/Ghost buttons */
 button.bg-white,
 button[class*="bg-white"],
 button[class*="border-slate-200"],
 [id$="Modal"] button[class*="text-slate-700"] {
-    color: var(--text-main) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid var(--border-glass) !important;
+    color: #0F172A !important;
+    background: #FFFFFF !important;
+    border: 1px solid rgba(15, 23, 42, 0.15) !important;
     border-radius: 14px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
     transition: all 0.2s ease !important;
 }
 
 button.bg-white:hover,
 button[class*="bg-white"]:hover,
 button[class*="border-slate-200"]:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+    background: #F1F5F9 !important;
+    border-color: rgba(15, 23, 42, 0.25) !important;
 }
 
 /* Glass inputs and textareas */
