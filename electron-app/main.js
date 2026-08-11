@@ -224,14 +224,29 @@ function createMainWindow() {
         }
     });
 
-    // When user clicks "Réessayer" on the error page, it does a reload which triggers navigation
-    // We intercept will-navigate to clear failedUrls and retry the Cloud
+    // Interception des téléchargements pour les ouvrir directement dans Chrome (navigateur externe)
+    mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
+        const downloadUrl = item.getURL();
+        console.log(`Fichier détecté pour téléchargement -> Ouverture dans Chrome : ${downloadUrl}`);
+        event.preventDefault();
+        shell.openExternal(downloadUrl);
+    });
+
+    // Navigation interception
     mainWindow.webContents.on('will-navigate', (event, url) => {
-        // If we're on the error page and user triggers reload, redirect to Cloud
+        // Data URIs (page d'erreur)
         if (url.startsWith('data:')) {
             event.preventDefault();
             failedUrls.clear();
             loadCloudOrFallback();
+            return;
+        }
+
+        // Si le lien est un fichier / PDF / export -> Ouvrir dans Chrome au lieu de l'application
+        if (url.includes('/pdf/') || url.includes('/uploads/') || url.endsWith('.pdf') || url.includes('download') || url.includes('/export/')) {
+            event.preventDefault();
+            console.log(`Lien de fichier intercepté -> Ouverture dans Chrome : ${url}`);
+            shell.openExternal(url);
         }
     });
 

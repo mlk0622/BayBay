@@ -237,7 +237,7 @@
 
                 <!-- Navigation Desktop -->
                 <div class="hidden lg:flex items-center gap-1 relative nav-pill-container">
-                    <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: linear-gradient(135deg, rgba(52, 211, 153, 0.9) 0%, rgba(16, 185, 129, 0.95) 100%); border: 1px solid rgba(255,255,255,0.7); box-shadow: inset 2px 2px 3px 0 rgba(255,255,255,0.6), inset -1px -1px 2px 1px rgba(0,0,0,0.12), 0 8px 22px rgba(16, 185, 129, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); pointer-events: none; opacity: 0;"></div>
+                    <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255,255,255,0.7); box-shadow: inset 1px 1px 2px 0 rgba(255,255,255,0.8), inset -1px -1px 2px 1px rgba(0,0,0,0.05), 0 6px 18px rgba(0, 0, 0, 0.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); pointer-events: none; opacity: 0;"></div>
                     <a href="{{ url_for('dashboard') }}"
                        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
                               {% if request.endpoint == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-900{% endif %}">
@@ -915,8 +915,17 @@
                 const href = link.getAttribute('href');
                 if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
                 
-                // Exclude external, logout, raw downloads, API calls
-                if (href.includes('://') || href.startsWith('/api') || href.includes('logout') || href.includes('switch-account') || href.endsWith('.pdf') || href.includes('/uploads/')) {
+                // For PDF, file uploads, or download links, open in external Chrome browser when running in Electron
+                if (href.endsWith('.pdf') || href.includes('/pdf/') || href.includes('/uploads/') || href.includes('download') || link.hasAttribute('download')) {
+                    if (window.electronAPI || window.process?.versions?.electron) {
+                        e.preventDefault();
+                        window.open(link.href, '_blank');
+                    }
+                    return;
+                }
+
+                // Exclude external, logout, API calls
+                if (href.includes('://') || href.startsWith('/api') || href.includes('logout') || href.includes('switch-account')) {
                     return;
                 }
                 

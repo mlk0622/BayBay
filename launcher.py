@@ -23,7 +23,7 @@ if sys.platform == 'win32':
 
 # ========== Configuration ==========
 APP_NAME = "Bay Bay"
-VERSION = "3.5.4"
+VERSION = "3.5.6"
 PORT = 5001
 HOST = "127.0.0.1"
 
