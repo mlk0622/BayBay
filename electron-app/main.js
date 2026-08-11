@@ -1,8 +1,7 @@
 const { app, BrowserWindow, shell, dialog, ipcMain } = require('electron');
 const path = require('path');
 
-// Disable hardware acceleration to prevent white/black screen rendering bugs on some GPUs
-app.disableHardwareAcceleration();
+// Hardware acceleration enabled for GPU rendering & high performance UI
 const fs = require('fs');
 const https = require('https');
 const { spawn } = require('child_process');
