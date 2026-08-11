@@ -1034,6 +1034,70 @@
                 loadPageViaAjax(currentUrl, null, true);
             };
 
+            // Global delete modal helpers
+            window.showDeleteModal = function(type, id, label) {
+                const typeInput = document.getElementById('deleteType');
+                const idInput = document.getElementById('deleteId');
+                const msgElem = document.getElementById('deleteMessage');
+                if (typeInput) typeInput.value = type;
+                if (idInput) idInput.value = id;
+                if (msgElem) {
+                    msgElem.textContent = label ? `Êtes-vous sûr de vouloir supprimer ${label} ?` : 'Êtes-vous sûr de vouloir supprimer cet élément ?';
+                }
+                openModal('deleteModal');
+            };
+
+            window.confirmDelete = async function() {
+                const type = document.getElementById('deleteType')?.value;
+                const id = document.getElementById('deleteId')?.value;
+                if (!type || !id) return;
+
+                let url = '';
+                if (type === 'sci') url = `/api/sci/${id}`;
+                else if (type === 'bien') url = `/api/bien/${id}`;
+                else if (type === 'appartement') url = `/api/appartement/${id}`;
+                else if (type === 'locataire') url = `/api/locataire/${id}`;
+                else if (type === 'appel') url = `/api/appel-loyer/${id}`;
+                else if (type === 'quittance') url = `/api/quittance/${id}`;
+
+                if (!url) return;
+
+                try {
+                    const response = await fetch(url, { method: 'DELETE' });
+                    const data = await response.json().catch(() => ({}));
+                    if (response.ok && (data.success !== false)) {
+                        closeModal('deleteModal');
+                        showNotification('Élément supprimé avec succès', 'success');
+                        setTimeout(() => {
+                            if (type === 'locataire' && window.location.pathname.includes('/locataire/')) {
+                                window.location.href = '/locataires';
+                            } else if (type === 'sci' && window.location.pathname.includes('/sci/')) {
+                                window.location.href = '/biens';
+                            } else if (type === 'bien' && window.location.pathname.includes('/bien/')) {
+                                window.location.href = '/biens';
+                            } else if (window.refreshPage) {
+                                window.refreshPage();
+                            } else {
+                                location.reload();
+                            }
+                        }, 600);
+                    } else {
+                        showNotification('Erreur: ' + (data.error || data.message || 'Impossible de supprimer'), 'error');
+                    }
+                } catch (err) {
+                    showNotification('Erreur lors de la suppression', 'error');
+                }
+            };
+
+            // Global PDF downloader helper
+            window.downloadPdfFromUrl = async function(url, filename) {
+                if (window.electronAPI && window.electronAPI.downloadFile) {
+                    window.electronAPI.downloadFile(url);
+                } else {
+                    window.open(url, '_blank');
+                }
+            };
+
             // Register preloaded views
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.app-view').forEach(view => {

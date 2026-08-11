@@ -73,6 +73,73 @@
     </div>
 </div>
 
+<div id="quittanceModal" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-black/70 p-4" style="display:none;">
+    <div class="glass-card w-full max-w-md p-6 space-y-4 my-auto">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-receipt text-black"></i>
+                <span>Créer une Quittance de Loyer</span>
+            </h3>
+            <button type="button" onclick="closeModal('quittanceModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-slate-200">
+                <i class="fas fa-times text-black"></i>
+            </button>
+        </div>
+
+        <form id="quittanceForm" onsubmit="submitCreerQuittance(event)" class="space-y-4" data-no-spa="true">
+            <div>
+                <label class="block text-sm font-bold text-slate-800 mb-1">Locataire *</label>
+                <select id="quittanceLocataire" name="locataire_id" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+                    <option value="">-- Sélectionner un locataire --</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-1">Mois *</label>
+                    <select id="quittanceMois" name="mois" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option>
+                        <option value="7">Juillet</option>
+                        <option value="8">Août</option>
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-1">Année *</label>
+                    <input type="number" id="quittanceAnnee" name="annee" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium" placeholder="2026">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-800 mb-1">Montant Payé (€) *</label>
+                <input type="number" step="0.01" id="quittanceMontant" name="montant_paye" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium" placeholder="0.00">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-800 mb-1">Date du Règlement *</label>
+                <input type="date" id="quittanceDatePaiement" name="date_paiement" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button type="button" onclick="closeModal('quittanceModal')" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit" class="ios-button-success text-black font-bold px-6 py-2 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important; color: #000000 !important;">
+                    <i class="fas fa-check text-black font-bold" style="color: #000000 !important;"></i>
+                    <span class="text-black font-bold">Créer la quittance</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="quittanceEmailModal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/60 p-4">
     <div class="glass-card w-full max-w-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between">
@@ -179,6 +246,51 @@ function openQuittanceModal() {
     document.getElementById('quittanceAnnee').value = {{ annee_actuelle }};
     document.getElementById('quittanceDatePaiement').value = new Date().toISOString().split('T')[0];
     openModal('quittanceModal');
+}
+
+async function submitCreerQuittance(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const locataireId = document.getElementById('quittanceLocataire').value;
+    const mois = document.getElementById('quittanceMois').value;
+    const annee = document.getElementById('quittanceAnnee').value;
+    const montant = document.getElementById('quittanceMontant').value;
+    const datePaiement = document.getElementById('quittanceDatePaiement').value;
+
+    if (!locataireId || !mois || !annee || !montant) {
+        showNotification('Veuillez remplir tous les champs obligatoires', 'warning');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/quittance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                locataire_id: parseInt(locataireId, 10),
+                mois: parseInt(mois, 10),
+                annee: parseInt(annee, 10),
+                montant_paye: parseFloat(montant),
+                date_paiement: datePaiement || null
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            closeModal('quittanceModal');
+            showNotification(data.message || 'Quittance créée avec succès !', 'success');
+            setTimeout(() => {
+                if (window.refreshPage) window.refreshPage();
+                else location.reload();
+            }, 800);
+        } else {
+            showNotification('Erreur: ' + (data.error || data.message || 'Impossible de créer la quittance'), 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur lors de la création de la quittance', 'error');
+    }
 }
 
 let currentQuittanceEmailId = null;

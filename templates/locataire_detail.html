@@ -1010,6 +1010,46 @@ function deleteBail() {
         .catch(() => showNotification('Erreur lors de la suppression', 'error'));
 }
 
+function openEditLocataireFromDetail() {
+    document.getElementById('locataireModalTitle').innerHTML = '<i class="fas fa-user text-pink-400 mr-2"></i>Modifier Locataire';
+    document.getElementById('locataireEditId').value = {{ locataire.id }};
+    document.getElementById('locataireNom').value = {{ (locataire.nom or '')|tojson }};
+    document.getElementById('locatairePrenom').value = {{ (locataire.prenom or '')|tojson }};
+    document.getElementById('locataireEmail').value = {{ (locataire.email or '')|tojson }};
+    document.getElementById('locataireTelephone').value = {{ (locataire.telephone or '')|tojson }};
+    document.getElementById('locataireAdresse').value = {{ (locataire.adresse_precedente or '')|tojson }};
+    document.getElementById('locataireDepot').value = {{ locataire.depot_garantie or 0 }};
+    document.getElementById('locataireDebutBail').value = {{ (locataire.date_debut_bail.strftime('%Y-%m-%d') if locataire.date_debut_bail else '')|tojson }};
+    document.getElementById('locataireFinBail').value = {{ (locataire.date_fin_bail.strftime('%Y-%m-%d') if locataire.date_fin_bail else '')|tojson }};
+    document.getElementById('locataireStatut').value = {{ (locataire.statut or 'Actif')|tojson }};
+
+    const select = document.getElementById('locataireAppartement');
+    select.innerHTML = '<option value="">-- Non attribué --</option>';
+    {% if locataire.appartement %}
+    select.innerHTML += `<option value="{{ locataire.appartement.id }}" selected>{{ locataire.appartement.numero_porte or '' }} - {{ locataire.appartement.bien.nom or '' }}</option>`;
+    {% endif %}
+
+    openModal('locataireModal');
+}
+
+function confirmDeleteLocataire() {
+    if (window.showDeleteModal) {
+        showDeleteModal('locataire', {{ locataire.id }}, '{{ locataire.nom_complet }}');
+    } else {
+        if (!confirm('Êtes-vous sûr de vouloir supprimer le locataire {{ locataire.nom_complet }} ?')) return;
+        fetch('/api/locataire/{{ locataire.id }}', { method: 'DELETE' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Locataire supprimé', 'success');
+                    setTimeout(() => window.location.href = '/locataires', 800);
+                } else {
+                    showNotification(data.error || 'Erreur lors de la suppression', 'error');
+                }
+            });
+    }
+}
+
 </script>
 </div>
 {% endblock %}
