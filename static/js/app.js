@@ -299,14 +299,14 @@ document.getElementById('sciForm')?.addEventListener('submit', async (e) => {
         const payload = await response.json().catch(() => ({}));
         const newSciId = payload.id;
 
+        closeModal('sciModal');
         if (!sciId && newSciId) {
-            closeModal('sciModal');
-            showNotification('SCI creee. Ajoutez maintenant un bien dans cette SCI.', 'success');
+            showNotification('SCI créée. Ajoutez maintenant un bien dans cette SCI.', 'success');
             setTimeout(() => openBienModal(newSciId), 250);
             return;
         }
 
-        showNotification(sciId ? 'SCI modifiee' : 'SCI creee', 'success');
+        showNotification(sciId ? 'SCI modifiée' : 'SCI créée', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         showNotification('Erreur', 'error');
@@ -332,7 +332,8 @@ document.getElementById('bienForm')?.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-        showNotification(bienId ? 'Bien modifie' : 'Bien cree', 'success');
+        closeModal('bienModal');
+        showNotification(bienId ? 'Bien modifié' : 'Bien créé', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
         const payload = await response.json().catch(() => ({}));
@@ -376,6 +377,7 @@ document.getElementById('appartForm')?.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
+        closeModal('appartementModal');
         showNotification(appartId ? 'Lot modifié' : 'Lot créé', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
@@ -403,6 +405,7 @@ document.getElementById('locataireForm')?.addEventListener('submit', async (e) =
     });
 
     if (response.ok) {
+        closeModal('locataireModal');
         showNotification(locataireId ? 'Locataire modifié' : 'Locataire créé', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
@@ -422,6 +425,7 @@ document.getElementById('paiementForm')?.addEventListener('submit', async (e) =>
     });
 
     if (response.ok) {
+        closeModal('paiementModal');
         showNotification('Paiement enregistré', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {
@@ -441,6 +445,7 @@ document.getElementById('appelLoyerForm')?.addEventListener('submit', async (e) 
     });
 
     if (response.ok) {
+        closeModal('appelLoyerModal');
         showNotification('Appel de loyer créé', 'success');
         setTimeout(() => { if (window.refreshPage) window.refreshPage(); else window.location.reload(); }, 500);
     } else {

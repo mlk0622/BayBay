@@ -242,9 +242,14 @@ function openQuittanceModal() {
         }
     };
 
-    document.getElementById('quittanceMois').value = {{ mois_actuel }};
-    document.getElementById('quittanceAnnee').value = {{ annee_actuelle }};
-    document.getElementById('quittanceDatePaiement').value = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const moisElem = document.getElementById('quittanceMois');
+    const anneeElem = document.getElementById('quittanceAnnee');
+    const dateElem = document.getElementById('quittanceDatePaiement');
+
+    if (moisElem) moisElem.value = now.getMonth() + 1;
+    if (anneeElem) anneeElem.value = now.getFullYear();
+    if (dateElem) dateElem.value = now.toISOString().split('T')[0];
     openModal('quittanceModal');
 }
 

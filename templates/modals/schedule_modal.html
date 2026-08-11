@@ -1,16 +1,17 @@
 <!-- Modal de programmation d'appel de loyer -->
-<div id="scheduleModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+<div id="scheduleModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[99999]" style="display:none;">
+    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto my-auto">
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">
-                <i class="fas fa-calendar-alt text-purple-500 mr-2"></i>Programmer un Appel de Loyer
+            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-purple-600"></i>
+                <span>Programmer un Appel de Loyer</span>
             </h3>
-            <button onclick="closeScheduleModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+            <button type="button" onclick="closeScheduleModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-200">
+                <i class="fas fa-times text-black"></i>
             </button>
         </div>
 
-        <form id="scheduleForm">
+        <form id="scheduleForm" data-no-spa="true">
             <input type="hidden" id="schedule_locataire_id" name="locataire_id">
             <input type="hidden" id="schedule_mois" name="mois">
             <input type="hidden" id="schedule_annee" name="annee">
@@ -134,9 +135,9 @@ function formatSchedulePeriodeLabel(mois, annee) {
 }
 
 function openScheduleModal(locataireId, locataireNom, locataireEmail, targetMois, targetAnnee) {
-    document.getElementById('schedule_locataire_id').value = locataireId;
-    document.getElementById('schedule_locataire_nom').value = locataireNom;
-    document.getElementById('schedule_locataire_email').value = locataireEmail;
+    document.getElementById('schedule_locataire_id').value = locataireId || '';
+    document.getElementById('schedule_locataire_nom').value = locataireNom || '';
+    document.getElementById('schedule_locataire_email').value = locataireEmail || '';
 
     const now = new Date();
     const defaultPeriod = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -153,15 +154,28 @@ function openScheduleModal(locataireId, locataireNom, locataireEmail, targetMois
     document.getElementById('schedule_time').value = '09:00';
     document.getElementById('schedule_recurrent').checked = false;
 
-    const modal = document.getElementById('scheduleModal');
-    modal.classList.remove('hidden');
-    modal.style.display = 'flex';
+    if (window.openModal) {
+        openModal('scheduleModal');
+    } else {
+        const modal = document.getElementById('scheduleModal');
+        if (modal) {
+            modal.style.zIndex = '99999';
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+        }
+    }
 }
 
 function closeScheduleModal() {
-    const modal = document.getElementById('scheduleModal');
-    modal.classList.add('hidden');
-    modal.style.display = 'none';
+    if (window.closeModal) {
+        closeModal('scheduleModal');
+    } else {
+        const modal = document.getElementById('scheduleModal');
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+        }
+    }
     document.getElementById('scheduleForm').reset();
     if (window.setRichTextEditorValue) {
         setRichTextEditorValue('schedule_message', '');
