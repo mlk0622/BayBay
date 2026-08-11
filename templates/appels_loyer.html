@@ -66,7 +66,7 @@
                         <td class="py-4 px-4 text-white/70">{{ appel.date_echeance.strftime('%d/%m/%Y') if appel.date_echeance else '-' }}</td>
                         <td class="py-4 px-4">
                             <div class="flex items-center justify-end space-x-2">
-                                <button onclick="openAppelProgrammationModal({{ appel.id }})"
+                                <button onclick="openScheduleModalFor({{ appel.locataire.id }}, {{ (appel.locataire.nom_complet or '')|tojson }}, {{ (appel.locataire.email or '')|tojson }}, {{ appel.mois }}, {{ appel.annee }})"
                                     class="p-2.5 rounded-xl bg-purple-500 hover:bg-purple-600 transition-all shadow-sm" title="Programmer l'envoi">
                                     <i class="fas fa-clock text-black text-sm font-bold" style="color: #000000 !important;"></i>
                                 </button>
@@ -100,6 +100,68 @@
             </button>
         </div>
         {% endif %}
+    </div>
+</div>
+
+<div id="appelLoyerModal" class="fixed inset-0 z-[99999] hidden items-center justify-center bg-black/70 p-4" style="display:none;">
+    <div class="glass-card w-full max-w-md p-6 space-y-4 my-auto">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <i class="fas fa-file-invoice text-black"></i>
+                <span>Créer un Appel de Loyer</span>
+            </h3>
+            <button type="button" onclick="closeModal('appelLoyerModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-slate-200">
+                <i class="fas fa-times text-black"></i>
+            </button>
+        </div>
+
+        <form id="appelLoyerForm" onsubmit="submitCreerAppelLoyer(event)" class="space-y-4" data-no-spa="true">
+            <div>
+                <label class="block text-sm font-bold text-slate-800 mb-1">Locataire *</label>
+                <select id="appelLocataire" name="locataire_id" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+                    <option value="">-- Sélectionner un locataire --</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-1">Mois *</label>
+                    <select id="appelMois" name="mois" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option>
+                        <option value="7">Juillet</option>
+                        <option value="8">Août</option>
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-800 mb-1">Année *</label>
+                    <input type="number" id="appelAnnee" name="annee" required class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium" placeholder="2026">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-slate-800 mb-1">Date d'échéance (optionnel)</label>
+                <input type="date" id="appelDateEcheance" name="date_echeance" class="w-full px-4 py-2 border border-slate-300 rounded-xl text-slate-900 bg-white font-medium">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                <button type="button" onclick="closeModal('appelLoyerModal')" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold hover:bg-slate-50">
+                    Annuler
+                </button>
+                <button type="submit" class="ios-button-success text-black font-bold px-6 py-2 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important; color: #000000 !important;">
+                    <i class="fas fa-check text-black font-bold" style="color: #000000 !important;"></i>
+                    <span class="text-black font-bold">Créer l'appel</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -194,6 +256,49 @@ function openAppelLoyerModal() {
     document.getElementById('appelMois').value = today.getMonth() + 1;
     document.getElementById('appelAnnee').value = today.getFullYear();
     openModal('appelLoyerModal');
+}
+
+async function submitCreerAppelLoyer(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const locataireId = document.getElementById('appelLocataire').value;
+    const mois = document.getElementById('appelMois').value;
+    const annee = document.getElementById('appelAnnee').value;
+    const dateEcheance = document.getElementById('appelDateEcheance').value;
+
+    if (!locataireId || !mois || !annee) {
+        showNotification('Veuillez remplir les champs obligatoires', 'warning');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/appel-loyer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                locataire_id: parseInt(locataireId, 10),
+                mois: parseInt(mois, 10),
+                annee: parseInt(annee, 10),
+                date_echeance: dateEcheance || null
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            closeModal('appelLoyerModal');
+            showNotification('Appel de loyer créé avec succès !', 'success');
+            setTimeout(() => {
+                if (window.refreshPage) window.refreshPage();
+                else location.reload();
+            }, 800);
+        } else {
+            showNotification('Erreur: ' + (data.message || data.error || 'Impossible de créer l\'appel'), 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur lors de la création de l\'appel de loyer', 'error');
+    }
 }
 
 function openScheduleModalFor(locataireId, locataireNom, locataireEmail, mois, annee) {

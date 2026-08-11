@@ -941,6 +941,11 @@
                 const form = e.target.closest('form');
                 if (!form) return;
                 
+                // Exclude forms inside modals or custom API forms
+                if (form.closest('[id$="Modal"]') || form.closest('[id$="modal"]') || form.dataset.noSpa || form.getAttribute('data-no-spa') || (form.id && form.id.endsWith('Form'))) {
+                    return;
+                }
+                
                 const action = form.getAttribute('action') || window.location.href;
                 const actionUrl = new URL(action, window.location.origin);
                 

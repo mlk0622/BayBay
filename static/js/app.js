@@ -6,7 +6,10 @@
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
+        modal.style.zIndex = '99999';
         modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
         // Force reflow
         modal.offsetHeight;
         modal.classList.add('active-modal');
