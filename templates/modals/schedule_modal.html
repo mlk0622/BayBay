@@ -1,96 +1,96 @@
 <!-- Modal de programmation d'appel de loyer -->
-<div id="scheduleModal" class="hidden" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto my-auto">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <i class="fas fa-calendar-alt text-purple-600"></i>
+<div id="scheduleModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4" style="display:none;">
+    <div class="glass-card w-full max-w-3xl p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-white/20 pb-3">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-white"></i>
                 <span>Programmer un Appel de Loyer</span>
             </h3>
-            <button type="button" onclick="closeScheduleModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 hover:bg-slate-200">
-                <i class="fas fa-times text-black"></i>
+            <button type="button" onclick="closeScheduleModal()" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
 
-        <form id="scheduleForm" data-no-spa="true" onsubmit="submitScheduleForm(event); return false;">
+        <form id="scheduleForm" data-no-spa="true" class="space-y-4">
             <input type="hidden" id="schedule_locataire_id" name="locataire_id">
             <input type="hidden" id="schedule_mois" name="mois">
             <input type="hidden" id="schedule_annee" name="annee">
-            <div class="p-6 space-y-4">
+            <div class="space-y-4">
                 <!-- Locataire -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Locataire</label>
+                    <label class="block text-sm font-bold text-white mb-1">Locataire</label>
                     <input type="text" id="schedule_locataire_nom" readonly
-                           class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                 </div>
 
                 <!-- Email du locataire -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Email du locataire</label>
+                    <label class="block text-sm font-bold text-white mb-1">Email du locataire</label>
                     <input type="email" id="schedule_locataire_email" readonly
-                           class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Période de l'appel</label>
+                    <label class="block text-sm font-bold text-white mb-1">Période de l'appel</label>
                     <input type="text" id="schedule_periode_label" readonly
-                           class="w-full px-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-700">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                 </div>
 
                 <!-- Email expéditeur -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Email expéditeur (optionnel)</label>
+                    <label class="block text-sm font-bold text-white mb-1">Email expéditeur (optionnel)</label>
                     <input type="email" id="email_expediteur" name="email_expediteur"
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium placeholder-white/50"
                            placeholder="Laissez vide pour utiliser la config par défaut">
-                    <p class="text-slate-400 text-xs mt-1">Si vide, utilise la configuration par défaut.</p>
+                    <p class="text-white/60 text-xs mt-1">Si vide, utilise la configuration par défaut.</p>
                 </div>
 
                 <!-- Sujet du mail -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Sujet du mail (optionnel)</label>
+                    <label class="block text-sm font-bold text-white mb-1">Sujet du mail (optionnel)</label>
                     <input type="text" id="schedule_sujet" name="sujet"
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium placeholder-white/50"
                            placeholder="Laissez vide pour utiliser le sujet par défaut">
                 </div>
 
                 <!-- Date et heure d'envoi -->
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                        <label class="block text-sm font-bold text-white mb-1">Date</label>
                         <input type="date" id="schedule_date" name="date_envoi_date" required
-                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Heure</label>
+                        <label class="block text-sm font-bold text-white mb-1">Heure</label>
                         <input type="time" id="schedule_time" name="date_envoi_time" required
-                               class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                     </div>
                 </div>
 
                 <div>
-                    <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
-                        <input type="checkbox" id="schedule_recurrent" name="recurrent" class="accent-purple-600">
+                    <label class="inline-flex items-center gap-2 text-sm font-medium text-white cursor-pointer">
+                        <input type="checkbox" id="schedule_recurrent" name="recurrent" class="accent-purple-500">
                         <span>Répéter tous les mois automatiquement</span>
                     </label>
-                    <p class="text-slate-400 text-xs mt-1">Une nouvelle programmation sera créée pour le mois suivant après chaque envoi réussi.</p>
+                    <p class="text-white/60 text-xs mt-1">Une nouvelle programmation sera créée pour le mois suivant après chaque envoi réussi.</p>
                 </div>
 
                 <!-- Message personnalisé -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Message personnalisé (optionnel)</label>
-                    <div class="rich-editor-shell" data-target="schedule_message">
-                        <div class="rich-editor-toolbar">
-                            <button type="button" data-command="bold"><strong>B</strong></button>
-                            <button type="button" data-command="italic"><em>I</em></button>
-                            <button type="button" data-command="underline"><u>U</u></button>
-                            <button type="button" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
-                            <button type="button" data-command="removeFormat">Tx</button>
-                            <select data-variable-select aria-label="Variables du mail"></select>
-                            <button type="button" data-insert-variable>Insérer</button>
-                            <label title="Couleur du texte">
-                                <input type="color" data-command="foreColor" value="#111827">
+                    <label class="block text-sm font-bold text-white mb-1">Message personnalisé (optionnel)</label>
+                    <div class="rich-editor-shell border border-white/30 rounded-xl overflow-hidden bg-black/50" data-target="schedule_message">
+                        <div class="rich-editor-toolbar bg-white/10 border-b border-white/30 p-2 flex gap-2">
+                            <button type="button" data-command="bold" class="text-white hover:bg-white/20 p-1 rounded"><strong>B</strong></button>
+                            <button type="button" data-command="italic" class="text-white hover:bg-white/20 p-1 rounded"><em>I</em></button>
+                            <button type="button" data-command="underline" class="text-white hover:bg-white/20 p-1 rounded"><u>U</u></button>
+                            <button type="button" data-command="insertUnorderedList" class="text-white hover:bg-white/20 p-1 rounded"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" data-command="removeFormat" class="text-white hover:bg-white/20 p-1 rounded">Tx</button>
+                            <select data-variable-select aria-label="Variables du mail" class="bg-black/50 text-white border border-white/30 rounded p-1"></select>
+                            <button type="button" data-insert-variable class="text-white hover:bg-white/20 p-1 rounded text-sm">Insérer</button>
+                            <label title="Couleur du texte" class="flex items-center">
+                                <input type="color" data-command="foreColor" value="#ffffff" class="bg-transparent border-0 w-6 h-6 p-0 cursor-pointer">
                             </label>
-                            <select data-command="fontName" aria-label="Police du mail" title="Police">
+                            <select data-command="fontName" aria-label="Police du mail" title="Police" class="bg-black/50 text-white border border-white/30 rounded p-1">
                                 <option value="Arial">Arial</option>
                                 <option value="Verdana">Verdana</option>
                                 <option value="Tahoma">Tahoma</option>
@@ -100,24 +100,25 @@
                                 <option value="Courier New">Courier New</option>
                             </select>
                         </div>
-                        <div id="scheduleMessageEditor" class="rich-editor-area" contenteditable="true" data-placeholder="Rédigez ici le message personnalisé..."></div>
+                        <div id="scheduleMessageEditor" class="rich-editor-area p-3 text-white min-h-[100px]" contenteditable="true" data-placeholder="Rédigez ici le message personnalisé..."></div>
                         <textarea id="schedule_message" name="message" class="hidden"></textarea>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="flex justify-end gap-3 pt-4 border-t border-white/20">
                 <button type="button" onclick="previewScheduleMessage()"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-                    <i class="fas fa-eye mr-2"></i>Aperçu
+                        class="px-4 py-2 bg-white/10 border border-white/30 text-white rounded-xl font-bold hover:bg-white/20">
+                    <i class="fas fa-eye mr-2 text-white"></i>Aperçu
                 </button>
                 <button type="button" onclick="closeScheduleModal()"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 text-white rounded-xl font-bold hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="button" onclick="submitScheduleForm(event)"
-                        class="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600">
-                    <i class="fas fa-calendar-check mr-2"></i>Programmer
+                        class="ios-button-purple text-white font-bold px-6 py-2 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important;">
+                    <i class="fas fa-calendar-check text-white font-bold"></i>
+                    <span class="text-white font-bold">Programmer</span>
                 </button>
             </div>
         </form>

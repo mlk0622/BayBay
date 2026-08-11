@@ -1,23 +1,23 @@
 <div id="choixAjoutModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
     <div class="glass-card w-full max-w-sm p-6 space-y-4">
-        <div class="flex items-start justify-between gap-4">
-            <h3 class="text-xl font-bold text-slate-900">Ajouter</h3>
-            <button type="button" onclick="closeModal('choixAjoutModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-slate-200">
-                <i class="fas fa-times text-black"></i>
+        <div class="flex items-start justify-between gap-4 border-b border-white/20 pb-3">
+            <h3 class="text-xl font-bold text-white">Ajouter</h3>
+            <button type="button" onclick="closeModal('choixAjoutModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <div class="grid grid-cols-2 gap-4">
             <button onclick="closeModal('choixAjoutModal'); openBienModal(null)"
-                    class="flex flex-col items-center p-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 transition-all shadow-sm">
-                <i class="fas fa-home text-black text-3xl mb-2" style="color: #000000 !important;"></i>
-                <span class="text-sm font-bold text-black">Bien</span>
-                <span class="text-xs text-slate-600 mt-1">Particulier</span>
+                    class="flex flex-col items-center p-4 rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 text-white transition-all shadow-sm">
+                <i class="fas fa-home text-white text-3xl mb-2"></i>
+                <span class="text-sm font-bold text-white">Bien</span>
+                <span class="text-xs text-white/60 mt-1">Particulier</span>
             </button>
             <button onclick="closeModal('choixAjoutModal'); openSciChoiceModal()"
-                    class="flex flex-col items-center p-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 transition-all shadow-sm">
-                <i class="fas fa-building text-black text-3xl mb-2" style="color: #000000 !important;"></i>
-                <span class="text-sm font-bold text-black">Via SCI</span>
-                <span class="text-xs text-slate-600 mt-1">Nouvelle ou existante</span>
+                    class="flex flex-col items-center p-4 rounded-xl bg-white/5 border border-white/20 hover:bg-white/10 text-white transition-all shadow-sm">
+                <i class="fas fa-building text-white text-3xl mb-2"></i>
+                <span class="text-sm font-bold text-white">Via SCI</span>
+                <span class="text-xs text-white/60 mt-1">Nouvelle ou existante</span>
             </button>
         </div>
     </div>
@@ -25,10 +25,10 @@
 
 <div id="choixSciModal" class="fixed inset-0 z-[101] hidden items-center justify-center bg-black/70 p-4">
     <div class="glass-card w-full max-w-lg p-6 space-y-4">
-        <div class="flex items-start justify-between gap-4">
-            <h3 class="text-xl font-bold text-slate-900">Ajouter un bien via SCI</h3>
-            <button type="button" onclick="closeModal('choixSciModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 hover:bg-slate-200">
-                <i class="fas fa-times text-black"></i>
+        <div class="flex items-start justify-between gap-4 border-b border-white/20 pb-3">
+            <h3 class="text-xl font-bold text-white">Ajouter un bien via SCI</h3>
+            <button type="button" onclick="closeModal('choixSciModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
 
@@ -51,9 +51,9 @@
             <button type="button" onclick="closeModal('choixSciModal')" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">
                 Annuler
             </button>
-            <button type="button" onclick="closeModal('choixSciModal'); openModal('sciModal')" class="ios-button-purple text-black font-bold px-4 py-2 flex items-center gap-2" style="background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important; color: #000000 !important;">
-                <i class="fas fa-plus text-black font-extrabold" style="color: #000000 !important;"></i>
-                <span class="text-black font-bold">Nouvelle SCI</span>
+            <button type="button" onclick="closeModal('choixSciModal'); openModal('sciModal')" class="ios-button-purple text-white font-bold px-4 py-2 flex items-center gap-2" style="background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important;">
+                <i class="fas fa-plus text-white font-extrabold"></i>
+                <span class="text-white font-bold">Nouvelle SCI</span>
             </button>
         </div>
     </div>
