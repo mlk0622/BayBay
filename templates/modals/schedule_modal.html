@@ -1,5 +1,5 @@
 <!-- Modal de programmation d'appel de loyer -->
-<div id="scheduleModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[99999]" style="display:none;">
+<div id="scheduleModal" class="hidden" style="display:none;">
     <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto my-auto">
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
             <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -115,7 +115,7 @@
                         class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
                     Annuler
                 </button>
-                <button type="submit"
+                <button type="button" onclick="submitScheduleForm(event)"
                         class="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm font-medium hover:bg-purple-600">
                     <i class="fas fa-calendar-check mr-2"></i>Programmer
                 </button>
@@ -197,23 +197,39 @@ function previewScheduleMessage() {
 }
 
 async function submitScheduleForm(e) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
+    if (e && e.preventDefault) e.preventDefault();
 
-    const locId = document.getElementById('schedule_locataire_id')?.value;
-    const dateVal = document.getElementById('schedule_date')?.value;
+    const locId = document.getElementById('schedule_locataire_id')?.value?.trim();
+    let dateVal = document.getElementById('schedule_date')?.value;
     const timeVal = document.getElementById('schedule_time')?.value || '09:00';
-    const moisVal = document.getElementById('schedule_mois')?.value;
-    const anneeVal = document.getElementById('schedule_annee')?.value;
-    const sujetVal = document.getElementById('schedule_sujet')?.value;
-    const recurrentVal = document.getElementById('schedule_recurrent')?.checked;
+    let moisVal = document.getElementById('schedule_mois')?.value;
+    let anneeVal = document.getElementById('schedule_annee')?.value;
+    const sujetVal = document.getElementById('schedule_sujet')?.value || '';
+    const recurrentVal = document.getElementById('schedule_recurrent')?.checked || false;
 
-    if (!locId || !dateVal || !moisVal || !anneeVal) {
-        showNotification('Veuillez remplir tous les champs obligatoires', 'warning');
+    // Auto-fill missing date with tomorrow
+    if (!dateVal) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateVal = tomorrow.toISOString().split('T')[0];
+        const dateEl = document.getElementById('schedule_date');
+        if (dateEl) dateEl.value = dateVal;
+    }
+
+    // Auto-fill missing mois/annee with next month
+    if (!moisVal || !anneeVal) {
+        const now = new Date();
+        const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        moisVal = moisVal || String(next.getMonth() + 1);
+        anneeVal = anneeVal || String(next.getFullYear());
+    }
+
+    if (!locId) {
+        showNotification('Erreur: locataire non identifié', 'error');
         return;
     }
 
-    const message = window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : (document.getElementById('schedule_message')?.value || '');
+    const message = (window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : '') || '';
 
     const data = {
         locataire_id: parseInt(locId, 10),
@@ -228,6 +244,12 @@ async function submitScheduleForm(e) {
         tous_locataires: false
     };
 
+    console.log('[Schedule] Submitting:', data);
+
+    // Disable button to prevent double-submit
+    const btn = document.querySelector('#scheduleModal button[onclick*="submitScheduleForm"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Programmation…'; }
+
     try {
         const response = await fetch('/api/programmation-appel', {
             method: 'POST',
@@ -236,24 +258,26 @@ async function submitScheduleForm(e) {
         });
 
         const result = await response.json().catch(() => ({}));
+        console.log('[Schedule] Response:', response.status, result);
 
         if (response.ok && result.success !== false) {
             closeScheduleModal();
-            showNotification('Appel de loyer programmé avec succès !', 'success');
-            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 800);
+            showNotification('✅ Appel de loyer programmé avec succès !', 'success');
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); }, 800);
         } else {
             showNotification('Erreur: ' + (result.error || result.message || 'Impossible de programmer'), 'error');
         }
     } catch (error) {
-        showNotification('Erreur lors de la programmation', 'error');
+        console.error('[Schedule] Fetch error:', error);
+        showNotification('Erreur réseau lors de la programmation', 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-calendar-check mr-2"></i>Programmer'; }
     }
 }
 
-// Attach via onsubmit to survive SPA re-injection
-(function attachScheduleForm() {
+// Also support form submit event (belt + suspenders)
+(function() {
     const form = document.getElementById('scheduleForm');
-    if (form) {
-        form.onsubmit = submitScheduleForm;
-    }
+    if (form) form.onsubmit = function(e) { e.preventDefault(); submitScheduleForm(e); };
 })();
 </script>

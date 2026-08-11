@@ -34,7 +34,7 @@ function openModal(modalId) {
         '-webkit-backdrop-filter: blur(12px)'
     ].join(';');
 
-    // Center the inner card
+    // Center the inner card (do NOT override max-width)
     const inner = modal.firstElementChild;
     if (inner) {
         inner.style.margin = 'auto';
@@ -42,7 +42,7 @@ function openModal(modalId) {
         inner.style.overflowY = 'auto';
         inner.style.position = 'relative';
         inner.style.zIndex = '100000';
-        inner.style.width = '100%';
+        inner.style.flexShrink = '0';
     }
 
     modal.classList.remove('hidden');
