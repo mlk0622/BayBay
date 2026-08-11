@@ -11,7 +11,7 @@
             </button>
         </div>
 
-        <form id="scheduleForm" data-no-spa="true">
+        <form id="scheduleForm" data-no-spa="true" onsubmit="submitScheduleForm(event); return false;">
             <input type="hidden" id="schedule_locataire_id" name="locataire_id">
             <input type="hidden" id="schedule_mois" name="mois">
             <input type="hidden" id="schedule_annee" name="annee">
@@ -196,22 +196,35 @@ function previewScheduleMessage() {
     showNotification('Prévisualisation indisponible', 'warning');
 }
 
-document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
+async function submitScheduleForm(e) {
     e.preventDefault();
+    e.stopImmediatePropagation();
 
-    const formData = new FormData(this);
+    const locId = document.getElementById('schedule_locataire_id')?.value;
+    const dateVal = document.getElementById('schedule_date')?.value;
+    const timeVal = document.getElementById('schedule_time')?.value || '09:00';
+    const moisVal = document.getElementById('schedule_mois')?.value;
+    const anneeVal = document.getElementById('schedule_annee')?.value;
+    const sujetVal = document.getElementById('schedule_sujet')?.value;
+    const recurrentVal = document.getElementById('schedule_recurrent')?.checked;
+
+    if (!locId || !dateVal || !moisVal || !anneeVal) {
+        showNotification('Veuillez remplir tous les champs obligatoires', 'warning');
+        return;
+    }
+
+    const message = window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : (document.getElementById('schedule_message')?.value || '');
 
     const data = {
-        locataire_id: parseInt(document.getElementById('schedule_locataire_id').value),
-        locataires_ids: [parseInt(document.getElementById('schedule_locataire_id').value)],
-        email_expediteur: formData.get('email_expediteur'),
-        sujet: formData.get('sujet'),
-        date_envoi: formData.get('date_envoi_date'),
-        heure_envoi: formData.get('date_envoi_time'),
-        mois: parseInt(formData.get('mois'), 10),
-        annee: parseInt(formData.get('annee'), 10),
-        message: window.getRichTextEditorValue ? getRichTextEditorValue('schedule_message') : formData.get('message'),
-        recurrent: document.getElementById('schedule_recurrent').checked,
+        locataire_id: parseInt(locId, 10),
+        locataires_ids: [parseInt(locId, 10)],
+        sujet: sujetVal || null,
+        date_envoi: dateVal,
+        heure_envoi: timeVal,
+        mois: parseInt(moisVal, 10),
+        annee: parseInt(anneeVal, 10),
+        message: message,
+        recurrent: recurrentVal,
         tous_locataires: false
     };
 
@@ -222,16 +235,25 @@ document.getElementById('scheduleForm').addEventListener('submit', async functio
             body: JSON.stringify(data)
         });
 
-        if (response.ok) {
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok && result.success !== false) {
             closeScheduleModal();
-            showNotification('Appel de loyer programmé', 'success');
-            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
+            showNotification('Appel de loyer programmé avec succès !', 'success');
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 800);
         } else {
-            const error = await response.json();
-            showNotification('Erreur: ' + error.message, 'error');
+            showNotification('Erreur: ' + (result.error || result.message || 'Impossible de programmer'), 'error');
         }
     } catch (error) {
         showNotification('Erreur lors de la programmation', 'error');
     }
-});
+}
+
+// Attach via onsubmit to survive SPA re-injection
+(function attachScheduleForm() {
+    const form = document.getElementById('scheduleForm');
+    if (form) {
+        form.onsubmit = submitScheduleForm;
+    }
+})();
 </script>

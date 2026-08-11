@@ -5,29 +5,67 @@
 // Modal functions
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.zIndex = '99999';
-        modal.style.display = 'flex';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
-        // Force reflow
-        modal.offsetHeight;
-        modal.classList.add('active-modal');
-        modal.classList.remove('hidden');
+    if (!modal) return;
+
+    // Full-page overlay setup
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.right = '0';
+    modal.style.bottom = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.zIndex = '99999';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.padding = '1.5rem';
+    modal.style.boxSizing = 'border-box';
+    // Frosted glass full-page blur
+    if (!modal.style.background || modal.style.background === 'none') {
+        modal.style.background = 'rgba(0,0,0,0.65)';
     }
+    modal.style.backdropFilter = 'blur(10px)';
+    modal.style.webkitBackdropFilter = 'blur(10px)';
+
+    // Center the inner content
+    const inner = modal.firstElementChild;
+    if (inner) {
+        inner.style.margin = 'auto';
+        inner.style.maxHeight = '85vh';
+        inner.style.overflowY = 'auto';
+        inner.style.position = 'relative';
+        inner.style.zIndex = '100000';
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('active-modal');
+    document.body.style.overflow = 'hidden';
+
+    // Close when clicking the backdrop
+    modal._backdropHandler = function(e) {
+        if (e.target === modal) closeModal(modalId);
+    };
+    modal.addEventListener('click', modal._backdropHandler);
 }
 
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.remove('active-modal');
-        setTimeout(() => {
-            if (!modal.classList.contains('active-modal')) {
-                modal.style.display = 'none';
-                modal.classList.add('hidden');
-            }
-        }, 250);
+    if (!modal) return;
+    modal.classList.remove('active-modal');
+    if (modal._backdropHandler) {
+        modal.removeEventListener('click', modal._backdropHandler);
+        delete modal._backdropHandler;
     }
+    setTimeout(() => {
+        if (!modal.classList.contains('active-modal')) {
+            modal.style.display = 'none';
+            modal.classList.add('hidden');
+        }
+    }, 200);
+    // Restore body scroll only if no other modal is open
+    const anyOpen = document.querySelector('[id$="Modal"].active-modal, [id$="modal"].active-modal');
+    if (!anyOpen) document.body.style.overflow = '';
 }
 
 function closeEmailPreviewModal() {

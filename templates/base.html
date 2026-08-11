@@ -1026,13 +1026,49 @@
                 return originalSend.apply(this, arguments);
             };
 
-            // SPA refresh page instead of hard reload
+            // SPA refresh page instead of hard reload — stays on the currently visible page
             window.refreshPage = function() {
-                console.log("SPA: Refreshing page via AJAX...");
-                const currentUrl = window.location.href;
-                invalidateCache();
-                loadPageViaAjax(currentUrl, null, true);
+                const currentPath = window.location.pathname;
+                console.log("SPA: Refreshing page:", currentPath);
+                // Reload just the current view content without navigation
+                fetch(window.location.href)
+                    .then(res => res.text())
+                    .then(htmlText => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlText, 'text/html');
+                        // Update all loaded views (main tabs)
+                        doc.querySelectorAll('.app-view').forEach(newView => {
+                            const path = newView.dataset.path;
+                            if (path && loadedViews[path]) {
+                                loadedViews[path].innerHTML = newView.innerHTML;
+                                executeScripts(loadedViews[path]);
+                                if (window.setupEditor) {
+                                    loadedViews[path].querySelectorAll('[data-target]').forEach(setupEditor);
+                                }
+                            }
+                        });
+                        // Also try to update current path-specific view
+                        const newView = doc.querySelector('.app-view');
+                        const curView = loadedViews[currentPath];
+                        if (newView && curView && !newView.dataset.path) {
+                            curView.innerHTML = newView.innerHTML;
+                            executeScripts(curView);
+                        }
+                        console.log("SPA: Page refreshed successfully.");
+                    })
+                    .catch(() => {
+                        // Fallback: full page reload as last resort
+                        location.reload();
+                    });
             };
+
+            // Close any open modal with ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const openModals = document.querySelectorAll('[id$="Modal"].active-modal, [id$="modal"].active-modal');
+                    openModals.forEach(m => closeModal(m.id));
+                }
+            });
 
             // Global delete modal helpers
             window.showDeleteModal = function(type, id, label) {
@@ -1075,10 +1111,8 @@
                                 window.location.href = '/biens';
                             } else if (type === 'bien' && window.location.pathname.includes('/bien/')) {
                                 window.location.href = '/biens';
-                            } else if (window.refreshPage) {
-                                window.refreshPage();
                             } else {
-                                location.reload();
+                                window.refreshPage();
                             }
                         }, 600);
                     } else {
