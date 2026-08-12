@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.8.5"
+VERSION = "3.8.6"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -3205,13 +3205,17 @@ def pdf_appel_loyer(appel_id):
     appel = AppelLoyer.query.get_or_404(appel_id)
     _get_locataire_for_user(appel.locataire_id, current_user.id) or abort(404)
 
+    pdf_path, pdf_error = _generate_appel_pdf_file(appel, force_regenerate=True)
+    if pdf_path and os.path.exists(pdf_path):
+        return send_file(pdf_path, mimetype='application/pdf')
+
     locataire = appel.locataire
     appartement = locataire.appartement
     bien = appartement.bien if appartement else None
     sci = bien.sci if bien else None
     bailleur = _get_bailleur_info(bien)
 
-    html = render_template('pdf/appel_loyer.html',
+    return render_template('pdf/appel_loyer.html',
                            appel=appel,
                            locataire=locataire,
                            appartement=appartement,
@@ -3223,7 +3227,6 @@ def pdf_appel_loyer(appel_id):
                            bailleur_ville=bailleur['ville'],
                            bailleur_siret=bailleur['siret'],
                            mois_fr=MOIS_FR)
-    return html
 
 
 @app.route('/api/appel-loyer/<int:appel_id>', methods=['DELETE'])
@@ -3324,17 +3327,24 @@ def create_quittance():
 @app.route('/api/quittance/<int:quittance_id>/pdf')
 @login_required
 def pdf_quittance(quittance_id):
-    return jsonify({
-        'success': False,
-        'message': 'Accès direct désactivé. Utilisez la référence publique du document.'
-    }), 410
+    quittance = Quittance.query.get_or_404(quittance_id)
+    _get_locataire_for_user(quittance.locataire_id, current_user.id) or abort(404)
+
+    pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
+    if pdf_path and os.path.exists(pdf_path):
+        return send_file(pdf_path, mimetype='application/pdf')
+
+    return render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
 
 
 @app.route('/quittance/document/<string:public_ref>/pdf')
 def pdf_quittance_public(public_ref):
     quittance = Quittance.query.filter_by(public_ref=public_ref).first_or_404()
-    html = render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
-    return html
+    pdf_path, pdf_error = _generate_quittance_pdf_file(quittance, force_regenerate=True)
+    if pdf_path and os.path.exists(pdf_path):
+        return send_file(pdf_path, mimetype='application/pdf')
+
+    return render_template('pdf/quittance.html', **_build_quittance_pdf_context(quittance))
 
 
 @app.route('/api/quittance/<int:quittance_id>/verify', methods=['GET'])

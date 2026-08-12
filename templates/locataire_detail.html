@@ -795,25 +795,32 @@ function deleteBailById(bailId) {
         .catch(() => showNotification('Erreur lors de la suppression', 'error'));
 }
 
-function openGarantModal() {
+window.openGarantModal = function() {
     const form = document.getElementById('garantForm');
     if (form) form.reset();
     openModal('garantModal');
-}
+};
 
-async function submitAddGarant(event) {
-    event.preventDefault();
+window.submitAddGarant = async function(event) {
+    if (event) { event.preventDefault(); event.stopPropagation(); }
     const typeGarant = document.querySelector('#garantForm input[name="type_garant"]:checked')?.value || 'Particulier';
-    const nom = document.getElementById('garantNom').value;
-    const prenom = document.getElementById('garantPrenom').value;
-    const email = document.getElementById('garantEmail').value;
-    const telephone = document.getElementById('garantTelephone').value;
-    const adresse = document.getElementById('garantAdresse').value;
-    const numeroContrat = document.getElementById('garantNumeroContrat').value;
-    const notes = document.getElementById('garantNotes').value;
+    const nom = document.getElementById('garantNom')?.value || '';
+    const prenom = document.getElementById('garantPrenom')?.value || '';
+    const email = document.getElementById('garantEmail')?.value || '';
+    const telephone = document.getElementById('garantTelephone')?.value || '';
+    const adresse = document.getElementById('garantAdresse')?.value || '';
+    const numeroContrat = document.getElementById('garantNumeroContrat')?.value || '';
+    const notes = document.getElementById('garantNotes')?.value || '';
+
+    if (!nom) {
+        showNotification('Veuillez au moins saisir le nom du garant ou de l\'organisme', 'warning');
+        return;
+    }
+
+    const currentLocataireId = typeof locataireId !== 'undefined' ? locataireId : {{ locataire.id }};
 
     try {
-        const response = await fetch('/api/locataire/' + locataireId + '/garant', {
+        const response = await fetch('/api/locataire/' + currentLocataireId + '/garant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -838,9 +845,9 @@ async function submitAddGarant(event) {
     } catch (err) {
         showNotification('Erreur lors de l\'ajout du garant', 'error');
     }
-}
+};
 
-function deleteGarant(garantId) {
+window.deleteGarant = function(garantId) {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce garant ?')) return;
     fetch('/api/garant/' + garantId, { method: 'DELETE' })
         .then(r => r.json())
@@ -853,7 +860,7 @@ function deleteGarant(garantId) {
             }
         })
         .catch(() => showNotification('Erreur lors de la suppression', 'error'));
-}
+};
 
 function openEditLocataireFromDetail() {
     document.getElementById('locataireModalTitle').innerHTML = '<i class="fas fa-user text-pink-400 mr-2"></i>Modifier Locataire';
