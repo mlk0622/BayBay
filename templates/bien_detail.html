@@ -5,14 +5,25 @@
 {% block content %}
 <div class="space-y-8">
     <div class="flex items-center gap-4">
+        {% if bien.sci %}
         <a href="{{ url_for('vue_sci', sci_id=bien.sci.id) }}" class="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center hover:bg-white/80 transition-all">
             <i class="fas fa-arrow-left text-white/80"></i>
         </a>
+        {% else %}
+        <a href="{{ url_for('liste_biens') }}" class="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center hover:bg-white/80 transition-all">
+            <i class="fas fa-arrow-left text-white/80"></i>
+        </a>
+        {% endif %}
         <div class="flex-1">
             <nav class="text-sm text-white/70 mb-1">
                 <a href="{{ url_for('dashboard') }}" class="hover:text-white">Dashboard</a>
+                {% if bien.sci %}
                 <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 <a href="{{ url_for('vue_sci', sci_id=bien.sci.id) }}" class="hover:text-white">{{ bien.sci.nom }}</a>
+                {% else %}
+                <i class="fas fa-chevron-right mx-2 text-xs"></i>
+                <a href="{{ url_for('liste_biens') }}" class="hover:text-white">Biens</a>
+                {% endif %}
                 <i class="fas fa-chevron-right mx-2 text-xs"></i>
                 <span class="text-white">{{ bien.adresse }}</span>
             </nav>

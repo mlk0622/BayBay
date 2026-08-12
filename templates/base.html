@@ -1008,9 +1008,13 @@
             window.refreshPage = function() {
                 const currentPath = window.location.pathname;
                 console.log('SPA: refreshPage', currentPath);
-                // Use the originalFetch to avoid triggering any interceptors
+                if (currentPath.includes('/locataire/') || currentPath.includes('/bien/') || currentPath.includes('/sci/') || currentPath.includes('/compte-locatif/')) {
+                    window.location.reload();
+                    return;
+                }
                 const fetchFn = window.__originalFetch || fetch;
-                fetchFn('/?_=' + Date.now())
+                const url = currentPath + (currentPath.includes('?') ? '&_=' : '?_=') + Date.now();
+                fetchFn(url)
                     .then(res => res.text())
                     .then(htmlText => {
                         const parser = new DOMParser();
@@ -1028,6 +1032,82 @@
                         console.log('SPA: refreshPage done, active view preserved.');
                     })
                     .catch(() => location.reload());
+            };
+
+            // Global modal submission fallbacks
+            window.submitCreerAppelLoyer = async function(event) {
+                if (event) { event.preventDefault(); event.stopPropagation(); }
+                const locataireId = document.getElementById('appelLocataire')?.value;
+                const mois = document.getElementById('appelMois')?.value;
+                const annee = document.getElementById('appelAnnee')?.value;
+                const dateEcheance = document.getElementById('appelDateEcheance')?.value;
+
+                if (!locataireId || !mois || !annee) {
+                    showNotification('Veuillez remplir les champs obligatoires', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/appel-loyer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            locataire_id: parseInt(locataireId, 10),
+                            mois: parseInt(mois, 10),
+                            annee: parseInt(annee, 10),
+                            date_echeance: dateEcheance || null
+                        })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        closeModal('appelLoyerModal');
+                        showNotification('Appel de loyer créé avec succès !', 'success');
+                        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 800);
+                    } else {
+                        showNotification('Erreur: ' + (data.message || data.error || 'Impossible de créer l\'appel'), 'error');
+                    }
+                } catch (err) {
+                    showNotification('Erreur lors de la création de l\'appel de loyer', 'error');
+                }
+            };
+            window.submitAppelLoyer = window.submitCreerAppelLoyer;
+
+            window.submitCreerQuittance = async function(event) {
+                if (event) { event.preventDefault(); event.stopPropagation(); }
+                const locataireId = document.getElementById('quittanceLocataire')?.value;
+                const mois = document.getElementById('quittanceMois')?.value;
+                const annee = document.getElementById('quittanceAnnee')?.value;
+                const montantPaye = document.getElementById('quittanceMontant')?.value;
+                const datePaiement = document.getElementById('quittanceDatePaiement')?.value;
+
+                if (!locataireId || !mois || !annee || !montantPaye || !datePaiement) {
+                    showNotification('Veuillez remplir tous les champs obligatoires', 'warning');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/quittance', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            locataire_id: parseInt(locataireId, 10),
+                            mois: parseInt(mois, 10),
+                            annee: parseInt(annee, 10),
+                            montant_paye: parseFloat(montantPaye),
+                            date_paiement: datePaiement
+                        })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        closeModal('quittanceModal');
+                        showNotification('Quittance créée avec succès !', 'success');
+                        setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 800);
+                    } else {
+                        showNotification('Erreur: ' + (data.error || 'Impossible de créer la quittance'), 'error');
+                    }
+                } catch (err) {
+                    showNotification('Erreur lors de la création de la quittance', 'error');
+                }
             };
 
             // Close any open modal with ESC key

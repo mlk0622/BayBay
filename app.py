@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.8.3"
+VERSION = "3.8.4"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -1609,16 +1609,14 @@ def liste_biens():
 @app.route('/bien/<int:bien_id>')
 @login_required
 def vue_bien(bien_id):
-    from sqlalchemy import or_
-    bien = BienImmobilier.query.filter(
-        BienImmobilier.id == bien_id,
-        or_(
-            BienImmobilier.user_id == current_user.id,
-            BienImmobilier.sci_id.in_(
-                db.session.query(SCI.id).filter(SCI.user_id == current_user.id)
-            )
-        )
-    ).first_or_404()
+    user_scis = [s.id for s in SCI.query.filter_by(user_id=current_user.id).all()]
+    if user_scis:
+        bien = BienImmobilier.query.filter(
+            BienImmobilier.id == bien_id,
+            (BienImmobilier.user_id == current_user.id) | (BienImmobilier.sci_id.in_(user_scis))
+        ).first_or_404()
+    else:
+        bien = BienImmobilier.query.filter_by(id=bien_id, user_id=current_user.id).first_or_404()
     return render_template('bien_detail.html', bien=bien)
 
 
