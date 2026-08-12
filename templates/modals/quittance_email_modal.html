@@ -1,0 +1,142 @@
+<!-- Modal Créer Quittance -->
+<div id="quittanceModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4" style="display:none;">
+    <div class="glass-card w-full max-w-md p-6 space-y-4 my-auto">
+        <div class="flex items-center justify-between border-b border-white/20 pb-3">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-file-invoice-dollar text-white"></i>
+                <span>Créer une Quittance de Loyer</span>
+            </h3>
+            <button type="button" onclick="closeModal('quittanceModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
+            </button>
+        </div>
+
+        <form id="quittanceForm" onsubmit="submitCreerQuittance(event)" class="space-y-4" data-no-spa="true">
+            <div>
+                <label class="block text-sm font-bold text-white mb-1">Locataire *</label>
+                <select id="quittanceLocataire" name="locataire_id" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
+                    <option value="">-- Sélectionner un locataire --</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-white mb-1">Mois *</label>
+                    <select id="quittanceMois" name="mois" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
+                        <option value="1">Janvier</option>
+                        <option value="2">Février</option>
+                        <option value="3">Mars</option>
+                        <option value="4">Avril</option>
+                        <option value="5">Mai</option>
+                        <option value="6">Juin</option>
+                        <option value="7">Juillet</option>
+                        <option value="8">Août</option>
+                        <option value="9">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-white mb-1">Année *</label>
+                    <input type="number" id="quittanceAnnee" name="annee" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium" placeholder="2026">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-white mb-1">Montant Payé (€) *</label>
+                <input type="number" step="0.01" id="quittanceMontant" name="montant_paye" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium" placeholder="0.00">
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-white mb-1">Date du Règlement *</label>
+                <input type="date" id="quittanceDatePaiement" name="date_paiement" required class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-white/20">
+                <button type="button" onclick="closeModal('quittanceModal')" class="px-4 py-2 bg-white/10 border border-white/30 text-white rounded-xl font-bold hover:bg-white/20">
+                    Annuler
+                </button>
+                <button type="button" onclick="submitCreerQuittance(event)" class="ios-button-success text-white font-bold px-6 py-2 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;">
+                    <i class="fas fa-check text-white font-bold"></i>
+                    <span class="text-white font-bold">Créer la quittance</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Envoyer Quittance par Email -->
+<div id="quittanceEmailModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4" style="display:none;">
+    <div class="glass-card w-full max-w-2xl p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-white/20 pb-3">
+            <h3 class="text-xl font-semibold text-white">Envoyer la quittance par email</h3>
+            <button type="button" onclick="closeModal('quittanceEmailModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
+            </button>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Modèle du corps</label>
+            <select id="quittanceEmailModele" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" onchange="applyQuittanceEmailTemplate()">
+                <option value="standard">Standard</option>
+                <option value="court">Court</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Sujet</label>
+            <input id="quittanceEmailSujet" type="text" class="w-full rounded-lg bg-black/60 border border-white/20 text-white px-3 py-2" placeholder="Sujet personnalisé (optionnel)">
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-white/15 bg-black/25 px-3 py-2">
+            <label class="inline-flex items-center gap-2 text-sm text-white/90 cursor-pointer">
+                <input id="quittanceEmailIncludePdf" type="checkbox" class="accent-blue-500" checked>
+                <span>Joindre le PDF de la quittance</span>
+            </label>
+            <button type="button" onclick="openQuittanceLinkedPdf()" class="px-3 py-1.5 rounded-lg border border-white/20 text-white/80 hover:text-white text-sm">
+                <i class="fas fa-file-pdf mr-2 text-white"></i>Voir le PDF lié
+            </button>
+        </div>
+
+        <div>
+            <label class="block text-sm text-white/80 mb-2">Corps Mail</label>
+            <div class="rich-editor-shell" data-target="quittanceEmailCorps">
+                <div class="rich-editor-toolbar">
+                    <button type="button" data-command="bold"><strong>B</strong></button>
+                    <button type="button" data-command="italic"><em>I</em></button>
+                    <button type="button" data-command="underline"><u>U</u></button>
+                    <button type="button" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
+                    <button type="button" data-command="removeFormat">Tx</button>
+                    <select data-variable-select aria-label="Variables du mail"></select>
+                    <button type="button" data-insert-variable>Insérer</button>
+                    <label title="Couleur du texte">
+                        <input type="color" data-command="foreColor" value="#ffffff">
+                    </label>
+                    <select data-command="fontName" aria-label="Police du mail" title="Police">
+                        <option value="Arial">Arial</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="Trebuchet MS">Trebuchet</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
+                <div id="quittanceEmailCorpsEditor" class="rich-editor-area" contenteditable="true" data-placeholder="Rédigez ici le corps du mail..."></div>
+                <textarea id="quittanceEmailCorps" class="hidden"></textarea>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-3 border-t border-white/20">
+            <button type="button" onclick="previewQuittanceEmail()" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">
+                <i class="fas fa-eye mr-2 text-white"></i>Aperçu
+            </button>
+            <button type="button" onclick="closeModal('quittanceEmailModal')" class="px-4 py-2 rounded-lg border border-white/20 text-white/80 hover:text-white">Annuler</button>
+            <button type="button" onclick="sendQuittanceEmail()" class="ios-button-success text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;">
+                <i class="fas fa-paper-plane text-white font-bold"></i>
+                <span class="text-white font-bold">Envoyer la quittance</span>
+            </button>
+        </div>
+    </div>
+</div>
