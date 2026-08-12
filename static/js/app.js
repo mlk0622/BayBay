@@ -82,9 +82,9 @@ function closeModal(modalId) {
     modal.classList.add('hidden');
     modal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
 
-    // Restore body scroll only if no other modal is open
-    const anyOpen = document.querySelector('.active-modal:not(.hidden)');
-    if (!anyOpen) document.body.style.overflow = '';
+    // Restore body scroll if no visible active modal is open
+    const visibleModal = document.querySelector('.active-modal:not(.hidden):not([style*="display: none"])');
+    if (!visibleModal) document.body.style.overflow = '';
 }
 
 function closeAllModals() {

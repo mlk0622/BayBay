@@ -932,8 +932,16 @@
                     return;
                 }
                 
-                const urlObj = new URL(link.href);
+                const urlObj = new URL(link.href, window.location.origin);
                 if (urlObj.origin !== window.location.origin) return;
+
+                // Bypass SPA AJAX when current page or target page is a detail view (/locataire/, /bien/, /sci/)
+                const currentIsDetail = window.location.pathname.includes('/locataire/') || window.location.pathname.includes('/bien/') || window.location.pathname.includes('/sci/');
+                const targetIsDetail = urlObj.pathname.includes('/locataire/') || urlObj.pathname.includes('/bien/') || urlObj.pathname.includes('/sci/');
+
+                if (currentIsDetail || targetIsDetail) {
+                    return; // Standard browser navigation
+                }
                 
                 e.preventDefault();
                 loadPageViaAjax(link.href, link);
