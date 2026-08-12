@@ -1110,6 +1110,17 @@
                 }
             };
 
+            window.openGarantModal = function() {
+                const form = document.getElementById('garantForm');
+                if (form) form.reset();
+                openModal('garantModal');
+            };
+            window.openLocataireBailModal = function() { openModal('locataireBailModal'); };
+            window.openLocataireAssuranceModal = function() { openModal('locataireAssuranceModal'); };
+            window.openPhotoModal = function() { openModal('photoModal'); };
+            window.openEtatModal = function() { openModal('etatModal'); };
+            window.openUploadEtatModal = function() { openModal('uploadEtatModal'); };
+
             // Close any open modal with ESC key
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
