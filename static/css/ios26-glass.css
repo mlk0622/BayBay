@@ -1319,6 +1319,68 @@ p, span, h1, h2, h3, h4, h5, h6, label, div {
     color: #ffffff !important;
 }
 
+/* ABSOLUTE FORCE OVERRIDE FOR ALL BUTTONS, CARDS, ICONS & MODALS TO DARK GLASS - NO SOLID WHITE BUTTONS */
+.bg-white,
+.bg-slate-50,
+.bg-slate-100,
+.bg-slate-200,
+.bg-slate-300 {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+}
+
+/* Close (X) buttons, Cancel buttons, Option buttons */
+button.rounded-full,
+.rounded-full.bg-white\/10,
+.rounded-full.bg-slate-100,
+button[onclick*="closeModal"],
+button[onclick*="close"],
+button[onclick*="Cancel"] {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #FFFFFF !important;
+}
+
+button[onclick*="closeModal"]:hover,
+button[onclick*="close"]:hover,
+.rounded-full:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Delete / Trash buttons (keep vibrant red gradient, white text) */
+button[onclick*="Delete"],
+button[onclick*="delete"],
+.bg-red-500,
+.bg-red-600 {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+}
+
+/* PDF, Preview & Action buttons */
+a[href*=".pdf"],
+button[onclick*="pdf"],
+button[onclick*="Pdf"],
+button[onclick*="preview"],
+button[onclick*="Preview"] {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #FFFFFF !important;
+}
+
+/* Bien & Via SCI Choice Buttons in Add Popup */
+#choixAjoutModal button,
+#choixSciModal button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #FFFFFF !important;
+}
+#choixAjoutModal button:hover,
+#choixSciModal button:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
+}
+
 
 
 
