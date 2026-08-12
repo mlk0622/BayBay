@@ -9,57 +9,57 @@
  */
 
 :root {
-    /* Fond blanc casse / gris tres doux */
-    --bg-1: #F8FAFC;              /* Slate 50 off-white background */
-    --bg-2: #F1F5F9;              /* Slate 100 soft light gray */
-    --bg-3: #E2E8F0;              /* Slate 200 light border tint */
-    --text-main: #0F172A;         /* Slate 900 dark text for optimal contrast */
-    --text-muted: #475569;        /* Slate 600 muted text */
+    /* Fond Sombre Gris Premium (Dark Slate Gray) */
+    --bg-1: #121214;              /* Deep Dark Gray */
+    --bg-2: #18181b;              /* Dark Zinc/Slate Gray */
+    --bg-3: #27272a;              /* Medium Gray Glow */
+    --text-main: #FFFFFF;         /* Texte Blanc Pur Universel */
+    --text-muted: #FFFFFF;        /* Texte Blanc Pur Universel */
     
     /* Liquid Glass Effects */
-    --border-glass: rgba(0, 0, 0, 0.08);
-    --surface-glass: rgba(255, 255, 255, 0.75);
-    --surface-glass-strong: rgba(255, 255, 255, 0.9);
-    --surface-nav: rgba(248, 250, 252, 0.85);
+    --border-glass: rgba(255, 255, 255, 0.2);
+    --surface-glass: rgba(24, 24, 27, 0.75);
+    --surface-glass-strong: rgba(39, 39, 42, 0.85);
+    --surface-nav: rgba(18, 18, 20, 0.85);
     
-    --shadow-soft: 0 12px 32px -8px rgba(0, 0, 0, 0.06);
+    --shadow-soft: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
     
-    /* Functional Palette Colors */
-    --primary: #3b82f6;           /* Bleu (Actions principales) */
+    /* Functional Palette Colors (Preserved) */
+    --primary: #3b82f6;           /* Bleu */
     --primary-strong: #2563eb;
-    --success: #10b981;           /* Vert (Validation / Ajouter) */
-    --danger: #ef4444;            /* Rouge (Supprimer / Danger) */
-    --warning: #f59e0b;           /* Jaune / Amber (Avertissement / Modifier) */
-    --purple: #8b5cf6;            /* Violet (Options / Filtres / Spécial) */
+    --success: #10b981;           /* Vert */
+    --danger: #ef4444;            /* Rouge */
+    --warning: #f59e0b;           /* Jaune / Amber */
+    --purple: #8b5cf6;            /* Violet */
 
     /* Dynamic Component Variables */
-    --modal-bg-end: rgba(248, 250, 252, 0.98);
-    --card-bg: #FFFFFF;
-    --input-bg: #FFFFFF;
-    --input-border: rgba(15, 23, 42, 0.15);
-    --select-bg: #FFFFFF;
-    --select-scheme: light;
-    --titlebar-bg: rgba(241, 245, 249, 0.95);
-    --titlebar-text: #0F172A;
-    --titlebar-border: rgba(0, 0, 0, 0.08);
-    --table-header-bg: rgba(0, 0, 0, 0.03);
-    --row-hover-bg: rgba(59, 130, 246, 0.04);
-    --modal-border-color: rgba(0, 0, 0, 0.1);
+    --modal-bg-end: rgba(24, 24, 27, 0.95);
+    --card-bg: rgba(24, 24, 27, 0.75);
+    --input-bg: rgba(0, 0, 0, 0.5);
+    --input-border: rgba(255, 255, 255, 0.3);
+    --select-bg: #18181b;
+    --select-scheme: dark;
+    --titlebar-bg: rgba(18, 18, 20, 0.95);
+    --titlebar-text: #FFFFFF;
+    --titlebar-border: rgba(255, 255, 255, 0.15);
+    --table-header-bg: rgba(255, 255, 255, 0.08);
+    --row-hover-bg: rgba(255, 255, 255, 0.1);
+    --modal-border-color: rgba(255, 255, 255, 0.25);
 
-    --scrollbar-thumb: rgba(15, 23, 42, 0.2);
-    --scrollbar-thumb-hover: rgba(15, 23, 42, 0.4);
-    --blob-1: rgba(59, 130, 246, 0.05);
-    --blob-2: rgba(139, 92, 246, 0.05);
-    --blob-3: rgba(16, 185, 129, 0.04);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.3);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.6);
+    --blob-1: rgba(255, 255, 255, 0.03);
+    --blob-2: rgba(255, 255, 255, 0.03);
+    --blob-3: rgba(255, 255, 255, 0.02);
 
     /* Rich Text Editor Variables */
-    --editor-bg: #ffffff;
-    --editor-text: #0F172A;
-    --editor-border: rgba(15, 23, 42, 0.15);
-    --editor-toolbar-bg: #F1F5F9;
-    --editor-btn-bg: #ffffff;
-    --editor-btn-text: #0F172A;
-    --editor-placeholder: #64748B;
+    --editor-bg: rgba(0, 0, 0, 0.5);
+    --editor-text: #FFFFFF;
+    --editor-border: rgba(255, 255, 255, 0.3);
+    --editor-toolbar-bg: rgba(255, 255, 255, 0.15);
+    --editor-btn-bg: rgba(255, 255, 255, 0.2);
+    --editor-btn-text: #FFFFFF;
+    --editor-placeholder: rgba(255, 255, 255, 0.6);
 }
 
 /* Animations de vagues liquides en arrière-plan */
@@ -82,14 +82,11 @@
 }
 
 /* Base style with fixed multi-gradient liquid background */
+body,
 body.app-shell {
     position: relative;
-    color: var(--text-main);
-    background: 
-        radial-gradient(circle at 75% 25%, var(--blob-1) 0%, transparent 45%),
-        radial-gradient(circle at 20% 80%, var(--blob-2) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, var(--blob-3) 0%, transparent 60%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3)) !important;
+    color: #FFFFFF !important;
+    background: radial-gradient(circle at 85% 85%, #334155 0%, #1e293b 30%, #0f172a 60%, #090d16 100%) fixed !important;
     background-attachment: fixed !important;
     overflow-x: hidden;
 }
@@ -840,31 +837,23 @@ html[data-theme="light"] .stat-icon.red {
 /* ====================================================
  * LIGHT THEME SPECIFIC IMPLEMENTATION (LIQUID GEL GLASS)
  * ==================================================== */
+html body.app-shell,
 html[data-theme="light"] body.app-shell {
-    background: 
-        radial-gradient(circle at 75% 25%, var(--blob-1) 0%, transparent 50%),
-        radial-gradient(circle at 20% 80%, var(--blob-2) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, var(--blob-3) 0%, transparent 60%),
-        radial-gradient(circle, #F2EFF6 0%, #EAE5DF 100%) !important;
+    background: radial-gradient(circle at 85% 85%, #334155 0%, #1e293b 30%, #0f172a 60%, #090d16 100%) fixed !important;
 }
 
-/* 32px rounded corners for panels */
-html[data-theme="light"] .glass-card,
-html[data-theme="light"] .stat-card,
-html[data-theme="light"] .bg-white.shadow-sm,
-html[data-theme="light"] .bg-white.rounded-xl,
-html[data-theme="light"] [id$="Modal"] > div {
-    border-radius: 32px !important;
-    background: var(--card-bg) !important;
+/* 24px/32px rounded corners for panels with Dark Ambient Liquid Glass */
+.glass-card,
+.stat-card,
+[id$="Modal"] > div,
+[id$="modal"] > div {
+    border-radius: 24px !important;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
     backdrop-filter: blur(28px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), var(--shadow-soft) !important;
-    
-    /* Asymmetrical border styling to simulate light catching on glass thickness */
-    border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.6) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
 }
 
 /* 9999px perfect capsule pill style for buttons and search inputs */
@@ -893,55 +882,48 @@ html[data-theme="light"] textarea {
 }
 
 /* Specular Highlights & Shadows for Accent_Purple_Gel (Primary/Submit Buttons) */
-html[data-theme="light"] .ios-button,
-html[data-theme="light"] button[type="submit"]:not(.bg-red-600):not(.bg-green-600),
-html[data-theme="light"] .bg-primary:not(.app-nav .bg-primary):not(.nav-pill-container *),
-html[data-theme="light"] .bg-blue-600 {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(192, 132, 252, 0.4) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+.ios-button,
+button[type="submit"]:not(.bg-red-600):not(.bg-green-600),
+.bg-primary:not(.app-nav .bg-primary):not(.nav-pill-container *),
+.bg-purple-600 {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.6), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 12px 24px rgba(168, 85, 247, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35) !important;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 /* Specular Highlights & Shadows for Accent_Teal_Gel (Success Buttons) */
-html[data-theme="light"] .ios-button-success,
-html[data-theme="light"] .bg-green-600 {
-    background: linear-gradient(135deg, rgba(13, 148, 136, 0.7) 0%, rgba(45, 212, 191, 0.4) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+.ios-button-success,
+.bg-green-500,
+.bg-green-600 {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.6), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 12px 24px rgba(13, 148, 136, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35) !important;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 /* Specular Highlights & Shadows for Accent_Red_Gel (Danger Buttons) */
-html[data-theme="light"] .ios-button-danger,
-html[data-theme="light"] .bg-red-600 {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.8) 0%, rgba(248, 113, 113, 0.4) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+.ios-button-danger,
+.bg-red-500,
+.bg-red-600 {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.6), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 12px 24px rgba(239, 68, 68, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.35) !important;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
-/* Secondary Cancel/Action Buttons (Pure White) */
-html[data-theme="light"] button.bg-white,
-html[data-theme="light"] button[class*="bg-white"],
-html[data-theme="light"] button[class*="border-slate-200"],
-html[data-theme="light"] [id$="Modal"] button[class*="text-slate-700"] {
-    background: #FFFFFF !important;
-    border: 1px solid rgba(92, 92, 100, 0.15) !important;
-    color: #121214 !important;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05) !important;
+/* Secondary Cancel/Action Buttons */
+button.bg-white,
+button[class*="bg-white"],
+button[class*="border-slate-200"],
+[id$="Modal"] button[class*="text-slate-700"] {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Interactive States: Hover (Swell light effect & increase opacity/glow) */
