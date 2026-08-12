@@ -185,43 +185,103 @@
         {% endif %}
     </div>
 
-    <!-- Bail -->
+    <!-- Baux (Contrats de location) -->
     <div class="bg-white rounded-xl border border-slate-200 p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-slate-900">
-                <i class="fas fa-file-signature text-indigo-600 mr-2"></i>Bail
-            </h3>
-            <button onclick="openLocataireBailModal()" class="text-sm text-primary hover:text-primary-dark font-medium">
-                {% if bail %}Modifier{% else %}Ajouter{% endif %}
+            <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-slate-900">
+                    <i class="fas fa-file-signature text-indigo-600 mr-2"></i>Baux (Contrats de location)
+                </h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">{{ baux|length if baux else 0 }}</span>
+            </div>
+            <button onclick="openLocataireBailModal()" class="inline-flex items-center px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark shadow-sm">
+                <i class="fas fa-plus mr-1.5"></i>Ajouter un bail
             </button>
         </div>
-        {% if bail %}
-        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
-                    <i class="fas fa-file-pdf text-indigo-600 text-xl"></i>
+        {% if baux %}
+        <div class="space-y-3">
+            {% for b in baux %}
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
+                        <i class="fas fa-file-pdf text-indigo-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-slate-900 text-sm">{{ b.nom_fichier }}</p>
+                        <p class="text-xs text-slate-500">Ajouté le {{ b.created_at.strftime('%d/%m/%Y à %H:%M') if b.created_at else '' }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-medium text-slate-900">{{ bail.nom_fichier }}</p>
-                    <p class="text-xs text-slate-500">Document de bail</p>
+                <div class="flex gap-2 shrink-0">
+                    <a href="/api/bail/{{ b.id }}" target="_blank"
+                       class="inline-flex items-center px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100">
+                        <i class="fas fa-download mr-1.5"></i>Télécharger
+                    </a>
+                    <button onclick="deleteBailById({{ b.id }})" class="inline-flex items-center px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs font-medium text-red-600 hover:bg-red-100">
+                        <i class="fas fa-trash mr-1.5"></i>Supprimer
+                    </button>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <a href="/api/locataire/{{ locataire.id }}/bail" target="_blank"
-                   class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                    <i class="fas fa-download mr-2"></i>Télécharger
-                </a>
-                <button onclick="deleteBail()" class="inline-flex items-center px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-100">
-                    <i class="fas fa-trash mr-2"></i>Supprimer
-                </button>
-            </div>
+            {% endfor %}
         </div>
         {% else %}
         <div class="text-center py-8 bg-slate-50 rounded-xl">
-            <div class="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-3">
-                <i class="fas fa-file-signature text-slate-400 text-2xl"></i>
+            <div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-file-signature text-slate-400 text-xl"></i>
             </div>
-            <p class="text-slate-500 text-sm">Aucun bail</p>
+            <p class="text-slate-500 text-sm">Aucun bail attaché pour le moment</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Garants -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-slate-900">
+                    <i class="fas fa-user-shield text-blue-600 mr-2"></i>Fiches Garants
+                </h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">{{ garants|length if garants else 0 }}</span>
+            </div>
+            <button onclick="openGarantModal()" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">
+                <i class="fas fa-user-plus mr-1.5"></i>Ajouter un garant
+            </button>
+        </div>
+        {% if garants %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for g in garants %}
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 relative">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mb-1
+                            {% if g.type_garant == 'Particulier' %}bg-blue-100 text-blue-800
+                            {% elif g.type_garant == 'Assurance' %}bg-emerald-100 text-emerald-800
+                            {% else %}bg-purple-100 text-purple-800{% endif %}">
+                            {{ g.type_garant }}
+                        </span>
+                        <h4 class="font-bold text-slate-900 text-base">{{ g.nom }} {{ g.prenom or '' }}</h4>
+                    </div>
+                    <button onclick="deleteGarant({{ g.id }})" class="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50" title="Supprimer ce garant">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                {% if g.numero_contrat %}
+                <p class="text-xs font-semibold text-slate-600"><i class="fas fa-hashtag text-slate-400 mr-1"></i>N° Dossier/Police: {{ g.numero_contrat }}</p>
+                {% endif %}
+                <div class="text-xs text-slate-600 space-y-1 pt-1 border-t border-slate-200">
+                    {% if g.email %}<p><i class="fas fa-envelope text-slate-400 mr-1.5"></i><a href="mailto:{{ g.email }}" class="text-primary hover:underline">{{ g.email }}</a></p>{% endif %}
+                    {% if g.telephone %}<p><i class="fas fa-phone text-slate-400 mr-1.5"></i><a href="tel:{{ g.telephone }}" class="text-slate-800 hover:underline">{{ g.telephone }}</a></p>{% endif %}
+                    {% if g.adresse %}<p><i class="fas fa-map-marker-alt text-slate-400 mr-1.5"></i>{{ g.adresse }}</p>{% endif %}
+                    {% if g.notes %}<p class="italic text-slate-500 pt-1"><i class="fas fa-sticky-note text-slate-400 mr-1.5"></i>{{ g.notes }}</p>{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 bg-slate-50 rounded-xl">
+            <div class="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-user-shield text-slate-400 text-xl"></i>
+            </div>
+            <p class="text-slate-500 text-sm">Aucun garant enregistré (Particulier, Assurance ou État)</p>
         </div>
         {% endif %}
     </div>
@@ -717,12 +777,76 @@ function deleteAssurance() {
 }
 
 function deleteBail() {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce document de bail ?')) return;
-    fetch('/api/locataire/' + locataireId + '/bail', {method: 'DELETE'})
+    deleteBailById(locataireId);
+}
+
+function deleteBailById(bailId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce bail ?')) return;
+    fetch('/api/bail/' + bailId, {method: 'DELETE'})
         .then(r => r.json())
         .then(result => {
             if (result.success) {
                 showNotification('Bail supprimé', 'success');
+                setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500);
+            } else {
+                showNotification(result.error || 'Erreur lors de la suppression', 'error');
+            }
+        })
+        .catch(() => showNotification('Erreur lors de la suppression', 'error'));
+}
+
+function openGarantModal() {
+    const form = document.getElementById('garantForm');
+    if (form) form.reset();
+    openModal('garantModal');
+}
+
+async function submitAddGarant(event) {
+    event.preventDefault();
+    const typeGarant = document.querySelector('#garantForm input[name="type_garant"]:checked')?.value || 'Particulier';
+    const nom = document.getElementById('garantNom').value;
+    const prenom = document.getElementById('garantPrenom').value;
+    const email = document.getElementById('garantEmail').value;
+    const telephone = document.getElementById('garantTelephone').value;
+    const adresse = document.getElementById('garantAdresse').value;
+    const numeroContrat = document.getElementById('garantNumeroContrat').value;
+    const notes = document.getElementById('garantNotes').value;
+
+    try {
+        const response = await fetch('/api/locataire/' + locataireId + '/garant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type_garant: typeGarant,
+                nom: nom,
+                prenom: prenom,
+                email: email,
+                telephone: telephone,
+                adresse: adresse,
+                numero_contrat: numeroContrat,
+                notes: notes
+            })
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+            showNotification('Garant ajouté avec succès !', 'success');
+            closeModal('garantModal');
+            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500);
+        } else {
+            showNotification('Erreur: ' + (result.error || 'Impossible d\'ajouter le garant'), 'error');
+        }
+    } catch (err) {
+        showNotification('Erreur lors de l\'ajout du garant', 'error');
+    }
+}
+
+function deleteGarant(garantId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce garant ?')) return;
+    fetch('/api/garant/' + garantId, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                showNotification('Garant supprimé', 'success');
                 setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500);
             } else {
                 showNotification(result.error || 'Erreur lors de la suppression', 'error');

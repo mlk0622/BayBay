@@ -414,6 +414,11 @@ class Locataire(db.Model):
                 return doc
         return None
 
+    @property
+    def baux(self):
+        return [doc for doc in self.documents if doc.type_document == 'bail']
+
+
 
 class DocumentLocataire(db.Model):
     __tablename__ = 'document_locataire'
@@ -425,6 +430,25 @@ class DocumentLocataire(db.Model):
     chemin_fichier = db.Column(db.String(500), nullable=False)
     date_validite = db.Column(db.Date, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Garant(db.Model):
+    __tablename__ = 'garant'
+
+    id = db.Column(db.Integer, primary_key=True)
+    locataire_id = db.Column(db.Integer, db.ForeignKey('locataire.id'), nullable=False)
+    type_garant = db.Column(db.String(50), nullable=False, default='Particulier')  # 'Particulier', 'Assurance', 'État'
+    nom = db.Column(db.String(100), nullable=False)
+    prenom = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(200), nullable=True)
+    telephone = db.Column(db.String(20), nullable=True)
+    adresse = db.Column(db.String(300), nullable=True)
+    numero_contrat = db.Column(db.String(100), nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    locataire = db.relationship('Locataire', backref=db.backref('garants', cascade='all, delete-orphan'))
+
 
 
 class EtatDesLieux(db.Model):

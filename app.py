@@ -26,9 +26,9 @@ from flask_bcrypt import Bcrypt
 
 from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, \
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
-    StatutPaiement, StatutLocataire, TypeEtatLieux
+    StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.8.2"
+VERSION = "3.8.3"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -1693,13 +1693,15 @@ def locataire_detail(id):
 
     etats_lieux = EtatDesLieux.query.filter_by(locataire_id=id).order_by(EtatDesLieux.date_etat.desc()).all()
     assurance = DocumentLocataire.query.filter_by(locataire_id=id, type_document='assurance').first()
-    bail = DocumentLocataire.query.filter_by(locataire_id=id, type_document='bail').first()
+    baux = DocumentLocataire.query.filter_by(locataire_id=id, type_document='bail').order_by(DocumentLocataire.created_at.desc()).all()
+    bail = baux[0] if baux else None
+    garants = Garant.query.filter_by(locataire_id=id).order_by(Garant.created_at.desc()).all()
     photo = DocumentLocataire.query.filter_by(locataire_id=id, type_document='photo').order_by(
         DocumentLocataire.created_at.desc()).first()
     photo_token = int(photo.created_at.timestamp()) if photo and photo.created_at else int(datetime.now().timestamp())
 
     return render_template('locataire_detail.html', locataire=locataire, etats_lieux=etats_lieux, assurance=assurance,
-                           bail=bail, photo=photo, photo_token=photo_token, now=datetime.now())
+                           bail=bail, baux=baux, garants=garants, photo=photo, photo_token=photo_token, now=datetime.now())
 
 
 @app.route('/programmation')
@@ -2382,14 +2384,7 @@ def delete_assurance(locataire_id):
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['POST'])
 @login_required
 def upload_bail(locataire_id):
-    from sqlalchemy import or_
-    Locataire.query.join(Appartement).join(BienImmobilier).filter(
-        Locataire.id == locataire_id,
-        or_(
-            BienImmobilier.user_id == current_user.id,
-            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
-        )
-    ).first_or_404()
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
 
     if 'file' not in request.files:
         return jsonify({'success': False, 'error': 'Aucun fichier'}), 400
@@ -2399,26 +2394,21 @@ def upload_bail(locataire_id):
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
     if file and file.filename.lower().endswith('.pdf'):
+        original_name = file.filename
         filename = secure_filename(f"bail_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances', filename)
         file.save(filepath)
 
-        old_doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').first()
-        if old_doc:
-            if os.path.exists(old_doc.chemin_fichier):
-                os.remove(old_doc.chemin_fichier)
-            db.session.delete(old_doc)
-
         doc = DocumentLocataire(
             locataire_id=locataire_id,
             type_document='bail',
-            nom_fichier=filename,
+            nom_fichier=original_name,
             chemin_fichier=filepath
         )
         db.session.add(doc)
         db.session.commit()
 
-        return jsonify({'success': True, 'id': doc.id})
+        return jsonify({'success': True, 'id': doc.id, 'nom_fichier': original_name})
 
     return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
 
@@ -2427,10 +2417,39 @@ def upload_bail(locataire_id):
 @login_required
 def get_bail(locataire_id):
     _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
-    doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').first()
+    doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').order_by(DocumentLocataire.created_at.desc()).first()
     if doc and os.path.exists(doc.chemin_fichier):
         return send_file(doc.chemin_fichier, as_attachment=True, download_name=doc.nom_fichier)
     return jsonify({'success': False, 'error': 'Bail non trouvé'}), 404
+
+
+@app.route('/api/bail/<int:bail_id>', methods=['GET'])
+@login_required
+def get_bail_by_id(bail_id):
+    doc = DocumentLocataire.query.get_or_404(bail_id)
+    _get_locataire_for_user(doc.locataire_id, current_user.id) or abort(404)
+    if doc and os.path.exists(doc.chemin_fichier):
+        return send_file(doc.chemin_fichier, as_attachment=True, download_name=doc.nom_fichier)
+    return jsonify({'success': False, 'error': 'Bail non trouvé'}), 404
+
+
+@app.route('/api/bail/<int:bail_id>', methods=['DELETE'])
+@login_required
+def delete_bail_by_id(bail_id):
+    try:
+        doc = DocumentLocataire.query.get_or_404(bail_id)
+        _get_locataire_for_user(doc.locataire_id, current_user.id) or abort(404)
+        if os.path.exists(doc.chemin_fichier):
+            try:
+                os.remove(doc.chemin_fichier)
+            except Exception:
+                pass
+        db.session.delete(doc)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Bail supprimé'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['DELETE'])
@@ -2438,14 +2457,62 @@ def get_bail(locataire_id):
 def delete_bail(locataire_id):
     try:
         _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
-        doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').first()
+        doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='bail').order_by(DocumentLocataire.created_at.desc()).first()
         if doc:
             if os.path.exists(doc.chemin_fichier):
-                os.remove(doc.chemin_fichier)
+                try:
+                    os.remove(doc.chemin_fichier)
+                except Exception:
+                    pass
             db.session.delete(doc)
             db.session.commit()
             return jsonify({'success': True, 'message': 'Bail supprimé'})
         return jsonify({'success': False, 'error': 'Aucun bail trouvé'}), 404
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# GARANTS ROUTES
+@app.route('/api/locataire/<int:locataire_id>/garant', methods=['POST'])
+@login_required
+def add_garant(locataire_id):
+    _get_locataire_for_user(locataire_id, current_user.id) or abort(404)
+    data = request.json or {}
+
+    nom = (data.get('nom') or '').strip()
+    if not nom:
+        return jsonify({'success': False, 'error': 'Le nom / dénomination est obligatoire'}), 400
+
+    type_garant = (data.get('type_garant') or 'Particulier').strip()
+    if type_garant not in ('Particulier', 'Assurance', 'État'):
+        type_garant = 'Particulier'
+
+    garant = Garant(
+        locataire_id=locataire_id,
+        type_garant=type_garant,
+        nom=nom,
+        prenom=(data.get('prenom') or '').strip() or None,
+        email=(data.get('email') or '').strip() or None,
+        telephone=(data.get('telephone') or '').strip() or None,
+        adresse=(data.get('adresse') or '').strip() or None,
+        numero_contrat=(data.get('numero_contrat') or '').strip() or None,
+        notes=(data.get('notes') or '').strip() or None
+    )
+    db.session.add(garant)
+    db.session.commit()
+    return jsonify({'success': True, 'id': garant.id})
+
+
+@app.route('/api/garant/<int:garant_id>', methods=['DELETE'])
+@login_required
+def delete_garant(garant_id):
+    try:
+        garant = Garant.query.get_or_404(garant_id)
+        _get_locataire_for_user(garant.locataire_id, current_user.id) or abort(404)
+        db.session.delete(garant)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Garant supprimé'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500

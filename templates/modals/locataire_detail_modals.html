@@ -340,5 +340,95 @@
                 </button>
             </div>
         </form>
+<!-- Modal Ajouter / Fiche Garant -->
+<div id="garantModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[100] p-4" style="display:none;">
+    <div class="glass-card max-w-lg w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-user-shield text-blue-400"></i>Ajouter une fiche Garant
+            </h3>
+            <button type="button" onclick="closeModal('garantModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
+            </button>
+        </div>
+        <form id="garantForm" onsubmit="submitAddGarant(event)">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-white mb-2">Type de garant *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/20 bg-black/40 text-white cursor-pointer hover:bg-white/10 has-[:checked]:border-blue-400 has-[:checked]:bg-blue-500/20">
+                            <input type="radio" name="type_garant" value="Particulier" checked class="hidden">
+                            <i class="fas fa-user text-lg mb-1 text-blue-400"></i>
+                            <span class="text-xs font-bold">Particulier</span>
+                        </label>
+                        <label class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/20 bg-black/40 text-white cursor-pointer hover:bg-white/10 has-[:checked]:border-emerald-400 has-[:checked]:bg-emerald-500/20">
+                            <input type="radio" name="type_garant" value="Assurance" class="hidden">
+                            <i class="fas fa-shield-alt text-lg mb-1 text-emerald-400"></i>
+                            <span class="text-xs font-bold">Assurance</span>
+                        </label>
+                        <label class="flex flex-col items-center justify-center p-3 rounded-xl border border-white/20 bg-black/40 text-white cursor-pointer hover:bg-white/10 has-[:checked]:border-purple-400 has-[:checked]:bg-purple-500/20">
+                            <input type="radio" name="type_garant" value="État" class="hidden">
+                            <i class="fas fa-landmark text-lg mb-1 text-purple-400"></i>
+                            <span class="text-xs font-bold">État / Organisme</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-white mb-1">Nom / Dénomination *</label>
+                        <input type="text" id="garantNom" name="nom" required placeholder="Nom ou nom de l'organisme"
+                               class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white mb-1">Prénom (si particulier)</label>
+                        <input type="text" id="garantPrenom" name="prenom" placeholder="Prénom du garant"
+                               class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-white mb-1">Email</label>
+                        <input type="email" id="garantEmail" name="email" placeholder="garant@exemple.com"
+                               class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white mb-1">Téléphone</label>
+                        <input type="tel" id="garantTelephone" name="telephone" placeholder="06 12 34 56 78"
+                               class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-white mb-1">Adresse postale</label>
+                    <input type="text" id="garantAdresse" name="adresse" placeholder="Adresse du garant / organisme"
+                           class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-white mb-1">N° de contrat / dossier (Visale, Police...)</label>
+                    <input type="text" id="garantNumeroContrat" name="numero_contrat" placeholder="Ex: VSL-12345678"
+                           class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-white mb-1">Notes / Remarques</label>
+                    <textarea id="garantNotes" name="notes" rows="2" placeholder="Informations complémentaires..."
+                              class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm font-medium"></textarea>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('garantModal')"
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
+                    Annuler
+                </button>
+                <button type="submit" class="ios-button-success px-5 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-check mr-2 text-white"></i>Enregistrer le garant
+                </button>
+            </div>
+        </form>
     </div>
 </div>
+
