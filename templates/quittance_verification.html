@@ -65,8 +65,8 @@
     </div>
 
     <div class="flex justify-end">
-        <a href="/quittance/document/{{ quittance.public_ref }}/pdf" target="_blank" class="ios-button text-white px-4 py-2">
-            <i class="fas fa-file-pdf mr-2"></i>Ouvrir le PDF
+        <a href="/quittance/document/{{ quittance.public_ref }}/pdf" target="_blank" download="quittance_{{ quittance.public_ref }}.pdf" class="ios-button text-white px-5 py-2.5 flex items-center font-bold">
+            <i class="fas fa-file-pdf mr-2"></i>Ouvrir / Télécharger le PDF
         </a>
     </div>
 </div>

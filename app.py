@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.8.6"
+VERSION = "3.8.7"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -289,6 +289,18 @@ def _ensure_config_email_schema():
         db.session.commit()
 
 
+def _ensure_garant_schema():
+    try:
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        if 'garants' not in tables:
+            db.create_all()
+            print("[SCHEMA] Table 'garants' créée avec succès.")
+    except Exception as e:
+        print(f"[SCHEMA] Erreur création schéma garants: {e}")
+
+
 with app.app_context():
     db.create_all()
     _ensure_proprietaire_schema()
@@ -299,6 +311,7 @@ with app.app_context():
     _ensure_programmation_schema()
     _ensure_sci_and_bien_schema()
     _ensure_appartement_schema()
+    _ensure_garant_schema()
 
 
 def _get_bailleur_info(bien):
@@ -1693,7 +1706,12 @@ def locataire_detail(id):
     assurance = DocumentLocataire.query.filter_by(locataire_id=id, type_document='assurance').first()
     baux = DocumentLocataire.query.filter_by(locataire_id=id, type_document='bail').order_by(DocumentLocataire.created_at.desc()).all()
     bail = baux[0] if baux else None
-    garants = Garant.query.filter_by(locataire_id=id).order_by(Garant.created_at.desc()).all()
+    try:
+        garants = Garant.query.filter_by(locataire_id=id).order_by(Garant.created_at.desc()).all()
+    except Exception:
+        db.session.rollback()
+        _ensure_garant_schema()
+        garants = Garant.query.filter_by(locataire_id=id).order_by(Garant.created_at.desc()).all()
     photo = DocumentLocataire.query.filter_by(locataire_id=id, type_document='photo').order_by(
         DocumentLocataire.created_at.desc()).first()
     photo_token = int(photo.created_at.timestamp()) if photo and photo.created_at else int(datetime.now().timestamp())
@@ -2486,20 +2504,42 @@ def add_garant(locataire_id):
     if type_garant not in ('Particulier', 'Assurance', 'État'):
         type_garant = 'Particulier'
 
-    garant = Garant(
-        locataire_id=locataire_id,
-        type_garant=type_garant,
-        nom=nom,
-        prenom=(data.get('prenom') or '').strip() or None,
-        email=(data.get('email') or '').strip() or None,
-        telephone=(data.get('telephone') or '').strip() or None,
-        adresse=(data.get('adresse') or '').strip() or None,
-        numero_contrat=(data.get('numero_contrat') or '').strip() or None,
-        notes=(data.get('notes') or '').strip() or None
-    )
-    db.session.add(garant)
-    db.session.commit()
-    return jsonify({'success': True, 'id': garant.id})
+    try:
+        garant = Garant(
+            locataire_id=locataire_id,
+            type_garant=type_garant,
+            nom=nom,
+            prenom=(data.get('prenom') or '').strip() or None,
+            email=(data.get('email') or '').strip() or None,
+            telephone=(data.get('telephone') or '').strip() or None,
+            adresse=(data.get('adresse') or '').strip() or None,
+            numero_contrat=(data.get('numero_contrat') or '').strip() or None,
+            notes=(data.get('notes') or '').strip() or None
+        )
+        db.session.add(garant)
+        db.session.commit()
+        return jsonify({'success': True, 'id': garant.id})
+    except Exception as e:
+        db.session.rollback()
+        try:
+            _ensure_garant_schema()
+            garant = Garant(
+                locataire_id=locataire_id,
+                type_garant=type_garant,
+                nom=nom,
+                prenom=(data.get('prenom') or '').strip() or None,
+                email=(data.get('email') or '').strip() or None,
+                telephone=(data.get('telephone') or '').strip() or None,
+                adresse=(data.get('adresse') or '').strip() or None,
+                numero_contrat=(data.get('numero_contrat') or '').strip() or None,
+                notes=(data.get('notes') or '').strip() or None
+            )
+            db.session.add(garant)
+            db.session.commit()
+            return jsonify({'success': True, 'id': garant.id})
+        except Exception as retry_err:
+            db.session.rollback()
+            return jsonify({'success': False, 'error': f"Erreur base de données: {retry_err}"}), 500
 
 
 @app.route('/api/garant/<int:garant_id>', methods=['DELETE'])
