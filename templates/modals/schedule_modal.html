@@ -18,7 +18,18 @@
             <div class="space-y-4">
                 <!-- Locataire -->
                 <div>
-                    <label class="block text-sm font-bold text-white mb-1">Locataire</label>
+                    <label class="block text-sm font-bold text-white mb-1">Locataire *</label>
+                    <div id="schedule_locataire_select_container" class="hidden">
+                        <select id="schedule_locataire_select" onchange="onScheduleLocataireSelectChange(this)"
+                                class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
+                            <option value="">-- Sélectionner un locataire --</option>
+                            {% if locataires %}
+                            {% for loc in locataires %}
+                            <option value="{{ loc.id }}" data-nom="{{ loc.nom_complet }}" data-email="{{ loc.email or '' }}">{{ loc.nom_complet }}</option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
                     <input type="text" id="schedule_locataire_nom" readonly
                            class="w-full px-4 py-2 border border-white/30 rounded-xl text-white bg-black/50 font-medium">
                 </div>
@@ -135,10 +146,35 @@ function formatSchedulePeriodeLabel(mois, annee) {
     return `${moisFr[mois] || mois} ${annee}`;
 }
 
+function onScheduleLocataireSelectChange(select) {
+    const opt = select.options[select.selectedIndex];
+    const locId = select.value;
+    const nom = opt ? (opt.getAttribute('data-nom') || opt.text) : '';
+    const email = opt ? (opt.getAttribute('data-email') || '') : '';
+    document.getElementById('schedule_locataire_id').value = locId || '';
+    document.getElementById('schedule_locataire_nom').value = nom || '';
+    document.getElementById('schedule_locataire_email').value = email || '';
+}
+
 function openScheduleModal(locataireId, locataireNom, locataireEmail, targetMois, targetAnnee) {
-    document.getElementById('schedule_locataire_id').value = locataireId || '';
-    document.getElementById('schedule_locataire_nom').value = locataireNom || '';
-    document.getElementById('schedule_locataire_email').value = locataireEmail || '';
+    const selectContainer = document.getElementById('schedule_locataire_select_container');
+    const nomInput = document.getElementById('schedule_locataire_nom');
+
+    if (locataireId) {
+        if (selectContainer) selectContainer.classList.add('hidden');
+        if (nomInput) nomInput.classList.remove('hidden');
+        document.getElementById('schedule_locataire_id').value = locataireId;
+        document.getElementById('schedule_locataire_nom').value = locataireNom || '';
+        document.getElementById('schedule_locataire_email').value = locataireEmail || '';
+    } else {
+        if (selectContainer) selectContainer.classList.remove('hidden');
+        if (nomInput) nomInput.classList.add('hidden');
+        document.getElementById('schedule_locataire_id').value = '';
+        document.getElementById('schedule_locataire_nom').value = '';
+        document.getElementById('schedule_locataire_email').value = '';
+        const select = document.getElementById('schedule_locataire_select');
+        if (select) select.value = '';
+    }
 
     const now = new Date();
     const defaultPeriod = new Date(now.getFullYear(), now.getMonth() + 1, 1);
