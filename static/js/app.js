@@ -8,20 +8,16 @@ const _modalParents = {};
 // Modal functions
 function openModal(modalId) {
     // 1. Close any currently open modals first
-    document.querySelectorAll('.active-modal').forEach(activeModal => {
+    document.querySelectorAll('.active-modal, [id$="Modal"]:not(.hidden), [id$="modal"]:not(.hidden)').forEach(activeModal => {
         if (activeModal.id !== modalId) {
-            closeModal(activeModal.id);
+            activeModal.classList.remove('active-modal');
+            activeModal.classList.add('hidden');
+            activeModal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
         }
     });
 
-    const modal = document.getElementById(modalId);
+    const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
     if (!modal) return;
-
-    // Teleport to <body> to escape CSS transform ancestors (which break position:fixed)
-    if (modal.parentElement !== document.body) {
-        _modalParents[modalId] = { parent: modal.parentElement, nextSibling: modal.nextSibling };
-        document.body.appendChild(modal);
-    }
 
     // Full-page overlay styling with forced flex display
     modal.style.cssText = [
@@ -36,7 +32,7 @@ function openModal(modalId) {
         'padding: 1.5rem !important',
         'box-sizing: border-box !important',
         'z-index: 99999 !important',
-        'background: rgba(0,0,0,0.7) !important',
+        'background: rgba(0,0,0,0.75) !important',
         'backdrop-filter: blur(16px) !important',
         '-webkit-backdrop-filter: blur(16px) !important',
         'visibility: visible !important',
@@ -58,11 +54,10 @@ function openModal(modalId) {
     modal.classList.add('active-modal');
     document.body.style.overflow = 'hidden';
 
-    // Close when clicking the backdrop
-    modal._backdropHandler = function(e) {
-        if (e.target === modal) closeModal(modalId);
+    // Close when clicking backdrop
+    modal.onclick = function(e) {
+        if (e.target === modal) closeModal(modal.id || modalId);
     };
-    modal.addEventListener('click', modal._backdropHandler);
 }
 
 function closeModal(modalId) {
@@ -83,28 +78,9 @@ function closeModal(modalId) {
 
     if (!modal) return;
 
-    const actualId = modal.id;
     modal.classList.remove('active-modal');
     modal.classList.add('hidden');
-    modal.style.cssText = 'display: none !important;';
-
-    if (modal._backdropHandler) {
-        modal.removeEventListener('click', modal._backdropHandler);
-        delete modal._backdropHandler;
-    }
-
-    // Restore to original DOM position immediately
-    if (actualId) {
-        const orig = _modalParents[actualId];
-        if (orig && orig.parent && document.body.contains(modal)) {
-            if (orig.nextSibling) {
-                orig.parent.insertBefore(modal, orig.nextSibling);
-            } else {
-                orig.parent.appendChild(modal);
-            }
-            delete _modalParents[actualId];
-        }
-    }
+    modal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
 
     // Restore body scroll only if no other modal is open
     const anyOpen = document.querySelector('.active-modal:not(.hidden)');
