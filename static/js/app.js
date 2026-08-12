@@ -64,9 +64,24 @@ function openModal(modalId) {
 }
 
 function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
+    let modal = null;
+    if (typeof modalId === 'string') {
+        modal = document.getElementById(modalId);
+    } else if (modalId && modalId.nodeType === 1) { // DOM Element
+        modal = modalId.closest('[id$="Modal"], [id$="modal"], .active-modal');
+    } else if (modalId && modalId.target) { // Event object
+        if (modalId.preventDefault) modalId.preventDefault();
+        modal = modalId.target.closest('[id$="Modal"], [id$="modal"], .active-modal');
+    }
+
+    // Fallback: if modal not found or no ID provided, close any active modal
+    if (!modal) {
+        modal = document.querySelector('.active-modal, [id$="Modal"]:not(.hidden), [id$="modal"]:not(.hidden)');
+    }
+
     if (!modal) return;
 
+    const actualId = modal.id;
     modal.classList.remove('active-modal');
     modal.classList.add('hidden');
     modal.style.cssText = 'display: none !important;';
@@ -77,14 +92,16 @@ function closeModal(modalId) {
     }
 
     // Restore to original DOM position immediately
-    const orig = _modalParents[modalId];
-    if (orig && orig.parent && document.body.contains(modal)) {
-        if (orig.nextSibling) {
-            orig.parent.insertBefore(modal, orig.nextSibling);
-        } else {
-            orig.parent.appendChild(modal);
+    if (actualId) {
+        const orig = _modalParents[actualId];
+        if (orig && orig.parent && document.body.contains(modal)) {
+            if (orig.nextSibling) {
+                orig.parent.insertBefore(modal, orig.nextSibling);
+            } else {
+                orig.parent.appendChild(modal);
+            }
+            delete _modalParents[actualId];
         }
-        delete _modalParents[modalId];
     }
 
     // Restore body scroll only if no other modal is open
