@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux
 
-VERSION = "3.7.6"
+VERSION = "3.7.7"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -1706,11 +1706,13 @@ def locataire_detail(id):
 @login_required
 def programmation():
     programmations = ProgrammationAppel.query.filter_by(user_id=current_user.id).order_by(ProgrammationAppel.date_envoi.desc()).all()
-    locs_sci = Locataire.query.join(Appartement).join(BienImmobilier).join(SCI).filter(
-        SCI.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
-    locs_direct = Locataire.query.join(Appartement).join(BienImmobilier).filter(
-        BienImmobilier.user_id == current_user.id, Locataire.statut == StatutLocataire.ACTIF).all()
-    locataires = list({loc.id: loc for loc in locs_sci + locs_direct}.values())
+    user_scis = [s.id for s in SCI.query.filter_by(user_id=current_user.id).all()]
+    user_biens = [b.id for b in BienImmobilier.query.filter((BienImmobilier.user_id == current_user.id) | (BienImmobilier.sci_id.in_(user_scis))).all()]
+    user_apparts = [a.id for a in Appartement.query.filter(Appartement.bien_id.in_(user_biens)).all()]
+    locataires = Locataire.query.filter(
+        (Locataire.appartement_id.in_(user_apparts)) | (Locataire.appartement_id == None),
+        Locataire.statut == StatutLocataire.ACTIF
+    ).all()
     config_email = ConfigEmail.query.filter_by(user_id=current_user.id).first()
     return render_template('programmation.html', programmations=programmations, locataires=locataires,
                            config_email=config_email)
@@ -2008,14 +2010,16 @@ def delete_bien(bien_id):
 
 def _get_locataire_for_user(locataire_id, user_id):
     """Retourne un locataire appartenant à l'utilisateur (via SCI ou bien direct), ou None."""
-    from sqlalchemy import or_
-    return Locataire.query.join(Appartement).join(BienImmobilier).filter(
-        Locataire.id == locataire_id,
-        or_(
-            BienImmobilier.user_id == user_id,
-            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == user_id))
-        )
-    ).first()
+    locataire = Locataire.query.get(locataire_id)
+    if not locataire:
+        return None
+    if locataire.appartement and locataire.appartement.bien:
+        bien = locataire.appartement.bien
+        user_scis = [s.id for s in SCI.query.filter_by(user_id=user_id).all()]
+        is_owner = (bien.user_id == user_id) or (bien.sci_id in user_scis)
+        if not is_owner:
+            return None
+    return locataire
 
 
 def _parse_appart_charges(charges_data):
@@ -3498,26 +3502,34 @@ def test_email():
 @app.route('/api/programmation-appel', methods=['POST'])
 @login_required
 def create_programmation_appel():
-    data = request.json
+    data = request.get_json(silent=True) or {}
 
     locataires_ids = data.get('locataires_ids', [])
+    loc_id = data.get('locataire_id')
+    if loc_id and not locataires_ids:
+        locataires_ids = [int(loc_id)]
+
     if isinstance(locataires_ids, list):
         locataires_ids_json = json.dumps(locataires_ids)
     else:
         locataires_ids_json = json.dumps([])
 
-    date_envoi_str = data['date_envoi']
+    date_envoi_str = data.get('date_envoi')
     heure_envoi = data.get('heure_envoi', '09:00')
+    if not date_envoi_str:
+        tomorrow = datetime.now() + timedelta(days=1)
+        date_envoi_str = tomorrow.strftime('%Y-%m-%d')
+
     date_envoi = datetime.strptime(f"{date_envoi_str} {heure_envoi}", '%Y-%m-%d %H:%M')
 
     prog = ProgrammationAppel(
         user_id=current_user.id,
-        mois=int(data['mois']),
-        annee=int(data['annee']),
+        mois=int(data.get('mois', datetime.now().month)),
+        annee=int(data.get('annee', datetime.now().year)),
         date_envoi=date_envoi,
-        tous_locataires=data.get('tous_locataires', False),
+        tous_locataires=bool(data.get('tous_locataires', False)),
         locataires_ids=locataires_ids_json,
-        recurrent=data.get('recurrent', False),
+        recurrent=bool(data.get('recurrent', False)),
         email_expediteur=data.get('email_expediteur') or None,
         sujet=data.get('sujet') or None,
         statut='en_attente'
