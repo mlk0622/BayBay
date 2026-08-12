@@ -125,44 +125,56 @@ body.app-shell::after {
 
 /* Sticky frosted glass navbar */
 .app-nav {
-    background: var(--surface-nav) !important;
-    backdrop-filter: blur(30px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(160%) !important;
-    border-bottom: 1px solid var(--border-glass) !important;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.25) !important;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
 }
 
 .app-nav .text-slate-900,
 .app-nav .text-slate-850,
 .app-nav .text-slate-700,
 .app-nav .text-slate-600 {
-    color: var(--text-main) !important;
+    color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .app-nav .hover\:bg-slate-100:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
 }
 
 .app-nav .bg-white,
 .app-nav .bg-slate-100 {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* --- NAVIGATION PILLULE GLISSANTE --- */
-.app-nav .hidden.lg\:flex {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+.app-nav .hidden.lg\:flex,
+.nav-pill-container {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 9999px !important;
     padding: 4px !important;
-    display: inline-flex !important;
-    align-items: center;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.25) !important;
 }
 
 .app-nav a {
     border-radius: 9999px !important;
     margin: 0 2px !important;
     padding: 0.5rem 1.1rem !important;
+    color: rgba(255, 255, 255, 0.9) !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative;
+    z-index: 1;
+}
+
+.app-nav a i,
+.app-nav a svg {
+    color: #ffffff !important;
+    fill: #ffffff !important;
 }
 
 /* Effet de transition de la pillule active */
@@ -172,19 +184,19 @@ body.app-shell::after {
 }
 
 .app-nav a.bg-primary {
-    background: rgba(255, 255, 255, 0.45) !important;
-    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
-    border: 1px solid rgba(255, 255, 255, 0.7) !important;
-    box-shadow: inset 1px 1px 2px 0 rgba(255, 255, 255, 0.8), inset -1px -1px 2px 1px rgba(0, 0, 0, 0.05), 0 6px 18px rgba(0, 0, 0, 0.08) !important;
-    backdrop-filter: blur(14px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: inset 1px 1px 2px 0 rgba(255, 255, 255, 0.6), inset -1px -1px 2px 1px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(20px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(200%) !important;
     animation: active-pill-slide 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .app-nav a.bg-primary i,
 .app-nav a.bg-primary * {
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
 /* Ice Glass Cards (Reflections & inner border shine) */
@@ -1216,7 +1228,7 @@ html[data-theme="light"] #app-body .bg-red-600 * {
 [id$="Modal"].hidden,
 [id$="modal"].hidden,
 .fixed.inset-0.hidden,
-div.hidden {
+.modal-overlay.hidden {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
