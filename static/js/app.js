@@ -8,13 +8,7 @@ const _modalParents = {};
 // Modal functions
 function openModal(modalId) {
     // 1. Close any currently open modals first
-    document.querySelectorAll('.active-modal, [id$="Modal"]:not(.hidden), [id$="modal"]:not(.hidden)').forEach(activeModal => {
-        if (activeModal.id !== modalId) {
-            activeModal.classList.remove('active-modal');
-            activeModal.classList.add('hidden');
-            activeModal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
-        }
-    });
+    closeAllModals();
 
     const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
     if (!modal) return;
@@ -71,37 +65,28 @@ function closeModal(modalId) {
         modal = modalId.target.closest('[id$="Modal"], [id$="modal"], .active-modal');
     }
 
-    // Fallback: if modal not found or no ID provided, close any active modal
-    if (!modal) {
-        modal = document.querySelector('.active-modal, [id$="Modal"]:not(.hidden), [id$="modal"]:not(.hidden)');
+    if (modal) {
+        modal.classList.remove('active-modal');
+        modal.classList.add('hidden');
+        modal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
     }
 
-    if (!modal) return;
+    // Force hide all active modals
+    document.querySelectorAll('.active-modal').forEach(m => {
+        m.classList.remove('active-modal');
+        m.classList.add('hidden');
+        m.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
+    });
 
-    modal.classList.remove('active-modal');
-    modal.classList.add('hidden');
-    modal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
-
-    // Restore body scroll if no visible active modal is open
-    const visibleModal = document.querySelector('.active-modal:not(.hidden):not([style*="display: none"])');
-    if (!visibleModal) document.body.style.overflow = '';
+    // ALWAYS restore body scroll
+    document.body.style.overflow = '';
 }
 
 function closeAllModals() {
     document.querySelectorAll('.active-modal, [id$="Modal"], [id$="modal"]').forEach(modal => {
         modal.classList.remove('active-modal');
         modal.classList.add('hidden');
-        modal.style.cssText = 'display: none !important;';
-
-        const orig = _modalParents[modal.id];
-        if (orig && orig.parent && document.body.contains(modal)) {
-            if (orig.nextSibling) {
-                orig.parent.insertBefore(modal, orig.nextSibling);
-            } else {
-                orig.parent.appendChild(modal);
-            }
-            delete _modalParents[modal.id];
-        }
+        modal.style.cssText = 'display: none !important; visibility: hidden !important; pointer-events: none !important;';
     });
     document.body.style.overflow = '';
 }
