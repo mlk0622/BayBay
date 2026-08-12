@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux
 
-VERSION = "3.6.9"
+VERSION = "3.7.4"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -1681,14 +1681,16 @@ def comptes_locatifs():
 @app.route('/locataire/<int:id>')
 @login_required
 def locataire_detail(id):
-    from sqlalchemy import or_
-    locataire = Locataire.query.join(Appartement).join(BienImmobilier).filter(
-        Locataire.id == id,
-        or_(
-            BienImmobilier.user_id == current_user.id,
-            BienImmobilier.sci_id.in_(db.session.query(SCI.id).filter(SCI.user_id == current_user.id))
-        )
-    ).first_or_404()
+    locataire = Locataire.query.get_or_404(id)
+
+    # Ownership check
+    if locataire.appartement and locataire.appartement.bien:
+        bien = locataire.appartement.bien
+        user_scis = [s.id for s in SCI.query.filter_by(user_id=current_user.id).all()]
+        is_owner = (bien.user_id == current_user.id) or (bien.sci_id in user_scis)
+        if not is_owner:
+            abort(403)
+
     etats_lieux = EtatDesLieux.query.filter_by(locataire_id=id).order_by(EtatDesLieux.date_etat.desc()).all()
     assurance = DocumentLocataire.query.filter_by(locataire_id=id, type_document='assurance').first()
     bail = DocumentLocataire.query.filter_by(locataire_id=id, type_document='bail').first()

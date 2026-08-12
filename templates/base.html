@@ -239,43 +239,43 @@
                 <div class="flex items-center gap-1 relative nav-pill-container my-auto overflow-x-auto max-w-full">
                     <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: rgba(255, 255, 255, 0.25); border: 1.5px solid rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); backdrop-filter: blur(16px) saturate(200%); -webkit-backdrop-filter: blur(16px) saturate(200%); pointer-events: none; opacity: 0;"></div>
                     <a href="{{ url_for('dashboard') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'dashboard' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'dashboard' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-chart-pie mr-2 text-white"></i>Dashboard
                     </a>
                     <a href="{{ url_for('liste_biens') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'liste_biens' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'liste_biens' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-home mr-2 text-white"></i>Biens
                     </a>
                     <a href="{{ url_for('liste_locataires') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'liste_locataires' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'liste_locataires' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-users mr-2 text-white"></i>Locataires
                     </a>
                     <a href="{{ url_for('appels_loyer') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'appels_loyer' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'appels_loyer' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-file-invoice mr-2 text-white"></i>Appels
                     </a>
                     <a href="{{ url_for('quittances') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'quittances' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'quittances' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-receipt mr-2 text-white"></i>Quittances
                     </a>
                     <a href="{{ url_for('resume_loyers') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'resume_loyers' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'resume_loyers' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-chart-bar mr-2 text-white"></i>Résumé
                     </a>
                     <a href="{{ url_for('comptes_locatifs') }}"
-                       class="px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'comptes_locatifs' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'comptes_locatifs' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-calculator mr-2 text-white"></i>Comptes
                     </a>
                     <a href="{{ url_for('parametres') }}"
-                       class="px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                              {% if request.endpoint == 'parametres' %}bg-primary text-white font-bold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                       class="px-3 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'parametres' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-cog text-white"></i>
                     </a>
                 </div>

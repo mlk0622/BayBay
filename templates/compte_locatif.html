@@ -371,44 +371,44 @@ async function deletePaiement(paiementId, periode) {
 </script>
 
 <!-- Modal Ajouter un versement -->
-<div id="addPaymentModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">
-                <i class="fas fa-plus-circle text-green-500 mr-2"></i>Ajouter un versement
+<div id="addPaymentModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-plus-circle text-green-400"></i>Ajouter un versement
             </h3>
-            <button type="button" onclick="closeModal('addPaymentModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+            <button type="button" onclick="closeModal('addPaymentModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="addPaymentForm">
             <input type="hidden" id="addPaymentMois">
             <input type="hidden" id="addPaymentAnnee">
-            <div class="p-6 space-y-4">
-                <div class="bg-slate-50 rounded-xl p-4">
+            <div class="space-y-4">
+                <div class="bg-white/10 rounded-xl p-4 border border-white/20">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm text-slate-600">Déjà payé</span>
-                        <span id="addPaymentDejaPaye" class="font-medium text-green-600">0.00 €</span>
+                        <span class="text-sm font-bold text-white">Déjà payé</span>
+                        <span id="addPaymentDejaPaye" class="font-bold text-green-400">0.00 €</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="text-sm text-slate-600">Reste à payer</span>
-                        <span id="addPaymentReste" class="font-bold text-red-600">0.00 €</span>
+                        <span class="text-sm font-bold text-white">Reste à payer</span>
+                        <span id="addPaymentReste" class="font-bold text-red-400">0.00 €</span>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Montant du versement (€) *</label>
+                    <label class="block text-sm font-bold text-white mb-2">Montant du versement (€) *</label>
                     <input type="number" id="addPaymentMontant" step="0.01" min="0.01" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Date du versement</label>
+                    <label class="block text-sm font-bold text-white mb-2">Date du versement</label>
                     <input type="date" id="addPaymentDate"
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Mode de paiement</label>
+                    <label class="block text-sm font-bold text-white mb-2">Mode de paiement</label>
                     <select id="addPaymentMode"
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                         <option value="">-- Sélectionner --</option>
                         <option value="Virement">Virement</option>
                         <option value="Chèque">Chèque</option>
@@ -417,14 +417,14 @@ async function deletePaiement(paiementId, periode) {
                     </select>
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('addPaymentModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-green-500 text-white rounded-lg text-sm font-medium hover:bg-green-600">
-                    <i class="fas fa-check mr-2"></i>Ajouter le versement
+                        class="ios-button-success px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-check mr-2 text-white"></i>Enregistrer
                 </button>
             </div>
         </form>

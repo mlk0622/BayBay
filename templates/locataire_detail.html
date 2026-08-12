@@ -345,63 +345,63 @@
 <!-- MODALS -->
 
 <!-- Modal État des lieux -->
-<div id="etatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Nouvel état des lieux</h3>
-            <button type="button" onclick="closeModal('etatModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="etatModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-lg w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Nouvel état des lieux</h3>
+            <button type="button" onclick="closeModal('etatModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="etatForm">
-            <div class="p-6 space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                    <label class="block text-sm font-bold text-white mb-2">Type</label>
                     <div class="flex gap-4">
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="flex items-center gap-2 cursor-pointer text-white">
                             <input type="radio" name="type_etat" value="Entrée" checked class="w-4 h-4 text-primary">
-                            <span class="text-sm"><i class="fas fa-sign-in-alt text-green-500 mr-1"></i>Entrée</span>
+                            <span class="text-sm font-bold text-white"><i class="fas fa-sign-in-alt text-green-400 mr-1"></i>Entrée</span>
                         </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
+                        <label class="flex items-center gap-2 cursor-pointer text-white">
                             <input type="radio" name="type_etat" value="Sortie" class="w-4 h-4 text-primary">
-                            <span class="text-sm"><i class="fas fa-sign-out-alt text-orange-500 mr-1"></i>Sortie</span>
+                            <span class="text-sm font-bold text-white"><i class="fas fa-sign-out-alt text-orange-400 mr-1"></i>Sortie</span>
                         </label>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                    <label class="block text-sm font-bold text-white mb-2">Date</label>
                     <input type="date" name="date_etat" id="etatDate" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                 </div>
-                <div class="bg-slate-50 rounded-xl p-4">
-                    <h4 class="font-medium text-slate-900 mb-3">Informations bailleur pour le PDF</h4>
+                <div class="bg-white/10 rounded-xl p-4 border border-white/20">
+                    <h4 class="font-bold text-white mb-3">Informations bailleur pour le PDF</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="sm:col-span-2">
-                            <label class="block text-xs text-slate-500 mb-1">Nom / Dénomination</label>
+                            <label class="block text-xs font-bold text-white mb-1">Nom / Dénomination</label>
                             <input type="text" name="bailleur_nom" required placeholder="Ex: SCI Les Tilleuls"
-                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                   class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-xs text-slate-500 mb-1">Adresse</label>
+                            <label class="block text-xs font-bold text-white mb-1">Adresse</label>
                             <input type="text" name="bailleur_adresse" required placeholder="Adresse du bailleur"
-                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                   class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-xs text-slate-500 mb-1">Nom et prénom du locataire</label>
+                            <label class="block text-xs font-bold text-white mb-1">Nom et prénom du locataire</label>
                             <input type="text" name="locataire_nom" required value="{{ locataire.nom }} {{ locataire.prenom }}"
-                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+                                   class="w-full px-3 py-2 border border-white/30 rounded-xl bg-black/50 text-white text-sm">
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('etatModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-save mr-2"></i>Créer et télécharger PDF
+                        class="ios-button-success px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-save mr-2 text-white"></i>Créer et télécharger PDF
                 </button>
             </div>
         </form>
@@ -409,43 +409,43 @@
 </div>
 
 <!-- Modal Upload État des lieux -->
-<div id="uploadEtatModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Uploader un état des lieux</h3>
-            <button type="button" onclick="closeModal('uploadEtatModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="uploadEtatModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Uploader un état des lieux</h3>
+            <button type="button" onclick="closeModal('uploadEtatModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="uploadEtatForm" enctype="multipart/form-data">
-            <div class="p-6 space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Type</label>
+                    <label class="block text-sm font-bold text-white mb-2">Type</label>
                     <select name="type_etat" required
-                            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                         <option value="entree">Entrée</option>
                         <option value="sortie">Sortie</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                    <label class="block text-sm font-bold text-white mb-2">Date</label>
                     <input type="date" name="date_etat" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <label class="block text-sm font-bold text-white mb-2">Fichier PDF</label>
                     <input type="file" name="file" accept=".pdf" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-sm text-white bg-black/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-bold">
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('uploadEtatModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-upload mr-2"></i>Uploader
+                        class="ios-button px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-upload mr-2 text-white"></i>Uploader
                 </button>
             </div>
         </form>
@@ -453,32 +453,32 @@
 </div>
 
 <!-- Modal Rattacher PDF à un état des lieux existant -->
-<div id="attachPdfModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Rattacher un PDF</h3>
-            <button type="button" onclick="closeModal('attachPdfModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="attachPdfModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Rattacher un PDF</h3>
+            <button type="button" onclick="closeModal('attachPdfModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="attachPdfForm" enctype="multipart/form-data">
             <input type="hidden" id="attachPdfEtatId" name="etat_id">
-            <div class="p-6 space-y-4">
-                <p class="text-sm text-slate-600">Sélectionnez un PDF à rattacher à cet état des lieux.</p>
+            <div class="space-y-4">
+                <p class="text-sm text-white/80">Sélectionnez un PDF à rattacher à cet état des lieux.</p>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <label class="block text-sm font-bold text-white mb-2">Fichier PDF</label>
                     <input type="file" name="file" accept=".pdf" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-sm text-white bg-black/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-bold">
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('attachPdfModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-paperclip mr-2"></i>Rattacher
+                        class="ios-button px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-paperclip mr-2 text-white"></i>Rattacher
                 </button>
             </div>
         </form>
@@ -486,35 +486,35 @@
 </div>
 
 <!-- Modal Photo -->
-<div id="photoModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Photo du locataire</h3>
-            <button type="button" onclick="closeModal('photoModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="photoModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Photo du locataire</h3>
+            <button type="button" onclick="closeModal('photoModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="photoForm" enctype="multipart/form-data">
-            <div class="p-6">
-                <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+            <div class="p-2">
+                <div class="border-2 border-dashed border-white/30 rounded-xl p-8 text-center cursor-pointer hover:border-white hover:bg-white/10 transition-colors"
                      onclick="document.getElementById('photoInput').click()">
-                    <i class="fas fa-camera text-slate-400 text-3xl mb-3"></i>
-                    <p class="text-slate-600 font-medium">Cliquez pour sélectionner une photo</p>
-                    <p class="text-slate-400 text-sm mt-1">JPG, PNG - Max 10MB</p>
+                    <i class="fas fa-camera text-white text-3xl mb-3"></i>
+                    <p class="text-white font-bold">Cliquez pour sélectionner une photo</p>
+                    <p class="text-white/70 text-sm mt-1">JPG, PNG - Max 10MB</p>
                     <input type="file" id="photoInput" name="file" accept="image/*" class="hidden" required>
                 </div>
                 <div id="photoPreview" class="hidden mt-4 text-center">
                     <img id="photoPreviewImg" src="" class="w-32 h-32 rounded-xl object-cover mx-auto shadow">
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('photoModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-save mr-2"></i>Enregistrer
+                        class="ios-button px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-save mr-2 text-white"></i>Enregistrer
                 </button>
             </div>
         </form>
@@ -522,35 +522,35 @@
 </div>
 
 <!-- Modal Assurance -->
-<div id="locataireAssuranceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Attestation d'assurance</h3>
-            <button type="button" onclick="closeModal('locataireAssuranceModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="locataireAssuranceModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Attestation d'assurance</h3>
+            <button type="button" onclick="closeModal('locataireAssuranceModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="locataireAssuranceForm" enctype="multipart/form-data">
-            <div class="p-6 space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <label class="block text-sm font-bold text-white mb-2">Fichier PDF</label>
                     <input type="file" name="file" accept=".pdf" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-sm text-white bg-black/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-bold">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Date de validité</label>
+                    <label class="block text-sm font-bold text-white mb-2">Date de validité</label>
                     <input type="date" name="date_validite"
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl bg-black/50 text-white font-medium">
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
                 <button type="button" onclick="closeModal('locataireAssuranceModal')"
-                        class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+                        class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-save mr-2"></i>Enregistrer
+                        class="ios-button px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-save mr-2 text-white"></i>Enregistrer
                 </button>
             </div>
         </form>
@@ -558,31 +558,31 @@
 </div>
 
 <!-- Modal Photos État des lieux -->
-<div id="photosModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Photos - <span id="photosTitle"></span></h3>
-            <button type="button" onclick="closeModal('photosModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="photosModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-3xl w-full p-6 space-y-4 my-auto max-h-[90vh] overflow-y-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Photos - <span id="photosTitle"></span></h3>
+            <button type="button" onclick="closeModal('photosModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
-        <div class="p-6">
+        <div class="space-y-4">
             <!-- Upload zone -->
-            <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors mb-6"
+            <div class="border-2 border-dashed border-white/30 rounded-xl p-6 text-center cursor-pointer hover:border-white hover:bg-white/10 transition-colors"
                  onclick="document.getElementById('photosInput').click()">
-                <i class="fas fa-cloud-upload-alt text-slate-400 text-2xl mb-2"></i>
-                <p class="text-slate-600 font-medium">Cliquez ou glissez des photos ici</p>
-                <p class="text-slate-400 text-sm">JPG, PNG - Max 10MB par fichier</p>
+                <i class="fas fa-cloud-upload-alt text-white text-2xl mb-2"></i>
+                <p class="text-white font-bold">Cliquez ou glissez des photos ici</p>
+                <p class="text-white/70 text-sm">JPG, PNG - Max 10MB par fichier</p>
                 <input type="file" id="photosInput" accept="image/*" multiple class="hidden" onchange="uploadPhotos(event)">
             </div>
 
             <!-- Progress -->
-            <div id="photosProgress" class="hidden mb-6">
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="text-slate-600">Upload en cours...</span>
-                    <span id="photosPercent" class="font-medium">0%</span>
+            <div id="photosProgress" class="hidden mb-4">
+                <div class="flex justify-between text-sm mb-2 text-white">
+                    <span class="text-white">Upload en cours...</span>
+                    <span id="photosPercent" class="font-bold text-white">0%</span>
                 </div>
-                <div class="h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-2 bg-white/20 rounded-full overflow-hidden">
                     <div id="photosBar" class="h-full bg-primary transition-all" style="width:0%"></div>
                 </div>
             </div>
@@ -592,36 +592,36 @@
 
             <!-- Empty state -->
             <div id="photosEmpty" class="text-center py-12 hidden">
-                <i class="fas fa-images text-slate-300 text-4xl mb-3"></i>
-                <p class="text-slate-500">Aucune photo pour cet état des lieux</p>
+                <i class="fas fa-images text-white/50 text-4xl mb-3"></i>
+                <p class="text-white/80">Aucune photo pour cet état des lieux</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Modal Bail -->
-<div id="locataireBailModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" style="display:none;">
-    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-slate-900">Bail du locataire</h3>
-            <button type="button" onclick="closeModal('locataireBailModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
-                <i class="fas fa-times"></i>
+<div id="locataireBailModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4" style="display:none;">
+    <div class="glass-card max-w-md w-full p-6 space-y-4 my-auto">
+        <div class="pb-3 border-b border-white/20 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Bail du locataire</h3>
+            <button type="button" onclick="closeModal('locataireBailModal')" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20">
+                <i class="fas fa-times text-white"></i>
             </button>
         </div>
         <form id="locataireBailForm" enctype="multipart/form-data">
-            <div class="p-6 space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Fichier PDF</label>
+                    <label class="block text-sm font-bold text-white mb-2">Fichier PDF</label>
                     <input type="file" name="file" accept=".pdf" required
-                           class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-medium hover:file:bg-primary-dark">
+                           class="w-full px-4 py-2 border border-white/30 rounded-xl text-sm text-white bg-black/50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary file:text-white file:font-bold">
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-slate-200 flex justify-end gap-3">
-                <button type="button" onclick="closeModal('locataireBailModal')" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+            <div class="pt-4 border-t border-white/20 flex justify-end gap-3">
+                <button type="button" onclick="closeModal('locataireBailModal')" class="px-4 py-2 bg-white/10 border border-white/30 rounded-xl text-sm font-bold text-white hover:bg-white/20">
                     Annuler
                 </button>
-                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                    <i class="fas fa-save mr-2"></i>Enregistrer
+                <button type="submit" class="ios-button px-4 py-2 text-white font-bold text-sm">
+                    <i class="fas fa-save mr-2 text-white"></i>Enregistrer
                 </button>
             </div>
         </form>
@@ -1021,7 +1021,7 @@ function openEditLocataireFromDetail() {
     document.getElementById('locataireDepot').value = {{ locataire.depot_garantie or 0 }};
     document.getElementById('locataireDebutBail').value = {{ (locataire.date_debut_bail.strftime('%Y-%m-%d') if locataire.date_debut_bail else '')|tojson }};
     document.getElementById('locataireFinBail').value = {{ (locataire.date_fin_bail.strftime('%Y-%m-%d') if locataire.date_fin_bail else '')|tojson }};
-    document.getElementById('locataireStatut').value = {{ (locataire.statut or 'Actif')|tojson }};
+    document.getElementById('locataireStatut').value = {{ (locataire.statut.value if locataire.statut and locataire.statut.value else 'Actif')|tojson }};
 
     const select = document.getElementById('locataireAppartement');
     select.innerHTML = '<option value="">-- Non attribué --</option>';

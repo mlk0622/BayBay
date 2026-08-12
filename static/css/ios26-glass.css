@@ -1243,29 +1243,63 @@ i, svg, .fas, .far, .fab, .fal, .fad {
     fill: #ffffff !important;
 }
 
+/* ABSOLUTE FORCE PURE WHITE TEXT & ICONS ON TOP NAV & ALL PAGES/POPUPS/INFORMATIONS */
+.app-nav,
+.app-nav a,
+.app-nav span,
+.app-nav i,
+.app-nav svg,
+.nav-pill-container,
+.nav-pill-container a,
+.nav-pill-container span,
+.nav-pill-container i,
+.nav-pill-container svg {
+    color: #FFFFFF !important;
+    fill: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+body,
+main,
+.app-view,
+.glass-card,
+.stat-card,
+.modal-content,
 [id$="Modal"],
 [id$="modal"],
+table, tr, td, th,
+p, span, h1, h2, h3, h4, h5, h6, label, div {
+    color: #FFFFFF !important;
+}
+
+/* All popup/modal cards in dark gray theme with white text */
+[id$="Modal"] > div,
+[id$="modal"] > div,
 .glass-card,
-.modal-content {
-    color: #ffffff !important;
+.modal-content,
+.modal-container {
+    background: linear-gradient(135deg, rgba(39, 39, 42, 0.92) 0%, rgba(24, 24, 27, 0.98) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7) !important;
 }
 
 [id$="Modal"] *,
 [id$="modal"] *,
-.glass-card * {
-    color: #ffffff !important;
+.glass-card *,
+.modal-content * {
+    color: #FFFFFF !important;
 }
 
-[id$="Modal"] i,
-[id$="modal"] i,
-[id$="Modal"] svg,
-[id$="modal"] svg,
-.glass-card i,
-.glass-card svg,
-button i,
-a i {
-    color: #ffffff !important;
-    fill: #ffffff !important;
+[id$="Modal"] .bg-white,
+[id$="modal"] .bg-white,
+[id$="Modal"] .bg-slate-50,
+[id$="modal"] .bg-slate-50,
+[id$="Modal"] .bg-slate-100,
+[id$="modal"] .bg-slate-100 {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
 }
 
 [id$="Modal"] input,
@@ -1281,7 +1315,7 @@ a i {
 
 [id$="Modal"] select option,
 [id$="modal"] select option {
-    background-color: #0f172a !important;
+    background-color: #18181b !important;
     color: #ffffff !important;
 }
 

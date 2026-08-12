@@ -23,22 +23,24 @@ function openModal(modalId) {
         document.body.appendChild(modal);
     }
 
-    // Full-page overlay styling
+    // Full-page overlay styling with forced flex display
     modal.style.cssText = [
-        'position: fixed',
-        'top: 0',
-        'left: 0',
-        'width: 100vw',
-        'height: 100vh',
-        'display: flex',
-        'align-items: center',
-        'justify-content: center',
-        'padding: 1.5rem',
-        'box-sizing: border-box',
-        'z-index: 99999',
-        'background: rgba(0,0,0,0.65)',
-        'backdrop-filter: blur(12px)',
-        '-webkit-backdrop-filter: blur(12px)'
+        'position: fixed !important',
+        'top: 0 !important',
+        'left: 0 !important',
+        'width: 100vw !important',
+        'height: 100vh !important',
+        'display: flex !important',
+        'align-items: center !important',
+        'justify-content: center !important',
+        'padding: 1.5rem !important',
+        'box-sizing: border-box !important',
+        'z-index: 99999 !important',
+        'background: rgba(0,0,0,0.7) !important',
+        'backdrop-filter: blur(16px) !important',
+        '-webkit-backdrop-filter: blur(16px) !important',
+        'visibility: visible !important',
+        'pointer-events: auto !important'
     ].join(';');
 
     // Center the inner card (do NOT override max-width)
