@@ -4,23 +4,16 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8 space-y-8">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div class="flex items-center space-x-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 flex items-center justify-center">
-                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-            </div>
-            <div>
-                <h1 class="text-3xl font-bold text-white">Envois Programmés</h1>
-                <p class="text-white/60 mt-1">Programmez l'envoi automatique des appels de loyer par email</p>
-            </div>
+    <div class="flex items-center space-x-4">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 flex items-center justify-center">
+            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
         </div>
-        <button type="button" onclick="openScheduleModal(null, null, null)"
-                class="ios-button-purple text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2" style="background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important;">
-            <i class="fas fa-plus text-white font-bold"></i>
-            <span class="text-white font-bold">Programmer un envoi</span>
-        </button>
+        <div>
+            <h1 class="text-3xl font-bold text-white">Envois Programmés</h1>
+            <p class="text-white/60 mt-1">Programmez l'envoi automatique des appels de loyer par email</p>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
