@@ -223,7 +223,11 @@
 
         if (isDesktopApp || localStorage.getItem('baybay_hide_download_banner') === '1' || document.cookie.includes('baybay_hide_download_banner=1')) {
             window.dismissDownloadBanner();
-            if (isDesktopApp) document.body.classList.add('is-desktop-app');
+            if (isDesktopApp) {
+                document.body.classList.add('is-desktop-app');
+                const bannerEl = document.getElementById('web-download-banner');
+                if (bannerEl) bannerEl.style.display = 'none';
+            }
         }
 
         if (window.electronAPI) {

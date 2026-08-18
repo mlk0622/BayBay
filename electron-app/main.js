@@ -147,6 +147,7 @@ function createMainWindow() {
         minHeight: 600,
         show: false,
         frame: false,
+        icon: path.join(__dirname, 'door_logo.png'),
         backgroundColor: appTheme === 'light' ? '#F2EFF6' : '#0b131a',
         autoHideMenuBar: true,
         webPreferences: {
