@@ -655,20 +655,18 @@ body.app-shell.app-loading-blur {
 /* Custom Window Titlebar (for Frameless Electron Window) */
 .window-titlebar {
     -webkit-app-region: drag;
-    height: 50px;
-    padding-top: 8px;
-    background: var(--titlebar-bg);
+    height: 38px;
+    padding: 0 16px;
+    background: rgba(18, 18, 20, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--titlebar-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 18px;
-    padding-right: 0; /* Align controls directly to the right edge */
     font-size: 13px;
-    font-weight: 500;
-    color: var(--titlebar-text);
+    font-weight: 600;
+    color: #ffffff;
     user-select: none;
     z-index: 9999;
     position: fixed;
@@ -1076,18 +1074,25 @@ html[data-theme="light"] #emailPreviewModal button.bg-white\/10:hover {
 
 /* Specificity boost to descend the top navigation bar when window-titlebar is present */
 body.has-electron-titlebar,
-body.has-electron-titlebar.app-shell {
-    padding-top: 50px !important;
+body.has-electron-titlebar.app-shell,
+body.is-desktop-app {
+    padding-top: 38px !important;
 }
 
 body.has-electron-titlebar nav.app-nav,
-body.has-electron-titlebar .app-nav {
+body.has-electron-titlebar .app-nav,
+body.is-desktop-app nav.app-nav {
     position: sticky !important;
-    top: 50px !important;
+    top: 38px !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 50 !important;
     margin-top: 0 !important;
+}
+
+body.has-electron-titlebar #web-download-banner,
+body.is-desktop-app #web-download-banner {
+    display: none !important;
 }
 
 body.has-electron-titlebar nav.app-nav ~ #app-content-wrapper,

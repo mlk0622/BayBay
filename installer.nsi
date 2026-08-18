@@ -1,7 +1,7 @@
 ;Bay Bay Installer Script
 !define APP_NAME "Bay Bay"
-!define APP_VERSION "3.9.6"
-!define APP_VERSION_WIN "3.9.6.0"
+!define APP_VERSION "3.9.7"
+!define APP_VERSION_WIN "3.9.7.0"
 !define APP_PUBLISHER "Bay Bay"
 !define APP_URL "https://github.com/mlk0622/BayBay"
 !define APP_DIR "BayBay-win32-x64"

@@ -5,7 +5,8 @@
     <title>Appel de Loyer - {{ mois_fr[appel.mois] }} {{ appel.annee }}</title>
     <style>
         * { margin: 0; padding: 0; }
-        body { font-family: Helvetica, Arial, sans-serif; padding: 40px; color: #333; font-size: 14px; }
+        body { font-family: Helvetica, Arial, sans-serif; padding: 45px 24px 20px 24px; color: #333; font-size: 14px; }
+        @page { size: A4; margin: 15mm 12mm 10mm 12mm; }
         @media print {
             body { padding: 20px; }
             .no-print { display: none; }
