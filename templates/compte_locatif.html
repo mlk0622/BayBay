@@ -204,9 +204,9 @@
                                 {% endif %}
                                 {% if h.paiement_id %}
                                 <button onclick="deletePaiement({{ h.paiement_id }}, '{{ MOIS_FR[h.mois] }} {{ h.annee }}')"
-                                        class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-red-400/20 text-red-400 hover:bg-red-400/30 transition-all"
+                                        class="action-btn delete"
                                         title="Supprimer le paiement">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-trash-alt text-white"></i>
                                 </button>
                                 {% endif %}
                                 {% if h.quittance %}
