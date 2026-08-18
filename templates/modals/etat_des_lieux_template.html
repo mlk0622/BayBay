@@ -22,12 +22,27 @@
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    @page {
+      size: A4;
+      margin: 12mm 12mm 12mm 12mm;
+    }
+
     body {
       font-family: 'Source Sans 3', sans-serif;
       font-size: 11px;
       color: var(--ink);
       background: #e8ecf0;
       line-height: 1.4;
+    }
+
+    @media print {
+      body { background: #ffffff !important; padding: 0 !important; }
+      .page {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+      }
     }
 
     .page {

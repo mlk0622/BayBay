@@ -209,41 +209,9 @@
     </div>
 
     <script>
-        // Affiche la barre de titre personnalisée si on tourne dans Electron
-        if (window.electronAPI) {
-            document.getElementById('electron-titlebar').style.display = 'flex';
-            document.body.classList.add('has-electron-titlebar');
-        }
+        // Masque la bannière de téléchargement et gère la titlebar si on tourne dans l'application Bureau
+        const isDesktopApp = !!(window.electronAPI || navigator.userAgent.includes('BayBayDesktop') || navigator.userAgent.includes('Electron'));
         
-        // Supprime l'écran de chargement et le flou une fois le DOM prêt
-        function removeAppBlur() {
-            document.body.classList.remove('app-loading-blur');
-            const loadingScreen = document.getElementById('app-loading-screen');
-            if (loadingScreen) {
-                loadingScreen.classList.add('opacity-0');
-                setTimeout(() => {
-                    loadingScreen.classList.add('hidden');
-                }, 400);
-            }
-            if (window.electronAPI && window.electronAPI.frontendReady) {
-                window.electronAPI.frontendReady();
-            }
-        }
-
-        window.showLoadingScreen = function(message = 'Chargement en cours...') {
-            const loadingScreen = document.getElementById('app-loading-screen');
-            const textElem = document.getElementById('app-loading-text');
-            if (textElem) textElem.textContent = message;
-            if (loadingScreen) {
-                loadingScreen.classList.remove('hidden', 'opacity-0');
-            }
-        };
-
-        window.hideLoadingScreen = function() {
-            removeAppBlur();
-        };
-
-        // Fonction pour masquer et mémoriser (cookie + localStorage) le masquage de la bannière web
         window.dismissDownloadBanner = function() {
             const banner = document.getElementById('web-download-banner');
             if (banner) banner.style.display = 'none';
@@ -253,19 +221,19 @@
             } catch(e) {}
         };
 
-        // Verification banniere masquee via localStorage/cookie
-        if (localStorage.getItem('baybay_hide_download_banner') === '1' || document.cookie.includes('baybay_hide_download_banner=1')) {
-            const banner = document.getElementById('web-download-banner');
-            if (banner) banner.style.display = 'none';
+        if (isDesktopApp || localStorage.getItem('baybay_hide_download_banner') === '1' || document.cookie.includes('baybay_hide_download_banner=1')) {
+            window.dismissDownloadBanner();
+            if (isDesktopApp) document.body.classList.add('is-desktop-app');
         }
 
-        // Masque la bannière de téléchargement et affiche la titlebar si on tourne dans l'application Bureau Electron
-        const isDesktopApp = window.electronAPI || navigator.userAgent.includes('BayBayDesktop') || navigator.userAgent.includes('Electron');
-        if (isDesktopApp) {
-            document.body.classList.add('has-electron-titlebar', 'is-desktop-app');
+        if (window.electronAPI) {
+            document.body.classList.add('has-electron-titlebar');
             const titlebar = document.getElementById('electron-titlebar');
             if (titlebar) titlebar.style.display = 'flex';
-            window.dismissDownloadBanner();
+        } else {
+            document.body.classList.remove('has-electron-titlebar');
+            const titlebar = document.getElementById('electron-titlebar');
+            if (titlebar) titlebar.style.display = 'none';
         }
         
         // Supprime l'écran de chargement et le flou une fois le DOM prêt
@@ -283,19 +251,7 @@
             }
         }
 
-        // L'écran de chargement ne s'affiche STRICTEMENT et UNIQUEMENT que lors du premier lancement sur le dashboard ("/")
-        const currentPath = window.location.pathname;
-        if (currentPath !== '/' && currentPath !== '') {
-            const loadingScreen = document.getElementById('app-loading-screen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-                loadingScreen.classList.add('hidden', 'opacity-0');
-            }
-            document.body.classList.remove('app-loading-blur');
-        }
-
         window.showLoadingScreen = function(message = 'Chargement en cours...') {
-            // Uniquement pour l'initialisation du dashboard sur base.html
             if (window.location.pathname === '/' || window.location.pathname === '') {
                 const loadingScreen = document.getElementById('app-loading-screen');
                 const textElem = document.getElementById('app-loading-text');
@@ -309,6 +265,16 @@
         window.hideLoadingScreen = function() {
             removeAppBlur();
         };
+
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/' && currentPath !== '') {
+            const loadingScreen = document.getElementById('app-loading-screen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+                loadingScreen.classList.add('hidden', 'opacity-0');
+            }
+            document.body.classList.remove('app-loading-blur');
+        }
 
         if (document.readyState === 'loading') {
             window.addEventListener('DOMContentLoaded', () => setTimeout(removeAppBlur, 250));

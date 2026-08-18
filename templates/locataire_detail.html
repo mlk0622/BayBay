@@ -342,9 +342,9 @@
                     </td>
                     <td class="px-6 py-4">
                         {% if etat.chemin_fichier %}
-                        <a href="/api/etat-lieux/{{ etat.id }}/download" target="_blank"
+                        <a href="/api/etat-lieux/{{ etat.id }}/download?inline=1" target="_blank"
                            class="inline-flex items-center text-sm text-purple-600 hover:text-purple-700 font-medium">
-                            <i class="fas fa-file-pdf mr-1"></i>Télécharger
+                            <i class="fas fa-file-pdf mr-1"></i>Voir PDF
                         </a>
                         {% else %}
                         <button onclick="openAttachPdfModal({{ etat.id }})"
@@ -360,9 +360,9 @@
                                 <i class="fas fa-camera text-sm"></i>
                             </button>
                             {% if etat.chemin_fichier %}
-                            <a href="/api/etat-lieux/{{ etat.id }}/download" target="_blank"
-                               class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center hover:bg-purple-200" title="Télécharger PDF">
-                                <i class="fas fa-download text-sm"></i>
+                            <a href="/api/etat-lieux/{{ etat.id }}/download?inline=1" target="_blank"
+                               class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center hover:bg-purple-200" title="Voir PDF dans un nouvel onglet">
+                                <i class="fas fa-file-pdf text-sm"></i>
                             </a>
                             {% else %}
                             <button onclick="openAttachPdfModal({{ etat.id }})"
@@ -428,19 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function downloadPdfFromUrl(url, filenameHint) {
-    const response = await fetch(url, { credentials: 'same-origin' });
-    if (!response.ok) {
-        throw new Error('Impossible de télécharger le PDF');
-    }
-    const blob = await response.blob();
-    const objectUrl = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = objectUrl;
-    link.download = filenameHint || 'etat_des_lieux.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(objectUrl);
+    const inlineUrl = url.includes('?') ? url + '&inline=1' : url + '?inline=1';
+    window.open(inlineUrl, '_blank');
 }
 
 

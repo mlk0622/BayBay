@@ -677,7 +677,7 @@ body.app-shell.app-loading-blur {
 }
 
 body.has-electron-titlebar {
-    padding-top: 50px !important;
+    padding-top: 38px !important;
 }
 
 .window-controls {
@@ -1074,14 +1074,12 @@ html[data-theme="light"] #emailPreviewModal button.bg-white\/10:hover {
 
 /* Specificity boost to descend the top navigation bar when window-titlebar is present */
 body.has-electron-titlebar,
-body.has-electron-titlebar.app-shell,
-body.is-desktop-app {
+body.has-electron-titlebar.app-shell {
     padding-top: 38px !important;
 }
 
 body.has-electron-titlebar nav.app-nav,
-body.has-electron-titlebar .app-nav,
-body.is-desktop-app nav.app-nav {
+body.has-electron-titlebar .app-nav {
     position: sticky !important;
     top: 38px !important;
     left: 0 !important;
@@ -1093,6 +1091,10 @@ body.is-desktop-app nav.app-nav {
 body.has-electron-titlebar #web-download-banner,
 body.is-desktop-app #web-download-banner {
     display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
 }
 
 body.has-electron-titlebar nav.app-nav ~ #app-content-wrapper,

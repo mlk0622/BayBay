@@ -2613,7 +2613,8 @@ def get_photo(locataire_id):
     return jsonify({'success': False, 'error': 'Photo non trouvée'}), 404
 
 
-def _get_edl_context(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='', locataire_nom=''):
+def _get_edl_context(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='', locataire_nom='',
+                     releve_electricite='', releve_gaz='', releve_eau_froide='', releve_eau_chaude='', observations=''):
     """Construit le contexte commun pour les templates état des lieux (web et PDF)."""
     appartement = locataire.appartement
     bien = appartement.bien if appartement and appartement.bien else None
@@ -2658,21 +2659,23 @@ def _get_edl_context(locataire, type_etat, date_etat, bailleur_nom='', bailleur_
         bailleur_adresse=bailleur_adresse.strip(),
         locataire_nom=locataire_nom.strip(),
         locataire_nouvelle_adresse='',
-        observations='',
+        releve_electricite=releve_electricite or '',
+        releve_gaz=releve_gaz or '',
+        releve_eau_froide=releve_eau_froide or '',
+        releve_eau_chaude=releve_eau_chaude or '',
+        observations=observations or '',
         signature_date=''
     )
 
 
-def _render_etat_des_lieux_template_html(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='',
-                                         locataire_nom=''):
-    ctx = _get_edl_context(locataire, type_etat, date_etat, bailleur_nom, bailleur_adresse, locataire_nom)
+def _render_etat_des_lieux_template_html(locataire, type_etat, date_etat, **kwargs):
+    ctx = _get_edl_context(locataire, type_etat, date_etat, **kwargs)
     return render_template('modals/etat_des_lieux_template.html', **ctx)
 
 
-def _render_etat_des_lieux_pdf_html(locataire, type_etat, date_etat, bailleur_nom='', bailleur_adresse='',
-                                    locataire_nom=''):
+def _render_etat_des_lieux_pdf_html(locataire, type_etat, date_etat, **kwargs):
     """Rendu avec le template PDF dédié (compatible xhtml2pdf, pas de CSS modernes)."""
-    ctx = _get_edl_context(locataire, type_etat, date_etat, bailleur_nom, bailleur_adresse, locataire_nom)
+    ctx = _get_edl_context(locataire, type_etat, date_etat, **kwargs)
     return render_template('pdf/etat_des_lieux.html', **ctx)
 
 
@@ -2782,7 +2785,8 @@ def download_prefill_pdf(prefill_id):
     if not prefill.chemin_fichier or not os.path.exists(prefill.chemin_fichier):
         return jsonify({'success': False, 'error': 'Fichier introuvable, regénérez le PDF'}), 404
 
-    return send_file(prefill.chemin_fichier, as_attachment=True, download_name=prefill.nom_fichier)
+    is_inline = request.args.get('inline') == '1'
+    return send_file(prefill.chemin_fichier, mimetype='application/pdf' if is_inline else None, as_attachment=not is_inline, download_name=prefill.nom_fichier)
 
 
 @app.route('/api/etat-lieux/prefill/<int:prefill_id>', methods=['DELETE'])
@@ -2997,7 +3001,8 @@ def download_etat_lieux(etat_id):
     locataire = etat.locataire
     nom_fichier = f"etat_lieux_{type_str}_{locataire.nom}_{date_str}.pdf"
 
-    return send_file(etat.chemin_fichier, as_attachment=True, download_name=nom_fichier)
+    is_inline = request.args.get('inline') == '1'
+    return send_file(etat.chemin_fichier, mimetype='application/pdf' if is_inline else None, as_attachment=not is_inline, download_name=nom_fichier)
 
 
 @app.route('/api/etat-lieux/<int:etat_id>', methods=['DELETE'])
@@ -3029,9 +3034,11 @@ def pdf_etat_lieux(etat_id):
         locataire=locataire,
         type_etat=etat.type_etat.value,
         date_etat=etat.date_etat,
-        bailleur_nom='',
-        bailleur_adresse='',
-        locataire_nom=''
+        releve_electricite=etat.releve_electricite,
+        releve_gaz=etat.releve_gaz,
+        releve_eau_froide=etat.releve_eau_froide,
+        releve_eau_chaude=etat.releve_eau_chaude,
+        observations=etat.observations
     )
 
 

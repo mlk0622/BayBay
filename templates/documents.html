@@ -192,8 +192,8 @@
                                             </svg>
                                         </a>
                                         {% if etat.chemin_fichier %}
-                                        <a href="/api/etat-lieux/{{ etat.id }}/download" target="_blank"
-                                            class="action-btn pdf" title="Télécharger PDF">
+                                        <a href="/api/etat-lieux/{{ etat.id }}/download?inline=1" target="_blank"
+                                            class="action-btn pdf" title="Voir PDF">
                                             <i class="fas fa-file-pdf text-white"></i>
                                         </a>
                                         {% endif %}

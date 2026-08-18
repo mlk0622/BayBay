@@ -74,7 +74,7 @@
                                     class="p-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 transition-all shadow-sm" title="Télécharger PDF">
                                     <i class="fas fa-file-pdf text-white text-sm font-bold"></i>
                                 </a>
-                                <button type="button" onclick="deleteAppel({{ appel.id }})"
+                                <button type="button" onclick="showDeleteModal('appel', {{ appel.id }}, 'l\'appel de loyer {{ MOIS_FR[appel.mois] }} {{ appel.annee }}')"
                                     class="p-2.5 rounded-xl bg-red-500 hover:bg-red-600 transition-all shadow-sm" title="Supprimer">
                                     <i class="fas fa-trash-alt text-white text-sm font-bold"></i>
                                 </button>
@@ -250,22 +250,7 @@ async function previewAppelEmail() {
     }
 }
 
-async function deleteAppel(appelId) {
-    if (!confirm('Supprimer cet appel de loyer ?')) return;
-
-    try {
-        const response = await fetch(`/api/appel-loyer/${appelId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            showNotification('Appel supprimé', 'success');
-            setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 1000);
-        } else {
-            showNotification('Erreur lors de la suppression', 'error');
-        }
-    } catch (error) {
-        showNotification('Erreur lors de la suppression', 'error');
-    }
+function deleteAppel(appelId, label) {
+    showDeleteModal('appel', appelId, label || 'cet appel de loyer');
 }
 </script>
