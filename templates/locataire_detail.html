@@ -416,14 +416,17 @@ const locataireId = {{ locataire.id }};
 let currentEtatId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('etatDate').value = new Date().toISOString().split('T')[0];
+    const etatDateElem = document.getElementById('etatDate');
+    if (etatDateElem) etatDateElem.value = new Date().toISOString().split('T')[0];
 
     // Charger compteurs photos
     {% for etat in etats_lieux %}
     fetch('/api/etat-lieux/{{ etat.id }}/photos').then(r=>r.json()).then(p=>{
-        document.querySelector('.photos-count-{{ etat.id }}').textContent = p.length + ' photo(s)';
+        const elem = document.querySelector('.photos-count-{{ etat.id }}');
+        if (elem) elem.textContent = p.length + ' photo(s)';
     }).catch(()=>{
-        document.querySelector('.photos-count-{{ etat.id }}').textContent = '0';
+        const elem = document.querySelector('.photos-count-{{ etat.id }}');
+        if (elem) elem.textContent = '0';
     });
     {% endfor %}
 });
@@ -624,19 +627,21 @@ function closeLightbox() {
 }
 
 // Photo preview
-document.getElementById('photoInput').addEventListener('change', function(e) {
+document.getElementById('photoInput')?.addEventListener('change', function(e) {
     if (e.target.files[0]) {
         const reader = new FileReader();
         reader.onload = (ev) => {
-            document.getElementById('photoPreviewImg').src = ev.target.result;
-            document.getElementById('photoPreview').classList.remove('hidden');
+            const previewImg = document.getElementById('photoPreviewImg');
+            const preview = document.getElementById('photoPreview');
+            if (previewImg) previewImg.src = ev.target.result;
+            if (preview) preview.classList.remove('hidden');
         };
         reader.readAsDataURL(e.target.files[0]);
     }
 });
 
 // Form submissions
-document.getElementById('etatForm').addEventListener('submit', async function(e) {
+document.getElementById('etatForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const fd = new FormData(this);
     const data = {}; fd.forEach((v,k) => data[k] = v);
@@ -695,19 +700,19 @@ document.getElementById('etatForm').addEventListener('submit', async function(e)
     }
 });
 
-document.getElementById('uploadEtatForm').addEventListener('submit', async function(e) {
+document.getElementById('uploadEtatForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const r = await fetch('/api/locataire/' + locataireId + '/etat-lieux/upload', { method: 'POST', body: new FormData(this) });
     if (r.ok) { showNotification('PDF uploadé', 'success'); closeModal('uploadEtatModal'); setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500); }
 });
 
-document.getElementById('photoForm').addEventListener('submit', async function(e) {
+document.getElementById('photoForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     const r = await fetch('/api/locataire/' + locataireId + '/photo', { method: 'POST', body: new FormData(this) });
     if (r.ok) { showNotification('Photo enregistrée', 'success'); closeModal('photoModal'); setTimeout(() => { if (window.refreshPage) window.refreshPage(); else location.reload(); }, 500); }
 });
 
-document.getElementById('locataireAssuranceForm').addEventListener('submit', async function(e) {
+document.getElementById('locataireAssuranceForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     try {
         const r = await fetch('/api/locataire/' + locataireId + '/assurance', { method: 'POST', body: new FormData(this) });
@@ -724,7 +729,7 @@ document.getElementById('locataireAssuranceForm').addEventListener('submit', asy
     }
 });
 
-document.getElementById('locataireBailForm').addEventListener('submit', async function(e) {
+document.getElementById('locataireBailForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
     try {
         const r = await fetch('/api/locataire/' + locataireId + '/bail', { method: 'POST', body: new FormData(this) });
@@ -741,9 +746,9 @@ document.getElementById('locataireBailForm').addEventListener('submit', async fu
     }
 });
 
-document.getElementById('attachPdfForm').addEventListener('submit', async function(e) {
+document.getElementById('attachPdfForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    const etatId = document.getElementById('attachPdfEtatId').value;
+    const etatId = document.getElementById('attachPdfEtatId')?.value;
     try {
         const r = await fetch('/api/etat-lieux/' + etatId + '/attach-pdf', { method: 'POST', body: new FormData(this) });
         const result = await r.json();
@@ -861,47 +866,6 @@ window.deleteGarant = function(garantId) {
         })
         .catch(() => showNotification('Erreur lors de la suppression', 'error'));
 };
-
-function openEditLocataireFromDetail() {
-    document.getElementById('locataireModalTitle').innerHTML = '<i class="fas fa-user text-pink-400 mr-2"></i>Modifier Locataire';
-    document.getElementById('locataireEditId').value = {{ locataire.id }};
-    document.getElementById('locataireNom').value = {{ (locataire.nom or '')|tojson }};
-    document.getElementById('locatairePrenom').value = {{ (locataire.prenom or '')|tojson }};
-    document.getElementById('locataireEmail').value = {{ (locataire.email or '')|tojson }};
-    document.getElementById('locataireTelephone').value = {{ (locataire.telephone or '')|tojson }};
-    document.getElementById('locataireAdresse').value = {{ (locataire.adresse_precedente or '')|tojson }};
-    document.getElementById('locataireDepot').value = {{ locataire.depot_garantie or 0 }};
-    document.getElementById('locataireDebutBail').value = {{ (locataire.date_debut_bail.strftime('%Y-%m-%d') if locataire.date_debut_bail else '')|tojson }};
-    document.getElementById('locataireFinBail').value = {{ (locataire.date_fin_bail.strftime('%Y-%m-%d') if locataire.date_fin_bail else '')|tojson }};
-    document.getElementById('locataireStatut').value = {{ (locataire.statut.value if locataire.statut and locataire.statut.value else 'Actif')|tojson }};
-
-    const select = document.getElementById('locataireAppartement');
-    select.innerHTML = '<option value="">-- Non attribué --</option>';
-    {% if locataire.appartement %}
-    select.innerHTML += `<option value="{{ locataire.appartement.id }}" selected>{{ locataire.appartement.numero_porte or '' }} - {{ locataire.appartement.bien.nom or '' }}</option>`;
-    {% endif %}
-
-    openModal('locataireModal');
-}
-
-function confirmDeleteLocataire() {
-    if (window.showDeleteModal) {
-        showDeleteModal('locataire', {{ locataire.id }}, '{{ locataire.nom_complet }}');
-    } else {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer le locataire {{ locataire.nom_complet }} ?')) return;
-        fetch('/api/locataire/{{ locataire.id }}', { method: 'DELETE' })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Locataire supprimé', 'success');
-                    setTimeout(() => window.location.href = '/locataires', 800);
-                } else {
-                    showNotification(data.error || 'Erreur lors de la suppression', 'error');
-                }
-            });
-    }
-}
-
 </script>
 </div>
 {% endblock %}

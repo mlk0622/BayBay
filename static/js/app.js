@@ -283,7 +283,8 @@ async function confirmDelete() {
 }
 
 // Close modal when clicking outside
-document.addEventListener('DOMContentLoaded', function() {
+function initModalListeners() {
+    closeAllModals();
     document.querySelectorAll('[class*="modal"], [id*="Modal"]').forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -291,6 +292,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalListeners);
+} else {
+    initModalListeners();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
 
     const sciType = document.getElementById('sciType');
     if (sciType && !sciType.value) {

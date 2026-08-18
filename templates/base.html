@@ -192,14 +192,17 @@
         }
         
         // Supprime l'effet de flou de chargement une fois le DOM chargé
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                document.body.classList.remove('app-loading-blur');
-                if (window.electronAPI && window.electronAPI.frontendReady) {
-                    window.electronAPI.frontendReady();
-                }
-            }, 500);
-        });
+        function removeAppBlur() {
+            document.body.classList.remove('app-loading-blur');
+            if (window.electronAPI && window.electronAPI.frontendReady) {
+                window.electronAPI.frontendReady();
+            }
+        }
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', () => setTimeout(removeAppBlur, 100));
+        } else {
+            removeAppBlur();
+        }
     </script>
 
     <!-- Navigation -->

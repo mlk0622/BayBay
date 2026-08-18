@@ -527,18 +527,23 @@ select optgroup {
 .progress-fill.red { background: linear-gradient(90deg, #f87171, #ef4444); }
 
 /* Liquid Popups/Modals */
-[id$="Modal"] {
+[id$="Modal"]:not(.active-modal):not(.flex),
+[id$="modal"]:not(.active-modal):not(.flex) {
     backdrop-filter: blur(15px) !important;
     -webkit-backdrop-filter: blur(15px) !important;
     transition: opacity 0.25s ease, visibility 0.25s ease !important;
     opacity: 0;
-    visibility: hidden;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    display: none !important;
 }
 
-[id$="Modal"].active-modal {
+[id$="Modal"].active-modal,
+[id$="modal"].active-modal {
     opacity: 1 !important;
     visibility: visible !important;
     display: flex !important;
+    pointer-events: auto !important;
 }
 
 [id$="Modal"] > div {
@@ -1004,13 +1009,11 @@ html[data-theme="light"] [class*="text-sky-400"]:not(.ios-button *):not(.bg-prim
 }
 
 /* GLOBAL MODALS: VIEWPORT CENTERING & TOP NAVBAR OVERLAP PREVENTION */
-[id$="Modal"],
-#emailPreviewModal,
-#choixAjoutModal,
-/* UNIFIED FULL-SCREEN MODAL OVERLAYS & CENTERING */
 .active-modal,
-[id$="Modal"]:not(.hidden),
-[id$="modal"]:not(.hidden) {
+[id$="Modal"].active-modal,
+[id$="modal"].active-modal,
+#emailPreviewModal.active-modal,
+#choixAjoutModal.active-modal {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -1028,10 +1031,15 @@ html[data-theme="light"] [class*="text-sky-400"]:not(.ios-button *):not(.bg-prim
 }
 
 [id$="Modal"].hidden,
-[id$="modal"].hidden {
+[id$="modal"].hidden,
+.fixed.inset-0.hidden,
+.modal-overlay.hidden,
+[id$="Modal"]:not(.active-modal):not(.flex),
+[id$="modal"]:not(.active-modal):not(.flex) {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
+    z-index: -9999 !important;
 }
 
 /* Modals children styling: centered box with maximum height, scroll and dark glass */
@@ -1157,13 +1165,10 @@ html[data-theme="light"] #app-body .bg-red-600 * {
 /* ==========================================================================
    UNIVERSAL HIGH-PRIORITY CENTERING MODALS & POPUPS
    ========================================================================== */
-.fixed.inset-0.z-\[100\],
-.fixed.inset-0.z-\[101\],
-.fixed.inset-0.z-\[120\],
-.fixed.inset-0.z-50,
-.fixed.inset-0,
-[id$="Modal"],
-[id$="modal"] {
+.fixed.inset-0.active-modal,
+.modal-overlay.active-modal,
+[id$="Modal"].active-modal,
+[id$="modal"].active-modal {
     z-index: 99999 !important;
     position: fixed !important;
     top: 0 !important;
@@ -1178,15 +1183,21 @@ html[data-theme="light"] #app-body .bg-red-600 * {
     background: rgba(0, 0, 0, 0.65) !important;
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
 }
 
 [id$="Modal"].hidden,
 [id$="modal"].hidden,
 .fixed.inset-0.hidden,
-.modal-overlay.hidden {
+.modal-overlay.hidden,
+[id$="Modal"]:not(.active-modal):not(.flex),
+[id$="modal"]:not(.active-modal):not(.flex),
+.modal-overlay:not(.active-modal):not(.flex) {
     display: none !important;
     visibility: hidden !important;
     pointer-events: none !important;
+    z-index: -9999 !important;
 }
 
 [id$="Modal"].flex,
