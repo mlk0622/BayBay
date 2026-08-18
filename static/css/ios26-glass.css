@@ -1072,7 +1072,17 @@ html[data-theme="light"] #emailPreviewModal button.bg-white\/10:hover {
     background: rgba(18, 18, 20, 0.08) !important;
 }
 
-/* Specificity boost to descend the top navigation bar when window-titlebar is present */
+/* Specificity boost to descend the top navigation bar ONLY when window-titlebar is actively rendered */
+body:not(.has-electron-titlebar) {
+    padding-top: 0 !important;
+}
+
+body:not(.has-electron-titlebar) nav.app-nav,
+body:not(.has-electron-titlebar) .app-nav {
+    top: 0 !important;
+    margin-top: 0 !important;
+}
+
 body.has-electron-titlebar,
 body.has-electron-titlebar.app-shell {
     padding-top: 38px !important;
@@ -1088,13 +1098,19 @@ body.has-electron-titlebar .app-nav {
     margin-top: 0 !important;
 }
 
-body.has-electron-titlebar #web-download-banner,
-body.is-desktop-app #web-download-banner {
+#web-download-banner[style*="display: none"],
+body.is-desktop-app #web-download-banner,
+body.has-electron-titlebar #web-download-banner {
     display: none !important;
     margin: 0 !important;
     padding: 0 !important;
     height: 0 !important;
+    max-height: 0 !important;
+    min-height: 0 !important;
     overflow: hidden !important;
+    border: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 body.has-electron-titlebar nav.app-nav ~ #app-content-wrapper,

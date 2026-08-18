@@ -24,8 +24,8 @@ AutoCloseWindow true
 !include MUI2.nsh
 
 !define MUI_ABORTWARNING
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
-!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_ICON "door_logo.ico"
+!define MUI_UNICON "door_logo.ico"
 
 !insertmacro MUI_PAGE_INSTFILES
 
