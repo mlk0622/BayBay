@@ -123,7 +123,11 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-home"></i>
-            <p class="text-white/70">Aucun bien pour cette SCI</p>
+            <h3 class="text-xl font-bold text-white mb-1">Aucun bien pour cette SCI</h3>
+            <p class="text-white/70 mb-4">Cette SCI ne possède aucun bien pour le moment.</p>
+            <button onclick="openBienModal({{ sci.id }})" class="ios-button-success text-white">
+                <i class="fas fa-plus mr-2 text-white"></i>Ajouter un bien
+            </button>
         </div>
         {% endif %}
     </div>
@@ -238,11 +242,12 @@
     {% endif %}
 
     {% if not scis and not biens_directs %}
-    <div class="glass-card empty-state">
+    <div class="empty-state">
         <i class="fas fa-building"></i>
-        <p class="text-white/70 mb-4">Aucun bien enregistré. Cliquez sur + pour ajouter un bien.</p>
-        <button onclick="openModal('choixAjoutModal')" class="ios-button text-white px-6 py-3">
-            <i class="fas fa-plus mr-2"></i>Ajouter un bien
+        <h3 class="text-xl font-bold text-white mb-1">Aucun bien enregistré</h3>
+        <p class="text-white/70 mb-4">Vous n'avez pas encore configuré de bien immobilier ou de SCI.</p>
+        <button onclick="openModal('choixAjoutModal')" class="ios-button-success text-white">
+            <i class="fas fa-plus mr-2 text-white"></i>Ajouter un bien / SCI
         </button>
     </div>
     {% endif %}

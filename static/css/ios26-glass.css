@@ -1337,8 +1337,71 @@ button[onclick*="Preview"] {
     color: #FFFFFF !important;
 }
 #choixAjoutModal button:hover,
-#choixSciModal button:hover {
-    background: rgba(255, 255, 255, 0.18) !important;
+/* ==========================================================================
+   UNIFIED LIQUID GLASS EMPTY STATES
+   ========================================================================== */
+.empty-state {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 3.5rem 2rem !important;
+    margin: 1.5rem auto !important;
+    width: 100% !important;
+    border-radius: 20px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    transition: all 0.3s ease !important;
+}
+
+.empty-state:hover {
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Icon badge inside empty state */
+.empty-state i:first-child,
+.empty-state .empty-icon {
+    font-size: 2.2rem !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    margin-bottom: 1.25rem !important;
+    width: 4.5rem !important;
+    height: 4.5rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Text elements inside empty state */
+.empty-state p,
+.empty-state span {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 1.25rem !important;
+    max-width: 460px !important;
+    line-height: 1.5 !important;
+}
+
+.empty-state h3 {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Buttons inside empty state */
+.empty-state button,
+.empty-state a {
+    margin-top: 0.25rem !important;
 }
 
 

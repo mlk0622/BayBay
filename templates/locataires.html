@@ -89,9 +89,10 @@
         {% else %}
         <div class="empty-state">
             <i class="fas fa-users"></i>
-            <p class="text-white/70 mb-4">Aucun locataire enregistré</p>
-            <button onclick="openLocataireModal()" class="ios-button text-white px-6 py-3">
-                <i class="fas fa-plus mr-2"></i>Ajouter un locataire
+            <h3 class="text-xl font-bold text-white mb-1">Aucun locataire</h3>
+            <p class="text-white/70 mb-4">Aucun locataire n'a encore été créé dans votre espace.</p>
+            <button onclick="openLocataireModal()" class="ios-button-success text-white">
+                <i class="fas fa-plus mr-2 text-white"></i>Ajouter un locataire
             </button>
         </div>
         {% endif %}
