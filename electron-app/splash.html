@@ -22,7 +22,7 @@
         html, body {
             width: 100%;
             height: 100%;
-            background: #181a26;
+            background: transparent;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             user-select: none;
@@ -33,6 +33,7 @@
             justify-content: center;
             align-items: center;
             color: #ffffff;
+            padding: 12px;
         }
 
         .splash-shell {
@@ -40,6 +41,10 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 50% 45%, #222638 0%, #151722 75%, #0f1018 100%);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -51,7 +56,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
             text-align: center;
         }
 
@@ -65,36 +70,21 @@
             justify-content: center;
         }
 
-        .door-svg {
-            width: 130px;
-            height: 130px;
-            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
-        }
-
-        /* Pulsing White Interior Light */
-        .door-light {
-            animation: door-light-pulse 1.8s ease-in-out infinite alternate;
-        }
-
-        @keyframes door-light-pulse {
-            0% {
-                opacity: 0.85;
-                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-            }
-            100% {
-                opacity: 1;
-                filter: drop-shadow(0 0 25px rgba(255, 255, 255, 1)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.9));
-            }
+        .door-img {
+            width: 135px;
+            height: 135px;
+            object-fit: contain;
+            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.55));
         }
 
         /* Title & Version styling */
         .title {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             letter-spacing: 0.5px;
             color: #ffffff;
             text-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.5);
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .version {
@@ -106,7 +96,7 @@
 
         /* Sleek Glowing Progress Bar */
         .loading-box {
-            margin-top: 16px;
+            margin-top: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -265,56 +255,15 @@
 <body>
     <div class="splash-shell">
         <div class="splash-container">
-            <!-- 3D Open Door Logo -->
+            <!-- 3D Open Door Logo Image -->
             <div class="door-container">
-                <svg class="door-svg" viewBox="0 0 160 160">
-                    <defs>
-                        <!-- Marble Surface Gradient -->
-                        <linearGradient id="marbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#ffffff" />
-                            <stop offset="35%" stop-color="#f1f5f9" />
-                            <stop offset="70%" stop-color="#cbd5e1" />
-                            <stop offset="100%" stop-color="#94a3b8" />
-                        </linearGradient>
-                        <linearGradient id="marbleShadow" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#e2e8f0" />
-                            <stop offset="100%" stop-color="#64748b" />
-                        </linearGradient>
-                        <!-- Intense White Door Glow -->
-                        <filter id="doorGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
-                            <feGaussianBlur stdDeviation="7" result="blur" />
-                            <feMerge>
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
-                    </defs>
-
-                    <!-- Outer Marble Arch / Doorframe -->
-                    <path d="M 40 135 V 50 C 40 30 120 30 120 50 V 135 Z" 
-                          fill="url(#marbleGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2" />
-
-                    <!-- Glowing White Interior (Pulsing Light) -->
-                    <path class="door-light" 
-                          d="M 54 133 V 52 C 54 41 106 41 106 52 V 133 Z" 
-                          fill="#ffffff" filter="url(#doorGlowFilter)" />
-
-                    <!-- Opened Door Leaf (Perspective 3D on the Left) -->
-                    <path d="M 40 135 L 54 130 V 50 L 40 54 Z" 
-                          fill="url(#marbleShadow)" stroke="rgba(255,255,255,0.7)" stroke-width="1" />
-                    <path d="M 22 140 L 54 130 V 50 L 22 56 Z" 
-                          fill="url(#marbleGrad)" stroke="#cbd5e1" stroke-width="2" />
-
-                    <!-- Door Handle/Knob -->
-                    <circle cx="48" cy="94" r="3.5" fill="#ffffff" stroke="#64748b" stroke-width="1" />
-                    <circle cx="48" cy="94" r="1.8" fill="#cbd5e1" />
-                </svg>
+                <img src="door_logo.png" class="door-img" alt="Logo BayBay">
             </div>
 
             <!-- Title & Version -->
             <div>
                 <div class="title">Bay Bay</div>
-                <div class="version">Version 3.9.1</div>
+                <div class="version">Version 3.9.2</div>
             </div>
 
             <!-- Loading Progress Bar -->
@@ -330,7 +279,7 @@
         <div id="update-modal" class="glass-modal">
             <div class="modal-card">
                 <div class="modal-title">Mise à jour disponible</div>
-                <div id="update-version" class="modal-version">v3.9.1</div>
+                <div id="update-version" class="modal-version">v3.9.2</div>
                 <div id="update-notes" class="modal-notes">Des améliorations visuelles et correctifs sont disponibles.</div>
                 <div class="modal-buttons">
                     <div class="btn-modal btn-modal-primary" onclick="acceptUpdate()">Télécharger & Installer</div>
@@ -342,7 +291,7 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const version = params.get('version') || '3.9.1';
+        const version = params.get('version') || '3.9.2';
         document.querySelector('.version').textContent = `Version ${version}`;
 
         function acceptUpdate() {
