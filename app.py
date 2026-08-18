@@ -4082,11 +4082,11 @@ def get_stats():
 @app.route('/download/desktop')
 def download_desktop_app():
     """Permet de télécharger directement le binaire d'installation de l'application Bureau."""
-    setup_filename = f"Bay.Bay.Setup.{app_version}.exe"
+    setup_filename = f"Bay.Bay.Setup.{VERSION}.exe"
     local_setup_path = os.path.join(app.root_path, setup_filename)
     if os.path.exists(local_setup_path):
         return send_file(local_setup_path, as_attachment=True, download_name=setup_filename)
-    return redirect(f"https://github.com/mlk0622/BayBay/releases/download/v{app_version}/Bay.Bay.Setup.{app_version}.exe")
+    return redirect(f"https://github.com/mlk0622/BayBay/releases/download/v{VERSION}/{setup_filename}")
 
 
 if __name__ == '__main__':
