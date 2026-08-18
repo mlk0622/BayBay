@@ -1198,24 +1198,43 @@ html[data-theme="light"] #app-body .bg-red-600 * {
 /* ==========================================================================
    SUPER FORCED WHITE THEME FOR ALL ICONS, TEXTS, LABELS, BUTTONS & POPUPS
    ========================================================================== */
-i, svg, .fas, .far, .fab, .fal, .fad {
-    color: #ffffff !important;
-    fill: #ffffff !important;
+/* ==========================================================================
+   CLEAN VECTOR & ICON NORMALIZATION (NO BLOB/SOLID WHITE OVERWRITES)
+   ========================================================================== */
+i, .fas, .far, .fab, .fal, .fad {
+    color: currentColor;
 }
 
-/* ABSOLUTE FORCE PURE WHITE TEXT & ICONS ON TOP NAV & ALL PAGES/POPUPS/INFORMATIONS */
+svg {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Stroke icons (Lucide, Heroicons, Feather, FontAwesome SVGs) keep fill="none" */
+svg[fill="none"],
+svg:not([fill]) {
+    fill: none !important;
+}
+
+svg[stroke="currentColor"],
+svg:not([stroke]) {
+    stroke: currentColor;
+}
+
+svg[fill="currentColor"] {
+    fill: currentColor !important;
+}
+
+/* ABSOLUTE FORCE PURE WHITE TEXT ON TOP NAV */
 .app-nav,
 .app-nav a,
 .app-nav span,
 .app-nav i,
-.app-nav svg,
 .nav-pill-container,
 .nav-pill-container a,
 .nav-pill-container span,
-.nav-pill-container i,
-.nav-pill-container svg {
+.nav-pill-container i {
     color: #FFFFFF !important;
-    fill: #FFFFFF !important;
     opacity: 1 !important;
 }
 
@@ -1228,27 +1247,20 @@ main,
 [id$="Modal"],
 [id$="modal"],
 table, tr, td, th,
-p, span, h1, h2, h3, h4, h5, h6, label, div {
-    color: #FFFFFF !important;
+p, span, h1, h2, h3, h4, h5, h6, label {
+    color: #FFFFFF;
 }
 
-/* All popup/modal cards in dark gray theme with white text */
+/* Popup/modal cards in dark glass theme */
 [id$="Modal"] > div,
 [id$="modal"] > div,
 .glass-card,
 .modal-content,
 .modal-container {
-    background: linear-gradient(135deg, rgba(39, 39, 42, 0.92) 0%, rgba(24, 24, 27, 0.98) 100%) !important;
+    background: linear-gradient(135deg, rgba(39, 39, 42, 0.95) 0%, rgba(24, 24, 27, 0.98) 100%) !important;
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
     color: #FFFFFF !important;
     box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7) !important;
-}
-
-[id$="Modal"] *,
-[id$="modal"] *,
-.glass-card *,
-.modal-content * {
-    color: #FFFFFF !important;
 }
 
 [id$="Modal"] .bg-white,
@@ -1279,7 +1291,7 @@ p, span, h1, h2, h3, h4, h5, h6, label, div {
     color: #ffffff !important;
 }
 
-/* ABSOLUTE FORCE OVERRIDE FOR ALL BUTTONS, CARDS, ICONS & MODALS TO DARK GLASS - NO SOLID WHITE BUTTONS */
+/* Background overrides for glass containers */
 .bg-white,
 .bg-slate-50,
 .bg-slate-100,
@@ -1287,25 +1299,82 @@ p, span, h1, h2, h3, h4, h5, h6, label, div {
 .bg-slate-300 {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.2) !important;
-    color: #FFFFFF !important;
 }
 
-/* Close (X) buttons, Cancel buttons, Option buttons */
-button.rounded-full,
-.rounded-full.bg-white\/10,
-.rounded-full.bg-slate-100,
-button[onclick*="closeModal"],
-button[onclick*="close"],
-button[onclick*="Cancel"] {
+/* 1. Modal Top-Right Close (X) Button */
+.modal-close-btn,
+button.rounded-full[onclick*="close"],
+button.rounded-full[onclick*="Modal"],
+.w-8.h-8.rounded-full[onclick*="close"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 9999px !important;
     background: rgba(255, 255, 255, 0.12) !important;
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    color: #FFFFFF !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-button[onclick*="closeModal"]:hover,
-button[onclick*="close"]:hover,
-.rounded-full:hover {
+.modal-close-btn:hover,
+button.rounded-full[onclick*="close"]:hover,
+button.rounded-full[onclick*="Modal"]:hover {
     background: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
+    transform: scale(1.05);
+}
+
+.modal-close-btn svg,
+button.rounded-full[onclick*="close"] svg {
+    width: 1rem !important;
+    height: 1rem !important;
+    stroke: #ffffff !important;
+    fill: none !important;
+    stroke-width: 2.2 !important;
+}
+
+.modal-close-btn i,
+button.rounded-full[onclick*="close"] i {
+    color: #ffffff !important;
+    font-size: 0.875rem !important;
+}
+
+/* 2. Modal Bottom Secondary / Cancel Buttons (Clean Liquid Glass Secondary) */
+.ios-button-secondary,
+.btn-secondary,
+button[onclick*="closeModal"]:not(.rounded-full):not(.w-8):not(.h-8),
+button[onclick*="close"]:not(.rounded-full):not(.w-8):not(.h-8) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    padding: 0.5rem 1.15rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    cursor: pointer !important;
+}
+
+.ios-button-secondary:hover,
+.btn-secondary:hover,
+button[onclick*="closeModal"]:not(.rounded-full):not(.w-8):not(.h-8):hover,
+button[onclick*="close"]:not(.rounded-full):not(.w-8):not(.h-8):hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
 }
 
 /* Delete / Trash buttons (keep vibrant red gradient, white text) */
