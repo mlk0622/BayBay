@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.9.4"
+VERSION = "3.9.5"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -76,7 +76,8 @@ def inject_globals():
     ua = request.headers.get('User-Agent', '') if has_request_context() else ''
     hdr = request.headers.get('X-BayBay-Desktop', '') if has_request_context() else ''
     is_desktop_app = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1')
-    return dict(app_version=VERSION, is_desktop_app=is_desktop_app)
+    banner_dismissed = bool(request.cookies.get('baybay_hide_download_banner') == '1') if has_request_context() else False
+    return dict(app_version=VERSION, is_desktop_app=is_desktop_app, banner_dismissed=banner_dismissed)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'baybay-cloud-secure-key-2026')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{DATABASE_PATH}')

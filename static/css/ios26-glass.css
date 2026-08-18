@@ -212,7 +212,7 @@ body.app-shell::after {
 
 .glass-card:hover,
 .stat-card:hover {
-    transform: translateY(-3px) scale(1.005);
+    transform: none !important;
     border-color: rgba(96, 165, 250, 0.45) !important;
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), 0 30px 70px -10px rgba(0, 8, 30, 0.5) !important;
 }
@@ -355,9 +355,9 @@ body.app-shell::after {
 .btn-secondary:hover,
 .btn-primary:hover,
 .btn-danger:hover {
-    transform: translateY(-2px) scale(1.02);
+    transform: none !important;
     filter: brightness(1.12);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
 }
 
 .ios-button:active,
@@ -366,7 +366,7 @@ body.app-shell::after {
 .ios-button-warning:active,
 .ios-button-purple:active,
 .ios-button-secondary:active {
-    transform: translateY(0) scale(0.98);
+    transform: none !important;
 }
 
 /* Glass inputs and textareas */

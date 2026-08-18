@@ -243,14 +243,29 @@
             removeAppBlur();
         };
 
+        // Fonction pour masquer et mémoriser (cookie + localStorage) le masquage de la bannière web
+        window.dismissDownloadBanner = function() {
+            const banner = document.getElementById('web-download-banner');
+            if (banner) banner.style.display = 'none';
+            try {
+                localStorage.setItem('baybay_hide_download_banner', '1');
+                document.cookie = "baybay_hide_download_banner=1; path=/; max-age=2592000";
+            } catch(e) {}
+        };
+
+        // Verification banniere masquee via localStorage/cookie
+        if (localStorage.getItem('baybay_hide_download_banner') === '1' || document.cookie.includes('baybay_hide_download_banner=1')) {
+            const banner = document.getElementById('web-download-banner');
+            if (banner) banner.style.display = 'none';
+        }
+
         // Masque la bannière de téléchargement et affiche la titlebar si on tourne dans l'application Bureau Electron
         const isDesktopApp = window.electronAPI || navigator.userAgent.includes('BayBayDesktop') || navigator.userAgent.includes('Electron');
         if (isDesktopApp) {
             document.body.classList.add('has-electron-titlebar', 'is-desktop-app');
             const titlebar = document.getElementById('electron-titlebar');
             if (titlebar) titlebar.style.display = 'flex';
-            const downloadBanner = document.getElementById('web-download-banner');
-            if (downloadBanner) downloadBanner.style.display = 'none';
+            window.dismissDownloadBanner();
         }
         
         // Supprime l'écran de chargement et le flou une fois le DOM prêt
@@ -268,12 +283,26 @@
             }
         }
 
-        window.showLoadingScreen = function(message = 'Chargement en cours...') {
+        // L'écran de chargement ne s'affiche STRICTEMENT et UNIQUEMENT que lors du premier lancement sur le dashboard ("/")
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/' && currentPath !== '') {
             const loadingScreen = document.getElementById('app-loading-screen');
-            const textElem = document.getElementById('app-loading-text');
-            if (textElem) textElem.textContent = message;
             if (loadingScreen) {
-                loadingScreen.classList.remove('hidden', 'opacity-0');
+                loadingScreen.style.display = 'none';
+                loadingScreen.classList.add('hidden', 'opacity-0');
+            }
+            document.body.classList.remove('app-loading-blur');
+        }
+
+        window.showLoadingScreen = function(message = 'Chargement en cours...') {
+            // Uniquement pour l'initialisation du dashboard sur base.html
+            if (window.location.pathname === '/' || window.location.pathname === '') {
+                const loadingScreen = document.getElementById('app-loading-screen');
+                const textElem = document.getElementById('app-loading-text');
+                if (textElem) textElem.textContent = message;
+                if (loadingScreen) {
+                    loadingScreen.classList.remove('hidden', 'opacity-0');
+                }
             }
         };
 
@@ -289,19 +318,19 @@
     </script>
 
     <!-- Desktop App Download Banner (Web Version Only) -->
-    {% if current_user.is_authenticated and not is_desktop_app %}
-    <div id="web-download-banner" class="no-print bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-white/20 px-4 py-2 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xl backdrop-blur-md sticky top-0 z-[60]">
+    {% if current_user.is_authenticated and not is_desktop_app and not banner_dismissed %}
+    <div id="web-download-banner" class="no-print bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-white/20 px-4 py-2 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xl relative z-40">
         <div class="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
             <div class="flex items-center gap-2.5">
                 <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay">
                 <span><strong class="text-white font-bold">BayBay Bureau :</strong> Téléchargez l'application officielle pour Windows et profitez de performances optimales.</span>
             </div>
             <div class="flex items-center gap-3 shrink-0">
-                <a href="https://github.com/mlk0622/BayBay/releases/download/v{{ app_version }}/Bay.Bay.Setup.{{ app_version }}.exe" target="_blank" download onclick="document.getElementById('web-download-banner').style.display='none'" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                <a href="https://github.com/mlk0622/BayBay/releases/download/v{{ app_version }}/Bay.Bay.Setup.{{ app_version }}.exe" target="_blank" download onclick="dismissDownloadBanner()" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
                     <i class="fas fa-download text-xs"></i>
                     <span>Télécharger l'application</span>
                 </a>
-                <button onclick="document.getElementById('web-download-banner').style.display='none'" class="text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors" title="Masquer">
+                <button onclick="dismissDownloadBanner()" class="text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors" title="Masquer">
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
@@ -1099,21 +1128,21 @@
             // Note: automatic cache invalidation is DISABLED to avoid unwanted navigation.
             // Each modal/form handles its own refresh after a successful API call.
 
-            // SPA refresh: reload the current view's content in-place
+            // SPA refresh: reload current view content in-place without replacing tabs or redirecting to dashboard
             window.refreshPage = function() {
+                const currentUrl = window.location.href;
                 const currentPath = window.location.pathname;
-                console.log('SPA: refreshPage', currentPath);
-                if (currentPath.includes('/locataire/') || currentPath.includes('/bien/') || currentPath.includes('/sci/') || currentPath.includes('/compte-locatif/')) {
-                    window.location.reload();
-                    return;
-                }
+                console.log('SPA: refreshPage in-place for', currentPath);
+                
                 const fetchFn = window.__originalFetch || fetch;
-                const url = currentPath + (currentPath.includes('?') ? '&_=' : '?_=') + Date.now();
-                fetchFn(url)
+                const cacheBusterUrl = currentUrl + (currentUrl.includes('?') ? '&_=' : '?_=') + Date.now();
+                fetchFn(cacheBusterUrl)
                     .then(res => res.text())
                     .then(htmlText => {
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(htmlText, 'text/html');
+                        
+                        // Update loaded SPA views in-place
                         doc.querySelectorAll('.app-view').forEach(newView => {
                             const path = newView.dataset.path;
                             if (path && loadedViews[path]) {
@@ -1124,9 +1153,17 @@
                                 }
                             }
                         });
-                        console.log('SPA: refreshPage done, active view preserved.');
+
+                        // Update view container if detail or standalone view
+                        const newContainer = doc.querySelector('#app-view-container');
+                        const currentContainer = document.querySelector('#app-view-container');
+                        if (newContainer && currentContainer && !doc.querySelector('.app-view')) {
+                            currentContainer.innerHTML = newContainer.innerHTML;
+                            executeScripts(currentContainer);
+                        }
+                        console.log('SPA: refreshPage done in-place.');
                     })
-                    .catch(() => location.reload());
+                    .catch(err => console.warn('SPA: refreshPage failed', err));
             };
 
             // Global modal submission fallbacks
