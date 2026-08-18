@@ -911,14 +911,32 @@
                         const doc = parser.parseFromString(htmlText, 'text/html');
                         
                         const newTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : 'BayBay';
-                        let incomingView = doc.querySelector('.app-view');
+                        // Update all background tab views returned in doc
+                        doc.querySelectorAll('.app-view').forEach(v => {
+                            const p = v.dataset.path;
+                            if (p && p !== finalPath && loadedViews[p]) {
+                                loadedViews[p].innerHTML = v.innerHTML;
+                                executeScripts(loadedViews[p]);
+                                if (window.setupEditor) {
+                                    loadedViews[p].querySelectorAll('[data-target]').forEach(setupEditor);
+                                }
+                            }
+                        });
+
+                        // Target exact view for finalPath
+                        let incomingView = doc.querySelector(`.app-view[data-path="${finalPath}"]`);
                         if (!incomingView) {
-                            const mainElem = doc.querySelector('#app-content-wrapper main') || doc.querySelector('main');
-                            if (mainElem) {
-                                incomingView = document.createElement('main');
-                                incomingView.className = 'app-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full';
-                                incomingView.dataset.path = finalPath;
-                                incomingView.innerHTML = mainElem.innerHTML;
+                            const allViews = doc.querySelectorAll('.app-view');
+                            if (allViews.length === 1) {
+                                incomingView = allViews[0];
+                            } else {
+                                const mainElem = doc.querySelector('#app-content-wrapper main') || doc.querySelector('main');
+                                if (mainElem) {
+                                    incomingView = document.createElement('main');
+                                    incomingView.className = 'app-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full';
+                                    incomingView.dataset.path = finalPath;
+                                    incomingView.innerHTML = mainElem.innerHTML;
+                                }
                             }
                         }
                         
