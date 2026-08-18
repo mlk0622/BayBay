@@ -75,7 +75,7 @@ def add_header(response):
 def inject_globals():
     ua = request.headers.get('User-Agent', '') if has_request_context() else ''
     hdr = request.headers.get('X-BayBay-Desktop', '') if has_request_context() else ''
-    is_desktop_app = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1')
+    is_desktop_app = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1' or getattr(sys, 'frozen', False) or os.environ.get('BAYBAY_DESKTOP') == '1')
     banner_dismissed = bool(request.cookies.get('baybay_hide_download_banner') == '1') if has_request_context() else False
     return dict(app_version=VERSION, is_desktop_app=is_desktop_app, banner_dismissed=banner_dismissed)
 

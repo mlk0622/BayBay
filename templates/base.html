@@ -230,14 +230,19 @@
             }
         }
 
-        if (window.electronAPI) {
-            document.body.classList.add('has-electron-titlebar');
+        // frame: true is used in Electron — native Windows titlebar handles
+        // minimize/maximize/close. The custom HTML titlebar must stay hidden.
+        {
             const titlebar = document.getElementById('electron-titlebar');
-            if (titlebar) titlebar.style.display = 'flex';
-        } else {
+            if (titlebar) {
+                titlebar.style.display = 'none';
+                titlebar.style.height = '0';
+                titlebar.style.overflow = 'hidden';
+            }
             document.body.classList.remove('has-electron-titlebar');
-            const titlebar = document.getElementById('electron-titlebar');
-            if (titlebar) titlebar.style.display = 'none';
+            if (isDesktopApp) {
+                document.body.classList.add('is-desktop-app');
+            }
         }
         
         // Supprime l'écran de chargement et le flou une fois le DOM prêt
@@ -288,6 +293,11 @@
     </script>
 
     <!-- Desktop App Download Banner (Web Version Only) -->
+    <script>
+        if (window.electronAPI || navigator.userAgent.includes('BayBayDesktop') || navigator.userAgent.includes('Electron')) {
+            document.write('<style>#web-download-banner{display:none!important;height:0!important;min-height:0!important;max-height:0!important;padding:0!important;margin:0!important;border:none!important;visibility:hidden!important;overflow:hidden!important;}</style>');
+        }
+    </script>
     {% if current_user.is_authenticated and not is_desktop_app and not banner_dismissed %}
     <div id="web-download-banner" class="no-print bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-white/20 px-4 py-2 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xl relative z-40">
         <div class="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">

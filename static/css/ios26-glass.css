@@ -652,32 +652,20 @@ body.app-shell.app-loading-blur {
     }
 }
 
-/* Custom Window Titlebar (for Frameless Electron Window) */
+/* Custom Window Titlebar — DISABLED: native frame is used (frame: true in Electron) */
 .window-titlebar {
-    -webkit-app-region: drag;
-    height: 38px;
-    padding: 0 16px;
-    background: rgba(18, 18, 20, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: #ffffff;
-    user-select: none;
-    z-index: 9999;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
+    display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
+    visibility: hidden !important;
 }
 
 body.has-electron-titlebar {
-    padding-top: 38px !important;
+    padding-top: 0 !important;
 }
 
 .window-controls {
@@ -1072,26 +1060,32 @@ html[data-theme="light"] #emailPreviewModal button.bg-white\/10:hover {
     background: rgba(18, 18, 20, 0.08) !important;
 }
 
-/* Specificity boost to descend the top navigation bar ONLY when window-titlebar is actively rendered */
-body:not(.has-electron-titlebar) {
-    padding-top: 0 !important;
+/* Desktop Nav & Titlebar Rules */
+.window-titlebar,
+#electron-titlebar {
+    display: none !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
 }
 
-body:not(.has-electron-titlebar) nav.app-nav,
-body:not(.has-electron-titlebar) .app-nav {
-    top: 0 !important;
+body,
+body.app-shell,
+body.has-electron-titlebar,
+body.is-desktop-app {
+    padding-top: 0 !important;
     margin-top: 0 !important;
 }
 
-body.has-electron-titlebar,
-body.has-electron-titlebar.app-shell {
-    padding-top: 38px !important;
-}
-
+nav.app-nav,
+.app-nav,
 body.has-electron-titlebar nav.app-nav,
 body.has-electron-titlebar .app-nav {
     position: sticky !important;
-    top: 38px !important;
+    top: 0 !important;
     left: 0 !important;
     right: 0 !important;
     z-index: 50 !important;

@@ -56,9 +56,9 @@ Section "MainSection" SEC01
   File /r "electron-app\dist-simple\${APP_DIR}\*.*"
 
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-  CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe"
-  CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe"
-  CreateShortCut "$SMPROGRAMS\${APP_NAME}\D�sinstaller.lnk" "$INSTDIR\uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe" "" "$INSTDIR\BayBay.exe" 0
+  CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\BayBay.exe" "" "$INSTDIR\BayBay.exe" 0
+  CreateShortCut "$SMPROGRAMS\${APP_NAME}\Désinstaller.lnk" "$INSTDIR\uninstall.exe"
 SectionEnd
 
 Section -AdditionalIcons
@@ -71,10 +71,12 @@ Section -Post
   WriteRegStr HKCU "Software\${APP_NAME}" "" $INSTDIR
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName" "${APP_NAME}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "UninstallString" "$INSTDIR\uninstall.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayIcon" "$INSTDIR\BayBay.exe"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayIcon" "$INSTDIR\BayBay.exe,0"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion" "${APP_VERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "URLInfoAbout" "${APP_URL}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher" "${APP_PUBLISHER}"
+  WriteRegStr HKCU "Software\Classes\AppUserModelId\com.baybay.gestionlocative" "DisplayName" "${APP_NAME}"
+  WriteRegStr HKCU "Software\Classes\AppUserModelId\com.baybay.gestionlocative" "Icon" "$INSTDIR\BayBay.exe,0"
 
   ; Run app immediately after install finishes (One-Click behavior)
   ExecShell "" "$INSTDIR\BayBay.exe"

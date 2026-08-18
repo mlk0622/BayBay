@@ -1,6 +1,11 @@
 const { app, BrowserWindow, shell, dialog, ipcMain } = require('electron');
 const path = require('path');
 
+// Fix taskbar icon grouping on Windows OS
+if (process.platform === 'win32') {
+    app.setAppUserModelId('com.baybay.gestionlocative');
+}
+
 // Hardware acceleration enabled for GPU rendering & high performance UI
 const fs = require('fs');
 const https = require('https');
@@ -138,16 +143,30 @@ p{font-size:14px;color:${textColor};line-height:1.6;margin-bottom:24px}
 </body></html>`)}`;
 }
 
+function getAppIconPath() {
+    const candidates = [
+        path.join(__dirname, 'build', 'icon.ico'),
+        path.join(__dirname, 'door_logo.ico'),
+        path.join(__dirname, 'icon.ico'),
+        path.join(__dirname, 'door_logo.png')
+    ];
+    for (const p of candidates) {
+        if (fs.existsSync(p)) return p;
+    }
+    return path.join(__dirname, 'door_logo.png');
+}
+
 function createMainWindow() {
     if (mainWindow) return mainWindow;
+    const windowIcon = getAppIconPath();
     mainWindow = new BrowserWindow({
         width: 1400,
         height: 900,
         minWidth: 1000,
         minHeight: 600,
         show: false,
-        frame: false,
-        icon: path.join(__dirname, 'door_logo.png'),
+        frame: true,
+        icon: windowIcon,
         backgroundColor: appTheme === 'light' ? '#F2EFF6' : '#0b131a',
         autoHideMenuBar: true,
         webPreferences: {
@@ -158,6 +177,9 @@ function createMainWindow() {
         },
         title: APP_NAME
     });
+    try {
+        mainWindow.setIcon(windowIcon);
+    } catch (e) {}
 
     // Indiquer l'environnement Desktop dans l'UserAgent
     try {
@@ -308,6 +330,7 @@ function createSplashWindow() {
         resizable: false,
         hasShadow: true,
         show: false, // Hide initially to prevent a brief white screen flash before content loads
+        icon: getAppIconPath(),
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true
