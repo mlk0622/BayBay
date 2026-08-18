@@ -1,70 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bay Bay</title>
     <style>
-        /* Variables par défaut pour le thème Dark */
         :root {
-            --bg-grad-start: #12161f;
-            --bg-grad-mid: #1a2130;
-            --bg-grad-end: #2a3347;
-            --border-glow: rgba(255, 255, 255, 0.08);
-            --blob-1: rgba(100, 116, 139, 0.3);
-            --blob-2: rgba(100, 116, 139, 0.25);
-            --text-title: linear-gradient(135deg, #f3f7ff 0%, #cbd5e1 100%);
-            --text-version: rgba(203, 213, 225, 0.7);
-            --progress-bg: rgba(255, 255, 255, 0.1);
-            --progress-bar-grad: linear-gradient(90deg, #64748b, #94a3b8);
-            --loading-text: rgba(203, 213, 225, 0.8);
-            --modal-bg: rgba(1, 4, 53, 0.75);
-            --modal-card-bg: linear-gradient(135deg, rgba(210, 233, 243, 0.12) 0%, rgba(155, 212, 236, 0.04) 100%);
-            --modal-card-border: rgba(155, 212, 236, 0.22);
-            --modal-title-color: #d2e9f3;
-            --modal-version-color: #4fafd9;
-            --modal-version-bg: rgba(79, 175, 217, 0.1);
-            --modal-notes-color: #9bd4ec;
-            --modal-notes-bg: rgba(1, 4, 53, 0.3);
-            --modal-notes-border: rgba(155, 212, 236, 0.08);
-            --btn-primary-grad: linear-gradient(135deg, #4fafd9 0%, #1f5fb6 100%);
-            --btn-primary-border: rgba(255, 255, 255, 0.25);
-            --btn-primary-text: #ffffff;
-            --btn-primary-shadow: rgba(31, 95, 182, 0.4);
-            --btn-secondary-bg: rgba(255, 255, 255, 0.06);
-            --btn-secondary-border: rgba(155, 212, 236, 0.15);
-            --btn-secondary-text: #9bd4ec;
-        }
-
-        /* Variables pour le thème Light (Crème/Beige Liquid Gel Glass) */
-        [data-theme="light"] {
-            --bg-grad-start: #F2EFF6;
-            --bg-grad-mid: #EAE5DF;
-            --bg-grad-end: #F0EBE6;
-            --border-glow: rgba(255, 255, 255, 0.6);
-            --blob-1: rgba(168, 85, 247, 0.07);
-            --blob-2: rgba(13, 148, 136, 0.06);
-            --text-title: linear-gradient(135deg, #121214 0%, #5C5C64 100%);
-            --text-version: #5C5C64;
-            --progress-bg: rgba(18, 18, 20, 0.1);
-            --progress-bar-grad: linear-gradient(90deg, #A855F7, #C084FC);
-            --loading-text: #5C5C64;
-            --modal-bg: rgba(242, 239, 246, 0.4);
-            --modal-card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.25) 45%, rgba(45, 212, 191, 0.05) 100%);
-            --modal-card-border: rgba(255, 255, 255, 0.6);
-            --modal-title-color: #121214;
-            --modal-version-color: #A855F7;
-            --modal-version-bg: rgba(168, 85, 247, 0.15);
-            --modal-notes-color: #5C5C64;
-            --modal-notes-bg: rgba(255, 255, 255, 0.5);
-            --modal-notes-border: rgba(18, 18, 20, 0.1);
-            --btn-primary-grad: linear-gradient(135deg, rgba(168, 85, 247, 0.8) 0%, rgba(192, 132, 252, 0.4) 100%);
-            --btn-primary-border: rgba(255, 255, 255, 0.4);
-            --btn-primary-text: #ffffff;
-            --btn-primary-shadow: rgba(168, 85, 247, 0.25);
-            --btn-secondary-bg: #FFFFFF;
-            --btn-secondary-border: rgba(92, 92, 100, 0.15);
-            --btn-secondary-text: #121214;
+            --bg-main: #181a26;
+            --text-title: #ffffff;
+            --text-version: rgba(255, 255, 255, 0.7);
+            --progress-bg: rgba(255, 255, 255, 0.12);
+            --progress-fill: #ffffff;
         }
 
         * {
@@ -73,278 +19,155 @@
             box-sizing: border-box;
         }
 
-        html,
-        body {
+        html, body {
             width: 100%;
             height: 100%;
-            background: transparent;
+            background: #181a26;
             overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
         }
 
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
-            color: #f3f7ff;
+            color: #ffffff;
         }
 
         .splash-shell {
             position: relative;
             width: 100%;
             height: 100%;
-            border-radius: 24px;
-            overflow: hidden;
-            background: linear-gradient(145deg, var(--bg-grad-start) 0%, var(--bg-grad-mid) 48%, var(--bg-grad-end) 100%);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
-            border: 1px solid var(--border-glow);
+            background: radial-gradient(circle at 50% 45%, #222638 0%, #151722 75%, #0f1018 100%);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-        }
-
-        /* Effets de fond */
-        .splash-shell::before,
-        .splash-shell::after {
-            content: "";
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .splash-shell::before {
-            width: 200px;
-            height: 200px;
-            top: -50px;
-            right: -30px;
-            background: var(--blob-1);
-        }
-
-        .splash-shell::after {
-            width: 150px;
-            height: 150px;
-            left: -40px;
-            bottom: -30px;
-            background: var(--blob-2);
+            padding: 40px;
         }
 
         .splash-container {
-            position: relative;
-            z-index: 1;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
+            text-align: center;
         }
 
-        .logo-container {
+        /* 3D Marble Door Container */
+        .door-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .door-svg {
+            width: 130px;
+            height: 130px;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+        }
+
+        /* Pulsing White Interior Light */
+        .door-light {
+            animation: door-light-pulse 1.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes door-light-pulse {
+            0% {
+                opacity: 0.85;
+                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+            }
+            100% {
+                opacity: 1;
+                filter: drop-shadow(0 0 25px rgba(255, 255, 255, 1)) drop-shadow(0 0 40px rgba(255, 255, 255, 0.9));
+            }
+        }
+
+        /* Title & Version styling */
+        .title {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 2px 10px rgba(0, 0, 0, 0.5);
+            margin-top: 4px;
+        }
+
+        .version {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.3px;
+        }
+
+        /* Sleek Glowing Progress Bar */
+        .loading-box {
+            margin-top: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 12px;
         }
 
-        .animation-container {
-            width: 160px;
-            height: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .splash-svg {
-            overflow: visible;
-        }
-
-        .house {
-            transform-origin: 100px 30px;
-            opacity: 0;
-            transform: translate(0px, -50px) scale(0.6);
-        }
-
-        @keyframes fall-in {
-            0% {
-                opacity: 0;
-                transform: translate(0px, -50px) scale(0.5) rotate(0deg);
-            }
-            15% {
-                opacity: 1;
-            }
-            70% {
-                opacity: 1;
-                transform: translate(0px, 60px) scale(0.5) rotate(45deg);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(0px, 95px) scale(0.05) rotate(90deg);
-            }
-        }
-
-        .house-1 {
-            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
-            animation-delay: 0s;
-        }
-
-        .house-2 {
-            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
-            animation-delay: 0.8s;
-        }
-
-        .house-3 {
-            animation: fall-in 2.4s cubic-bezier(0.4, 0, 1, 1) infinite;
-            animation-delay: 1.6s;
-        }
-
-        .bag-group {
-            transform-origin: 100px 150px;
-            animation: bag-bounce 2.4s ease-in-out infinite;
-        }
-
-        @keyframes bag-bounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            42% {
-                transform: scale(1);
-            }
-            46% {
-                transform: scale(1.08, 0.92);
-            }
-            50% {
-                transform: scale(0.95, 1.05);
-            }
-            54% {
-                transform: scale(1);
-            }
-            75% {
-                transform: scale(1);
-            }
-            79% {
-                transform: scale(1.08, 0.92);
-            }
-            83% {
-                transform: scale(0.95, 1.05);
-            }
-            87% {
-                transform: scale(1);
-            }
-            8% {
-                transform: scale(1);
-            }
-            12% {
-                transform: scale(1.08, 0.92);
-            }
-            16% {
-                transform: scale(0.95, 1.05);
-            }
-            20% {
-                transform: scale(1);
-            }
-        }
-
-        .title {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            background: var(--text-title);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .version {
-            font-size: 13px;
-            color: var(--text-version);
-            margin-top: 6px;
-            font-weight: 500;
-        }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .progress-container {
-            width: 200px;
-            height: 6px;
-            background: var(--progress-bg);
-            border-radius: 3px;
+        .progress-track {
+            width: 320px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 9999px;
             overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 0, 0, 0.3);
         }
 
-        .progress-bar {
+        .progress-bar-glow {
             height: 100%;
-            width: 30%;
-            background: var(--progress-bar-grad);
-            border-radius: 3px;
-            animation: loading 1.5s ease-in-out infinite;
+            width: 0%;
+            background: #ffffff;
+            border-radius: 9999px;
+            box-shadow: 0 0 12px #ffffff, 0 0 25px rgba(255, 255, 255, 0.9);
+            animation: fictive-loading 3.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
 
-        @keyframes loading {
+        @keyframes fictive-loading {
             0% {
                 width: 0%;
-                margin-left: 0%;
+                opacity: 0.6;
             }
-            50% {
-                width: 40%;
-                margin-left: 30%;
+            45% {
+                width: 65%;
+                opacity: 1;
+            }
+            85% {
+                width: 95%;
+                opacity: 1;
             }
             100% {
-                width: 0%;
-                margin-left: 100%;
+                width: 100%;
+                opacity: 0.8;
             }
         }
 
-        .loading-text {
+        .status-text {
             font-size: 13px;
-            color: var(--loading-text);
+            color: rgba(255, 255, 255, 0.75);
             font-weight: 500;
         }
 
-        .dots {
-            display: inline-block;
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
-        }
-
-        .dots::after {
-            content: '';
-            animation: dots-content 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes dots-content {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75%, 100% { content: '...'; }
-        }
-
-        /* Liquid Glass Update Modal */
+        /* Update Modal Overlay */
         .glass-modal {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--modal-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            inset: 0;
+            background: rgba(15, 16, 24, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 100;
             padding: 24px;
             opacity: 0;
             pointer-events: none;
@@ -356,14 +179,14 @@
             pointer-events: auto;
         }
 
-        .modal-content {
-            background: var(--modal-card-bg);
-            border: 1px solid var(--modal-card-border);
+        .modal-card {
+            background: linear-gradient(135deg, rgba(39, 42, 60, 0.9) 0%, rgba(24, 26, 38, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 24px;
             width: 100%;
-            max-width: 420px;
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2);
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -372,139 +195,146 @@
 
         .modal-title {
             font-size: 20px;
-            font-weight: 750;
-            color: var(--modal-title-color);
-            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #ffffff;
         }
 
         .modal-version {
-            font-size: 14px;
-            color: var(--modal-version-color);
+            font-size: 13px;
             font-weight: 600;
-            background: var(--modal-version-bg);
-            padding: 4px 12px;
-            border-radius: 99px;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 14px;
+            border-radius: 9999px;
             align-self: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
         .modal-notes {
             font-size: 13px;
-            color: var(--modal-notes-color);
-            background: var(--modal-notes-bg);
-            border: 1px solid var(--modal-notes-border);
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 12px;
             max-height: 120px;
             overflow-y: auto;
             text-align: left;
-            line-height: 1.5;
+            line-height: 1.45;
         }
 
         .modal-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
-        .btn-glass {
+        .btn-modal {
             flex: 1;
-            padding: 12px;
+            padding: 11px;
             border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            text-align: center;
         }
 
-        .btn-glass-primary {
-            background: var(--btn-primary-grad);
-            border: 1px solid var(--btn-primary-border);
-            color: var(--btn-primary-text);
-            box-shadow: 0 4px 15px var(--btn-primary-shadow);
+        .btn-modal-primary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
         }
 
-        .btn-glass-primary:hover {
+        .btn-modal-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px var(--btn-primary-shadow);
             filter: brightness(1.1);
         }
 
-        .btn-glass-secondary {
-            background: var(--btn-secondary-bg);
-            border: 1px solid var(--btn-secondary-border);
-            color: var(--btn-secondary-text);
+        .btn-modal-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
         }
 
-        .btn-glass-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            filter: brightness(1.05);
+        .btn-modal-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
     <div class="splash-shell">
         <div class="splash-container">
-            <div class="logo-container">
-                <div class="animation-container">
-                    <svg class="splash-svg" viewBox="0 0 200 200" width="160" height="160">
-                        <!-- Houses falling -->
-                        <g class="house house-1">
-                            <polygon points="100,5 80,25 120,25" fill="#38bdf8" />
-                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#38bdf8" />
-                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
-                        </g>
-                        <g class="house house-2">
-                            <polygon points="100,5 80,25 120,25" fill="#60a5fa" />
-                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#60a5fa" />
-                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
-                        </g>
-                        <g class="house house-3">
-                            <polygon points="100,5 80,25 120,25" fill="#0284c7" />
-                            <rect x="85" y="25" width="30" height="30" rx="3" fill="#0284c7" />
-                            <rect x="96" y="38" width="8" height="17" rx="1.5" fill="#1e293b" />
-                        </g>
+            <!-- 3D Open Door Logo -->
+            <div class="door-container">
+                <svg class="door-svg" viewBox="0 0 160 160">
+                    <defs>
+                        <!-- Marble Surface Gradient -->
+                        <linearGradient id="marbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="35%" stop-color="#f1f5f9" />
+                            <stop offset="70%" stop-color="#cbd5e1" />
+                            <stop offset="100%" stop-color="#94a3b8" />
+                        </linearGradient>
+                        <linearGradient id="marbleShadow" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="#64748b" />
+                        </linearGradient>
+                        <!-- Intense White Door Glow -->
+                        <filter id="doorGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
 
-                        <!-- The bag (sac) -->
-                        <g class="bag-group">
-                            <!-- Drawstring Ties -->
-                            <path d="M 90,80 C 85,76 75,76 70,82 C 67,86 70,92 75,92 C 82,92 87,85 90,80 Z" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" />
-                            <path d="M 110,80 C 115,76 125,76 130,82 C 133,86 130,92 125,92 C 118,92 113,85 110,80 Z" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round" />
-                            <!-- Drawstring Knot -->
-                            <circle cx="100" cy="80" r="6" fill="#38bdf8" stroke="#0284c7" stroke-width="2" />
-                            <!-- Main Pouch Body -->
-                            <path d="M 85,83 C 70,83 45,95 45,130 C 45,165 70,175 100,175 C 130,175 155,165 155,130 C 155,95 130,83 115,83 Z" 
-                                  fill="rgba(14, 165, 233, 0.18)" 
-                                  stroke="#0284c7" 
-                                  stroke-width="4.5" 
-                                  stroke-linejoin="round" />
-                            <!-- Drawstring Collar -->
-                            <path d="M 80,78 C 85,82 92,84 100,84 C 108,84 115,82 120,78 C 123,73 120,68 115,68 C 108,68 104,73 100,73 C 96,73 92,68 85,68 C 80,68 77,73 80,78 Z" 
-                                  fill="rgba(56, 189, 248, 0.3)" 
-                                  stroke="#0284c7" 
-                                  stroke-width="3.5" />
-                        </g>
-                    </svg>
-                </div>
-                <div class="title">Bay Bay</div>
-                <div class="version"></div>
+                    <!-- Outer Marble Arch / Doorframe -->
+                    <path d="M 40 135 V 50 C 40 30 120 30 120 50 V 135 Z" 
+                          fill="url(#marbleGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2" />
+
+                    <!-- Glowing White Interior (Pulsing Light) -->
+                    <path class="door-light" 
+                          d="M 54 133 V 52 C 54 41 106 41 106 52 V 133 Z" 
+                          fill="#ffffff" filter="url(#doorGlowFilter)" />
+
+                    <!-- Opened Door Leaf (Perspective 3D on the Left) -->
+                    <path d="M 40 135 L 54 130 V 50 L 40 54 Z" 
+                          fill="url(#marbleShadow)" stroke="rgba(255,255,255,0.7)" stroke-width="1" />
+                    <path d="M 22 140 L 54 130 V 50 L 22 56 Z" 
+                          fill="url(#marbleGrad)" stroke="#cbd5e1" stroke-width="2" />
+
+                    <!-- Door Handle/Knob -->
+                    <circle cx="48" cy="94" r="3.5" fill="#ffffff" stroke="#64748b" stroke-width="1" />
+                    <circle cx="48" cy="94" r="1.8" fill="#cbd5e1" />
+                </svg>
             </div>
-            <div class="loading">
-                <div class="progress-container">
-                    <div class="progress-bar"></div>
+
+            <!-- Title & Version -->
+            <div>
+                <div class="title">Bay Bay</div>
+                <div class="version">Version 3.9.1</div>
+            </div>
+
+            <!-- Loading Progress Bar -->
+            <div class="loading-box">
+                <div class="progress-track">
+                    <div class="progress-bar-glow"></div>
                 </div>
+                <div class="status-text">Chargement en cours...</div>
             </div>
         </div>
 
-        <!-- Liquid Glass Update Modal -->
+        <!-- Update Modal Overlay -->
         <div id="update-modal" class="glass-modal">
-            <div class="modal-content">
+            <div class="modal-card">
                 <div class="modal-title">Mise à jour disponible</div>
-                <div id="update-version" class="modal-version">v0.0.0</div>
-                <div id="update-notes" class="modal-notes">Notes de version...</div>
+                <div id="update-version" class="modal-version">v3.9.1</div>
+                <div id="update-notes" class="modal-notes">Des améliorations visuelles et correctifs sont disponibles.</div>
                 <div class="modal-buttons">
-                    <div class="btn-glass btn-glass-primary" onclick="acceptUpdate()">Télécharger & Installer</div>
-                    <div class="btn-glass btn-glass-secondary" onclick="declineUpdate()">Plus tard</div>
+                    <div class="btn-modal btn-modal-primary" onclick="acceptUpdate()">Télécharger & Installer</div>
+                    <div class="btn-modal btn-modal-secondary" onclick="declineUpdate()">Plus tard</div>
                 </div>
             </div>
         </div>
@@ -512,12 +342,8 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const version = params.get('version') || 'inconnue';
+        const version = params.get('version') || '3.9.1';
         document.querySelector('.version').textContent = `Version ${version}`;
-
-        // Appliquer le thème reçu en paramètre
-        const theme = params.get('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', theme);
 
         function acceptUpdate() {
             document.title = 'update-accept';
@@ -531,7 +357,9 @@
 
         window.showUpdateModal = function(ver, notes) {
             document.getElementById('update-version').textContent = 'v' + ver;
-            document.getElementById('update-notes').innerHTML = notes.replace(/\n/g, '<br>');
+            if (notes) {
+                document.getElementById('update-notes').innerHTML = notes.replace(/\n/g, '<br>');
+            }
             document.getElementById('update-modal').classList.add('active');
         };
     </script>

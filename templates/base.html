@@ -184,6 +184,62 @@
         </div>
     </div>
     
+    <!-- Fullscreen Loading & Update Overlay (Matching Gemini_Generated_Image_l655dbl655dbl655.jpg) -->
+    <div id="app-loading-screen" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#151722] transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-6 text-center">
+            <!-- 3D Open Door Logo -->
+            <div class="w-32 h-32 flex items-center justify-center relative">
+                <svg class="w-28 h-28 drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)]" viewBox="0 0 160 160">
+                    <defs>
+                        <linearGradient id="webMarbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="35%" stop-color="#f1f5f9" />
+                            <stop offset="70%" stop-color="#cbd5e1" />
+                            <stop offset="100%" stop-color="#94a3b8" />
+                        </linearGradient>
+                        <linearGradient id="webMarbleShadow" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="#64748b" />
+                        </linearGradient>
+                        <filter id="webDoorGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="7" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Doorframe -->
+                    <path d="M 40 135 V 50 C 40 30 120 30 120 50 V 135 Z" fill="url(#webMarbleGrad)" stroke="rgba(255,255,255,0.9)" stroke-width="2" />
+                    
+                    <!-- Glowing White Interior (Pulsing Light) -->
+                    <path class="animate-pulse" d="M 54 133 V 52 C 54 41 106 41 106 52 V 133 Z" fill="#ffffff" filter="url(#webDoorGlowFilter)" />
+
+                    <!-- Open Door Leaf -->
+                    <path d="M 40 135 L 54 130 V 50 L 40 54 Z" fill="url(#webMarbleShadow)" stroke="rgba(255,255,255,0.7)" stroke-width="1" />
+                    <path d="M 22 140 L 54 130 V 50 L 22 56 Z" fill="url(#webMarbleGrad)" stroke="#cbd5e1" stroke-width="2" />
+
+                    <!-- Door Knob -->
+                    <circle cx="48" cy="94" r="3.5" fill="#ffffff" stroke="#64748b" stroke-width="1" />
+                    <circle cx="48" cy="94" r="1.8" fill="#cbd5e1" />
+                </svg>
+            </div>
+
+            <div>
+                <h1 class="text-3xl font-extrabold text-white tracking-wide drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]">Bay Bay</h1>
+                <p class="text-xs text-white/70 mt-1 font-medium">Version {{ app_version }}</p>
+            </div>
+
+            <div class="mt-2 flex flex-col items-center gap-3">
+                <div class="w-80 h-2 bg-white/12 rounded-full overflow-hidden relative shadow-inner">
+                    <div class="h-full bg-white rounded-full shadow-[0_0_12px_#ffffff,0_0_25px_rgba(255,255,255,0.9)] animate-[fictive-loading_3.2s_ease-in-out_infinite]"></div>
+                </div>
+                <p id="app-loading-text" class="text-xs text-white/75 font-medium">Chargement en cours...</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Affiche la barre de titre personnalisée si on tourne dans Electron
         if (window.electronAPI) {
@@ -191,17 +247,38 @@
             document.body.classList.add('has-electron-titlebar');
         }
         
-        // Supprime l'effet de flou de chargement une fois le DOM chargé
+        // Supprime l'écran de chargement et le flou une fois le DOM prêt
         function removeAppBlur() {
             document.body.classList.remove('app-loading-blur');
+            const loadingScreen = document.getElementById('app-loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('opacity-0');
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 400);
+            }
             if (window.electronAPI && window.electronAPI.frontendReady) {
                 window.electronAPI.frontendReady();
             }
         }
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', () => setTimeout(removeAppBlur, 100));
-        } else {
+
+        window.showLoadingScreen = function(message = 'Chargement en cours...') {
+            const loadingScreen = document.getElementById('app-loading-screen');
+            const textElem = document.getElementById('app-loading-text');
+            if (textElem) textElem.textContent = message;
+            if (loadingScreen) {
+                loadingScreen.classList.remove('hidden', 'opacity-0');
+            }
+        };
+
+        window.hideLoadingScreen = function() {
             removeAppBlur();
+        };
+
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', () => setTimeout(removeAppBlur, 250));
+        } else {
+            setTimeout(removeAppBlur, 250);
         }
     </script>
 

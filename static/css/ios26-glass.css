@@ -622,10 +622,29 @@ select optgroup {
     }
 }
 
-/* Loading Blur Effect */
+/* Loading Blur Effect & Progress Animation */
 body.app-shell.app-loading-blur {
     filter: blur(25px);
     transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fictive-loading {
+    0% {
+        width: 0%;
+        opacity: 0.6;
+    }
+    45% {
+        width: 65%;
+        opacity: 1;
+    }
+    85% {
+        width: 95%;
+        opacity: 1;
+    }
+    100% {
+        width: 100%;
+        opacity: 0.8;
+    }
 }
 
 /* Custom Window Titlebar (for Frameless Electron Window) */
