@@ -5,10 +5,10 @@
     <title>Quittance de Loyer - {{ mois_fr[quittance.mois] }} {{ quittance.annee }}</title>
     <style>
         * { margin: 0; padding: 0; }
-        body { font-family: Helvetica, Arial, sans-serif; padding: 55px 24px 20px 24px; color: #333; font-size: 13px; }
-        @page { size: A4; margin: 22mm 12mm 10mm 12mm; }
+        body { font-family: Helvetica, Arial, sans-serif; padding: 60px 28px 25px 28px; color: #333; font-size: 13px; }
+        @page { size: A4; margin: 25mm 12mm 10mm 12mm; }
         @media print {
-            body { padding: 15px 0 0 0; }
+            body { padding: 25px 0 0 0; }
             .no-print { display: none; }
         }
     </style>
@@ -16,32 +16,32 @@
 <body>
     <div style="max-width: 800px; margin: 0 auto;">
         <!-- Header -->
-        <div style="text-align: center; margin-top: 15px; margin-bottom: 18px;">
-            <h1 style="color: #059669; font-size: 24px; margin-bottom: 10px;">QUITTANCE DE LOYER</h1>
-            <p style="color: #666; margin-bottom: 1px;">{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</p>
-            <p style="font-size: 12px; margin-bottom: 0;">Référence document: <strong>{{ document_reference }}</strong></p>
-            <table style="width: 100%; margin-top: 6px;" cellpadding="0" cellspacing="0"><tr><td style="border-top: 2px solid #059669; font-size: 1px; line-height: 1px;">&nbsp;</td></tr></table>
+        <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;">
+            <h1 style="color: #059669; font-size: 26px; margin-bottom: 12px; letter-spacing: 1px;">QUITTANCE DE LOYER</h1>
+            <p style="color: #4b5563; font-size: 14px; margin-bottom: 4px;">{{ mois_fr[quittance.mois] }} {{ quittance.annee }}</p>
+            <p style="font-size: 12px; color: #6b7280; margin-bottom: 0;">Référence document: <strong>{{ document_reference }}</strong></p>
+            <table style="width: 100%; margin-top: 18px; margin-bottom: 20px;" cellpadding="0" cellspacing="0"><tr><td style="border-top: 2.5px solid #059669; font-size: 1px; line-height: 1px;">&nbsp;</td></tr></table>
         </div>
 
         <!-- Bailleur / Locataire -->
-        <table style="width: 100%; margin-bottom: 12px;" cellpadding="0" cellspacing="0">
+        <table style="width: 100%; margin-top: 20px; margin-bottom: 30px;" cellpadding="0" cellspacing="0">
             <tr>
-                <td style="vertical-align: top; width: 48%; padding-right: 20px;">
-                    <div style="font-size: 12px; color: #059669; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #059669; padding-bottom: 3px;">BAILLEUR</div>
+                <td style="vertical-align: top; width: 48%; padding-right: 25px;">
+                    <div style="font-size: 13px; color: #059669; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #059669; padding-bottom: 5px; letter-spacing: 0.5px;">BAILLEUR</div>
                     {% if bailleur_nom %}
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">{{ bailleur_nom }}</div>
-                    {% if bailleur_adresse %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bailleur_adresse }}</div>{% endif %}
-                    {% if bailleur_code_postal or bailleur_ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bailleur_code_postal or '' }} {{ bailleur_ville or '' }}</div>{% endif %}
-                    {% if bailleur_siret %}<div style="font-size: 12px; color: #666; margin-bottom: 2px;">SIRET: {{ bailleur_siret }}</div>{% endif %}
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 6px; color: #111827;">{{ bailleur_nom }}</div>
+                    {% if bailleur_adresse %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151;">{{ bailleur_adresse }}</div>{% endif %}
+                    {% if bailleur_code_postal or bailleur_ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151;">{{ bailleur_code_postal or '' }} {{ bailleur_ville or '' }}</div>{% endif %}
+                    {% if bailleur_siret %}<div style="font-size: 12px; color: #6b7280; margin-bottom: 3px;">SIRET: {{ bailleur_siret }}</div>{% endif %}
                     {% endif %}
                 </td>
-                <td style="vertical-align: top; width: 48%; padding-left: 20px;">
-                    <div style="font-size: 12px; color: #059669; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #059669; padding-bottom: 3px;">LOCATAIRE</div>
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">{{ locataire.nom_complet }}</div>
+                <td style="vertical-align: top; width: 48%; padding-left: 25px;">
+                    <div style="font-size: 13px; color: #059669; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #059669; padding-bottom: 5px; letter-spacing: 0.5px;">LOCATAIRE</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 6px; color: #111827;">{{ locataire.nom_complet }}</div>
                     {% if appartement and bien %}
-                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ appartement.numero_porte }}</div>
-                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bien.adresse }}</div>
-                    {% if bien.code_postal or bien.ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{{ bien.code_postal or '' }} {{ bien.ville or '' }}</div>{% endif %}
+                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151;">{{ appartement.numero_porte }}</div>
+                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151;">{{ bien.adresse }}</div>
+                    {% if bien.code_postal or bien.ville %}<div style="font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #374151;">{{ bien.code_postal or '' }} {{ bien.ville or '' }}</div>{% endif %}
                     {% endif %}
                 </td>
             </tr>
