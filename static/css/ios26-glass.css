@@ -3,6 +3,11 @@
  * ====================================================
  */
 
+html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+}
+
 /* 
  * iOS Liquid Glass Design System - Single Off-White / Light Gray Theme
  * ==================================================================

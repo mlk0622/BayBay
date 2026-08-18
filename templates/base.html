@@ -786,14 +786,11 @@
                 if (activeLink) {
                     activeLink.style.color = '#ffffff';
                     
-                    const containerRect = container.getBoundingClientRect();
-                    const linkRect = activeLink.getBoundingClientRect();
-                    
                     pill.style.opacity = '1';
-                    pill.style.left = `${linkRect.left - containerRect.left}px`;
-                    pill.style.top = `${linkRect.top - containerRect.top}px`;
-                    pill.style.width = `${linkRect.width}px`;
-                    pill.style.height = `${linkRect.height}px`;
+                    pill.style.left = `${activeLink.offsetLeft}px`;
+                    pill.style.top = `${activeLink.offsetTop}px`;
+                    pill.style.width = `${activeLink.offsetWidth}px`;
+                    pill.style.height = `${activeLink.offsetHeight}px`;
                 } else {
                     pill.style.opacity = '0';
                 }
@@ -805,14 +802,11 @@
                 const pill = document.querySelector('.nav-indicator-pill');
                 if (!container || !pill || !activeLink) return;
                 
-                const containerRect = container.getBoundingClientRect();
-                const linkRect = activeLink.getBoundingClientRect();
-                
                 pill.style.opacity = '1';
-                pill.style.left = `${linkRect.left - containerRect.left}px`;
-                pill.style.top = `${linkRect.top - containerRect.top}px`;
-                pill.style.width = `${linkRect.width}px`;
-                pill.style.height = `${linkRect.height}px`;
+                pill.style.left = `${activeLink.offsetLeft}px`;
+                pill.style.top = `${activeLink.offsetTop}px`;
+                pill.style.width = `${activeLink.offsetWidth}px`;
+                pill.style.height = `${activeLink.offsetHeight}px`;
             }
 
             // Sync mobile menu links
