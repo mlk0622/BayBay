@@ -243,12 +243,69 @@
             removeAppBlur();
         };
 
+        // Cache la bannière de téléchargement si on est dans Electron
+        if (window.electronAPI) {
+            document.getElementById('electron-titlebar').style.display = 'flex';
+            document.body.classList.add('has-electron-titlebar');
+            const downloadBanner = document.getElementById('web-download-banner');
+            if (downloadBanner) downloadBanner.style.display = 'none';
+        }
+        
+        // Supprime l'écran de chargement et le flou une fois le DOM prêt
+        function removeAppBlur() {
+            document.body.classList.remove('app-loading-blur');
+            const loadingScreen = document.getElementById('app-loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('opacity-0');
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 400);
+            }
+            if (window.electronAPI && window.electronAPI.frontendReady) {
+                window.electronAPI.frontendReady();
+            }
+        }
+
+        window.showLoadingScreen = function(message = 'Chargement en cours...') {
+            const loadingScreen = document.getElementById('app-loading-screen');
+            const textElem = document.getElementById('app-loading-text');
+            if (textElem) textElem.textContent = message;
+            if (loadingScreen) {
+                loadingScreen.classList.remove('hidden', 'opacity-0');
+            }
+        };
+
+        window.hideLoadingScreen = function() {
+            removeAppBlur();
+        };
+
         if (document.readyState === 'loading') {
             window.addEventListener('DOMContentLoaded', () => setTimeout(removeAppBlur, 250));
         } else {
             setTimeout(removeAppBlur, 250);
         }
     </script>
+
+    <!-- Desktop App Download Banner (Web Version Only) -->
+    {% if current_user.is_authenticated %}
+    <div id="web-download-banner" class="no-print bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-white/20 px-4 py-2 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xl backdrop-blur-md sticky top-0 z-[60]">
+        <div class="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+            <div class="flex items-center gap-2.5">
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay">
+                <span><strong class="text-white font-bold">BayBay Bureau :</strong> Téléchargez l'application officielle pour Windows et profitez de performances optimales.</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/download/desktop" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+                    <i class="fas fa-download text-xs"></i>
+                    <span>Télécharger l'application</span>
+                </a>
+                <button onclick="document.getElementById('web-download-banner').style.display='none'" class="text-white/60 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors" title="Masquer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Navigation -->
     {% if current_user.is_authenticated %}
