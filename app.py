@@ -1327,23 +1327,22 @@ def register():
         email = (request.form.get('email') or '').strip().lower()
         password = (request.form.get('password') or '').strip()
 
-        if not _is_valid_email(email):
-            flash('Adresse email invalide')
+        if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
+            flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')
             return redirect(url_for('register'))
 
         if len(password) < 6:
-            flash('Le mot de passe doit contenir au moins 6 caracteres')
+            flash('Le mot de passe doit contenir au moins 6 caractères', 'error')
             return redirect(url_for('register'))
 
-        # Le pseudo est base sur l'email pour conserver le comportement actuel.
         pseudo = email
 
         if User.query.filter_by(email=email).first():
-            flash('Cette adresse email est déjà utilisée')
+            flash('Cette adresse email est déjà utilisée', 'error')
             return redirect(url_for('register'))
 
         if User.query.filter_by(pseudo=pseudo).first():
-            flash('Ce pseudo est déjà utilisé')
+            flash('Cette adresse email est déjà utilisée', 'error')
             return redirect(url_for('register'))
 
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -1353,13 +1352,17 @@ def register():
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            flash('Impossible de creer le compte: adresse deja utilisee')
+            flash('Impossible de créer le compte : adresse déjà utilisée', 'error')
             return redirect(url_for('register'))
         except Exception:
             db.session.rollback()
-            flash('Erreur interne lors de la creation du compte')
+            flash('Erreur interne lors de la création du compte', 'error')
             return redirect(url_for('register'))
-        return redirect(url_for('login'))
+
+        # Connexion automatique directe après création de compte
+        login_user(new_user, remember=True, duration=timedelta(days=30))
+        flash('Compte créé avec succès ! Bienvenue sur BayBay.', 'success')
+        return redirect(url_for('dashboard'))
     return render_template('register.html')
 
 
@@ -1368,13 +1371,16 @@ def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = (request.form.get('password') or '').strip()
-        # Permettre la connexion par email ou par pseudo/nom d'utilisateur
-        user = User.query.filter((User.email == email) | (User.pseudo == email)).first()
+
+        if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
+            flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')
+            return redirect(url_for('login'))
+
+        user = User.query.filter(User.email == email).first()
         if user and bcrypt.check_password_hash(user.password, password):
-            # Session persistante pour rester connecte entre les redemarrages de l'application.
             login_user(user, remember=True, duration=timedelta(days=30))
             return redirect(url_for('dashboard'))
-        flash('Identifiants incorrects')
+        flash('Identifiants incorrects (email ou mot de passe)', 'error')
     return render_template('login.html')
 
 

@@ -6,12 +6,20 @@
     <h2 class="text-2xl font-bold mb-2">Créer un compte</h2>
     <p class="text-sm opacity-85 mb-6">Rejoignez le Cloud BayBay</p>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="{% if category == 'success' %}text-emerald-400{% else %}text-red-500{% endif %} mb-4 text-sm font-medium">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
         <div>
-            <input type="email" name="email" placeholder="Adresse email" required class="w-full">
+            <input type="email" name="email" placeholder="Adresse email (ex: nom@domaine.com)" required pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="L'adresse email doit contenir un '@' et un point" class="w-full" autocomplete="email">
         </div>
         <div>
-            <input type="password" name="password" placeholder="Mot de passe robuste" required class="w-full">
+            <input type="password" name="password" placeholder="Mot de passe robuste" required class="w-full" autocomplete="new-password">
         </div>
         <button type="submit" class="w-full cursor-pointer mt-2">Créer mon compte</button>
     </form>
