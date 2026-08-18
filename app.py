@@ -2771,7 +2771,7 @@ def prefill_etat_lieux_pdf(locataire_id):
     return jsonify({
         'success': True,
         'id': historique.id,
-        'download_url': f'/api/etat-lieux/prefill/{historique.id}/download',
+        'download_url': f'/api/etat-lieux/prefill/{historique.id}/download?inline=1',
         'filename': filename
     })
 
@@ -2854,7 +2854,7 @@ def generate_etat_lieux_avance(locataire_id):
                 'success': True,
                 'id': etat.id,
                 'pdf_generated': True,
-                'download_url': f'/api/etat-lieux/{etat.id}/download',
+                'download_url': f'/api/etat-lieux/{etat.id}/download?inline=1',
                 'filename': filename
             })
         else:

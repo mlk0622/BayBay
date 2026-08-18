@@ -199,10 +199,12 @@
   {% if type_entree_checked %}[X] ENTRÉE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ ] SORTIE{% else %}[ ] ENTRÉE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [X] SORTIE{% endif %}
 </p>
 
-<p class="center" style="font-size:9.5pt; margin:2px 0 8px 0;">
-  <b>Date d'entrée :</b> {{ date_entree or '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' }}
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <b>Date de sortie :</b> {{ date_sortie or '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' }}
+<p class="center" style="font-size:9.5pt; margin:4px 0 8px 0;">
+  {% if type_entree_checked or date_entree %}
+    <b>Date d'entrée :</b> {{ date_entree or '-' }}
+  {% else %}
+    <b>Date de sortie :</b> {{ date_sortie or '-' }}
+  {% endif %}
 </p>
 
 <table class="data">

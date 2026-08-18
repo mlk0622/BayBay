@@ -1021,9 +1021,12 @@
                 const href = link.getAttribute('href');
                 if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
                 
-                // For PDF, file uploads, or download links, open in external Chrome browser when running in Electron
-                if (href.endsWith('.pdf') || href.includes('/pdf/') || href.includes('/uploads/') || href.includes('download') || link.hasAttribute('download')) {
-                    if (window.electronAPI || window.process?.versions?.electron) {
+                // Exclude target="_blank", PDF, file uploads, or download links from SPA navigation
+                const isBlank = link.target === '_blank' || link.getAttribute('target') === '_blank';
+                const isPdfOrDownload = href.endsWith('.pdf') || href.includes('pdf') || href.includes('/uploads/') || href.includes('download') || link.hasAttribute('download');
+
+                if (isBlank || isPdfOrDownload) {
+                    if ((window.electronAPI || window.process?.versions?.electron) && isBlank) {
                         e.preventDefault();
                         window.open(link.href, '_blank');
                     }
