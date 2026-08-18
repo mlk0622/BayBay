@@ -50,17 +50,17 @@
         </div>
 
         <div class="flex flex-wrap gap-2">
-            <button onclick="openEditLocataireFromDetail()" class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-                <i class="fas fa-edit mr-2 text-slate-400"></i>Modifier profil
+            <button onclick="openEditLocataireFromDetail()" class="ios-button-warning text-white">
+                <i class="fas fa-edit mr-2 text-white"></i>Modifier profil
             </button>
-            <button onclick="openLocataireAssuranceModal()" class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-                <i class="fas fa-shield-alt mr-2 text-slate-400"></i>Assurance
+            <button onclick="openLocataireAssuranceModal()" class="ios-button-purple text-white">
+                <i class="fas fa-shield-alt mr-2 text-white"></i>Assurance
             </button>
-            <button onclick="openEtatModal()" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                <i class="fas fa-clipboard-check mr-2"></i>Nouvel état des lieux
+            <button onclick="openEtatModal()" class="ios-button-success text-white">
+                <i class="fas fa-clipboard-check mr-2 text-white"></i>Nouvel état des lieux
             </button>
-            <button onclick="confirmDeleteLocataire()" class="inline-flex items-center px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-100">
-                <i class="fas fa-trash mr-2"></i>Supprimer
+            <button onclick="confirmDeleteLocataire()" class="ios-button-danger text-white">
+                <i class="fas fa-trash mr-2 text-white"></i>Supprimer
             </button>
         </div>
     </div>
@@ -167,11 +167,11 @@
             </div>
             <div class="flex gap-2">
                 <a href="/api/locataire/{{ locataire.id }}/assurance" target="_blank"
-                   class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                    <i class="fas fa-download mr-2"></i>Télécharger
+                   class="ios-button text-xs font-bold px-3 py-1.5">
+                    <i class="fas fa-download mr-1.5 text-white"></i>Télécharger
                 </a>
-                <button onclick="deleteAssurance()" class="inline-flex items-center px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-100">
-                    <i class="fas fa-trash mr-2"></i>Supprimer
+                <button onclick="deleteAssurance()" class="ios-button-danger text-xs font-bold px-3 py-1.5">
+                    <i class="fas fa-trash mr-1.5 text-white"></i>Supprimer
                 </button>
             </div>
         </div>
@@ -194,8 +194,8 @@
                 </h3>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">{{ baux|length if baux else 0 }}</span>
             </div>
-            <button onclick="openLocataireBailModal()" class="inline-flex items-center px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark shadow-sm">
-                <i class="fas fa-plus mr-1.5"></i>Ajouter un bail
+            <button onclick="openLocataireBailModal()" class="ios-button-success text-xs font-bold px-3 py-1.5">
+                <i class="fas fa-plus mr-1.5 text-white"></i>Ajouter un bail
             </button>
         </div>
         {% if baux %}
@@ -213,11 +213,11 @@
                 </div>
                 <div class="flex gap-2 shrink-0">
                     <a href="/api/bail/{{ b.id }}" target="_blank"
-                       class="inline-flex items-center px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100">
-                        <i class="fas fa-download mr-1.5"></i>Télécharger
+                       class="ios-button text-xs font-bold px-3 py-1.5">
+                        <i class="fas fa-download mr-1.5 text-white"></i>Télécharger
                     </a>
-                    <button onclick="deleteBailById({{ b.id }})" class="inline-flex items-center px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-xs font-medium text-red-600 hover:bg-red-100">
-                        <i class="fas fa-trash mr-1.5"></i>Supprimer
+                    <button onclick="deleteBailById({{ b.id }})" class="ios-button-danger text-xs font-bold px-3 py-1.5">
+                        <i class="fas fa-trash mr-1.5 text-white"></i>Supprimer
                     </button>
                 </div>
             </div>
@@ -242,8 +242,8 @@
                 </h3>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">{{ garants|length if garants else 0 }}</span>
             </div>
-            <button onclick="openGarantModal()" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm">
-                <i class="fas fa-user-plus mr-1.5"></i>Ajouter un garant
+            <button onclick="openGarantModal()" class="ios-button text-xs font-bold px-3 py-1.5">
+                <i class="fas fa-user-plus mr-1.5 text-white"></i>Ajouter un garant
             </button>
         </div>
         {% if garants %}
@@ -260,8 +260,8 @@
                         </span>
                         <h4 class="font-bold text-slate-900 text-base">{{ g.nom }} {{ g.prenom or '' }}</h4>
                     </div>
-                    <button onclick="deleteGarant({{ g.id }})" class="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50" title="Supprimer ce garant">
-                        <i class="fas fa-trash"></i>
+                    <button onclick="deleteGarant({{ g.id }})" class="ios-button-danger text-xs px-2.5 py-1" title="Supprimer ce garant">
+                        <i class="fas fa-trash text-white"></i>
                     </button>
                 </div>
                 {% if g.numero_contrat %}
@@ -297,11 +297,11 @@
             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">{{ etats_lieux|length }}</span>
         </div>
         <div class="flex gap-2">
-            <button onclick="openUploadEtatModal()" class="inline-flex items-center px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-                <i class="fas fa-upload mr-2 text-slate-400"></i>Upload PDF
+            <button onclick="openUploadEtatModal()" class="ios-button-purple text-xs font-bold px-3 py-1.5">
+                <i class="fas fa-upload mr-1.5 text-white"></i>Upload PDF
             </button>
-            <button onclick="openEtatModal()" class="inline-flex items-center px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark">
-                <i class="fas fa-plus mr-2"></i>Nouveau
+            <button onclick="openEtatModal()" class="ios-button-success text-xs font-bold px-3 py-1.5">
+                <i class="fas fa-plus mr-1.5 text-white"></i>Nouveau
             </button>
         </div>
     </div>

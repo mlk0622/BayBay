@@ -251,114 +251,99 @@ body.app-shell::after {
     box-shadow: 0 0 15px rgba(248, 113, 113, 0.3) !important;
 }
 
-/* Functional Button Palette (Blue, Green, Red, Yellow, Purple) */
+/* Functional Button Palette (Blue, Green, Red, Yellow, Purple, Secondary) */
 .ios-button,
 .ios-button-success,
 .ios-button-danger,
 .ios-button-warning,
 .ios-button-purple,
-button[type="submit"],
-.bg-primary,
-.bg-blue-600,
-.bg-green-600,
-.bg-red-600,
-.bg-yellow-500,
-.bg-purple-600 {
+.ios-button-secondary,
+.btn-secondary,
+.btn-primary,
+.btn-danger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     font-weight: 700 !important;
     border-radius: 14px !important;
-    padding: 0.7rem 1.4rem !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    color: #000000 !important;
+    padding: 0.65rem 1.3rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
 }
 
-/* ALL icons inside buttons, stat cards, and badges MUST BE BLACK */
 .ios-button i,
 .ios-button-success i,
 .ios-button-danger i,
 .ios-button-warning i,
 .ios-button-purple i,
-button[type="submit"] i,
-button i,
-.bg-primary i,
-.bg-blue-600 i,
-.bg-green-600 i,
-.bg-red-600 i,
-.bg-yellow-500 i,
-.bg-purple-600 i,
-.stat-icon i,
-.btn i,
-a.bg-primary i,
-.nav-pill-container i {
-    color: #000000 !important;
+.ios-button-secondary i,
+.btn-secondary i,
+.btn-primary i,
+.btn-danger i {
+    color: #ffffff !important;
 }
 
-/* SVG icons handling: apply black stroke and black color without breaking fill="none" paths */
-.stat-icon svg,
-button svg,
 .ios-button svg,
 .ios-button-success svg,
 .ios-button-danger svg,
 .ios-button-warning svg,
-.ios-button-purple svg {
-    color: #000000 !important;
-    stroke: #000000 !important;
+.ios-button-purple svg,
+.ios-button-secondary svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
 }
 
-.stat-icon svg path[fill]:not([fill="none"]),
-button svg path[fill]:not([fill="none"]) {
-    fill: #000000 !important;
-}
-
-/* 1. BLEU - Actions principales / Navigation / Soumission par défaut */
+/* 1. BLEU - Actions principales / Navigation */
 .ios-button,
-button[type="submit"]:not(.bg-red-600):not(.bg-green-600):not(.bg-yellow-500):not(.bg-purple-600),
-.bg-primary,
-.bg-blue-600,
-.ios-btn-blue {
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
-    color: #000000 !important;
+.ios-btn-blue,
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
 }
 
 /* 2. VERT - Validation / Confirmation / Enregistrer / Ajouter */
 .ios-button-success,
-.bg-green-600,
-.bg-emerald-600,
 .ios-btn-green {
-    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
-    color: #000000 !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: #ffffff !important;
 }
 
 /* 3. ROUGE - Suppression / Annulation / Déconnexion / Danger */
 .ios-button-danger,
-.bg-red-600,
-.ios-btn-red {
-    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
-    color: #000000 !important;
+.ios-btn-red,
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
 }
 
-/* 4. JAUNE - Avertissement / Attention / Modification / Alertes */
+/* 4. JAUNE - Modification / Warning */
 .ios-button-warning,
-.bg-yellow-500,
-.bg-amber-500,
 .ios-btn-yellow {
-    background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%) !important;
-    color: #000000 !important;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    color: #ffffff !important;
 }
 
-/* 5. VIOLET - Options / Filtres / Actions Spéciales */
+/* 5. VIOLET - Options / Actions Spéciales */
 .ios-button-purple,
-.bg-purple-600,
-.bg-indigo-600,
 .ios-btn-purple {
-    background: linear-gradient(135deg, #c084fc 0%, #8b5cf6 100%) !important;
-    color: #000000 !important;
+    background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%) !important;
+    color: #ffffff !important;
+}
+
+/* 6. SECONDARY - Annuler / Ghost Glass */
+.ios-button-secondary,
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .ios-button:hover,
@@ -366,16 +351,13 @@ button[type="submit"]:not(.bg-red-600):not(.bg-green-600):not(.bg-yellow-500):no
 .ios-button-danger:hover,
 .ios-button-warning:hover,
 .ios-button-purple:hover,
-button[type="submit"]:hover,
-.bg-primary:hover,
-.bg-blue-600:hover,
-.bg-green-600:hover,
-.bg-red-600:hover,
-.bg-yellow-500:hover,
-.bg-purple-600:hover {
+.ios-button-secondary:hover,
+.btn-secondary:hover,
+.btn-primary:hover,
+.btn-danger:hover {
     transform: translateY(-2px) scale(1.02);
-    filter: brightness(1.08);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+    filter: brightness(1.12);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
 .ios-button:active,
@@ -383,28 +365,8 @@ button[type="submit"]:hover,
 .ios-button-danger:active,
 .ios-button-warning:active,
 .ios-button-purple:active,
-button[type="submit"]:active {
+.ios-button-secondary:active {
     transform: translateY(0) scale(0.98);
-}
-
-/* Secondary Cancel/Ghost buttons */
-button.bg-white,
-button[class*="bg-white"],
-button[class*="border-slate-200"],
-[id$="Modal"] button[class*="text-slate-700"] {
-    color: #0F172A !important;
-    background: #FFFFFF !important;
-    border: 1px solid rgba(15, 23, 42, 0.15) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
-    transition: all 0.2s ease !important;
-}
-
-button.bg-white:hover,
-button[class*="bg-white"]:hover,
-button[class*="border-slate-200"]:hover {
-    background: #F1F5F9 !important;
-    border-color: rgba(15, 23, 42, 0.25) !important;
 }
 
 /* Glass inputs and textareas */
@@ -501,11 +463,25 @@ select optgroup {
     box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
 }
 
-.action-btn.view { color: #60a5fa !important; }
-.action-btn.edit { color: #fbbf24 !important; }
-.action-btn.delete { color: #f87171; }
-.action-btn.pdf { color: #f472b6; }
-.action-btn.email { color: #34d399; }
+.action-btn.view { color: #60a5fa !important; background: rgba(59, 130, 246, 0.12) !important; border: 1px solid rgba(59, 130, 246, 0.25) !important; }
+.action-btn.edit { color: #f59e0b !important; background: rgba(245, 158, 11, 0.12) !important; border: 1px solid rgba(245, 158, 11, 0.25) !important; }
+.action-btn.delete { color: #ef4444 !important; background: rgba(239, 68, 68, 0.12) !important; border: 1px solid rgba(239, 68, 68, 0.25) !important; }
+.action-btn.pdf { color: #ec4899 !important; background: rgba(236, 72, 153, 0.12) !important; border: 1px solid rgba(236, 72, 153, 0.25) !important; }
+.action-btn.email { color: #10b981 !important; background: rgba(16, 185, 129, 0.12) !important; border: 1px solid rgba(16, 185, 129, 0.25) !important; }
+
+.action-btn.view:hover { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; color: #ffffff !important; }
+.action-btn.edit:hover { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; color: #ffffff !important; }
+.action-btn.delete:hover { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important; }
+.action-btn.pdf:hover { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important; color: #ffffff !important; }
+.action-btn.email:hover { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: #ffffff !important; }
+
+.action-btn.view i, .action-btn.view:hover i,
+.action-btn.edit i, .action-btn.edit:hover i,
+.action-btn.delete i, .action-btn.delete:hover i,
+.action-btn.pdf i, .action-btn.pdf:hover i,
+.action-btn.email i, .action-btn.email:hover i {
+    color: inherit !important;
+}
 
 /* Progress bars */
 .progress-bar {

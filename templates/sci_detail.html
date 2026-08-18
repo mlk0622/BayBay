@@ -15,14 +15,14 @@
                 {% if sci.siret %}<span class="ml-3"><i class="fas fa-id-card mr-1"></i>{{ sci.siret }}</span>{% endif %}
             </p>
         </div>
-        <button onclick="openEditSciModal({{ sci.id }})" class="ios-button text-white px-4 py-2">
-            <i class="fas fa-edit mr-2"></i>Modifier SCI
+        <button onclick="openEditSciModal({{ sci.id }})" class="ios-button-warning text-white">
+            <i class="fas fa-edit mr-2 text-white"></i>Modifier SCI
         </button>
-        <button onclick="openBienModal({{ sci.id }})" class="ios-button-success text-white px-4 py-2">
-            <i class="fas fa-plus mr-2"></i>Ajouter un bien
+        <button onclick="openBienModal({{ sci.id }})" class="ios-button-success text-white">
+            <i class="fas fa-plus mr-2 text-white"></i>Ajouter un bien
         </button>
-        <button onclick='showDeleteModal("sci", {{ sci.id }}, {{ sci.nom|tojson }})' class="ios-button-danger text-white px-4 py-2">
-            <i class="fas fa-trash mr-2"></i>Supprimer SCI
+        <button onclick='showDeleteModal("sci", {{ sci.id }}, {{ sci.nom|tojson }})' class="ios-button-danger text-white">
+            <i class="fas fa-trash mr-2 text-white"></i>Supprimer SCI
         </button>
     </div>
 
