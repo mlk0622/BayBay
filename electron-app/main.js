@@ -158,6 +158,14 @@ function createMainWindow() {
         title: APP_NAME
     });
 
+    // Indiquer l'environnement Desktop dans l'UserAgent
+    try {
+        const defaultUa = mainWindow.webContents.getUserAgent();
+        mainWindow.webContents.setUserAgent(defaultUa + ' BayBayDesktop/' + app.getVersion());
+    } catch (uaErr) {
+        console.error('Error setting userAgent:', uaErr);
+    }
+
     // Track which URLs have already failed to prevent infinite cascade
     let failedUrls = new Set();
 

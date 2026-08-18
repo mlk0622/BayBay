@@ -169,9 +169,9 @@
 <body id="app-body" class="app-shell min-h-screen app-loading-blur">
     <!-- Custom Window Titlebar (only for Electron) -->
     <div class="window-titlebar no-print" id="electron-titlebar" style="display: none;">
-        <div class="flex items-center gap-2">
-            <i class="fas fa-building text-xs"></i>
-            <span>Bay Bay - Gestion Locative</span>
+        <div class="flex items-center gap-2.5">
+            <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-5 h-5 object-contain" alt="BayBay Logo">
+            <span class="font-bold text-white tracking-wide">BayBay - Gestion Locative</span>
         </div>
         <div class="window-controls">
             <div class="window-control-btn window-control-minimize" onclick="window.electronAPI.minimize()" title="Réduire">
@@ -243,10 +243,12 @@
             removeAppBlur();
         };
 
-        // Cache la bannière de téléchargement si on est dans Electron
-        if (window.electronAPI) {
-            document.getElementById('electron-titlebar').style.display = 'flex';
-            document.body.classList.add('has-electron-titlebar');
+        // Masque la bannière de téléchargement et affiche la titlebar si on tourne dans l'application Bureau Electron
+        const isDesktopApp = window.electronAPI || navigator.userAgent.includes('BayBayDesktop') || navigator.userAgent.includes('Electron');
+        if (isDesktopApp) {
+            document.body.classList.add('has-electron-titlebar', 'is-desktop-app');
+            const titlebar = document.getElementById('electron-titlebar');
+            if (titlebar) titlebar.style.display = 'flex';
             const downloadBanner = document.getElementById('web-download-banner');
             if (downloadBanner) downloadBanner.style.display = 'none';
         }
