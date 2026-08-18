@@ -43,9 +43,13 @@
                         </td>
                         <td class="py-4 px-4 text-white">{{ appel.locataire.nom_complet }}</td>
                         <td class="py-4 px-4 text-white/70">
-                            {% if appel.locataire.appartement %}
-                            {{ appel.locataire.appartement.numero }} - {{ appel.locataire.appartement.bien.nom }}
-                            {% else %}-{% endif %}
+                            {% if appel.locataire and appel.locataire.appartement and appel.locataire.appartement.bien %}
+                            <span class="font-medium text-white">{{ appel.locataire.appartement.numero_porte }}</span> - {{ appel.locataire.appartement.bien.adresse }}
+                            {% elif appel.locataire and appel.locataire.appartement %}
+                            <span class="font-medium text-white">{{ appel.locataire.appartement.numero_porte }}</span>
+                            {% else %}
+                            <span class="text-white/40">-</span>
+                            {% endif %}
                         </td>
                         <td class="py-4 px-4 text-white">{{ "%.2f"|format(appel.loyer_hc) }} €</td>
                         <td class="py-4 px-4 text-white/70">{{ "%.2f"|format(appel.charges) }} €</td>
@@ -101,7 +105,14 @@
 <script>
 const locatairesAppel = [
     {% for loc in locataires %}
-    { id: {{ loc.id }}, nom: "{{ loc.nom_complet }}", email: "{{ loc.email or '' }}", loyer: {{ loc.loyer_actuel or 0 }}, charges: {{ loc.charges_actuelles or 0 }} },
+    {
+        id: {{ loc.id }},
+        nom: {{ loc.nom_complet|tojson }},
+        email: {{ (loc.email or '')|tojson }},
+        bien: {{ ((loc.appartement.numero_porte ~ ' - ' ~ loc.appartement.bien.adresse) if (loc.appartement and loc.appartement.bien) else (loc.appartement.numero_porte if loc.appartement else ''))|tojson }},
+        loyer: {{ loc.loyer_actuel or 0 }},
+        charges: {{ loc.charges_actuelles or 0 }}
+    },
     {% endfor %}
 ];
 
@@ -109,7 +120,8 @@ function openAppelLoyerModal() {
     const select = document.getElementById('appelLocataire');
     select.innerHTML = '<option value="">-- Sélectionner --</option>';
     locatairesAppel.forEach(l => {
-        select.innerHTML += `<option value="${l.id}">${l.nom}</option>`;
+        const info = l.bien ? ` (${l.bien})` : '';
+        select.innerHTML += `<option value="${l.id}">${l.nom}${info}</option>`;
     });
     const today = new Date();
     document.getElementById('appelMois').value = today.getMonth() + 1;
