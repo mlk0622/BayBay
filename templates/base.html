@@ -289,7 +289,7 @@
     </script>
 
     <!-- Desktop App Download Banner (Web Version Only) -->
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and not is_desktop_app %}
     <div id="web-download-banner" class="no-print bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 border-b border-white/20 px-4 py-2 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xl backdrop-blur-md sticky top-0 z-[60]">
         <div class="max-w-7xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
             <div class="flex items-center gap-2.5">

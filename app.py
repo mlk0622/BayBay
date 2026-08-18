@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.9.3"
+VERSION = "3.9.4"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -72,8 +72,11 @@ def add_header(response):
     return response
 
 @app.context_processor
-def inject_version():
-    return dict(app_version=VERSION)
+def inject_globals():
+    ua = request.headers.get('User-Agent', '') if has_request_context() else ''
+    hdr = request.headers.get('X-BayBay-Desktop', '') if has_request_context() else ''
+    is_desktop_app = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1')
+    return dict(app_version=VERSION, is_desktop_app=is_desktop_app)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'baybay-cloud-secure-key-2026')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{DATABASE_PATH}')

@@ -457,10 +457,10 @@ select optgroup {
 }
 
 .action-btn:hover {
-    transform: translateY(-2px) scale(1.06);
-    background: rgba(255, 255, 255, 0.16) !important;
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.18) !important;
     border-color: rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .action-btn.view { color: #60a5fa !important; background: rgba(59, 130, 246, 0.12) !important; border: 1px solid rgba(59, 130, 246, 0.25) !important; }
@@ -931,7 +931,7 @@ html[data-theme="light"] .ios-button:hover,
 html[data-theme="light"] button[type="submit"]:hover:not(.bg-red-600):not(.bg-green-600),
 html[data-theme="light"] .bg-primary:hover:not(.app-nav .bg-primary):not(.nav-pill-container *),
 html[data-theme="light"] .bg-blue-600:hover {
-    transform: translateY(-2px) scale(1.025) !important;
+    transform: none !important;
     filter: brightness(1.15);
     box-shadow: 
         inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
@@ -941,7 +941,7 @@ html[data-theme="light"] .bg-blue-600:hover {
 
 html[data-theme="light"] .ios-button-success:hover,
 html[data-theme="light"] .bg-green-600:hover {
-    transform: translateY(-2px) scale(1.025) !important;
+    transform: none !important;
     filter: brightness(1.15);
     box-shadow: 
         inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
@@ -951,7 +951,7 @@ html[data-theme="light"] .bg-green-600:hover {
 
 html[data-theme="light"] .ios-button-danger:hover,
 html[data-theme="light"] .bg-red-600:hover {
-    transform: translateY(-2px) scale(1.025) !important;
+    transform: none !important;
     filter: brightness(1.15);
     box-shadow: 
         inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
@@ -1345,7 +1345,7 @@ button.rounded-full[onclick*="Modal"]:hover {
     background: rgba(255, 255, 255, 0.25) !important;
     border-color: rgba(255, 255, 255, 0.4) !important;
     color: #ffffff !important;
-    transform: scale(1.05);
+    transform: none !important;
 }
 
 .modal-close-btn svg,
