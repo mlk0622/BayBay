@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malik B. | Développeur Full-Stack & Logiciel — mb-site.com</title>
+    <meta name="description" content="Portfolio de Malik B., étudiant en 2ème année à l'EFREI Paris et développeur full-stack. Découvrez mes projets, mon expertise logicielle et mes réalisations.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                        },
+                        darkbg: '#060913',
+                        darkcard: '#0d1322',
+                        darkcardhover: '#131b30',
+                        darkborder: '#1e293b',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #060913;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background-color: #7c3aed;
+            color: #ffffff;
+        }
+
+        /* Subtle animated grid pattern like supercraft.tech */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Interactive Spotlight glow */
+        .spotlight-cursor {
+            pointer-events: none;
+            position: fixed;
+            width: 650px;
+            height: 650px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, rgba(6, 182, 212, 0.04) 45%, transparent 70%);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Supercraft-like Glass Cards */
+        .super-card {
+            background: linear-gradient(135deg, rgba(13, 19, 34, 0.85) 0%, rgba(9, 13, 24, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .super-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .super-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 25px 50px -10px rgba(124, 58, 237, 0.25);
+        }
+
+        .super-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Gradient typography */
+        .gradient-text-hero {
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, #a78bfa 70%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-text-purple {
+            background: linear-gradient(135deg, #c084fc 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Scroll reveal animations */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #060913;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen bg-grid-pattern">
+
+    <!-- Interactive Cursor Glow (Suivi de souris) -->
+    <div id="spotlight" class="spotlight-cursor hidden md:block"></div>
+
+    <!-- Background Orbs -->
+    <div class="fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+    <div class="fixed top-[40%] -left-[200px] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+    <div class="fixed bottom-[-100px] -right-[150px] w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="sticky top-0 z-50 px-4 sm:px-8 py-4 backdrop-blur-xl bg-[#060913]/80 border-b border-white/5">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <!-- Brand -->
+            <a href="#hero" class="flex items-center gap-3 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-purple-600/30 group-hover:scale-105 transition-transform">
+                    MB
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-base tracking-tight text-white group-hover:text-purple-400 transition-colors">Malik B.</span>
+                    <span class="text-[11px] text-slate-400 font-mono">mb-site.com</span>
+                </div>
+            </a>
+
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="#about" class="hover:text-white transition-colors">À propos</a>
+                <a href="#skills" class="hover:text-white transition-colors">Compétences</a>
+                <a href="#projects" class="hover:text-white transition-colors">Projets</a>
+                <a href="#experience" class="hover:text-white transition-colors">Parcours</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+            </nav>
+
+            <!-- Status & Action -->
+            <div class="flex items-center gap-3">
+                <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Disponible</span>
+                </div>
+                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center gap-2 transition-all">
+                    <i class="fab fa-github text-sm"></i>
+                    <span class="hidden sm:inline">GitHub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= HERO SECTION ================= -->
+    <section id="hero" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-20 text-center relative z-10">
+        
+        <!-- Status Pill -->
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-mono mb-8 reveal-on-scroll">
+            <span class="text-purple-400 font-bold">~/portfolio</span>
+            <span class="text-slate-500">•</span>
+            <span>Étudiant en 2ème année @ EFREI Paris</span>
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-display max-w-5xl mx-auto leading-[1.1] mb-6 reveal-on-scroll">
+            Je conçois des applications <span class="gradient-text-hero">modernes, rapides</span> et utiles.
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 reveal-on-scroll">
+            Développeur passionné par l'architecture logicielle, les applications web full-stack, le développement desktop et l'intégration de l'IA pour créer des solutions robustes.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16 reveal-on-scroll">
+            <a href="#projects" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-xl shadow-purple-600/25 hover:shadow-purple-600/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-folder-open text-xs"></i>
+                <span>Explorer mes projets</span>
+            </a>
+            <a href="https://baybay.mb-site.com" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-external-link-alt text-xs text-purple-400"></i>
+                <span>Découvrir BayBay</span>
+            </a>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-white/5 reveal-on-scroll">
+            <div class="p-4 rounded-2xl super-card text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-white font-display">EFREI</div>
+                <div class="text-xs text-slate-400 mt-1">Paris • 2ème année</div>
+            </div>
+            <div class="p-4 rounded-2xl super-card text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-purple-400 font-display">Full-Stack</div>
+                <div class="text-xs text-slate-400 mt-1">Web & Desktop</div>
+            </div>
+            <div class="p-4 rounded-2xl super-card text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-display">100%</div>
+                <div class="text-xs text-slate-400 mt-1">Projets Déployés</div>
+            </div>
+            <div class="p-4 rounded-2xl super-card text-center">
+                <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-display">256-bit</div>
+                <div class="text-xs text-slate-400 mt-1">Sécurité & Chiffrement</div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ================= ABOUT ME ================= -->
+    <section id="about" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+        
+        <div class="text-center mb-16 reveal-on-scroll">
+            <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                // Présentation
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
+                Qui suis-je ?
+            </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            <!-- Bio text (7 cols) -->
+            <div class="lg:col-span-7 space-y-6 text-slate-300 text-base leading-relaxed reveal-on-scroll">
+                <p class="text-lg text-white font-medium">
+                    Bonjour ! Je m'appelle <span class="text-purple-400 font-bold">Malik B.</span>, étudiant ingénieur en 2ème année à l'EFREI Paris et développeur passionné.
+                </p>
+                <p>
+                    J'aime transformer des problématiques concrètes du quotidien en logiciels élégants, performants et intuitifs. C'est ainsi que j'ai développé <strong class="text-white">BayBay</strong> de A à Z lorsque mon oncle cherchait une solution complète et moderne pour gérer son parc immobilier et ses SCI.
+                </p>
+                <p>
+                    Toujours curieux et rigoureux, je m'appuie sur les standards de l'ingénierie logicielle ainsi que sur les outils modernes d'Intelligence Artificielle pour concevoir des produits à forte valeur ajoutée.
+                </p>
+
+                <div class="pt-4 flex flex-wrap gap-3">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">📍 Paris, France</span>
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">🎓 EFREI Paris Promo 2029</span>
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">⚡ Python / JS / Electron</span>
+                </div>
+            </div>
+
+            <!-- Terminal Mockup (5 cols) -->
+            <div class="lg:col-span-5 reveal-on-scroll">
+                <div class="super-card p-5 rounded-2xl font-mono text-xs text-slate-300 border border-white/10 shadow-2xl">
+                    <!-- Window Controls -->
+                    <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                        </div>
+                        <span class="text-[11px] text-slate-500">malik@macbook-pro ~</span>
+                    </div>
+                    <!-- Terminal Content -->
+                    <div class="space-y-2 text-slate-300">
+                        <p><span class="text-purple-400">$</span> whoami</p>
+                        <p class="text-slate-400">Malik B. — Software Engineer Student</p>
+                        <p><span class="text-purple-400">$</span> cat skills.json</p>
+                        <p class="text-emerald-400">{</p>
+                        <p class="pl-4 text-slate-400">"languages": ["Python", "JavaScript", "TypeScript", "SQL"],</p>
+                        <p class="pl-4 text-slate-400">"frameworks": ["Flask", "Electron", "TailwindCSS"],</p>
+                        <p class="pl-4 text-slate-400">"focus": ["Full-Stack", "Architecture", "AI Integration"],</p>
+                        <p class="pl-4 text-slate-400">"status": "building awesome software"</p>
+                        <p class="text-emerald-400">}</p>
+                        <p class="pt-2"><span class="text-purple-400">$</span> <span class="animate-pulse">▊</span></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= SKILLS SECTION ================= -->
+    <section id="skills" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-white/5">
+        
+        <div class="text-center mb-16 reveal-on-scroll">
+            <span class="text-cyan-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">
+                // Stack Technique
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
+                Mes Compétences
+            </h2>
+            <p class="text-slate-400 text-sm max-w-md mx-auto mt-3">
+                Un ensemble d'outils modernes pour concevoir des architectures robustes et complètes.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- 1. Backend & Logiciel -->
+            <div class="super-card p-7 rounded-3xl space-y-5 reveal-on-scroll">
+                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl border border-purple-500/20">
+                    <i class="fas fa-server"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white font-display">Backend & Données</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Conception de serveurs rapides, API RESTful sécurisées et gestion optimale des bases de données relationnelles.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Python</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Flask</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">SQLAlchemy</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">MySQL / MariaDB</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">SQLite</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Bcrypt</span>
+                </div>
+            </div>
+
+            <!-- 2. Frontend & Desktop -->
+            <div class="super-card p-7 rounded-3xl space-y-5 reveal-on-scroll">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl border border-cyan-500/20">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white font-display">Frontend & Desktop</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Interfaces réactives, applications natives bureau Windows avec packaging NSIS et expériences utilisateur soignées.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Electron.js</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">JavaScript (ES6+)</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Tailwind CSS</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">HTML5 / CSS3</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">SPA Router</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">PyInstaller</span>
+                </div>
+            </div>
+
+            <!-- 3. DevOps & Cloud -->
+            <div class="super-card p-7 rounded-3xl space-y-5 reveal-on-scroll">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white font-display">DevOps & Déploiement</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Gestion de serveurs dédiés Linux (Debian), configuration Nginx, tunnels Cloudflare et scripts de CI/CD automatisés.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Linux Debian</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Nginx</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Gunicorn</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Git / GitHub Actions</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">Cloudflare SSL</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 text-slate-300 text-xs font-mono">SSH / Paramiko</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= PROJECTS SECTION ================= -->
+    <section id="projects" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-white/5">
+        
+        <div class="text-center mb-16 reveal-on-scroll">
+            <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                // Réalisations
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
+                Projets Phares
+            </h2>
+            <p class="text-slate-400 text-sm max-w-md mx-auto mt-3">
+                Des projets complets, développés de la conception jusqu'à la mise en production.
+            </p>
+        </div>
+
+        <!-- Featured Project 1: BayBay -->
+        <div class="super-card p-8 sm:p-12 rounded-3xl border border-white/10 mb-12 reveal-on-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-mono font-bold">Projet Majeur • v4.0</span>
+                        <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold">En production</span>
+                    </div>
+
+                    <h3 class="text-3xl sm:text-4xl font-extrabold text-white font-display">
+                        BayBay — Gestion Locative Intelligente
+                    </h3>
+
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        Plateforme logicielle complète destinée aux propriétaires bailleurs et SCI. Disponible en version Web (SaaS) et application Bureau Windows rapide. Automatise les quittances de loyer certifiées ALUR, les avis d'échéance, les états des lieux et le suivi de rentabilité.
+                    </p>
+
+                    <!-- Tech list -->
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Python (Flask)</span>
+                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Electron.js</span>
+                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">MySQL / SQLite</span>
+                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">ReportLab / PDF</span>
+                        <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Chiffrement AES-256</span>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="pt-4 flex flex-wrap items-center gap-4">
+                        <a href="https://baybay.mb-site.com" target="_blank" class="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all">
+                            <span>Visiter le site</span>
+                            <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                        <a href="https://github.com/mlk0622/BayBay" target="_blank" class="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center gap-2 transition-all">
+                            <i class="fab fa-github"></i>
+                            <span>Voir le repo GitHub</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Visual Card Mockup -->
+                <div class="lg:col-span-5">
+                    <div class="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                                <span class="text-xs font-bold text-white">BayBay Desktop & Web</span>
+                            </div>
+                            <span class="text-[10px] text-emerald-400 font-mono">v4.0.0 Release</span>
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300">
+                            <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
+                                <span>📄 Quittances certifiées ALUR</span>
+                                <span class="text-emerald-400 font-bold">1-Clic</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
+                                <span>🔐 Chiffrement & Sécurité</span>
+                                <span class="text-purple-400 font-bold">AES-256</span>
+                            </div>
+                            <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
+                                <span>🏢 Gestion Multi-SCI</span>
+                                <span class="text-cyan-400 font-bold">Illimité</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- More Projects Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Project 2 : Auto Deploy & CI Pipeline -->
+            <div class="super-card p-8 rounded-3xl space-y-4 reveal-on-scroll">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-mono font-bold">DevOps / Tooling</span>
+                    <a href="https://github.com/mlk0622" target="_blank" class="text-slate-400 hover:text-white transition-colors"><i class="fab fa-github text-base"></i></a>
+                </div>
+                <h3 class="text-2xl font-bold text-white font-display">Auto-Deployment & Server Orchestrator</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Script d'automatisation de déploiement distant via Paramiko SSH, gestion de services systemd, configuration reverse proxy Nginx et synchronisation continue GitHub.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Python</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Paramiko SSH</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Systemd</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Nginx</span>
+                </div>
+            </div>
+
+            <!-- Project 3 : Portfolio & Personal Brand mb-site -->
+            <div class="super-card p-8 rounded-3xl space-y-4 reveal-on-scroll">
+                <div class="flex items-center justify-between">
+                    <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-mono font-bold">Web & Design</span>
+                    <a href="https://mb-site.com" class="text-slate-400 hover:text-white transition-colors"><i class="fas fa-globe text-base"></i></a>
+                </div>
+                <h3 class="text-2xl font-bold text-white font-display">mb-site.com — Personal Showcase</h3>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Portfolio interactif haute performance inspiré des meilleurs standards UI tech (Supercraft / Spruce CSS), animations fluides au scroll, spotlight curseur et responsive design.
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">HTML5 / Tailwind</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Vanilla JS</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Debian Apache</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= EXPERIENCE / TIMELINE ================= -->
+    <section id="experience" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-white/5">
+        
+        <div class="text-center mb-16 reveal-on-scroll">
+            <span class="text-emerald-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                // Parcours
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
+                Parcours & Formation
+            </h2>
+        </div>
+
+        <div class="space-y-6">
+            
+            <!-- Step 1 -->
+            <div class="super-card p-6 sm:p-8 rounded-3xl reveal-on-scroll flex flex-col sm:flex-row gap-6 items-start">
+                <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl border border-purple-500/20 shrink-0">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <h3 class="text-xl font-bold text-white font-display">EFREI Paris — École d'Ingénieurs du Numérique</h3>
+                        <span class="text-xs font-mono text-purple-400 font-bold">2024 — Présent</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Cycle préparatoire intégré et spécialisation en ingénierie logicielle, algorithmique avancée, bases de données relationnelles et architectures réseaux.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="super-card p-6 sm:p-8 rounded-3xl reveal-on-scroll flex flex-col sm:flex-row gap-6 items-start">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xl border border-cyan-500/20 shrink-0">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <h3 class="text-xl font-bold text-white font-display">Création & Déploiement de BayBay</h3>
+                        <span class="text-xs font-mono text-cyan-400 font-bold">2025 — 2026</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">
+                        Développement autonome d'une suite logicielle complète pour bailleurs, gestion des serveurs Linux de production, packaging NSIS et mises à jour continues.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= CONTACT ================= -->
+    <section id="contact" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center relative z-10 border-t border-white/5">
+        
+        <div class="super-card p-8 sm:p-14 rounded-3xl space-y-6 reveal-on-scroll">
+            <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
+                // Contact
+            </span>
+            <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display">
+                Un projet ou une question ?
+            </h2>
+            <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                N'hésitez pas à me contacter directement par e-mail ou à consulter mon profil GitHub.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <a href="mailto:bouaissimalik@gmail.com" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-xl shadow-purple-600/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-envelope"></i>
+                    <span>bouaissimalik@gmail.com</span>
+                </a>
+                <a href="https://github.com/mlk0622" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                    <i class="fab fa-github"></i>
+                    <span>github.com/mlk0622</span>
+                </a>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="border-t border-white/5 py-8 px-4 sm:px-8 bg-[#060913] text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+                    MB
+                </div>
+                <span class="font-bold text-slate-300">Malik B.</span>
+                <span>— © 2026 mb-site.com. Tous droits réservés.</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://baybay.mb-site.com" class="hover:text-white transition-colors">BayBay</a>
+                <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                <a href="mailto:bouaissimalik@gmail.com" class="hover:text-white transition-colors">Email</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= JAVASCRIPT ANIMATIONS ================= -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Spotlight Cursor Follower
+            const spotlight = document.getElementById('spotlight');
+            if (spotlight) {
+                window.addEventListener('mousemove', (e) => {
+                    spotlight.style.left = `${e.clientX}px`;
+                    spotlight.style.top = `${e.clientY}px`;
+                });
+            }
+
+            // 2. Scroll Reveal Observer
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            revealElements.forEach((el) => observer.observe(el));
+        });
+    </script>
+
+</body>
+</html>
