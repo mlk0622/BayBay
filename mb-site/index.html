@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="fr" data-theme="dark" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malik B. | Développeur Full-Stack & Logiciel — mb-site.com</title>
-    <meta name="description" content="Portfolio de Malik B., étudiant en 2ème année à l'EFREI Paris et développeur full-stack. Découvrez mes projets, dont BayBay et Poudelard.">
+    <title>Malik B. — mb-site.com</title>
+    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris et passionné par le développement de projets informatiques.">
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,38 +14,19 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f5f3ff',
-                            100: '#ede9fe',
-                            400: '#a78bfa',
-                            500: '#8b5cf6',
-                            600: '#7c3aed',
-                            700: '#6d28d9',
-                        },
-                        cyan: {
-                            400: '#22d3ee',
-                            500: '#06b6d4',
-                        },
-                        amber: {
-                            400: '#fbbf24',
-                            500: '#f59e0b',
-                        },
-                        darkbg: '#060913',
-                        darkcard: '#0d1322',
-                        darkcardhover: '#131b30',
-                        darkborder: '#1e293b',
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb',
+                        darkbg: '#0b131a',
                     },
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        display: ['Space Grotesk', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
 
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
@@ -59,141 +35,92 @@
         }
 
         body {
-            background-color: #060913;
-            color: #f1f5f9;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
+            color: #FFFFFF;
             overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
         }
 
-        ::selection {
-            background-color: #7c3aed;
-            color: #ffffff;
+        .liquid-glass {
+            background: rgba(24, 24, 27, 0.65);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Subtle animated grid pattern */
-        .bg-grid-pattern {
-            background-size: 40px 40px;
-            background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        }
-
-        /* Interactive Spotlight glow */
-        .spotlight-cursor {
-            pointer-events: none;
-            position: fixed;
-            width: 650px;
-            height: 650px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, rgba(6, 182, 212, 0.04) 45%, transparent 70%);
-            transform: translate(-50%, -50%);
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Supercraft-like Glass Cards */
-        .super-card {
-            background: linear-gradient(135deg, rgba(13, 19, 34, 0.85) 0%, rgba(9, 13, 24, 0.95) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .liquid-glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .super-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .super-card:hover {
+        .liquid-glass-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 25px 50px -10px rgba(124, 58, 237, 0.25);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
         }
 
-        .super-card:hover::before {
-            opacity: 1;
-        }
-
-        /* Gradient typography */
-        .gradient-text-hero {
-            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 40%, #a78bfa 70%, #38bdf8 100%);
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #38bdf8 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Scroll reveal animations */
-        .reveal-on-scroll {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        .glow-blob {
+            position: absolute;
+            border-radius: 9999px;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .reveal-on-scroll.is-visible {
-            opacity: 1;
-            transform: translateY(0);
+        .fade-in-element {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #060913;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
-<body class="relative min-h-screen bg-grid-pattern flex flex-col justify-between">
+<body class="min-h-screen text-slate-100 relative selection:bg-blue-500 selection:text-white flex flex-col justify-between">
 
-    <!-- Interactive Cursor Glow -->
-    <div id="spotlight" class="spotlight-cursor hidden md:block"></div>
+    <!-- Orbes lumineuses décoratives -->
+    <div class="glow-blob w-[550px] h-[550px] bg-blue-600/20 top-[-100px] left-1/2 -translate-x-1/2"></div>
+    <div class="glow-blob w-[450px] h-[450px] bg-purple-600/15 top-[400px] left-[5%]"></div>
+    <div class="glow-blob w-[450px] h-[450px] bg-cyan-500/15 top-[800px] right-[5%]"></div>
 
-    <!-- Background Orbs -->
-    <div class="fixed top-[-150px] left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
-    <div class="fixed top-[40%] -left-[200px] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
-    <div class="fixed bottom-[-100px] -right-[150px] w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
-
-    <!-- ================= NAVBAR ================= -->
-    <header class="sticky top-0 z-50 px-4 sm:px-8 py-4 backdrop-blur-xl bg-[#060913]/80 border-b border-white/5">
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <!-- Brand -->
-            <a href="#hero" class="flex items-center gap-3 group">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center font-black text-white text-base shadow-lg shadow-purple-600/30 group-hover:scale-105 transition-transform">
+            <a href="{{ url_for('index') if request is defined else '/' }}" class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-black text-white text-sm shadow-md shadow-blue-500/30">
                     MB
                 </div>
-                <div class="flex flex-col">
-                    <span class="font-bold text-base tracking-tight text-white group-hover:text-purple-400 transition-colors">Malik B.</span>
-                    <span class="text-[11px] text-slate-400 font-mono">mb-site.com</span>
-                </div>
+                <span class="text-xl font-bold text-white tracking-tight">Malik B.</span>
             </a>
 
-            <!-- Nav Links (À propos, Projets, Contact) -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+            <!-- Nav Links : Simples écritures -->
+            <nav class="flex items-center gap-8 text-sm font-medium text-slate-300">
                 <a href="#about" class="hover:text-white transition-colors">À propos</a>
                 <a href="#projects" class="hover:text-white transition-colors">Projets</a>
-                <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+                <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
             </nav>
 
             <!-- Action GitHub Button -->
             <div class="flex items-center gap-3">
-                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center gap-2 transition-all">
+                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 transition-all text-xs font-semibold">
                     <i class="fab fa-github text-sm"></i>
                     <span>GitHub</span>
                 </a>
@@ -205,117 +132,61 @@
     <main class="flex-1">
 
         <!-- ================= HERO SECTION ================= -->
-        <section id="hero" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-20 text-center relative z-10">
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-16 text-center relative z-10 fade-in-element">
             
-            <!-- Status Pill -->
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-mono mb-8 reveal-on-scroll">
-                <span class="text-purple-400 font-bold">~/portfolio</span>
-                <span class="text-slate-500">•</span>
-                <span>Étudiant en 2ème année @ EFREI Paris</span>
-            </div>
+            <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                Étudiant @ EFREI Paris
+            </span>
 
-            <!-- Main Title -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight font-display max-w-5xl mx-auto leading-[1.1] mb-6 reveal-on-scroll">
-                Je conçois des applications <span class="gradient-text-hero">modernes, rapides</span> et utiles.
+            <h1 class="text-4xl sm:text-6xl font-black text-white mt-6 mb-6 tracking-tight leading-tight">
+                Passionné par la création de <span class="gradient-text">projets et logiciels utiles</span>.
             </h1>
 
-            <!-- Subtitle -->
-            <p class="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10 reveal-on-scroll">
-                Développeur passionné par l'architecture logicielle, les applications web full-stack, le développement desktop et l'intégration de l'IA pour créer des solutions robustes.
+            <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed mb-8">
+                Étudiant en 2ème année à l'EFREI Paris, j'aime imaginer, coder et concrétiser des applications modernes en utilisant les meilleures technologies et un peu d'IA.
             </p>
 
-            <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16 reveal-on-scroll">
-                <a href="#projects" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-xl shadow-purple-600/25 hover:shadow-purple-600/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+            <!-- Bouton d'action unique vers les projets -->
+            <div class="flex items-center justify-center">
+                <a href="#projects" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 hover:-translate-y-0.5 transition-all">
                     <i class="fas fa-folder-open text-xs"></i>
-                    <span>Explorer mes projets</span>
+                    <span>Voir mes réalisations</span>
                 </a>
-                <a href="https://baybay.mb-site.com" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 hover:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                    <i class="fas fa-external-link-alt text-xs text-purple-400"></i>
-                    <span>Découvrir BayBay</span>
-                </a>
-            </div>
-
-            <!-- Stats Bar -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-8 border-t border-white/5 reveal-on-scroll">
-                <div class="p-4 rounded-2xl super-card text-center">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-white font-display">EFREI</div>
-                    <div class="text-xs text-slate-400 mt-1">Paris • 2ème année</div>
-                </div>
-                <div class="p-4 rounded-2xl super-card text-center">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-purple-400 font-display">Full-Stack</div>
-                    <div class="text-xs text-slate-400 mt-1">Web & Desktop</div>
-                </div>
-                <div class="p-4 rounded-2xl super-card text-center">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-display">100%</div>
-                    <div class="text-xs text-slate-400 mt-1">Projets Déployés</div>
-                </div>
-                <div class="p-4 rounded-2xl super-card text-center">
-                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-display">256-bit</div>
-                    <div class="text-xs text-slate-400 mt-1">Sécurité & Chiffrement</div>
-                </div>
             </div>
 
         </section>
 
-        <!-- ================= ABOUT ME ================= -->
-        <section id="about" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-white/5">
+        <!-- ================= ABOUT SECTION ================= -->
+        <section id="about" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
             
-            <div class="text-center mb-16 reveal-on-scroll">
-                <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
-                    // Présentation
-                </span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
-                    Qui suis-je ?
-                </h2>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-6">
                 
-                <!-- Bio text (7 cols) -->
-                <div class="lg:col-span-7 space-y-6 text-slate-300 text-base leading-relaxed reveal-on-scroll">
-                    <p class="text-lg text-white font-medium">
-                        Bonjour ! Je m'appelle <span class="text-purple-400 font-bold">Malik B.</span>, étudiant ingénieur en 2ème année à l'EFREI Paris et développeur passionné.
-                    </p>
+                <!-- Profil & Titre -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 border-b border-white/10">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-2xl text-white font-black shadow-lg shadow-blue-500/30 shrink-0">
+                        MB
+                    </div>
+                    <div class="text-center sm:text-left space-y-1">
+                        <h2 class="text-2xl font-bold text-white">Malik B.</h2>
+                        <p class="text-blue-400 text-sm font-medium">Étudiant en 2ème année à l'EFREI Paris</p>
+                    </div>
+                </div>
+
+                <!-- Texte général et authentique -->
+                <div class="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed">
                     <p>
                         J'aime transformer des problématiques concrètes en logiciels élégants, performants et intuitifs. C'est ainsi que j'ai développé <strong class="text-white">BayBay</strong> de A à Z lorsque mon oncle cherchait une solution complète et moderne pour gérer son parc immobilier et ses SCI.
                     </p>
                     <p>
-                        Toujours curieux et rigoureux, je m'appuie sur les standards de l'ingénierie logicielle ainsi que sur les outils modernes d'Intelligence Artificielle pour concevoir des produits à forte valeur ajoutée.
+                        Toujours curieux et motivé par l'apprentissage, je m'appuie sur les bases de l'informatique ainsi que sur les outils modernes d'Intelligence Artificielle pour concevoir et accélérer le développement de projets bien pensés.
                     </p>
-
-                    <div class="pt-4 flex flex-wrap gap-3">
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">📍 Paris, France</span>
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">🎓 EFREI Paris Promo 2029</span>
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-slate-300">⚡ Python / JS / Electron</span>
-                    </div>
                 </div>
 
-                <!-- Terminal Mockup (5 cols) -->
-                <div class="lg:col-span-5 reveal-on-scroll">
-                    <div class="super-card p-5 rounded-2xl font-mono text-xs text-slate-300 border border-white/10 shadow-2xl">
-                        <!-- Window Controls -->
-                        <div class="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
-                            <div class="flex items-center gap-2">
-                                <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-                                <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-                                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-                            </div>
-                            <span class="text-[11px] text-slate-500">malik@macbook-pro ~</span>
-                        </div>
-                        <!-- Terminal Content -->
-                        <div class="space-y-2 text-slate-300">
-                            <p><span class="text-purple-400">$</span> whoami</p>
-                            <p class="text-slate-400">Malik B. — Software Engineer Student @ EFREI Paris</p>
-                            <p><span class="text-purple-400">$</span> cat projects.json</p>
-                            <p class="text-emerald-400">{</p>
-                            <p class="pl-4 text-slate-400">"active_projects": ["BayBay", "Poudelard"],</p>
-                            <p class="pl-4 text-slate-400">"focus": ["Full-Stack", "Architecture", "AI Integration"],</p>
-                            <p class="pl-4 text-slate-400">"status": "building awesome software"</p>
-                            <p class="text-emerald-400">}</p>
-                            <p class="pt-2"><span class="text-purple-400">$</span> <span class="animate-pulse">▊</span></p>
-                        </div>
-                    </div>
+                <!-- Tags badges -->
+                <div class="pt-2 flex flex-wrap gap-2.5">
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">📍 Paris</span>
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">🎓 EFREI Paris</span>
+                    <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">💡 Projets & Logiciels</span>
                 </div>
 
             </div>
@@ -323,180 +194,87 @@
         </section>
 
         <!-- ================= PROJECTS SECTION ================= -->
-        <section id="projects" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 border-t border-white/5">
+        <section id="projects" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
             
-            <div class="text-center mb-16 reveal-on-scroll">
-                <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
-                    // Réalisations
+            <div class="text-center mb-10">
+                <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                    Réalisations
                 </span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display mt-4">
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-4">
                     Mes Projets
                 </h2>
-                <p class="text-slate-400 text-sm max-w-md mx-auto mt-3">
-                    Découvrez mes réalisations logicielles, développées avec rigueur et passion.
-                </p>
             </div>
 
-            <!-- Projet 1 : BayBay (Majeur) -->
-            <div class="super-card p-8 sm:p-12 rounded-3xl border border-white/10 mb-8 reveal-on-scroll">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    
-                    <div class="lg:col-span-7 space-y-6">
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-mono font-bold">Projet Phare • v4.0</span>
-                            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold">En production</span>
-                        </div>
-
-                        <h3 class="text-3xl sm:text-4xl font-extrabold text-white font-display">
-                            BayBay — Gestion Locative Intelligente
-                        </h3>
-
-                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                            Plateforme logicielle complète destinée aux propriétaires bailleurs et SCI. Disponible en version Web (SaaS) et application Bureau Windows rapide. Automatise les quittances de loyer certifiées ALUR, les avis d'échéance, les états des lieux et le suivi de rentabilité avec chiffrement AES-256 bits.
-                        </p>
-
-                        <!-- Tech list -->
-                        <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Python (Flask)</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Electron.js</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">MySQL / SQLite</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">ReportLab / PDF ALUR</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-purple-300">Chiffrement AES-256</span>
-                        </div>
-
-                        <!-- Links -->
-                        <div class="pt-4 flex flex-wrap items-center gap-4">
-                            <a href="https://baybay.mb-site.com" target="_blank" class="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all">
-                                <span>Visiter le site BayBay</span>
-                                <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
-                            </a>
-                            <a href="https://github.com/mlk0622/BayBay" target="_blank" class="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-semibold flex items-center gap-2 transition-all">
-                                <i class="fab fa-github"></i>
-                                <span>Code source GitHub</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Visual Card Mockup -->
-                    <div class="lg:col-span-5">
-                        <div class="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
-                            <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full bg-purple-500"></span>
-                                    <span class="text-xs font-bold text-white">BayBay Desktop & Web</span>
-                                </div>
-                                <span class="text-[10px] text-emerald-400 font-mono">v4.0.0 Release</span>
-                            </div>
-                            <div class="space-y-2 text-xs text-slate-300">
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>📄 Quittances certifiées ALUR</span>
-                                    <span class="text-emerald-400 font-bold">1-Clic</span>
-                                </div>
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>🔐 Chiffrement & Sécurité</span>
-                                    <span class="text-purple-400 font-bold">AES-256</span>
-                                </div>
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>🏢 Gestion Multi-SCI</span>
-                                    <span class="text-cyan-400 font-bold">Illimité</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+            <!-- Projet 1 : BayBay -->
+            <div class="liquid-glass-card p-8 sm:p-10 rounded-3xl border border-white/20 shadow-2xl space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold">
+                        Projet Phare • Version 4.0
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">
+                        En production
+                    </span>
                 </div>
-            </div>
 
-            <!-- Projet 2 : Poudelard (EFREI Paris) -->
-            <div class="super-card p-8 sm:p-12 rounded-3xl border border-white/10 reveal-on-scroll">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                    
-                    <div class="lg:col-span-7 space-y-6">
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-mono font-bold">Projet EFREI Paris</span>
-                            <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-mono font-bold">Open Source</span>
-                        </div>
-
-                        <h3 class="text-3xl sm:text-4xl font-extrabold text-white font-display">
-                            Poudelard — Simulation & Logique Métier
-                        </h3>
-
-                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                            Projet académique d'ingénierie logicielle réalisé à l'EFREI Paris en équipe (Belfar, Bouaissi). Développement d'un système complet de simulation interactif inspiré de l'univers de Poudlard, mettant en œuvre des structures de données avancées, la programmation orientée objet et des algorithmes de gestion d'événements.
-                        </p>
-
-                        <!-- Tech list -->
-                        <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-amber-300">Programmation Orientée Objet</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-amber-300">Algorithmique Avancée</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-amber-300">Gestion de Données</span>
-                            <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-amber-300">Git & Travail d'équipe</span>
-                        </div>
-
-                        <!-- Links -->
-                        <div class="pt-4 flex flex-wrap items-center gap-4">
-                            <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-amber-600/30 transition-all">
-                                <i class="fab fa-github"></i>
-                                <span>Voir le projet sur GitHub</span>
-                                <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Visual Card Mockup Poudelard -->
-                    <div class="lg:col-span-5">
-                        <div class="p-6 rounded-2xl bg-black/40 border border-white/10 space-y-4">
-                            <div class="flex items-center justify-between pb-3 border-b border-white/10">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                                    <span class="text-xs font-bold text-white">Poudelard Project</span>
-                                </div>
-                                <span class="text-[10px] text-amber-400 font-mono">EFREI Paris SC1</span>
-                            </div>
-                            <div class="space-y-2 text-xs text-slate-300">
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>🏰 Simulation & Maisons</span>
-                                    <span class="text-amber-400 font-bold">POO</span>
-                                </div>
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>⚡ Gestion des Événements</span>
-                                    <span class="text-purple-400 font-bold">Algorithmes</span>
-                                </div>
-                                <div class="p-3 rounded-xl bg-white/5 flex items-center justify-between">
-                                    <span>👥 Équipe Belfar & Bouaissi</span>
-                                    <span class="text-cyan-400 font-bold">EFREI</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+                        BayBay — Gestion Locative Complète
+                    </h3>
+                    <p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
+                        Logiciel et plateforme web de gestion immobilière pour propriétaires bailleurs et SCI. Génération instantanée de quittances certifiées ALUR, calculs automatisés, suivi des encaissements et application bureau Windows rapide.
+                    </p>
                 </div>
-            </div>
 
-        </section>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Python Flask</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Electron.js</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">MySQL / SQLite</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Chiffrement AES-256</span>
+                </div>
 
-        <!-- ================= CONTACT ================= -->
-        <section id="contact" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center relative z-10 border-t border-white/5">
-            
-            <div class="super-card p-8 sm:p-14 rounded-3xl space-y-6 reveal-on-scroll">
-                <span class="text-purple-400 text-xs font-mono tracking-wider uppercase font-bold px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20">
-                    // Contact
-                </span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white font-display">
-                    Un projet ou une question ?
-                </h2>
-                <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                    N'hésitez pas à me contacter directement par e-mail ou à consulter mon profil GitHub.
-                </p>
-
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                    <a href="mailto:bouaissimalik@gmail.com" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-xl shadow-purple-600/30 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-envelope"></i>
-                        <span>bouaissimalik@gmail.com</span>
+                <div class="pt-2 flex flex-wrap items-center gap-3">
+                    <a href="https://baybay.mb-site.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/30 transition-all">
+                        <span>Visiter BayBay</span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
-                    <a href="https://github.com/mlk0622" target="_blank" class="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                    <a href="https://github.com/mlk0622/BayBay" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-white font-semibold text-xs transition-all">
                         <i class="fab fa-github"></i>
-                        <span>github.com/mlk0622</span>
+                        <span>Code source GitHub</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Projet 2 : Poudelard -->
+            <div class="liquid-glass-card p-8 sm:p-10 rounded-3xl border border-white/20 shadow-2xl space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold">
+                        Projet EFREI Paris
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
+                        Équipe Belfar & Bouaissi
+                    </span>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
+                        Poudelard — Simulation & Logique Métier
+                    </h3>
+                    <p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
+                        Projet académique d'ingénierie logicielle réalisé à l'EFREI Paris en équipe. Système de simulation interactif avec programmation orientée objet, gestion des événements, algorithmes et structures de données avancées.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">Programmation Orientée Objet</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">Algorithmique</span>
+                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">EFREI SC1</span>
+                </div>
+
+                <div class="pt-2 flex flex-wrap items-center gap-3">
+                    <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-600/30 transition-all">
+                        <i class="fab fa-github"></i>
+                        <span>Voir le projet sur GitHub</span>
+                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
                 </div>
             </div>
@@ -505,53 +283,24 @@
 
     </main>
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="border-t border-white/5 py-8 px-4 sm:px-8 bg-[#060913] text-xs text-slate-500">
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 mt-16">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center font-bold text-white text-xs">
+            <div class="flex items-center gap-2.5">
+                <div class="w-5 h-5 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-white text-[10px]">
                     MB
                 </div>
-                <span class="font-bold text-slate-300">Malik B.</span>
+                <span class="font-bold text-white">Malik B.</span>
                 <span>— © 2026 mb-site.com. Tous droits réservés.</span>
             </div>
             <div class="flex items-center gap-4">
                 <a href="https://baybay.mb-site.com" class="hover:text-white transition-colors">BayBay</a>
                 <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="hover:text-white transition-colors">Poudelard</a>
                 <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors">GitHub</a>
-                <a href="mailto:bouaissimalik@gmail.com" class="hover:text-white transition-colors">Email</a>
+                <a href="mailto:bouaissimalik@gmail.com" class="hover:text-white transition-colors">Contact</a>
             </div>
         </div>
     </footer>
-
-    <!-- ================= JAVASCRIPT ANIMATIONS ================= -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Spotlight Cursor Follower
-            const spotlight = document.getElementById('spotlight');
-            if (spotlight) {
-                window.addEventListener('mousemove', (e) => {
-                    spotlight.style.left = `${e.clientX}px`;
-                    spotlight.style.top = `${e.clientY}px`;
-                });
-            }
-
-            // 2. Scroll Reveal Observer
-            const revealElements = document.querySelectorAll('.reveal-on-scroll');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -40px 0px'
-            });
-
-            revealElements.forEach((el) => observer.observe(el));
-        });
-    </script>
 
 </body>
 </html>
