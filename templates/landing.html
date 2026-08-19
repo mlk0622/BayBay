@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark" class="scroll-smooth">
+<html lang="fr" data-theme-mode="dark" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +7,21 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     
+    <!-- Google Fonts: Inter & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: ['class', '[data-theme-mode="dark"]'],
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        'primary-dark': '#2563eb',
-                        darkbg: '#0b131a',
-                    },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+                        display: ['Space Grotesk', 'Inter', 'sans-serif'],
                     }
                 }
             }
@@ -31,154 +32,177 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
+        /* Spruce CSS Theme Variables */
+        :root {
+            --color-primary: hsl(262, 71%, 49%);
+            --color-primary-hover: hsl(262, 71%, 42%);
+            --color-primary-light: hsl(262, 71%, 95%);
+            --color-heading: hsl(205, 100%, 2%);
+            --color-text: hsl(208, 9%, 42%);
+            --color-muted: hsl(208, 7%, 55%);
+            --color-background: #f8fafc;
+            --color-surface: #ffffff;
+            --color-card-bg: #ffffff;
+            --color-border: #e2e8f0;
+            --color-border-hover: #cbd5e1;
+            --color-tag-bg: #f1f5f9;
+            --color-tag-text: #6b21a8;
+            --color-nav-bg: rgba(255, 255, 255, 0.85);
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-card-hover: 0 12px 24px -4px rgba(124, 58, 237, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        :root[data-theme-mode="dark"] {
+            --color-primary: hsl(261, 54%, 70%);
+            --color-primary-hover: hsl(261, 54%, 78%);
+            --color-primary-light: rgba(167, 139, 250, 0.15);
+            --color-heading: #f8fafc;
+            --color-text: #cbd5e1;
+            --color-muted: #94a3b8;
+            --color-background: #090d16;
+            --color-surface: #111827;
+            --color-card-bg: #111827;
+            --color-border: #1e293b;
+            --color-border-hover: #334155;
+            --color-tag-bg: rgba(167, 139, 250, 0.12);
+            --color-tag-text: #c084fc;
+            --color-nav-bg: rgba(9, 13, 22, 0.85);
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-card-hover: 0 12px 28px -4px rgba(167, 139, 250, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
         * {
             box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
+
         body {
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
-            color: #FFFFFF;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
         }
 
-        .liquid-glass {
-            background: rgba(24, 24, 27, 0.65);
-            backdrop-filter: blur(20px) saturate(190%);
-            -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--color-heading);
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            letter-spacing: -0.02em;
         }
 
-        .liquid-glass-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .liquid-glass-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .glow-blob {
-            position: absolute;
-            border-radius: 9999px;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
-            transition: transform 0.2s ease-out;
-        }
-
-        .glow-btn-desktop {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #0284c7 100%);
-            box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.25s ease;
-        }
-
-        .glow-btn-desktop:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 15px 35px -5px rgba(37, 99, 235, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-            filter: brightness(1.1);
-        }
-
-        .glow-btn-web {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        .spruce-navbar {
+            background-color: var(--color-nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            transition: all 0.25s ease;
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .glow-btn-web:hover {
-            transform: translateY(-2px) scale(1.02);
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 15px 35px -5px rgba(255, 255, 255, 0.15);
+        .spruce-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-card);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
-        /* Elements flottants qui tournent avec le scroll */
-        .parallax-floating-key {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-            transition: transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1);
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
+        .spruce-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-border-hover);
+            box-shadow: var(--shadow-card-hover);
         }
 
-        .tranquille-stickman {
-            animation: floatingChilling 4s ease-in-out infinite;
+        .spruce-tag {
+            background-color: var(--color-tag-bg);
+            color: var(--color-tag-text);
+            font-family: 'Inter', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        @keyframes floatingChilling {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(-2deg); }
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #ffffff !important;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px -2px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-surface);
+            color: var(--color-heading) !important;
+            border: 1px solid var(--color-border);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Cookie Notice Style */
+        .cookie-banner {
+            background-color: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 relative selection:bg-blue-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
-    <!-- Glowing background decorative orbs (bougent au scroll) -->
-    <div id="orb-1" class="glow-blob w-[550px] h-[550px] bg-blue-600/20 top-[-100px] left-1/2 -translate-x-1/2"></div>
-    <div id="orb-2" class="glow-blob w-[450px] h-[450px] bg-purple-600/15 top-[600px] left-[5%]"></div>
-    <div id="orb-3" class="glow-blob w-[500px] h-[500px] bg-cyan-500/15 top-[1200px] right-[5%]"></div>
-    <div id="orb-4" class="glow-blob w-[400px] h-[400px] bg-emerald-500/15 top-[2000px] left-[15%]"></div>
+    <!-- Theme detector script immédiat (évite le flash) -->
+    <script>
+        (() => {
+            const savedTheme = localStorage.getItem('preferred-theme') || 'dark';
+            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const activeMode = savedTheme === 'system' ? systemMode : savedTheme;
+            document.documentElement.setAttribute('data-theme-mode', activeMode);
+        })();
+    </script>
 
-    <!-- ================= ÉLÉMENTS FLOTTANTS INTERACTIFS AU SCROLL ================= -->
-    <!-- Clé Dorée Flottante 1 (Gauche) -->
-    <div id="key-1" class="parallax-floating-key hidden lg:flex top-[22%] left-[4%] w-24 h-24 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-amber-400 text-4xl shadow-2xl opacity-75">
-        <i class="fas fa-key"></i>
-    </div>
-
-    <!-- Clé Dorée Flottante 2 (Droite) -->
-    <div id="key-2" class="parallax-floating-key hidden lg:flex top-[45%] right-[4%] w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-yellow-300 text-3xl shadow-2xl opacity-70">
-        <i class="fas fa-key"></i>
-    </div>
-
-    <!-- Clé Flottante 3 (Bas Gauche) -->
-    <div id="key-3" class="parallax-floating-key hidden lg:flex top-[72%] left-[3%] w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-blue-400 text-2xl shadow-xl opacity-60">
-        <i class="fas fa-key"></i>
-    </div>
-
-    <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Normal Standard BayBay Logo -->
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 spruce-navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
             <a href="{{ url_for('index') }}" class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" alt="BayBay Logo">
-                <span class="text-xl font-black text-white tracking-tight">BayBay</span>
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-7 h-7 object-contain" alt="BayBay">
+                <span class="text-xl font-bold tracking-tight text-[var(--color-heading)]">BayBay</span>
             </a>
 
-            <!-- Nav Links : Simples écritures -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
-                <a href="{{ url_for('a_propos') }}" class="hover:text-white transition-colors">À propos</a>
+            <!-- Navigation Links : Simples écritures -->
+            <nav class="flex items-center gap-6 text-sm font-medium">
+                <a href="https://mb-site.com" class="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors">À propos</a>
             </nav>
 
-            <!-- Top Right Action Buttons: Connexion & Inscription -->
+            <!-- Actions : Theme Switcher + Auth -->
             <div class="flex items-center gap-3">
+                <!-- Theme Switcher Button -->
+                <button id="theme-toggle-btn" type="button" aria-label="Changer de thème" class="w-9 h-9 rounded-xl flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">
+                    <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                </button>
+
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
+                    <a href="{{ url_for('dashboard') }}" class="btn-primary inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold">
                         <i class="fas fa-chart-pie text-xs"></i>
-                        <span>Mon Tableau de Bord</span>
+                        <span>Tableau de bord</span>
                     </a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-all">
-                        <i class="fas fa-sign-in-alt text-xs"></i>
-                        <span>Connexion</span>
+                    <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium text-[var(--color-text)] hover:text-[var(--color-heading)]">
+                        Connexion
                     </a>
-                    <a href="{{ url_for('register') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
-                        <i class="fas fa-user-plus text-xs"></i>
+                    <a href="{{ url_for('register') }}" class="btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold">
                         <span>Inscription</span>
                     </a>
                 {% endif %}
@@ -187,297 +211,219 @@
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10">
+    <main class="flex-1">
 
         <!-- ================= HERO SECTION ================= -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-12 text-center">
+        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-16 text-center">
+            
+            <!-- Badges Tags Spruce CSS style -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-6">
+                <span class="spruce-tag">#gestion-locative</span>
+                <span class="spruce-tag">#sci</span>
+                <span class="spruce-tag">#loi-alur</span>
+                <span class="spruce-tag">#chiffrement-256</span>
+            </div>
 
             <!-- Main Heading -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15] mb-6">
-                Votre gestion locative <br class="hidden sm:inline">
-                <span class="gradient-text">sécurisée, accessible partout et en 1 clic.</span>
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-[var(--color-heading)] tracking-tight max-w-4xl mx-auto leading-[1.12] mb-6">
+                Votre gestion locative simple, sécurisée et en 1 clic.
             </h1>
 
             <!-- Subtitle -->
-            <p class="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
-                Accédez à toutes vos informations immobilières où que vous soyez. Générez et envoyez vos <strong class="text-white font-semibold">quittances</strong>, <strong class="text-white font-semibold">avis d'échéance</strong> et <strong class="text-white font-semibold">documents</strong> en un seul clic avec une sécurité absolue de vos données.
+            <p class="text-base sm:text-xl text-[var(--color-text)] max-w-2xl mx-auto leading-relaxed mb-10">
+                Pilotez vos biens, vos locataires et vos SCI en toute sérénité. Générez vos quittances certifiées ALUR, vos avis d'échéance et vos documents où que vous soyez.
             </p>
 
-            <!-- ================= CALL TO ACTION BUTTONS (DESKTOP & WEB) ================= -->
-            <div class="max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl liquid-glass border border-white/20 shadow-2xl mb-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    <!-- Bouton 1 : Télécharger Version Bureau -->
-                    <a href="{{ url_for('download_desktop_app') }}" class="glow-btn-desktop group flex items-center justify-between p-5 rounded-2xl text-white text-left relative overflow-hidden">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                                <i class="fab fa-windows"></i>
-                            </div>
-                            <div>
-                                <span class="block text-lg font-black tracking-tight leading-tight">Version Bureau</span>
-                                <span class="text-xs text-blue-200 font-medium">Télécharger pour Windows (.exe)</span>
-                            </div>
-                        </div>
-                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm group-hover:translate-y-0.5 transition-transform shrink-0">
-                            <i class="fas fa-download"></i>
-                        </div>
-                    </a>
-
-                    <!-- Bouton 2 : Continuer vers la Version Web -->
-                    <a href="{{ url_for('dashboard') }}" class="glow-btn-web group flex items-center justify-between p-5 rounded-2xl text-white text-left relative overflow-hidden">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div>
-                                <span class="block text-lg font-black tracking-tight leading-tight">Version Web</span>
-                                <span class="text-xs text-slate-300 font-medium">Continuer vers la version web</span>
-                            </div>
-                        </div>
-                        <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm group-hover:translate-x-1 transition-transform shrink-0">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </a>
-
-                </div>
+            <!-- Call to Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16">
+                <a href="{{ url_for('download_desktop_app') }}" class="btn-primary w-full sm:w-auto px-6 py-3.5 rounded-2xl flex items-center justify-center gap-2.5 shadow-sm text-sm">
+                    <i class="fab fa-windows text-base"></i>
+                    <span>Version Bureau (.exe)</span>
+                </a>
+                <a href="{{ url_for('dashboard') }}" class="btn-secondary w-full sm:w-auto px-6 py-3.5 rounded-2xl flex items-center justify-center gap-2.5 text-sm">
+                    <i class="fas fa-globe text-base text-[var(--color-primary)]"></i>
+                    <span>Version Web en ligne</span>
+                </a>
             </div>
 
         </section>
 
-        <!-- ================= GRANDE SECTION : CHOISISSEZ LA TRANQUILLITÉ ================= -->
-        <section id="tranquillite" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="text-center max-w-4xl mx-auto mb-14">
-                <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
+        <!-- ================= SECTION : TRANQUILLITÉ & SÉCURITÉ ================= -->
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-[var(--color-border)]">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-[var(--color-heading)]">
                     Choisissez la tranquillité
                 </h2>
-            </div>
-
-            <!-- Illustration & Bonhomme Relax sans lunettes ni bulle zen -->
-            <div class="max-w-4xl mx-auto mb-12 p-8 rounded-3xl liquid-glass border border-white/20 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="max-w-md text-left">
-                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">
-                        Détendez-vous, tout est sous contrôle.
-                    </h3>
-                    <p class="text-slate-300 text-sm leading-relaxed mb-4">
-                        Pendant que vous vaquez à vos occupations, BayBay calcule vos montants dus, suit les paiements, alerte en cas de retard et génère vos quittances officielles à la seconde près.
-                    </p>
-                    <div class="flex items-center gap-3 text-xs text-slate-300 font-semibold">
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> Zéro stress</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> 100% Conforme</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> Gain de temps</span>
-                    </div>
-                </div>
-
-                <!-- Bonhomme Allongé Relax en mode Chill (sans lunettes, sans bulle zen) -->
-                <div class="relative w-64 h-48 flex items-center justify-center shrink-0">
-                    <div id="chill-illustration" class="tranquille-stickman w-full h-full flex items-center justify-center">
-                        <svg viewBox="0 0 240 180" class="w-full h-full drop-shadow-[0_10px_20px_rgba(59,130,246,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Parasol arrière -->
-                            <path d="M170 30 C190 20, 220 20, 230 45 L170 45 Z" fill="url(#umbrellaGrad)" opacity="0.85" />
-                            <line x1="200" y1="35" x2="210" y2="150" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
-                            <!-- Transat / Chaise longue moderne -->
-                            <path d="M30 145 L70 140 L135 125 L180 85 L205 105" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                            <line x1="65" y1="140" x2="55" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
-                            <line x1="145" y1="120" x2="160" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
-                            
-                            <!-- Bonhomme qui s'allonge en mode tranquille (visage souriant sans lunettes) -->
-                            <circle cx="170" cy="72" r="14" fill="#fed7aa" stroke="#fbbf24" stroke-width="2" />
-                            <!-- Yeux fermés détendus et sourire -->
-                            <path d="M164 70 Q167 73 170 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            <path d="M172 70 Q175 73 178 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            <path d="M167 78 Q171 82 175 78" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            
-                            <!-- Corps détendu -->
-                            <path d="M160 84 L125 118 L70 128 L40 135" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                            
-                            <!-- Bras tenant un cocktail -->
-                            <path d="M142 98 L130 112 L110 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                            
-                            <!-- Cocktail avec paille -->
-                            <polygon points="102,82 118,82 114,96 106,96" fill="#f43f5e" opacity="0.9" />
-                            <line x1="110" y1="96" x2="110" y2="104" stroke="#e2e8f0" stroke-width="2" />
-                            <line x1="104" y1="104" x2="116" y2="104" stroke="#e2e8f0" stroke-width="2" />
-                            <line x1="110" y1="84" x2="120" y2="72" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" />
-
-                            <defs>
-                                <linearGradient id="umbrellaGrad" x1="170" y1="30" x2="230" y2="45" gradientUnits="userSpaceOnUse">
-                                    <stop stop-color="#f43f5e"/>
-                                    <stop offset="1" stop-color="#fbbf24"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3 Piliers Clés Spacieux -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                
-                <!-- Carte 1 : Sécurité -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-emerald-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mb-6 border border-emerald-500/30">
-                            <i class="fas fa-shield-halved"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Sécurité Absolue</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Vos données sont protégées par un chiffrement strict de bout en bout et des sauvegardes continues. Vos dossiers locatifs et documents restent strictement confidentiels et sécurisés.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-emerald-400 font-semibold">
-                        <i class="fas fa-lock"></i> Données chiffrées & isolées
-                    </div>
-                </div>
-
-                <!-- Carte 2 : Partout -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-blue-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl mb-6 border border-blue-500/30">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Accessible Partout</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Consultez vos biens et retrouvez tous vos dossiers à tout moment : au bureau sur votre ordinateur, chez vous ou en déplacement sur votre smartphone et tablette.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-blue-400 font-semibold">
-                        <i class="fas fa-mobile-screen"></i> PC, Mac, Tablette & Mobile
-                    </div>
-                </div>
-
-                <!-- Carte 3 : 1 Clic -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-purple-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mb-6 border border-purple-500/30">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Tout en 1 Clic</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Générez vos quittances officielles, avis d'échéance et documents en un clic, et transmettez-les instantanément par e-mail avec pièces jointes à vos locataires.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-purple-400 font-semibold">
-                        <i class="fas fa-paper-plane"></i> Envois et quittances instantanés
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= SECTION FONCTIONNALITÉS (8 BULLES ÉPURÉES SANS "ONGLET N") ================= -->
-        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/10">
-            <div class="text-center max-w-4xl mx-auto mb-14">
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white">
-                    Une application pensée pour chaque aspect de votre gestion
-                </h2>
-                <p class="text-slate-400 text-sm sm:text-base mt-3">
-                    Découvrez toutes les fonctionnalités intégrées pour piloter sereinement vos locations.
+                <p class="text-[var(--color-text)] text-sm sm:text-base mt-2">
+                    Automatisez les tâches répétitives et conservez vos dossiers sous haute protection.
                 </p>
             </div>
 
-            <!-- Grille de 8 Bulles épurées -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <!-- 1. Dashboard -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-blue-500/25 flex flex-col justify-between">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 1. Sécurité -->
+                <div class="spruce-card p-6 sm:p-8 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-4 bg-purple-500/10 text-[var(--color-primary)]">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[var(--color-heading)] mb-2">Sécurité Absolue</h3>
+                        <p class="text-sm text-[var(--color-text)] leading-relaxed">
+                            Chiffrement fort AES-256 bits, hachage sécurisé Bcrypt et isolation intégrale des données pour garantir la stricte confidentialité de vos biens.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-[var(--color-border)] text-xs text-[var(--color-muted)] font-semibold flex items-center gap-2">
+                        <i class="fas fa-lock text-[var(--color-primary)]"></i> 100% Données chiffrées
+                    </div>
+                </div>
+
+                <!-- 2. Accessible Partout -->
+                <div class="spruce-card p-6 sm:p-8 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-4 bg-blue-500/10 text-blue-500">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[var(--color-heading)] mb-2">Accessible Partout</h3>
+                        <p class="text-sm text-[var(--color-text)] leading-relaxed">
+                            Consultez vos dossiers et gérez vos encaissements au bureau comme en déplacement, depuis votre PC, Mac, tablette ou smartphone.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-[var(--color-border)] text-xs text-[var(--color-muted)] font-semibold flex items-center gap-2">
+                        <i class="fas fa-laptop-code text-blue-500"></i> Bureau & Mobile
+                    </div>
+                </div>
+
+                <!-- 3. Tout en 1 Clic -->
+                <div class="spruce-card p-6 sm:p-8 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-4 bg-emerald-500/10 text-emerald-500">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-[var(--color-heading)] mb-2">Tout en 1 Clic</h3>
+                        <p class="text-sm text-[var(--color-text)] leading-relaxed">
+                            Édition instantanée des quittances certifiées ALUR avec signature, avis d'échéance et envoi direct par e-mail ou programmé chaque mois.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-[var(--color-border)] text-xs text-[var(--color-muted)] font-semibold flex items-center gap-2">
+                        <i class="fas fa-paper-plane text-emerald-500"></i> Envoi automatique
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION : FONCTIONNALITÉS ================= -->
+        <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 border-t border-[var(--color-border)]">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl sm:text-4xl font-bold text-[var(--color-heading)]">
+                    Une boîte à outils complète
+                </h2>
+                <p class="text-[var(--color-text)] text-sm sm:text-base mt-2">
+                    Tous les modules indispensables réunis dans une interface rapide et intuitive.
+                </p>
+            </div>
+
+            <!-- Grille de 8 Cartes Spruce UI -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- 1. Tableau de Bord -->
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
+                    <div>
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-[var(--color-primary)] flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-chart-pie"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Tableau de Bord</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Visualisez en un coup d'œil vos loyers attendus, vos encaissements réels, le taux de recouvrement global et les alertes d'impayés pour toutes vos SCI.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Tableau de Bord</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Vue synthétique en direct : loyers attendus, montants encaissés, taux de recouvrement et alertes d'impayés.
                         </p>
                     </div>
                 </div>
 
-                <!-- 2. Biens & SCI -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-indigo-500/25 flex flex-col justify-between">
+                <!-- 2. Biens & SCIs -->
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-home"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Biens & SCIs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Organisez votre patrimoine par SCI ou en détention directe. Structurez vos immeubles, lots, appartements, surfaces et charges déductibles associées.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Biens & SCIs</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Gestion multi-SCI et biens en nom propre, organisation des immeubles, lots, surfaces et charges déductibles.
                         </p>
                     </div>
                 </div>
 
                 <!-- 3. Locataires & Garants -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-emerald-500/25 flex flex-col justify-between">
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-users"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Locataires & Garants</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Fiches complètes des locataires, coordonnées, garants solidaires, contrats de bail signés, attestations d'assurance habitation et dépôts de garantie.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Locataires & Garants</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Fiches complètes des locataires, garants solidaires, baux signés, attestations d'assurance et dépôts de garantie.
                         </p>
                     </div>
                 </div>
 
-                <!-- 4. Appels de Loyer (avec programmation & envoi) -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-cyan-500/25 flex flex-col justify-between">
+                <!-- 4. Appels de Loyer -->
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-file-invoice"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Appels de Loyer</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Génération instantanée des avis d'échéance avec calcul du loyer nu et des provisions, envoi en 1 clic ou programmé automatiquement chaque mois par e-mail.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Appels de Loyer</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Génération automatique des avis d'échéance avec détail loyer nu/charges et envoi par e-mail en 1 clic ou programmé.
                         </p>
                     </div>
                 </div>
 
-                <!-- 5. Quittances de Loyer (avec signature & programmation) -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-amber-500/25 flex flex-col justify-between">
+                <!-- 5. Quittances de Loyer -->
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-receipt"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Quittances de Loyer</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Édition certifiée loi ALUR avec signature du bailleur, QR code public d'authenticité et expédition directe par e-mail ou envoi programmé.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Quittances ALUR</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Édition certifiée avec signature officielle du bailleur, QR code public de vérification et expédition e-mail.
                         </p>
                     </div>
                 </div>
 
                 <!-- 6. Résumé des Loyers -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-purple-500/25 flex flex-col justify-between">
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-chart-bar"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Résumé des Loyers</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Bilan financier mois par mois et synthèse pluriannuelle des loyers perçus, facilitant le suivi comptable et vos déclarations fiscales annuelles (2044 / 2072).
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Résumé des Loyers</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Bilan financier mensuel et synthèse pluriannuelle facilitant vos déclarations fiscales annuelles (2044 / 2072).
                         </p>
                     </div>
                 </div>
 
                 <!-- 7. Comptes Locatifs -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-teal-500/25 flex flex-col justify-between">
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-calculator"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Comptes Locatifs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Suivi du grand livre individuel par locataire : débits, crédits, historique complet des règlements, régularisation des charges et solde net en direct.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">Comptes Locatifs</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Grand livre individuel : débits, crédits, régularisation annuelle des charges et solde locataire en direct.
                         </p>
                     </div>
                 </div>
 
-                <!-- 8. États des Lieux & Docs -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-rose-500/25 flex flex-col justify-between">
+                <!-- 8. États des Lieux -->
+                <div class="spruce-card p-5 rounded-2xl flex flex-col justify-between">
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-rose-600/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-lg mb-3.5">
                             <i class="fas fa-clipboard-check"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">États des Lieux & Docs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Inventaires d'entrée et sortie numérisés, relevés de compteurs, insertion de photos horodatées pièce par pièce et archivage sécurisé des baux.
+                        <h3 class="text-base font-bold text-[var(--color-heading)] mb-1.5">États des Lieux</h3>
+                        <p class="text-xs text-[var(--color-text)] leading-relaxed">
+                            Inventaires d'entrée et sortie numérisés, relevés de compteurs et photos horodatées avec rapports PDF.
                         </p>
                     </div>
                 </div>
@@ -485,23 +431,23 @@
             </div>
         </section>
 
-        <!-- ================= FINAL CTA BOTTOM ================= -->
-        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <div class="p-8 sm:p-12 rounded-3xl liquid-glass border border-blue-500/30 shadow-2xl relative overflow-hidden">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+        <!-- ================= FINAL CTA ================= -->
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <div class="spruce-card p-8 sm:p-12 rounded-3xl text-center">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[var(--color-heading)] mb-3">
                     Prêt à simplifier votre gestion locative ?
                 </h2>
-                <p class="text-slate-300 text-sm max-w-xl mx-auto mb-8">
-                    Téléchargez l'application pour votre bureau ou accédez directement à la version web en ligne.
+                <p class="text-[var(--color-text)] text-sm max-w-md mx-auto mb-8">
+                    Installez l'application bureau ou commencez directement depuis votre navigateur.
                 </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="{{ url_for('download_desktop_app') }}" class="w-full sm:w-auto glow-btn-desktop py-3.5 px-8 rounded-xl font-bold text-white flex items-center justify-center gap-2">
-                        <i class="fas fa-download"></i>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <a href="{{ url_for('download_desktop_app') }}" class="btn-primary w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fab fa-windows"></i>
                         <span>Télécharger pour Windows</span>
                     </a>
-                    <a href="{{ url_for('dashboard') }}" class="w-full sm:w-auto glow-btn-web py-3.5 px-8 rounded-xl font-bold text-white flex items-center justify-center gap-2">
+                    <a href="{{ url_for('dashboard') }}" class="btn-secondary w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
                         <i class="fas fa-globe"></i>
-                        <span>Continuer vers la version Web</span>
+                        <span>Accéder à la version Web</span>
                     </a>
                 </div>
             </div>
@@ -509,87 +455,64 @@
 
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <!-- Footer Spruce CSS Style -->
+    <footer class="border-t border-[var(--color-border)] py-8 px-4 sm:px-8 bg-[var(--color-surface)] text-xs text-[var(--color-muted)]">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay Logo">
-                <span class="font-bold text-white">BayBay</span>
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-5 h-5 object-contain" alt="BayBay">
+                <span class="font-bold text-[var(--color-heading)]">BayBay</span>
                 <span>— © 2026 Malik B. Tous droits réservés.</span>
             </div>
             <div class="flex items-center gap-3">
-                <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:text-[var(--color-heading)] hover:border-[var(--color-primary)] transition-colors">
                     <i class="fab fa-github text-sm"></i>
                     <span>GitHub</span>
                 </a>
-                <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
-                    <i class="fas fa-envelope text-sm text-blue-400"></i>
+                <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:text-[var(--color-heading)] hover:border-[var(--color-primary)] transition-colors">
+                    <i class="fas fa-envelope text-sm text-[var(--color-primary)]"></i>
                     <span>bouaissimalik@gmail.com</span>
                 </a>
             </div>
         </div>
     </footer>
 
-    <!-- Script d'animation interactive au défilement (Parallax & Clés qui tournent) -->
+    <!-- Theme Switcher JavaScript (Spruce CSS implementation) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const key1 = document.getElementById('key-1');
-            const key2 = document.getElementById('key-2');
-            const key3 = document.getElementById('key-3');
-            const orb1 = document.getElementById('orb-1');
-            const orb2 = document.getElementById('orb-2');
-            const orb3 = document.getElementById('orb-3');
-            const chillIllustration = document.getElementById('chill-illustration');
-
-            let ticking = false;
-
-            window.addEventListener('scroll', () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-                        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-
-                        // Rotation des clés en fonction du scroll
-                        if (key1) {
-                            const rot1 = scrollY * 0.45;
-                            const y1 = Math.sin(scrollY * 0.003) * 35;
-                            key1.style.transform = `translateY(${y1}px) rotate(${rot1}deg) scale(${1 + Math.sin(scrollY * 0.002) * 0.1})`;
-                        }
-
-                        if (key2) {
-                            const rot2 = -scrollY * 0.55;
-                            const y2 = Math.cos(scrollY * 0.003) * 30;
-                            key2.style.transform = `translateY(${y2}px) rotate(${rot2}deg) scale(${1 + Math.cos(scrollY * 0.002) * 0.1})`;
-                        }
-
-                        if (key3) {
-                            const rot3 = scrollY * 0.65;
-                            const y3 = Math.sin(scrollY * 0.004) * 25;
-                            key3.style.transform = `translateY(${y3}px) rotate(${rot3}deg)`;
-                        }
-
-                        // Mouvement subtil des bulles de fond lumineuses
-                        if (orb1) {
-                            orb1.style.transform = `translate(-50%, ${scrollY * 0.25}px)`;
-                        }
-                        if (orb2) {
-                            orb2.style.transform = `translateY(${scrollY * 0.18}px)`;
-                        }
-                        if (orb3) {
-                            orb3.style.transform = `translateY(${-scrollY * 0.15}px)`;
-                        }
-
-                        // Léger mouvement relax sur l'illustration du bonhomme au scroll
-                        if (chillIllustration) {
-                            const chillAngle = Math.sin(scrollY * 0.01) * 3;
-                            chillIllustration.style.transform = `rotate(${chillAngle}deg) translateY(${Math.sin(scrollY * 0.008) * 8}px)`;
-                        }
-
-                        ticking = false;
-                    });
-                    ticking = true;
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            function updateIcon(mode) {
+                if (!themeIcon) return;
+                if (mode === 'dark') {
+                    themeIcon.className = 'fas fa-sun text-sm text-amber-400';
+                } else {
+                    themeIcon.className = 'fas fa-moon text-sm text-indigo-500';
                 }
-            }, { passive: true });
+            }
+
+            const currentMode = document.documentElement.getAttribute('data-theme-mode') || 'dark';
+            updateIcon(currentMode);
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const activeMode = document.documentElement.getAttribute('data-theme-mode');
+                    const nextMode = activeMode === 'dark' ? 'light' : 'dark';
+                    
+                    document.documentElement.setAttribute('data-theme-mode', nextMode);
+                    localStorage.setItem('preferred-theme', nextMode);
+                    updateIcon(nextMode);
+                });
+            }
+
+            // Écoute les changements de préférences système si non défini
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('preferred-theme')) {
+                    const newMode = e.matches ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme-mode', newMode);
+                    updateIcon(newMode);
+                }
+            });
         });
     </script>
 

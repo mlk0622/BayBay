@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark" class="scroll-smooth">
+<html lang="fr" data-theme-mode="dark" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +7,21 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     
+    <!-- Google Fonts: Inter & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: ['class', '[data-theme-mode="dark"]'],
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        'primary-dark': '#2563eb',
-                        darkbg: '#0b131a',
-                    },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+                        display: ['Space Grotesk', 'Inter', 'sans-serif'],
                     }
                 }
             }
@@ -31,104 +32,155 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
+        /* Spruce CSS Theme Variables */
+        :root {
+            --color-primary: hsl(262, 71%, 49%);
+            --color-primary-hover: hsl(262, 71%, 42%);
+            --color-primary-light: hsl(262, 71%, 95%);
+            --color-heading: hsl(205, 100%, 2%);
+            --color-text: hsl(208, 9%, 42%);
+            --color-muted: hsl(208, 7%, 55%);
+            --color-background: #f8fafc;
+            --color-surface: #ffffff;
+            --color-card-bg: #ffffff;
+            --color-border: #e2e8f0;
+            --color-border-hover: #cbd5e1;
+            --color-tag-bg: #f1f5f9;
+            --color-tag-text: #6b21a8;
+            --color-nav-bg: rgba(255, 255, 255, 0.85);
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-card-hover: 0 12px 24px -4px rgba(124, 58, 237, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        :root[data-theme-mode="dark"] {
+            --color-primary: hsl(261, 54%, 70%);
+            --color-primary-hover: hsl(261, 54%, 78%);
+            --color-primary-light: rgba(167, 139, 250, 0.15);
+            --color-heading: #f8fafc;
+            --color-text: #cbd5e1;
+            --color-muted: #94a3b8;
+            --color-background: #090d16;
+            --color-surface: #111827;
+            --color-card-bg: #111827;
+            --color-border: #1e293b;
+            --color-border-hover: #334155;
+            --color-tag-bg: rgba(167, 139, 250, 0.12);
+            --color-tag-text: #c084fc;
+            --color-nav-bg: rgba(9, 13, 22, 0.85);
+            --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-card-hover: 0 12px 28px -4px rgba(167, 139, 250, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
         * {
             box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
+
         body {
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
-            color: #FFFFFF;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
         }
 
-        .liquid-glass {
-            background: rgba(24, 24, 27, 0.65);
-            backdrop-filter: blur(20px) saturate(190%);
-            -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--color-heading);
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            letter-spacing: -0.02em;
         }
 
-        .liquid-glass-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .spruce-navbar {
+            background-color: var(--color-nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
         }
 
-        .liquid-glass-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+        .spruce-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-card);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .spruce-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-border-hover);
+            box-shadow: var(--shadow-card-hover);
         }
 
-        .glow-blob {
-            position: absolute;
+        .spruce-tag {
+            background-color: var(--color-tag-bg);
+            color: var(--color-tag-text);
+            font-family: 'Inter', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
             border-radius: 9999px;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        .fade-in-element {
-            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: #ffffff !important;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-primary:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px -2px rgba(124, 58, 237, 0.4);
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 relative selection:bg-blue-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
-    <!-- Orbes lumineuses décoratives -->
-    <div class="glow-blob w-[550px] h-[550px] bg-blue-600/20 top-[-100px] left-1/2 -translate-x-1/2"></div>
-    <div class="glow-blob w-[450px] h-[450px] bg-purple-600/15 top-[400px] left-[5%]"></div>
-    <div class="glow-blob w-[450px] h-[450px] bg-cyan-500/15 top-[800px] right-[5%]"></div>
+    <!-- Theme detector script immédiat -->
+    <script>
+        (() => {
+            const savedTheme = localStorage.getItem('preferred-theme') || 'dark';
+            const systemMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            const activeMode = savedTheme === 'system' ? systemMode : savedTheme;
+            document.documentElement.setAttribute('data-theme-mode', activeMode);
+        })();
+    </script>
 
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Normal Standard BayBay Logo -->
+    <header class="sticky top-0 z-50 spruce-navbar">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
             <a href="{{ url_for('index') }}" class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" alt="BayBay Logo">
-                <span class="text-xl font-black text-white tracking-tight">BayBay</span>
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-7 h-7 object-contain" alt="BayBay">
+                <span class="text-xl font-bold tracking-tight text-[var(--color-heading)]">BayBay</span>
             </a>
 
-            <!-- Nav Links : Simples écritures -->
-            <nav class="flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
-                <a href="{{ url_for('a_propos') }}" class="text-white font-semibold transition-colors">À propos</a>
+            <!-- Navigation Links : Simples écritures -->
+            <nav class="flex items-center gap-6 text-sm font-medium">
+                <a href="https://mb-site.com" class="text-[var(--color-text)] hover:text-[var(--color-primary)] transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="text-[var(--color-primary)] font-semibold transition-colors">À propos</a>
             </nav>
 
-            <!-- Top Right Action Buttons -->
+            <!-- Actions : Theme Switcher + Auth -->
             <div class="flex items-center gap-3">
+                <button id="theme-toggle-btn" type="button" aria-label="Changer de thème" class="w-9 h-9 rounded-xl flex items-center justify-center border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors">
+                    <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                </button>
+
                 {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
+                    <a href="{{ url_for('dashboard') }}" class="btn-primary inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold">
                         <i class="fas fa-chart-pie text-xs"></i>
-                        <span>Mon Tableau de Bord</span>
+                        <span>Tableau de bord</span>
                     </a>
                 {% else %}
-                    <a href="{{ url_for('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-all">
-                        <i class="fas fa-sign-in-alt text-xs"></i>
-                        <span>Connexion</span>
+                    <a href="{{ url_for('login') }}" class="hidden sm:inline-flex px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium text-[var(--color-text)] hover:text-[var(--color-heading)]">
+                        Connexion
                     </a>
-                    <a href="{{ url_for('register') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
-                        <i class="fas fa-user-plus text-xs"></i>
+                    <a href="{{ url_for('register') }}" class="btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold">
                         <span>Inscription</span>
                     </a>
                 {% endif %}
@@ -136,85 +188,88 @@
         </div>
     </header>
 
-    <!-- Main Content À propos -->
-    <main class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 fade-in-element">
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
         
         <!-- Header À propos -->
-        <div class="text-center mb-12">
-            <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
-                À propos de l'application
-            </span>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mt-5 tracking-tight leading-tight">
-                L'histoire derrière <span class="gradient-text">BayBay</span>
+        <div class="text-center mb-10">
+            <div class="flex flex-wrap items-center justify-center gap-2 mb-4">
+                <span class="spruce-tag">#efrei-paris</span>
+                <span class="spruce-tag">#developpement</span>
+                <span class="spruce-tag">#intelligence-artificielle</span>
+                <span class="spruce-tag">#chiffrement-256</span>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-[var(--color-heading)] tracking-tight">
+                L'histoire derrière BayBay
             </h1>
         </div>
 
-        <!-- Grande carte de présentation -->
-        <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-8">
+        <!-- Grande carte Spruce UI -->
+        <div class="spruce-card p-8 sm:p-12 rounded-3xl space-y-8">
             
             <!-- Profil & Intro -->
-            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-8 border-b border-white/10">
-                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl text-white font-black shadow-lg shadow-blue-500/30 shrink-0">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-8 border-b border-[var(--color-border)]">
+                <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl text-white font-bold bg-gradient-to-br from-purple-600 to-indigo-600 shadow-md shrink-0">
                     MB
                 </div>
-                <div class="text-center sm:text-left space-y-2">
-                    <h2 class="text-2xl font-bold text-white">Malik B.</h2>
-                    <p class="text-blue-400 text-sm font-medium">Étudiant en 2ème année à l'EFREI Paris</p>
-                    <p class="text-slate-300 text-sm leading-relaxed">
-                        Passionné par le code, l'architecture logicielle et la création d'outils concrets et élégants.
+                <div class="text-center sm:text-left space-y-1.5">
+                    <h2 class="text-2xl font-bold text-[var(--color-heading)]">Malik B.</h2>
+                    <p class="text-[var(--color-primary)] text-sm font-semibold">Étudiant en 2ème année à l'EFREI Paris</p>
+                    <p class="text-[var(--color-text)] text-sm leading-relaxed">
+                        Passionné de programmation, d'architecture logicielle et de création d'outils concrets et élégants.
                     </p>
                 </div>
             </div>
 
-            <!-- Histoire et genèse -->
-            <div class="space-y-5 text-sm sm:text-base text-slate-300 leading-relaxed">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
-                    <i class="fas fa-lightbulb text-amber-400 text-base"></i>
+            <!-- Récit de création -->
+            <div class="space-y-4 text-sm sm:text-base text-[var(--color-text)] leading-relaxed">
+                <h3 class="text-xl font-bold text-[var(--color-heading)] flex items-center gap-2">
+                    <i class="fas fa-lightbulb text-amber-500"></i>
                     Comment est né le projet ?
                 </h3>
                 <p>
-                    Tout a commencé lorsque <strong class="text-white">mon oncle cherchait un logiciel simple et efficace pour gérer ses biens immobiliers et ses SCI</strong>. Face à des solutions existantes souvent trop chères, complexes ou dépassées, j'ai décidé de me charger moi-même du développement de l'outil de A à Z.
+                    Tout a commencé lorsque <strong class="text-[var(--color-heading)]">mon oncle cherchait un logiciel simple et efficace pour gérer ses biens immobiliers et ses SCI</strong>. Face à des outils existants souvent trop chers, complexes ou vieillots, j'ai décidé de me charger moi-même du développement de la solution de A à Z.
                 </p>
                 <p>
-                    En combinant mes compétences en programmation et en m'aidant des technologies d'intelligence artificielle pour accélérer le développement et perfectionner chaque détail, j'ai créé <strong class="text-white">BayBay</strong> : une solution moderne disponible à la fois en <strong class="text-white">application bureau Windows ultra-rapide</strong> et en <strong class="text-white">version web responsive</strong>.
+                    En combinant mes compétences en développement et en m'aidant des technologies d'intelligence artificielle pour accélérer le développement et peaufiner chaque détail, j'ai conçu <strong class="text-[var(--color-heading)]">BayBay</strong> : une plateforme moderne disponible à la fois en <strong class="text-[var(--color-heading)]">application bureau Windows ultra-rapide</strong> et en <strong class="text-[var(--color-heading)]">version web accessible partout</strong>.
                 </p>
             </div>
 
-            <!-- Piliers du projet -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
-                    <div class="text-2xl text-blue-400"><i class="fas fa-code"></i></div>
-                    <div class="font-bold text-white text-sm">Développement & IA</div>
-                    <p class="text-xs text-slate-400">Architecture Python Flask, Electron, SQLite/MySQL assistée par IA.</p>
+            <!-- 3 Piliers Clés -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div class="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] space-y-2">
+                    <div class="text-xl text-[var(--color-primary)]"><i class="fas fa-code"></i></div>
+                    <div class="font-bold text-[var(--color-heading)] text-sm">Développement & IA</div>
+                    <p class="text-xs text-[var(--color-muted)]">Python Flask, Electron, SQLite/MySQL assisté par IA.</p>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
-                    <div class="text-2xl text-emerald-400"><i class="fas fa-shield-halved"></i></div>
-                    <div class="font-bold text-white text-sm">Chiffrement 256 bits</div>
-                    <p class="text-xs text-slate-400">Chiffrement AES-256 / SSL, hachage Bcrypt et isolation des données.</p>
+                <div class="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] space-y-2">
+                    <div class="text-xl text-emerald-500"><i class="fas fa-shield-halved"></i></div>
+                    <div class="font-bold text-[var(--color-heading)] text-sm">Chiffrement 256 bits</div>
+                    <p class="text-xs text-[var(--color-muted)]">Chiffrement fort AES-256 / SSL et hachage Bcrypt.</p>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
-                    <div class="text-2xl text-purple-400"><i class="fas fa-bolt"></i></div>
-                    <div class="font-bold text-white text-sm">Tout en 1 Clic</div>
-                    <p class="text-xs text-slate-400">Quittances certifiées ALUR, avis d'échéance et gestion automatisée.</p>
+                <div class="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] space-y-2">
+                    <div class="text-xl text-purple-500"><i class="fas fa-bolt"></i></div>
+                    <div class="font-bold text-[var(--color-heading)] text-sm">Tout en 1 Clic</div>
+                    <p class="text-xs text-[var(--color-muted)]">Quittances ALUR, avis d'échéance et gestion automatisée.</p>
                 </div>
             </div>
 
-            <!-- Liens et contact -->
-            <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <!-- Liens et retour -->
+            <div class="pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-muted)]">
                 <div class="flex items-center gap-3">
-                    <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 transition-all font-semibold">
+                    <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:text-[var(--color-heading)] hover:border-[var(--color-primary)] transition-colors">
                         <i class="fab fa-github text-sm"></i>
                         <span>Code source GitHub</span>
                     </a>
-                    <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 transition-all font-semibold">
-                        <i class="fas fa-envelope text-sm text-blue-400"></i>
+                    <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-[var(--color-text)] hover:text-[var(--color-heading)] hover:border-[var(--color-primary)] transition-colors">
+                        <i class="fas fa-envelope text-sm text-[var(--color-primary)]"></i>
                         <span>bouaissimalik@gmail.com</span>
                     </a>
                 </div>
 
-                <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-[var(--color-primary)] font-semibold hover:underline">
                     <i class="fas fa-arrow-left text-xs"></i>
                     <span>Retour à l'accueil</span>
                 </a>
@@ -225,20 +280,51 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 mt-16">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <footer class="border-t border-[var(--color-border)] py-8 px-4 sm:px-8 bg-[var(--color-surface)] text-xs text-[var(--color-muted)]">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay Logo">
-                <span class="font-bold text-white">BayBay</span>
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-5 h-5 object-contain" alt="BayBay">
+                <span class="font-bold text-[var(--color-heading)]">BayBay</span>
                 <span>— © 2026 Malik B. Tous droits réservés.</span>
             </div>
             <div class="flex items-center gap-4">
-                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
-                <a href="{{ url_for('a_propos') }}" class="hover:text-white transition-colors">À propos</a>
-                <a href="{{ url_for('index') }}" class="hover:text-white transition-colors">Accueil</a>
+                <a href="https://mb-site.com" class="hover:text-[var(--color-heading)] transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="hover:text-[var(--color-heading)] transition-colors">À propos</a>
+                <a href="{{ url_for('index') }}" class="hover:text-[var(--color-heading)] transition-colors">Accueil</a>
             </div>
         </div>
     </footer>
+
+    <!-- Theme Switcher JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            function updateIcon(mode) {
+                if (!themeIcon) return;
+                if (mode === 'dark') {
+                    themeIcon.className = 'fas fa-sun text-sm text-amber-400';
+                } else {
+                    themeIcon.className = 'fas fa-moon text-sm text-indigo-500';
+                }
+            }
+
+            const currentMode = document.documentElement.getAttribute('data-theme-mode') || 'dark';
+            updateIcon(currentMode);
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const activeMode = document.documentElement.getAttribute('data-theme-mode');
+                    const nextMode = activeMode === 'dark' ? 'light' : 'dark';
+                    
+                    document.documentElement.setAttribute('data-theme-mode', nextMode);
+                    localStorage.setItem('preferred-theme', nextMode);
+                    updateIcon(nextMode);
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
