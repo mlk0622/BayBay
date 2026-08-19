@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À propos - BayBay</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb',
+                        darkbg: '#0b131a',
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+        }
+
+        .liquid-glass {
+            background: rgba(24, 24, 27, 0.65);
+            backdrop-filter: blur(20px) saturate(190%);
+            -webkit-backdrop-filter: blur(20px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .liquid-glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .liquid-glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow-blob {
+            position: absolute;
+            border-radius: 9999px;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .fade-in-element {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-100 relative selection:bg-blue-500 selection:text-white">
+
+    <!-- Orbes lumineuses décoratives -->
+    <div class="glow-blob w-[550px] h-[550px] bg-blue-600/20 top-[-100px] left-1/2 -translate-x-1/2"></div>
+    <div class="glow-blob w-[450px] h-[450px] bg-purple-600/15 top-[400px] left-[5%]"></div>
+    <div class="glow-blob w-[450px] h-[450px] bg-cyan-500/15 top-[800px] right-[5%]"></div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Normal Standard BayBay Logo -->
+            <a href="{{ url_for('index') }}" class="flex items-center gap-2.5">
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" alt="BayBay Logo">
+                <span class="text-xl font-black text-white tracking-tight">BayBay</span>
+            </a>
+
+            <!-- Nav Links : Simples écritures -->
+            <nav class="flex items-center gap-8 text-sm font-medium text-slate-300">
+                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="text-white font-semibold transition-colors">À propos</a>
+            </nav>
+
+            <!-- Top Right Action Buttons -->
+            <div class="flex items-center gap-3">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
+                        <i class="fas fa-chart-pie text-xs"></i>
+                        <span>Mon Tableau de Bord</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-all">
+                        <i class="fas fa-sign-in-alt text-xs"></i>
+                        <span>Connexion</span>
+                    </a>
+                    <a href="{{ url_for('register') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
+                        <i class="fas fa-user-plus text-xs"></i>
+                        <span>Inscription</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content À propos -->
+    <main class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 fade-in-element">
+        
+        <!-- Header À propos -->
+        <div class="text-center mb-12">
+            <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                À propos de l'application
+            </span>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mt-5 tracking-tight leading-tight">
+                L'histoire derrière <span class="gradient-text">BayBay</span>
+            </h1>
+        </div>
+
+        <!-- Grande carte de présentation -->
+        <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-8">
+            
+            <!-- Profil & Intro -->
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-8 border-b border-white/10">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl text-white font-black shadow-lg shadow-blue-500/30 shrink-0">
+                    MB
+                </div>
+                <div class="text-center sm:text-left space-y-2">
+                    <h2 class="text-2xl font-bold text-white">Malik B.</h2>
+                    <p class="text-blue-400 text-sm font-medium">Étudiant & Développeur du projet BayBay</p>
+                    <p class="text-slate-300 text-sm leading-relaxed">
+                        Passionné d'informatique, de conception logicielle et de solutions concrètes pour simplifier la vie de tous les jours.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Histoire et vision -->
+            <div class="space-y-5 text-sm sm:text-base text-slate-300 leading-relaxed">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2.5">
+                    <i class="fas fa-lightbulb text-amber-400 text-base"></i>
+                    Pourquoi avoir créé BayBay ?
+                </h3>
+                <p>
+                    En tant qu'étudiant passionné par le développement, j'ai voulu concevoir un outil moderne, rapide et ultra accessible pour répondre à un besoin réel : <strong class="text-white">permettre aux propriétaires bailleurs et aux SCI de gérer leur patrimoine locatif sans prise de tête</strong>.
+                </p>
+                <p>
+                    Les solutions existantes sont souvent soit trop complexes, soit trop coûteuses, soit vieillottes. Avec BayBay, l'objectif est d'offrir une expérience fluide, disponible à la fois en <strong class="text-white">application bureau Windows rapide</strong> et en <strong class="text-white">version web responsive</strong>, avec des automatisations poussées (quittances instantanées certifiées, appels de loyer, états des lieux numérisés et bilan des encaissements).
+                </p>
+            </div>
+
+            <!-- Piliers du projet -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
+                    <div class="text-2xl text-blue-400"><i class="fas fa-code"></i></div>
+                    <div class="font-bold text-white text-sm">Développement Soigné</div>
+                    <p class="text-xs text-slate-400">Architecture propre en Python Flask, SQLite/MySQL et Electron.</p>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
+                    <div class="text-2xl text-emerald-400"><i class="fas fa-shield-alt"></i></div>
+                    <div class="font-bold text-white text-sm">Sécurité & Confidentialité</div>
+                    <p class="text-xs text-slate-400">Chiffrement strict des mots de passe et isolation des données.</p>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-white/5 border border-white/10 text-center space-y-2">
+                    <div class="text-2xl text-purple-400"><i class="fas fa-rocket"></i></div>
+                    <div class="font-bold text-white text-sm">Évolution Continue</div>
+                    <p class="text-xs text-slate-400">Mises à jour régulières avec ajout continu de fonctionnalités.</p>
+                </div>
+            </div>
+
+            <!-- Liens et contact -->
+            <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+                <div class="flex items-center gap-3">
+                    <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 transition-all font-semibold">
+                        <i class="fab fa-github text-sm"></i>
+                        <span>Code source GitHub</span>
+                    </a>
+                    <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/15 text-slate-200 hover:text-white border border-white/10 transition-all font-semibold">
+                        <i class="fas fa-envelope text-sm text-blue-400"></i>
+                        <span>bouaissimalik@gmail.com</span>
+                    </a>
+                </div>
+
+                <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 mt-16">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay Logo">
+                <span class="font-bold text-white">BayBay</span>
+                <span>— © 2026 Malik B. Tous droits réservés.</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="hover:text-white transition-colors">À propos</a>
+                <a href="{{ url_for('index') }}" class="hover:text-white transition-colors">Accueil</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

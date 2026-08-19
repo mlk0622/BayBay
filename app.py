@@ -28,7 +28,7 @@ from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paieme
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
-VERSION = "3.9.9"
+VERSION = "4.0"
 def get_user_data_dir():
     data_dir = os.environ.get('BAYBAY_DATA_DIR')
     if data_dir:
@@ -1635,6 +1635,12 @@ def dashboard():
 @app.route('/landing')
 def presentation():
     return render_template('landing.html', app_version=VERSION)
+
+
+@app.route('/a-propos')
+@app.route('/about')
+def a_propos():
+    return render_template('a_propos.html', app_version=VERSION)
 
 
 @app.route('/sci/<int:sci_id>')

@@ -159,13 +159,10 @@
                 <span class="text-xl font-black text-white tracking-tight">BayBay</span>
             </a>
 
-            <!-- Nav Links : mb-site et a propos -->
+            <!-- Nav Links : Simples écritures -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors flex items-center gap-1.5">
-                    <span>mb-site</span>
-                    <i class="fas fa-external-link-alt text-[10px] text-slate-400"></i>
-                </a>
-                <a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">À propos</a>
+                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
+                <a href="{{ url_for('a_propos') }}" class="hover:text-white transition-colors">À propos</a>
             </nav>
 
             <!-- Top Right Action Buttons: Connexion & Inscription -->
