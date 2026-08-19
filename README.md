@@ -1,201 +1,160 @@
-# Bay Bay - Guide Developpeur (Windows)
+# 🏠 BayBay — Gestion Locative Intelligente & Sécurisée (v4.0)
 
-Application de gestion locative basee sur Flask (backend Python) + Electron (client desktop).
+<div align="center">
 
-Ce README remplace l'ancienne doc et centralise les prerequis reels du projet, la procedure de build/publish, et les points a adapter sur une nouvelle machine.
+[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg?style=for-the-badge&logo=appveyor)](https://github.com/mlk0622/BayBay/releases)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0.0-000000.svg?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Electron](https://img.shields.io/badge/Electron-Desktop-47848F.svg?style=for-the-badge&logo=electron&logoColor=white)](https://www.electronjs.org/)
+[![Encryption](https://img.shields.io/badge/Security-AES--256-success.svg?style=for-the-badge&logo=shield)](https://github.com/mlk0622/BayBay)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](license.txt)
 
-## Fonctionnalites principales
+<br/>
 
-- Gestion multi-SCI, biens, locataires
-- Suivi des paiements et comptes locatifs
-- Generation de quittances et appels de loyer PDF
-- Stockage des donnees utilisateur dans `%APPDATA%\BayBay`
-- Verification de mises a jour via GitHub Releases
+**BayBay** est une suite logicielle tout-en-un de gestion immobilière moderne conçue pour les **propriétaires bailleurs particuliers** et les **sociétés civiles immobilières (SCI)**.  
+Disponible en **application Bureau native Windows** et en **plateforme Web SaaS cloud**.
 
-## Prerequis developpeur
+[🚀 Télécharger l'Installeur Windows (v4.0)](https://github.com/mlk0622/BayBay/releases/tag/v4.0) • [🌐 Accéder à la version Web](https://baybay.mb-site.com) • [👨‍💻 Site de l'auteur](https://mb-site.com)
 
-### 1) Python + Python Launcher (obligatoire)
+</div>
 
-Le projet utilise les commandes `py`, donc le Python Launcher Windows doit etre installe.
+---
 
-- Installer Python 3.10+ depuis https://www.python.org/downloads/windows/
-- Pendant l'installation, cocher :
-  - `Install launcher for all users (recommended)`
-  - `Add python.exe to PATH`
+## 📖 L'Histoire du Projet
 
-Verification :
+> *"Ce projet est né d'un besoin concret : mon oncle cherchait une solution simple, moderne et centralisée pour piloter son parc locatif et ses SCI sans dépendre d'abonnements exorbitants ou d'outils obsolètes. Étudiant en 2ème année à l'EFREI Paris, j'ai décidé de prendre en charge l'intégralité de la conception et du développement de l'architecture logicielle, assisté par l'intelligence artificielle pour garantir une expérience utilisateur fluide et une sécurité optimale."*  
+> — **Malik Bouaissi** ([mb-site.com](https://mb-site.com))
 
-```powershell
-py --version
-py -m pip --version
+---
+
+## ✨ Fonctionnalités Clés
+
+### 📄 1. Génération Instantanée de Quittances ALUR
+- Génération en 1 clic de **quittances de loyer officielles conformes à la loi ALUR**.
+- Signature numérique intégrée du bailleur / de la SCI.
+- Envoi direct et automatisé des quittances et avis d'échéance par email aux locataires.
+- Format PDF vectoriel haute définition (généré via *ReportLab*).
+
+### 🏢 2. Multi-Biens & Multi-SCI
+- Gestion simultanée d'un nombre illimité de biens, appartements, parkings et locaux commerciaux.
+- Prise en charge des SCI, indivisions et propriétés en nom propre.
+- Baux personnalisables, gestion des dépôts de garantie, révision des loyers (IRL) et suivi des charges.
+
+### 📊 3. Tableau de Bord Financier & Rentabilité
+- Visualisation en temps réel des encaissements, loyers en attente et retards de paiement.
+- Alertes automatiques en cas d'impayé.
+- Calculs automatisés des revenus nets, des charges déductibles et bilan fiscal exportable.
+
+### 🔐 4. Sécurité Avancée & Chiffrement 256 bits
+- Chiffrement symétrique **AES-256 bits** des données sensibles et documents.
+- Hachage robuste des mots de passe avec **Bcrypt + Salt**.
+- Isolation des sessions utilisateurs et protection contre les failles CSRF, XSS et SQL Injection.
+
+### 🔄 5. Double Mode : Bureau (Offline/Cloud) & Web (SaaS)
+- **Version Bureau Windows** : Application Electron fluide avec démarrage instantané en arrière-plan, synchronisation optionnelle et mises à jour automatiques transparentes (*Auto-Updater*).
+- **Version Web Cloud** : Accessible depuis n'importe quel navigateur sur smartphone, tablette ou PC via [baybay.mb-site.com](https://baybay.mb-site.com).
+
+---
+
+## 🛠️ Architecture & Stack Technique
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    BayBay Platform                      │
+├────────────────────────────┬────────────────────────────┤
+│       Desktop Client       │         Web Client         │
+│  (Electron.js + Native UI) │ (Tailwind CSS + Dark Glass)│
+├────────────────────────────┴────────────────────────────┤
+│                    Application Layer                    │
+│            Python 3.11+ • Flask • Gunicorn              │
+├────────────────────────────┬────────────────────────────┤
+│      Database Layer        │     Security & Reports     │
+│  MySQL / MariaDB / SQLite  │ ReportLab PDF • AES-256    │
+└────────────────────────────┴────────────────────────────┘
 ```
 
-Si `py` n'est pas reconnu, reinstall Python en activant bien le Launcher.
+| Composant | Technologie | Rôle |
+| :--- | :--- | :--- |
+| **Backend** | Python 3.11+, Flask, SQLAlchemy | Serveur d'application, API REST et logique métier |
+| **Frontend** | HTML5, Tailwind CSS, JavaScript (ES6+) | Interface utilisateur Dark Glassmorphism |
+| **Desktop Wrapper** | Electron.js, Node.js | Application bureau native Windows |
+| **Génération PDF** | ReportLab, PyMuPDF | Quittances de loyer et documents officiels ALUR |
+| **Base de Données** | MySQL, MariaDB, SQLite | Persistance et intégrité relationnelle |
+| **Packaging** | PyInstaller, NSIS Setup Maker | Compilateur d'exécutable et installeur Windows |
+| **Serveur & Proxy** | Linux Debian, Nginx, Gunicorn | Hébergement de production et reverse proxy |
 
-### 2) Node.js + npm (obligatoire)
+---
 
-- Installer Node.js 18+ (LTS recommande) : https://nodejs.org/
+## 🚀 Installation & Démarrage
 
-Verification :
+### Option 1 : Utiliser l'Installeur Windows (Recommandé pour Bureau)
 
-```powershell
-node -v
-npm -v
-```
+1. Rendez-vous sur la page des [Releases GitHub](https://github.com/mlk0622/BayBay/releases).
+2. Téléchargez le fichier **`Bay.Bay.Setup.4.0.exe`**.
+3. Lancez l'installeur et suivez les instructions.
+4. L'application démarre automatiquement sur votre bureau !
 
-### 3) NSIS (obligatoire pour generer le setup)
+---
 
-`build.bat` appelle `makensis.exe` pour creer l'installeur.
+### Option 2 : Lancer depuis les sources (Développement)
 
-- Installer NSIS : https://nsis.sourceforge.io/Download
-- Chemin attendu par defaut dans le script :
-  - `C:\Program Files (x86)\NSIS\makensis.exe`
+#### 1. Prérequis
+- **Python 3.11** ou supérieur installé.
+- **Node.js 18+** (optionnel, uniquement pour compiler la version Electron).
+- **Git**.
 
-Si NSIS est installe ailleurs, modifier `build.bat` en consequence.
-
-### 4) Git + GitHub CLI (obligatoire pour publish.bat)
-
-- Installer Git : https://git-scm.com/download/win
-- Installer GitHub CLI : https://cli.github.com/
-- Se connecter :
-
-```powershell
-gh auth login
-```
-
-`publish.bat` utilise `gh release create`.
-
-## Installation du projet (developpement)
-
-Depuis PowerShell :
-
-```powershell
+#### 2. Cloner le projet
+```bash
 git clone https://github.com/mlk0622/BayBay.git
 cd BayBay
-
-# Dependances Python
-py -m pip install --upgrade pip
-py -m pip install -r requirements.txt
-
-# Dependances Electron
-cd electron-app
-npm install
-cd ..
 ```
 
-Lancement local :
+#### 3. Installer les dépendances Python
+```bash
+python -m venv venv
+# Windows :
+venv\Scripts\activate
+# Linux/macOS :
+source venv/bin/activate
 
-```powershell
-py launcher.py
+pip install -r requirements.txt
 ```
 
-## IMPORTANT - Adapter la racine locale dans les scripts BAT
-
-Dans l'etat actuel du projet, les scripts utilisent un chemin absolu machine-specifique :
-
-- `build.bat`
-- `publish.bat`
-
-Ils contiennent une ligne de ce type :
-
-```bat
-cd "C:\Users\<User>\Documents\>path>"
+#### 4. Lancer le serveur local
+```bash
+python app.py
 ```
+Ouvrez ensuite votre navigateur sur `http://127.0.0.1:5000`.
 
-Sur une autre machine, cette ligne doit etre modifiee avec votre vrai chemin local du repo, sinon le build/publish echoue.
+---
 
-## Build local (installeur .exe)
+## 📦 Compilation de l'Installeur Bureau (.exe)
 
-Commande recommandee :
+Pour compiler l'installeur Windows complet depuis les sources :
 
-```powershell
-build.bat
+```bash
+# 1. Compiler le backend Flask en standalone via PyInstaller
+pyinstaller BayBay.spec
+
+# 2. Synchroniser la version (ex: v4.0)
+python sync_version.py 4.0
+
+# 3. Compiler l'installeur final avec NSIS
+makensis installer.nsi
 ```
+Le fichier d'installation `Bay.Bay.Setup.4.0.exe` sera généré à la racine.
 
-Le script effectue :
+---
 
-1. Build backend Python avec PyInstaller (`BayBay.spec`)
-2. Packaging Electron (`@electron/packager`)
-3. Copie du backend dans `electron-app/dist-simple/BayBay-win32-x64/resources/backend`
-4. Creation de l'installeur NSIS via `installer.nsi`
+## 👤 Auteur & Crédits
 
-Sortie attendue :
+- **Malik Bouaissi** — *Étudiant en 2ème année à l'EFREI Paris (École d'ingénieurs du numérique)*
+  - Portfolio : [mb-site.com](https://mb-site.com)
+  - GitHub : [@mlk0622](https://github.com/mlk0622)
+  - Email : `bouaissimalik@gmail.com`
 
-- `Bay.Bay.Setup.<version>.exe` a la racine du projet
+---
 
-## Publication d'une nouvelle version
+## 📄 Licence
 
-Commande :
-
-```powershell
-publish.bat
-```
-
-Le script :
-
-1. Demande une version (ex: `2.5.2`)
-2. Met a jour les versions dans :
-   - `electron-app/package.json`
-   - `launcher.py`
-   - `installer.nsi`
-3. Lance `build.bat`
-4. Commit + push + tag Git
-5. Cree la release GitHub avec `gh`
-
-## Fichiers de version a surveiller
-
-Pour eviter les incoherences entre backend, setup et auto-update, verifier ces fichiers avant release :
-
-- `launcher.py` (`VERSION = "..."`)
-- `installer.nsi` (`!define APP_VERSION "..."`)
-- `electron-app/package.json` (`"version": "..."`)
-- `auto_updater.py` (`CURRENT_VERSION = "..."`) si la logique de comparaison de version en depend
-
-## Arborescence utile
-
-```text
-BayBay/
-|-- app.py
-|-- launcher.py
-|-- auto_updater.py
-|-- BayBay.spec
-|-- build.bat
-|-- publish.bat
-|-- installer.nsi
-|-- requirements.txt
-|-- electron-app/
-|   |-- main.js
-|   |-- package.json
-|   `-- dist-simple/
-|-- templates/
-|-- static/
-`-- models/
-```
-
-## Donnees utilisateur
-
-Les donnees sont stockees hors dossier projet :
-
-```text
-%APPDATA%\BayBay\
-|-- baybay.db
-|-- .installed
-`-- uploads/
-```
-
-Ce dossier est preserve lors des mises a jour applicatives.
-
-## Depannage rapide
-
-- `py` non reconnu : reinstall Python avec le Launcher active
-- `makensis.exe` introuvable : installer NSIS ou corriger son chemin dans `build.bat`
-- `gh` non reconnu : installer GitHub CLI puis `gh auth login`
-- Build KO apres clone sur autre PC : verifier la racine locale configuree dans `build.bat` et `publish.bat`
-
-## Licence
-
-MIT License
-
-## Support
-
-Issues GitHub : https://github.com/mlk0622/BayBay/issues
+Ce projet est distribué sous la licence [MIT](license.txt).

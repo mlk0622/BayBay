@@ -1,0 +1,5 @@
+{
+  "CLOUD_URL": "http://88.190.118.23:33081",
+  "BACKEND_PORT": 5001,
+  "BACKEND_HOST": "localhost"
+}

@@ -1,173 +1,89 @@
-# ========================================
-# Bay Bay - .gitignore
-# ========================================
-build/
-dist/
-.claude-code/
-electron-app/
+# =========================
+# Executables & Large Binaries
+# =========================
 *.exe
-node_modules/
+*.dll
+*.so
+*.dylib
+Bay.Bay.Setup.*.exe
 
-# Build/Publish/Installer scripts and outputs
-publish.bat
-build.bat
-installer.nsi
-build/
-dist/
-
-
-# Python
+# =========================
+# Python & Virtual Environments
+# =========================
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# =========================
+# Environment Variables & Secrets
+# =========================
+.env
+.env.local
+.env.*.local
+*.secret
+instance/
+
+# =========================
+# Build & Packaging Artifacts
+# =========================
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+dist-simple/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
-
-# Virtual environments
-venv/
-ENV/
-env/
-.venv/
-
-# PyInstaller
 *.manifest
-*.spec.bak
-build/
-dist/
+*.spec
 
-# Electron
-electron-app/node_modules/
-electron-app/release/
-electron-app/dist/
-electron-app/dist-simple/
-electron-app/.cache/
-electron-app/out/
-
-# Build files
-*.exe
-Bay Bay Setup *.exe
-BayBay-*.zip
-
-# npm
+# =========================
+# Node & Electron
+# =========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+electron-app/dist/
+electron-app/dist-simple/
 
-# IDE
+# =========================
+# IDEs & Editor configs
+# =========================
 .idea/
 .vscode/
-*.swp
-*.swo
-*~
-.project
-.pydevproject
-.settings/
 *.sublime-project
 *.sublime-workspace
+.claude/
+.cursor/
+*.swp
+*.swo
 
-# OS
+# =========================
+# Logs & Databases
+# =========================
+*.log
+*.sqlite
+*.sqlite3
+*.db
+debug_updater_report.txt
+
+# =========================
+# OS Generated Files
+# =========================
 .DS_Store
 .DS_Store?
-._*
-.Spotlight-V100
-.Trashes
 ehthumbs.db
 Thumbs.db
-desktop.ini
+Desktop.ini
 
-# Logs
-*.log
-logs/
-app.log
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-instance/
-
-# Uploads (structure versionnée, contenu ignoré)
-uploads/*
+# =========================
+# Uploads & Temp files
+# =========================
+uploads/tmp/*
 !uploads/.gitkeep
-!uploads/assurances/
-uploads/assurances/*
-!uploads/assurances/.gitkeep
-!uploads/etats_lieux/
-uploads/etats_lieux/*
-!uploads/etats_lieux/.gitkeep
-!uploads/etats_lieux/photos/
-uploads/etats_lieux/photos/*
-!uploads/etats_lieux/photos/.gitkeep
-!uploads/photos/
-uploads/photos/*
-!uploads/photos/.gitkeep
-!uploads/quittances/
-uploads/quittances/*
-!uploads/quittances/.gitkeep
-!uploads/quittances/signatures/
-uploads/quittances/signatures/*
-!uploads/quittances/signatures/.gitkeep
-!uploads/appels_loyer/
-uploads/appels_loyer/*
-!uploads/appels_loyer/.gitkeep
-!uploads/signatures/
-uploads/signatures/*
-!uploads/signatures/.gitkeep
-
-# Données locales utilisateur
-data/
-baybay.db
-*.db
-*.sqlite
-*.sqlite3
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-*.env
-deploy_remote.py
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup
-*~
-.cache/
-tmp/
-temp/
-
-# Test files
-.coverage
-htmlcov/
-.tox/
-.pytest_cache/
-.mypy_cache/
-
-# Documentation build
-docs/_build/
-
-# Secrets
-*.pem
-*.key
-credentials.json
-secrets.json
