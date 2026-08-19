@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-view {% if active_tab == 'dashboard' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/" id="view-dashboard">
+<div class="app-view {% if active_tab == 'dashboard' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/dashboard" id="view-dashboard">
     {% include 'dashboard.html' %}
 </div>
 <div class="app-view {% if active_tab == 'biens' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/biens" id="view-biens">

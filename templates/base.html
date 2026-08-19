@@ -717,7 +717,7 @@
             let isTransitioning = false;
             
             const tabTitles = {
-                '/': 'Dashboard - BayBay',
+                '/dashboard': 'Dashboard - BayBay',
                 '/biens': 'Biens - BayBay',
                 '/locataires': 'Locataires - BayBay',
                 '/appels-loyer': 'Appels de Loyer - BayBay',
@@ -971,7 +971,7 @@
                 console.log("SPA: Data changed, reloading views in background...");
                 
                 // 1. Reload all main tabs
-                fetch('/')
+                fetch('/dashboard')
                     .then(res => {
                         if (!res.ok) throw new Error();
                         return res.text();
@@ -998,7 +998,7 @@
                 
                 // 2. Reload current detail page if on one
                 const currentPath = window.location.pathname;
-                if (currentPath !== '/' && !tabTitles[currentPath]) {
+                if (currentPath !== '/dashboard' && !tabTitles[currentPath]) {
                     fetch(window.location.href)
                         .then(res => {
                             if (!res.ok) throw new Error();
