@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Malik B. — mb-site.com</title>
-    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris et passionné par le développement de projets informatiques.">
+    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris et passionné par le développement informatique (C, Python, HTML/CSS, JavaScript, PHP).">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -104,7 +104,7 @@
     <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <!-- Brand -->
-            <a href="{{ url_for('index') if request is defined else '/' }}" class="flex items-center gap-2.5">
+            <a href="/" class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-black text-white text-sm shadow-md shadow-blue-500/30">
                     MB
                 </div>
@@ -114,7 +114,8 @@
             <!-- Nav Links : Simples écritures -->
             <nav class="flex items-center gap-8 text-sm font-medium text-slate-300">
                 <a href="#about" class="hover:text-white transition-colors">À propos</a>
-                <a href="#projects" class="hover:text-white transition-colors">Projets</a>
+                <a href="#skills" class="hover:text-white transition-colors">Compétences</a>
+                <a href="/projets.html" class="hover:text-white transition-colors">Projets</a>
                 <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
             </nav>
 
@@ -132,7 +133,7 @@
     <main class="flex-1">
 
         <!-- ================= HERO SECTION ================= -->
-        <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-16 text-center relative z-10 fade-in-element">
+        <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-14 text-center relative z-10 fade-in-element">
             
             <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
                 Étudiant @ EFREI Paris
@@ -146,18 +147,22 @@
                 Étudiant en 2ème année à l'EFREI Paris, j'aime imaginer, coder et concrétiser des applications modernes en utilisant les meilleures technologies et un peu d'IA.
             </p>
 
-            <!-- Bouton d'action unique vers les projets -->
-            <div class="flex items-center justify-center">
-                <a href="#projects" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 hover:-translate-y-0.5 transition-all">
+            <!-- Boutons d'action -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="/projets.html" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 hover:-translate-y-0.5 transition-all">
                     <i class="fas fa-folder-open text-xs"></i>
-                    <span>Voir mes réalisations</span>
+                    <span>Découvrir mes projets</span>
+                </a>
+                <a href="#skills" class="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/10 text-slate-200 hover:text-white font-semibold text-sm hover:-translate-y-0.5 transition-all">
+                    <i class="fas fa-code text-xs text-blue-400"></i>
+                    <span>Voir mes compétences</span>
                 </a>
             </div>
 
         </section>
 
         <!-- ================= ABOUT SECTION ================= -->
-        <section id="about" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+        <section id="about" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
             
             <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-6">
                 
@@ -172,7 +177,7 @@
                     </div>
                 </div>
 
-                <!-- Texte général et authentique -->
+                <!-- Récit général et authentique -->
                 <div class="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed">
                     <p>
                         J'aime transformer des problématiques concrètes en logiciels élégants, performants et intuitifs. C'est ainsi que j'ai développé <strong class="text-white">BayBay</strong> de A à Z lorsque mon oncle cherchait une solution complète et moderne pour gérer son parc immobilier et ses SCI.
@@ -193,90 +198,120 @@
 
         </section>
 
-        <!-- ================= PROJECTS SECTION ================= -->
-        <section id="projects" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
+        <!-- ================= SKILLS SECTION (À la place des projets sur l'accueil) ================= -->
+        <section id="skills" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
             
-            <div class="text-center mb-10">
+            <div class="text-center mb-8">
                 <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
-                    Réalisations
+                    Stack & Technologies
                 </span>
                 <h2 class="text-3xl sm:text-4xl font-black text-white mt-4">
-                    Mes Projets
+                    Compétences Techniques
                 </h2>
+                <p class="text-slate-400 text-sm max-w-lg mx-auto mt-2">
+                    Je sais coder en <span class="text-blue-400 font-semibold">C</span>, en <span class="text-purple-400 font-semibold">Python</span>, en <span class="text-amber-400 font-semibold">HTML / CSS / JavaScript</span> et en <span class="text-cyan-400 font-semibold">PHP</span>.
+                </p>
             </div>
 
-            <!-- Projet 1 : BayBay -->
-            <div class="liquid-glass-card p-8 sm:p-10 rounded-3xl border border-white/20 shadow-2xl space-y-6">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-bold">
-                        Projet Phare • Version 4.0
-                    </span>
-                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">
-                        En production
-                    </span>
-                </div>
-
-                <div>
-                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
-                        BayBay — Gestion Locative Complète
-                    </h3>
-                    <p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
-                        Logiciel et plateforme web de gestion immobilière pour propriétaires bailleurs et SCI. Génération instantanée de quittances certifiées ALUR, calculs automatisés, suivi des encaissements et application bureau Windows rapide.
+            <!-- Grille des Compétences -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
+                <!-- 1. Développement Web -->
+                <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl border border-blue-500/20">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Développement Web</h3>
+                            <p class="text-xs text-blue-400 font-medium">React & TypeScript, PHP, Python</p>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Création d'applications web réactives et de serveurs robustes. Architecture backend avec Python (Flask / API) et PHP, intégration frontend avec React et TypeScript.
                     </p>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">React</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">TypeScript</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">PHP</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Python (Flask)</span>
+                    </div>
                 </div>
 
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Python Flask</span>
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Electron.js</span>
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">MySQL / SQLite</span>
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-blue-300 font-medium">Chiffrement AES-256</span>
+                <!-- 2. Développement HTML/CSS & Desktop -->
+                <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl border border-purple-500/20">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Développement HTML/CSS</h3>
+                            <p class="text-xs text-purple-400 font-medium">Applications & Plateformes</p>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Intégration responsive haute fidélité, animations fluides et applications logicielles desktop multiplateformes avec Electron.js.
+                    </p>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">HTML5</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">CSS3 / Tailwind</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">JavaScript</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Electron.js</span>
+                    </div>
                 </div>
 
-                <div class="pt-2 flex flex-wrap items-center gap-3">
-                    <a href="https://baybay.mb-site.com" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/30 transition-all">
-                        <span>Visiter BayBay</span>
-                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-                    <a href="https://github.com/mlk0622/BayBay" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-white font-semibold text-xs transition-all">
-                        <i class="fab fa-github"></i>
-                        <span>Code source GitHub</span>
-                    </a>
+                <!-- 3. Base de données -->
+                <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Bases de Données</h3>
+                            <p class="text-xs text-emerald-400 font-medium">SQL, NoSQL</p>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Modélisation relationnelle, optimisation de requêtes et persistance des données sous MySQL, MariaDB, SQLite et architectures NoSQL.
+                    </p>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">MySQL</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">SQLite</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">SQLAlchemy</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">NoSQL</span>
+                    </div>
                 </div>
+
+                <!-- 4. UI/UX Design & Langage C -->
+                <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl border border-amber-500/20">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">UI/UX & Algorithmique</h3>
+                            <p class="text-xs text-amber-400 font-medium">Interfaces modernes & C</p>
+                        </div>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        Conception d'interfaces soignées (Dark Glassmorphism, ergonomie réactive) et programmation bas niveau / algorithmique en langage C à l'EFREI Paris.
+                    </p>
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Langage C</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Dark Glassmorphism</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">UI/UX</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Algorithmique</span>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Projet 2 : Poudelard -->
-            <div class="liquid-glass-card p-8 sm:p-10 rounded-3xl border border-white/20 shadow-2xl space-y-6">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold">
-                        Projet EFREI Paris
-                    </span>
-                    <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold">
-                        Équipe Belfar & Bouaissi
-                    </span>
-                </div>
-
-                <div>
-                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white">
-                        Poudelard — Simulation & Logique Métier
-                    </h3>
-                    <p class="text-slate-300 text-sm sm:text-base mt-2 leading-relaxed">
-                        Projet académique d'ingénierie logicielle réalisé à l'EFREI Paris en équipe. Système de simulation interactif avec programmation orientée objet, gestion des événements, algorithmes et structures de données avancées.
-                    </p>
-                </div>
-
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">Programmation Orientée Objet</span>
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">Algorithmique</span>
-                    <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-xs text-purple-300 font-medium">EFREI SC1</span>
-                </div>
-
-                <div class="pt-2 flex flex-wrap items-center gap-3">
-                    <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-600/30 transition-all">
-                        <i class="fab fa-github"></i>
-                        <span>Voir le projet sur GitHub</span>
-                        <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-                </div>
+            <!-- Bouton vers la page projets -->
+            <div class="pt-6 text-center">
+                <a href="/projets.html" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/25 hover:-translate-y-0.5 transition-all">
+                    <span>Accéder à la page de mes projets</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
             </div>
 
         </section>
@@ -294,8 +329,8 @@
                 <span>— © 2026 mb-site.com. Tous droits réservés.</span>
             </div>
             <div class="flex items-center gap-4">
+                <a href="/projets.html" class="hover:text-white transition-colors">Projets</a>
                 <a href="https://baybay.mb-site.com" class="hover:text-white transition-colors">BayBay</a>
-                <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="hover:text-white transition-colors">Poudelard</a>
                 <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors">GitHub</a>
                 <a href="mailto:bouaissimalik@gmail.com" class="hover:text-white transition-colors">Contact</a>
             </div>
