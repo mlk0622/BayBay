@@ -1611,9 +1611,30 @@ def render_app_consolidated(active_tab):
 
 
 @app.route('/')
+def index():
+    ua = request.headers.get('User-Agent', '') if has_request_context() else ''
+    hdr = request.headers.get('X-BayBay-Desktop', '') if has_request_context() else ''
+    is_desktop = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1' or getattr(sys, 'frozen', False) or os.environ.get('BAYBAY_DESKTOP') == '1')
+    
+    if is_desktop:
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))
+        
+    return render_template('landing.html', app_version=VERSION)
+
+
+@app.route('/dashboard')
+@app.route('/app')
 @login_required
 def dashboard():
     return render_app_consolidated('dashboard')
+
+
+@app.route('/presentation')
+@app.route('/landing')
+def presentation():
+    return render_template('landing.html', app_version=VERSION)
 
 
 @app.route('/sci/<int:sci_id>')
