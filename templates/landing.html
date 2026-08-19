@@ -122,7 +122,7 @@
 
         @keyframes floatingChilling {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-12px) rotate(-2deg); }
+            50% { transform: translateY(-10px) rotate(-2deg); }
         }
     </style>
 </head>
@@ -159,10 +159,13 @@
                 <span class="text-xl font-black text-white tracking-tight">BayBay</span>
             </a>
 
-            <!-- Nav Links (Desktop) -->
+            <!-- Nav Links : mb-site et a propos -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="#tranquillite" class="hover:text-white transition-colors">Tranquillité</a>
-                <a href="#features" class="hover:text-white transition-colors">Fonctionnalités de l'app</a>
+                <a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors flex items-center gap-1.5">
+                    <span>mb-site</span>
+                    <i class="fas fa-external-link-alt text-[10px] text-slate-400"></i>
+                </a>
+                <a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">À propos</a>
             </nav>
 
             <!-- Top Right Action Buttons: Connexion & Inscription -->
@@ -244,26 +247,17 @@
 
         </section>
 
-        <!-- ================= GRANDE SECTION : CHOISISSEZ LA TRANQUILLITÉ AVEC BONHOMME RELAX ================= -->
+        <!-- ================= GRANDE SECTION : CHOISISSEZ LA TRANQUILLITÉ ================= -->
         <section id="tranquillite" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div class="text-center max-w-4xl mx-auto mb-14">
-                <span class="text-blue-400 text-xs sm:text-sm uppercase tracking-widest font-extrabold px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
-                    Sérénité & Efficacité
-                </span>
-                <h2 class="text-4xl sm:text-6xl font-black text-white mt-4 tracking-tight leading-tight">
+                <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
                     Choisissez la tranquillité
                 </h2>
-                <p class="text-slate-300 text-base sm:text-lg mt-4 max-w-2xl mx-auto leading-relaxed">
-                    Installez-vous confortablement. BayBay protège vos données, s'occupe de vos calculs et expédie vos documents locatifs en toute autonomie.
-                </p>
             </div>
 
-            <!-- Illustration & Animation Interactive Bonhomme Tranquille / Chill -->
+            <!-- Illustration & Bonhomme Relax sans lunettes ni bulle zen -->
             <div class="max-w-4xl mx-auto mb-12 p-8 rounded-3xl liquid-glass border border-white/20 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
                 <div class="max-w-md text-left">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold mb-3">
-                        <i class="fas fa-umbrella-beach"></i> 100% Sérénité
-                    </div>
                     <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">
                         Détendez-vous, tout est sous contrôle.
                     </h3>
@@ -277,7 +271,7 @@
                     </div>
                 </div>
 
-                <!-- Bonhomme Allongé Relax en mode Chill (SVG Stylisé Glassmorphism) -->
+                <!-- Bonhomme Allongé Relax en mode Chill (sans lunettes, sans bulle zen) -->
                 <div class="relative w-64 h-48 flex items-center justify-center shrink-0">
                     <div id="chill-illustration" class="tranquille-stickman w-full h-full flex items-center justify-center">
                         <svg viewBox="0 0 240 180" class="w-full h-full drop-shadow-[0_10px_20px_rgba(59,130,246,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -289,16 +283,17 @@
                             <line x1="65" y1="140" x2="55" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
                             <line x1="145" y1="120" x2="160" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
                             
-                            <!-- Bonhomme qui s'allonge en mode tranquille -->
-                            <!-- Tête avec lunettes de soleil -->
+                            <!-- Bonhomme qui s'allonge en mode tranquille (visage souriant sans lunettes) -->
                             <circle cx="170" cy="72" r="14" fill="#fed7aa" stroke="#fbbf24" stroke-width="2" />
-                            <rect x="162" y="68" width="16" height="6" rx="3" fill="#1e293b" />
-                            <line x1="160" y1="71" x2="180" y2="71" stroke="#0f172a" stroke-width="2" />
+                            <!-- Yeux fermés détendus et sourire -->
+                            <path d="M164 70 Q167 73 170 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
+                            <path d="M172 70 Q175 73 178 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
+                            <path d="M167 78 Q171 82 175 78" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
                             
                             <!-- Corps détendu -->
                             <path d="M160 84 L125 118 L70 128 L40 135" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
                             
-                            <!-- Bras tenant un cocktail ou son smartphone -->
+                            <!-- Bras tenant un cocktail -->
                             <path d="M142 98 L130 112 L110 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
                             
                             <!-- Cocktail avec paille -->
@@ -306,12 +301,6 @@
                             <line x1="110" y1="96" x2="110" y2="104" stroke="#e2e8f0" stroke-width="2" />
                             <line x1="104" y1="104" x2="116" y2="104" stroke="#e2e8f0" stroke-width="2" />
                             <line x1="110" y1="84" x2="120" y2="72" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" />
-                            
-                            <!-- Petite bulle "Zen" -->
-                            <g transform="translate(195, 38)">
-                                <circle cx="12" cy="12" r="14" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" />
-                                <text x="12" y="16" font-size="9" font-weight="bold" fill="#38bdf8" text-anchor="middle">ZEN</text>
-                            </g>
 
                             <defs>
                                 <linearGradient id="umbrellaGrad" x1="170" y1="30" x2="230" y2="45" gradientUnits="userSpaceOnUse">
@@ -378,30 +367,26 @@
             </div>
         </section>
 
-        <!-- ================= SECTION FONCTIONNALITÉS ÉTOFFÉES (BULLE POUR CHAQUE ONGLET DE L'APP) ================= -->
+        <!-- ================= SECTION FONCTIONNALITÉS (8 BULLES ÉPURÉES SANS "ONGLET N") ================= -->
         <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/10">
             <div class="text-center max-w-4xl mx-auto mb-14">
-                <span class="text-blue-400 text-xs sm:text-sm uppercase tracking-widest font-extrabold px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
-                    Boîte à Outils Complète
-                </span>
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white mt-4">
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-white">
                     Une application pensée pour chaque aspect de votre gestion
                 </h2>
                 <p class="text-slate-400 text-sm sm:text-base mt-3">
-                    Retrouvez une vue claire et structurée à travers tous les onglets clés de l'application BayBay.
+                    Découvrez toutes les fonctionnalités intégrées pour piloter sereinement vos locations.
                 </p>
             </div>
 
-            <!-- Grille de Bulles pour CHAQUE onglet de l'application -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Grille de 8 Bulles épurées -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-                <!-- 1. Onglet Dashboard -->
+                <!-- 1. Dashboard -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-blue-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-chart-pie"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-blue-400 font-bold mb-1">Onglet 1</div>
                         <h3 class="text-lg font-bold text-white mb-2">Tableau de Bord</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Visualisez en un coup d'œil vos loyers attendus, vos encaissements réels, le taux de recouvrement global et les alertes d'impayés pour toutes vos SCI.
@@ -409,13 +394,12 @@
                     </div>
                 </div>
 
-                <!-- 2. Onglet Biens & SCI -->
+                <!-- 2. Biens & SCI -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-indigo-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-home"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-indigo-400 font-bold mb-1">Onglet 2</div>
                         <h3 class="text-lg font-bold text-white mb-2">Biens & SCIs</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Organisez votre patrimoine par SCI ou en détention directe. Structurez vos immeubles, lots, appartements, surfaces et charges déductibles associées.
@@ -423,13 +407,12 @@
                     </div>
                 </div>
 
-                <!-- 3. Onglet Locataires & Garants -->
+                <!-- 3. Locataires & Garants -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-emerald-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-users"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-emerald-400 font-bold mb-1">Onglet 3</div>
                         <h3 class="text-lg font-bold text-white mb-2">Locataires & Garants</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Fiches complètes des locataires, coordonnées, garants solidaires, contrats de bail signés, attestations d'assurance habitation et dépôts de garantie.
@@ -437,41 +420,38 @@
                     </div>
                 </div>
 
-                <!-- 4. Onglet Appels de Loyer -->
+                <!-- 4. Appels de Loyer (avec programmation & envoi) -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-cyan-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-file-invoice"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-cyan-400 font-bold mb-1">Onglet 4</div>
                         <h3 class="text-lg font-bold text-white mb-2">Appels de Loyer</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Génération automatique et instantanée des avis d'échéance mensuels avec détail du loyer nu et des provisions, prêts à l'envoi en 1 clic.
+                            Génération instantanée des avis d'échéance avec calcul du loyer nu et des provisions, envoi en 1 clic ou programmé automatiquement chaque mois par e-mail.
                         </p>
                     </div>
                 </div>
 
-                <!-- 5. Onglet Quittances de Loyer -->
+                <!-- 5. Quittances de Loyer (avec signature & programmation) -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-amber-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-receipt"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">Onglet 5</div>
                         <h3 class="text-lg font-bold text-white mb-2">Quittances de Loyer</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            Édition certifiée conforme à la loi ALUR avec signature du bailleur, QR code public de vérification d'authenticité et expédition par e-mail.
+                            Édition certifiée loi ALUR avec signature du bailleur, QR code public d'authenticité et expédition directe par e-mail ou envoi programmé.
                         </p>
                     </div>
                 </div>
 
-                <!-- 6. Onglet Résumé des Loyers -->
+                <!-- 6. Résumé des Loyers -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-purple-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-chart-bar"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-purple-400 font-bold mb-1">Onglet 6</div>
                         <h3 class="text-lg font-bold text-white mb-2">Résumé des Loyers</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Bilan financier mois par mois et synthèse pluriannuelle des loyers perçus, facilitant le suivi comptable et vos déclarations fiscales annuelles (2044 / 2072).
@@ -479,13 +459,12 @@
                     </div>
                 </div>
 
-                <!-- 7. Onglet Comptes Locatifs -->
+                <!-- 7. Comptes Locatifs -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-teal-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-calculator"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-teal-400 font-bold mb-1">Onglet 7</div>
                         <h3 class="text-lg font-bold text-white mb-2">Comptes Locatifs</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Suivi du grand livre individuel par locataire : débits, crédits, historique complet des règlements, régularisation des charges et solde net en direct.
@@ -493,44 +472,15 @@
                     </div>
                 </div>
 
-                <!-- 8. Onglet États des Lieux & Documents -->
+                <!-- 8. États des Lieux & Docs -->
                 <div class="liquid-glass-card p-6 rounded-3xl border border-rose-500/25 flex flex-col justify-between">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-rose-600/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl mb-4">
                             <i class="fas fa-clipboard-check"></i>
                         </div>
-                        <div class="text-xs uppercase tracking-wider text-rose-400 font-bold mb-1">Onglet 8</div>
                         <h3 class="text-lg font-bold text-white mb-2">États des Lieux & Docs</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
                             Inventaires d'entrée et sortie numérisés, relevés de compteurs, insertion de photos horodatées pièce par pièce et archivage sécurisé des baux.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 9. Onglet Programmation des Envois -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-yellow-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-yellow-600/20 text-yellow-400 border border-yellow-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="text-xs uppercase tracking-wider text-yellow-400 font-bold mb-1">Onglet 9</div>
-                        <h3 class="text-lg font-bold text-white mb-2">Programmation</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Planifiez l'envoi mensuel automatique de vos appels de loyer et quittances à date fixe avec prévisualisation des e-mails avant expédition.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 10. Onglet Paramètres & Configuration -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-slate-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-slate-600/20 text-slate-300 border border-slate-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                        <div class="text-xs uppercase tracking-wider text-slate-400 font-bold mb-1">Onglet 10</div>
-                        <h3 class="text-lg font-bold text-white mb-2">Paramètres & SMTP</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Configuration de votre propre serveur SMTP pour l'envoi des mails, coordonnées bancaires RIB/IBAN du bailleur et signature décorative officielle.
                         </p>
                     </div>
                 </div>
@@ -563,17 +513,22 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 text-center">
+    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
                 <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay Logo">
                 <span class="font-bold text-white">BayBay</span>
-                <span>— Gestion locative immobilière</span>
+                <span>— © 2026 Malik B. Tous droits réservés.</span>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="{{ url_for('login') }}" class="hover:text-white transition-colors">Connexion</a>
-                <a href="{{ url_for('register') }}" class="hover:text-white transition-colors">Inscription</a>
-                <a href="{{ url_for('download_desktop_app') }}" class="hover:text-white transition-colors">Télécharger</a>
+            <div class="flex items-center gap-3">
+                <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                    <i class="fab fa-github text-sm"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="mailto:bouaissimalik@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
+                    <i class="fas fa-envelope text-sm text-blue-400"></i>
+                    <span>bouaissimalik@gmail.com</span>
+                </a>
             </div>
         </div>
     </footer>
@@ -596,7 +551,6 @@
                     window.requestAnimationFrame(() => {
                         const scrollY = window.pageYOffset || document.documentElement.scrollTop;
                         const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-                        const scrollProgress = scrollHeight > 0 ? (scrollY / scrollHeight) : 0;
 
                         // Rotation des clés en fonction du scroll
                         if (key1) {
