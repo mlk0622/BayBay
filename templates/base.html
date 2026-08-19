@@ -131,11 +131,12 @@
         }
         .app-view {
             width: 100%;
-            display: none;
+            display: none !important;
             opacity: 0;
         }
         .app-view.active {
-            display: block;
+            display: block !important;
+            opacity: 1 !important;
             animation: ios-fade-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         @keyframes ios-fade-in {
@@ -846,120 +847,131 @@
                     }
                 }
                 
-                // 2. Load from DOM-preserved cache (Instant transition)
-                if (!forceReload && loadedViews[pathTo]) {
-                    isTransitioning = true;
-                    const outgoingView = loadedViews[pathFrom];
-                    const incomingView = loadedViews[pathTo];
-                    
-                    wrapper.classList.add('fade-out');
-                    
-                    setTimeout(() => {
-                        if (outgoingView) outgoingView.classList.remove('active');
-                        incomingView.classList.add('active');
-                        
-                        if (history.state?.url !== toUrl) {
-                            history.pushState({url: toUrl}, '', toUrl);
-                        }
-                        
-                        document.title = tabTitles[pathTo] || 'BayBay';
-                        syncNavPillWithCurrentRoute();
-                        syncMobileMenu();
-                        window.scrollTo(0, 0);
-                        
-                        wrapper.classList.remove('fade-out');
-                        isTransitioning = false;
-                    }, 200);
-                    return;
-                }
-                
-                // 3. Fetch from network
+            function activateOnlyView(targetPath) {
+                document.querySelectorAll('.app-view').forEach(v => {
+                    const p = v.dataset.path;
+                    if (p === targetPath) {
+                        v.classList.add('active');
+                        v.style.setProperty('display', 'block', 'important');
+                        v.style.setProperty('opacity', '1', 'important');
+                    } else {
+                        v.classList.remove('active');
+                        v.style.setProperty('display', 'none', 'important');
+                        v.style.setProperty('opacity', '0', 'important');
+                    }
+                });
+            }
+
+            // 2. Load from DOM-preserved cache (Instant transition)
+            if (!forceReload && loadedViews[pathTo]) {
                 isTransitioning = true;
+                
                 wrapper.classList.add('fade-out');
                 
-                const startTime = Date.now();
-                
-                fetch(url)
-                    .then(res => {
-                        const finalUrl = res.url || url;
-                        if (!res.ok) throw new Error("HTTP error " + res.status);
-                        return res.text().then(text => ({ url: finalUrl, text: text }));
-                    })
-                    .then(({ url: finalUrl, text: htmlText }) => {
-                        const finalPath = new URL(finalUrl).pathname;
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(htmlText, 'text/html');
-                        
-                        const newTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : 'BayBay';
-                        // Update all background tab views returned in doc
-                        doc.querySelectorAll('.app-view').forEach(v => {
-                            const p = v.dataset.path;
-                            if (p && p !== finalPath && loadedViews[p]) {
-                                loadedViews[p].innerHTML = v.innerHTML;
-                                executeScripts(loadedViews[p]);
-                                if (window.setupEditor) {
-                                    loadedViews[p].querySelectorAll('[data-target]').forEach(setupEditor);
-                                }
-                            }
-                        });
-
-                        // Target exact view for finalPath
-                        let incomingView = doc.querySelector(`.app-view[data-path="${finalPath}"]`);
-                        if (!incomingView) {
-                            const allViews = doc.querySelectorAll('.app-view');
-                            if (allViews.length === 1) {
-                                incomingView = allViews[0];
-                            } else {
-                                const mainElem = doc.querySelector('#app-content-wrapper main') || doc.querySelector('main');
-                                if (mainElem) {
-                                    incomingView = document.createElement('main');
-                                    incomingView.className = 'app-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full';
-                                    incomingView.dataset.path = finalPath;
-                                    incomingView.innerHTML = mainElem.innerHTML;
-                                }
-                            }
-                        }
-                        
-                        if (incomingView) {
-                            // Ensure it starts hidden
-                            incomingView.classList.remove('active');
-                            
-                            // Remove existing view for the same path if exists to avoid duplicates
-                            const existing = loadedViews[finalPath];
-                            if (existing) existing.remove();
-                            
-                            wrapper.appendChild(incomingView);
-                            loadedViews[finalPath] = incomingView;
-                            
-                            executeScripts(incomingView);
+                setTimeout(() => {
+                    activateOnlyView(pathTo);
+                    
+                    if (history.state?.url !== toUrl) {
+                        history.pushState({url: toUrl}, '', toUrl);
+                    }
+                    
+                    document.title = tabTitles[pathTo] || 'BayBay';
+                    syncNavPillWithCurrentRoute();
+                    syncMobileMenu();
+                    window.scrollTo(0, 0);
+                    
+                    wrapper.classList.remove('fade-out');
+                    isTransitioning = false;
+                }, 200);
+                return;
+            }
+            
+            // 3. Fetch from network
+            isTransitioning = true;
+            wrapper.classList.add('fade-out');
+            
+            const startTime = Date.now();
+            
+            fetch(url)
+                .then(res => {
+                    const finalUrl = res.url || url;
+                    if (!res.ok) throw new Error("HTTP error " + res.status);
+                    return res.text().then(text => ({ url: finalUrl, text: text }));
+                })
+                .then(({ url: finalUrl, text: htmlText }) => {
+                    const finalPath = new URL(finalUrl).pathname;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    
+                    const newTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : 'BayBay';
+                    // Update all background tab views returned in doc
+                    doc.querySelectorAll('.app-view').forEach(v => {
+                        const p = v.dataset.path;
+                        if (p && p !== finalPath && loadedViews[p]) {
+                            loadedViews[p].innerHTML = v.innerHTML;
+                            executeScripts(loadedViews[p]);
                             if (window.setupEditor) {
-                                incomingView.querySelectorAll('[data-target]').forEach(setupEditor);
+                                loadedViews[p].querySelectorAll('[data-target]').forEach(setupEditor);
+                            }
+                        }
+                    });
+
+                    // Target exact view for finalPath
+                    let incomingView = doc.querySelector(`.app-view[data-path="${finalPath}"]`);
+                    if (!incomingView) {
+                        const allViews = doc.querySelectorAll('.app-view');
+                        if (allViews.length === 1) {
+                            incomingView = allViews[0];
+                        } else {
+                            const mainElem = doc.querySelector('#app-content-wrapper main') || doc.querySelector('main');
+                            if (mainElem) {
+                                incomingView = document.createElement('main');
+                                incomingView.className = 'app-view max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full';
+                                incomingView.dataset.path = finalPath;
+                                incomingView.innerHTML = mainElem.innerHTML;
+                            }
+                        }
+                    }
+                    
+                    if (incomingView) {
+                        // Ensure it starts hidden
+                        incomingView.classList.remove('active');
+                        incomingView.style.setProperty('display', 'none', 'important');
+                        
+                        // Remove existing view for the same path if exists to avoid duplicates
+                        const existing = loadedViews[finalPath];
+                        if (existing) existing.remove();
+                        
+                        wrapper.appendChild(incomingView);
+                        loadedViews[finalPath] = incomingView;
+                        
+                        executeScripts(incomingView);
+                        if (window.setupEditor) {
+                            incomingView.querySelectorAll('[data-target]').forEach(setupEditor);
+                        }
+                        
+                        const elapsedTime = Date.now() - startTime;
+                        const remainingTime = Math.max(0, 200 - elapsedTime);
+                        
+                        setTimeout(() => {
+                            activateOnlyView(finalPath);
+                            
+                            if (history.state?.url !== finalUrl) {
+                                history.pushState({url: finalUrl}, '', finalUrl);
                             }
                             
-                            const elapsedTime = Date.now() - startTime;
-                            const remainingTime = Math.max(0, 200 - elapsedTime);
+                            document.title = newTitle;
+                            syncNavPillWithCurrentRoute();
+                            syncMobileMenu();
+                            window.scrollTo(0, 0);
                             
-                            setTimeout(() => {
-                                const outgoingView = loadedViews[pathFrom];
-                                if (outgoingView) outgoingView.classList.remove('active');
-                                incomingView.classList.add('active');
-                                
-                                if (history.state?.url !== finalUrl) {
-                                    history.pushState({url: finalUrl}, '', finalUrl);
-                                }
-                                
-                                document.title = newTitle;
-                                syncNavPillWithCurrentRoute();
-                                syncMobileMenu();
-                                window.scrollTo(0, 0);
-                                
-                                wrapper.classList.remove('fade-out');
-                                isTransitioning = false;
-                            }, remainingTime);
-                        } else {
-                            window.location.href = finalUrl; // Hard fallback
-                        }
-                    })
+                            wrapper.classList.remove('fade-out');
+                            isTransitioning = false;
+                        }, remainingTime);
+                    } else {
+                        window.location.href = finalUrl; // Hard fallback
+                    }
+                })
                     .catch(err => {
                         console.error("SPA Fetch failed:", err);
                         window.location.href = url; // Hard fallback

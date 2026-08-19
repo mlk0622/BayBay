@@ -13,28 +13,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="app-view {% if active_tab == 'dashboard' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/dashboard" id="view-dashboard">
+<div class="app-view {% if active_tab == 'dashboard' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/dashboard" id="view-dashboard" {% if active_tab != 'dashboard' %}style="display: none !important;"{% endif %}>
     {% include 'dashboard.html' %}
 </div>
-<div class="app-view {% if active_tab == 'biens' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/biens" id="view-biens">
+<div class="app-view {% if active_tab == 'biens' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/biens" id="view-biens" {% if active_tab != 'biens' %}style="display: none !important;"{% endif %}>
     {% include 'biens.html' %}
 </div>
-<div class="app-view {% if active_tab == 'locataires' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/locataires" id="view-locataires">
+<div class="app-view {% if active_tab == 'locataires' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/locataires" id="view-locataires" {% if active_tab != 'locataires' %}style="display: none !important;"{% endif %}>
     {% include 'locataires.html' %}
 </div>
-<div class="app-view {% if active_tab == 'appels' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/appels-loyer" id="view-appels">
+<div class="app-view {% if active_tab == 'appels' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/appels-loyer" id="view-appels" {% if active_tab != 'appels' %}style="display: none !important;"{% endif %}>
     {% include 'appels_loyer.html' %}
 </div>
-<div class="app-view {% if active_tab == 'quittances' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/quittances" id="view-quittances">
+<div class="app-view {% if active_tab == 'quittances' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/quittances" id="view-quittances" {% if active_tab != 'quittances' %}style="display: none !important;"{% endif %}>
     {% include 'quittances.html' %}
 </div>
-<div class="app-view {% if active_tab == 'resume' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/resume-loyers" id="view-resume">
+<div class="app-view {% if active_tab == 'resume' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/resume-loyers" id="view-resume" {% if active_tab != 'resume' %}style="display: none !important;"{% endif %}>
     {% include 'resume_loyers.html' %}
 </div>
-<div class="app-view {% if active_tab == 'comptes' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/comptes-locatifs" id="view-comptes">
+<div class="app-view {% if active_tab == 'comptes' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/comptes-locatifs" id="view-comptes" {% if active_tab != 'comptes' %}style="display: none !important;"{% endif %}>
     {% include 'comptes_locatifs.html' %}
 </div>
-<div class="app-view {% if active_tab == 'parametres' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/parametres" id="view-parametres">
+<div class="app-view {% if active_tab == 'parametres' %}active{% endif %} max-w-7xl mx-auto py-8 w-full" data-path="/parametres" id="view-parametres" {% if active_tab != 'parametres' %}style="display: none !important;"{% endif %}>
     {% include 'parametres.html' %}
 </div>
 {% endblock %}
