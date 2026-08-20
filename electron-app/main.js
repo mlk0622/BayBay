@@ -14,7 +14,7 @@ const net = require('net');
 
 // Configuration
 const APP_NAME = 'Bay Bay';
-let CLOUD_URL = 'http://88.190.118.23:33081'; // URL par défaut du serveur Cloud
+let CLOUD_URL = 'https://baybay.mb-site.com'; // URL par défaut du serveur Cloud
 let BACKEND_PORT = 5001;
 let BACKEND_HOST = 'localhost';
 

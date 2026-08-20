@@ -88,13 +88,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-# Secure=True requis pour HTTPS/Cloudflare (False uniquement en développement local)
-_is_production = bool(os.environ.get('DATABASE_URL'))
-app.config['SESSION_COOKIE_SECURE'] = _is_production
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
-app.config['REMEMBER_COOKIE_SECURE'] = _is_production
+app.config['REMEMBER_COOKIE_SECURE'] = False
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'assurances'), exist_ok=True)
