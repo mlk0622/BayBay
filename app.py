@@ -2013,6 +2013,76 @@ def _verify_turnstile(response_token, remote_ip=None):
         return True
 
 
+# Dictionnaire en mémoire pour le rate-limiting des tentatives de connexion (IP + Email)
+_login_attempts = {}
+
+def _check_login_rate_limit(key, max_attempts=5, lock_minutes=15):
+    """Vérifie si une IP/Email a dépassé la limite de tentatives de connexion."""
+    now = datetime.utcnow()
+    record = _login_attempts.get(key)
+    if not record:
+        return True, 0, 0
+    
+    count, lock_until = record
+    if lock_until and now < lock_until:
+        remaining_seconds = int((lock_until - now).total_seconds())
+        remaining_minutes = max(1, (remaining_seconds + 59) // 60)
+        return False, count, remaining_minutes
+    
+    if lock_until and now >= lock_until:
+        # Période de blocage écoulée, on réinitialise
+        _login_attempts.pop(key, None)
+        return True, 0, 0
+        
+    return True, count, 0
+
+def _record_login_failure(key, max_attempts=5, lock_minutes=15):
+    """Enregistre un échec de connexion et bloque après max_attempts échecs consécutifs."""
+    now = datetime.utcnow()
+    record = _login_attempts.get(key)
+    count = (record[0] + 1) if record else 1
+    
+    if count >= max_attempts:
+        lock_until = now + timedelta(minutes=lock_minutes)
+        _login_attempts[key] = (count, lock_until)
+        return True, count, lock_minutes
+    else:
+        _login_attempts[key] = (count, None)
+        return False, count, 0
+
+def _clear_login_failures(key):
+    """Efface les échecs après une connexion réussie."""
+    _login_attempts.pop(key, None)
+
+
+# --- Protection CSRF native transparente (Formulaires + Headers AJAX) ---
+def generate_csrf_token():
+    if '_csrf_token' not in session:
+        session['_csrf_token'] = secrets.token_hex(32)
+    return session['_csrf_token']
+
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+@app.before_request
+def csrf_protect():
+    if request.method in ('POST', 'PUT', 'PATCH', 'DELETE'):
+        # Exemptions : routes publiques sans session préalable ou authentification desktop
+        exempt_routes = {'login', 'register', 'forgot_password', 'verify_email', 'reset_password', 'resend_verification_code'}
+        if request.endpoint in exempt_routes or _is_desktop():
+            return
+        
+        # Vérification du jeton CSRF (provenant d'un formulaire POST ou d'un en-tête X-CSRFToken / X-CSRF-Token)
+        token = request.form.get('csrf_token') or request.headers.get('X-CSRFToken') or request.headers.get('X-CSRF-Token')
+        session_token = session.get('_csrf_token')
+        
+        if not session_token or not token or not secrets.compare_digest(token, session_token):
+            # Si requête API JSON, répondre en JSON 403
+            if request.path.startswith('/api/') or request.is_json:
+                return jsonify({'success': False, 'error': 'Jeton de sécurité CSRF invalide ou expiré.'}), 403
+            flash('Session de formulaire expirée. Veuillez recharger la page et réessayer.', 'error')
+            return redirect(request.referrer or url_for('dashboard'))
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -2020,13 +2090,21 @@ def login():
         password = (request.form.get('password') or '').strip()
         turnstile_token = request.form.get('cf-turnstile-response', '').strip()
 
-        # Le Captcha est STRICTEMENT OBLIGATOIRE sur la version Web (non requis sur l'application Desktop)
+        client_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr or '127.0.0.1'
+        rate_key = f"{client_ip}:{email}"
+
+        # 1. Vérification du Rate Limiting (5 échecs = blocage 15 minutes)
+        allowed, fail_count, remaining_mins = _check_login_rate_limit(rate_key, max_attempts=5, lock_minutes=15)
+        if not allowed:
+            flash(f"Trop de tentatives infructueuses. Par mesure de sécurité, la connexion est bloquée pendant encore {remaining_mins} minute(s).", 'error')
+            return render_template('login.html', email=email)
+
+        # 2. Le Captcha est STRICTEMENT OBLIGATOIRE sur la version Web (non requis sur Desktop)
         if not _is_desktop():
             if not turnstile_token:
                 flash('Veuillez valider la vérification de sécurité (Captcha) pour vous connecter.', 'error')
                 return render_template('login.html', email=email)
 
-            client_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
             if not _verify_turnstile(turnstile_token, client_ip):
                 flash('Échec de la validation de sécurité (Captcha). Veuillez réessayer.', 'error')
                 return render_template('login.html', email=email)
@@ -2037,9 +2115,19 @@ def login():
 
         user = User.query.filter((func.lower(User.email) == email) | (func.lower(User.pseudo) == email)).first()
         if user and bcrypt.check_password_hash(user.password, password):
+            # Succès : Réinitialisation du compteur d'échecs
+            _clear_login_failures(rate_key)
             login_user(user, remember=True, duration=timedelta(days=30))
             return redirect(url_for('dashboard'))
-        flash('Identifiants incorrects (email ou mot de passe)', 'error')
+
+        # Échec : Enregistrement de la tentative ratée
+        is_locked, new_count, lock_mins = _record_login_failure(rate_key, max_attempts=5, lock_minutes=15)
+        if is_locked:
+            flash(f"Trop d'échecs consécutifs (5/5). Votre accès est temporairement suspendu pour {lock_mins} minutes.", 'error')
+        else:
+            tentatives_restantes = 5 - new_count
+            flash(f"Identifiants incorrects (email ou mot de passe). {tentatives_restantes} tentative(s) restante(s).", 'error')
+
     return render_template('login.html')
 
 
