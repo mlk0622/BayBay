@@ -88,9 +88,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# Secure=True requis pour HTTPS/Cloudflare (False uniquement en développement local)
+_is_production = bool(os.environ.get('DATABASE_URL'))
+app.config['SESSION_COOKIE_SECURE'] = _is_production
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
+app.config['REMEMBER_COOKIE_SECURE'] = _is_production
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'assurances'), exist_ok=True)
@@ -1731,12 +1735,13 @@ def forgot_password():
         )
 
         session['reset_email'] = user.email
+        session.modified = True
         if not sent:
             flash(f"Erreur lors de l'envoi de l'email : {err}", 'error')
             return render_template('forgot_password.html')
 
-        flash(f"Un code de sécurité à 6 chiffres a été envoyé à {user.email}.", 'success')
-        return redirect(url_for('reset_password', email=user.email))
+        flash(f"Code envoyé à {user.email}. Saisissez-le ci-dessous avec votre nouveau mot de passe.", 'success')
+        return render_template('reset_password.html', email=user.email, cooldown=60)
 
     return render_template('forgot_password.html')
 
