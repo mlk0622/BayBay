@@ -1,6 +1,8 @@
-import paramiko
+import os
 import sys
 import time
+import subprocess
+import paramiko
 
 # Configuration de l'encodage pour Windows
 if sys.platform == 'win32':
