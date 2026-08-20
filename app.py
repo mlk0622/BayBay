@@ -73,11 +73,16 @@ def add_header(response):
     response.headers["Expires"] = "0"
     return response
 
+def _is_desktop():
+    if not has_request_context():
+        return False
+    ua = request.headers.get('User-Agent', '')
+    hdr = request.headers.get('X-BayBay-Desktop', '')
+    return bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1' or getattr(sys, 'frozen', False) or os.environ.get('BAYBAY_DESKTOP') == '1' or request.args.get('desktop') == '1')
+
 @app.context_processor
 def inject_globals():
-    ua = request.headers.get('User-Agent', '') if has_request_context() else ''
-    hdr = request.headers.get('X-BayBay-Desktop', '') if has_request_context() else ''
-    is_desktop_app = bool('BayBayDesktop' in ua or 'Electron' in ua or hdr == '1' or getattr(sys, 'frozen', False) or os.environ.get('BAYBAY_DESKTOP') == '1')
+    is_desktop_app = _is_desktop()
     banner_dismissed = bool(request.cookies.get('baybay_hide_download_banner') == '1') if has_request_context() else False
     return dict(app_version=VERSION, is_desktop_app=is_desktop_app, banner_dismissed=banner_dismissed)
 
@@ -1870,12 +1875,16 @@ def login():
         password = (request.form.get('password') or '').strip()
         turnstile_token = request.form.get('cf-turnstile-response', '').strip()
 
-        # Validation du Captcha Cloudflare Turnstile
-        client_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
-        if turnstile_token:
+        # Le Captcha est STRICTEMENT OBLIGATOIRE sur la version Web (non requis sur l'application Desktop)
+        if not _is_desktop():
+            if not turnstile_token:
+                flash('Veuillez valider la vérification de sécurité (Captcha) pour vous connecter.', 'error')
+                return render_template('login.html', email=email)
+
+            client_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
             if not _verify_turnstile(turnstile_token, client_ip):
-                flash('Échec de la vérification de sécurité (Captcha). Veuillez réessayer.', 'error')
-                return render_template('login.html')
+                flash('Échec de la validation de sécurité (Captcha). Veuillez réessayer.', 'error')
+                return render_template('login.html', email=email)
 
         if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
             flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')

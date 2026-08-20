@@ -181,12 +181,16 @@ function createMainWindow() {
         mainWindow.setIcon(windowIcon);
     } catch (e) {}
 
-    // Indiquer l'environnement Desktop dans l'UserAgent
+    // Indiquer l'environnement Desktop dans l'UserAgent et les Headers HTTP
     try {
         const defaultUa = mainWindow.webContents.getUserAgent();
         mainWindow.webContents.setUserAgent(defaultUa + ' BayBayDesktop/' + app.getVersion());
+        mainWindow.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+            details.requestHeaders['X-BayBay-Desktop'] = '1';
+            callback({ requestHeaders: details.requestHeaders });
+        });
     } catch (uaErr) {
-        console.error('Error setting userAgent:', uaErr);
+        console.error('Error setting userAgent / headers:', uaErr);
     }
 
     // Track which URLs have already failed to prevent infinite cascade

@@ -40,12 +40,14 @@
             </div>
         </div>
 
-        <!-- Cloudflare Turnstile CAPTCHA -->
-        <div class="flex justify-center pt-2 pb-1">
+        <!-- Cloudflare Turnstile CAPTCHA (Obligatoire sur le Web, masqué sur Desktop) -->
+        {% if not is_desktop_app %}
+        <div id="turnstile-wrapper" class="flex justify-center pt-2 pb-1">
             <div class="cf-turnstile" data-sitekey="0x4AAAAAAEWViITbtsgHP0yW" data-theme="dark"></div>
         </div>
+        {% endif %}
 
-        <button type="submit" class="w-full cursor-pointer mt-5 py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2">
+        <button type="submit" id="loginSubmitBtn" class="w-full cursor-pointer mt-5 py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2">
             <i class="fas fa-arrow-right-to-bracket text-xs"></i>
             <span>Se connecter</span>
         </button>
@@ -56,9 +58,42 @@
     </p>
 </div>
 
+{% if not is_desktop_app %}
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+{% endif %}
 
 <script>
+const isDesktopApp = Boolean(
+    window.electronAPI ||
+    navigator.userAgent.includes('BayBayDesktop') ||
+    navigator.userAgent.includes('Electron') ||
+    {{ 'true' if is_desktop_app else 'false' }}
+);
+
+// Si environnement desktop détecté, masquer et supprimer le widget Captcha
+if (isDesktopApp) {
+    const tw = document.getElementById('turnstile-wrapper');
+    if (tw) tw.remove();
+}
+
+function validateLoginForm(e) {
+    if (isDesktopApp) {
+        return true;
+    }
+    const turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
+    if (!turnstileInput || !turnstileInput.value) {
+        if (e) e.preventDefault();
+        alert("Veuillez valider la vérification de sécurité (Captcha Cloudflare) avant de vous connecter.");
+        return false;
+    }
+    return true;
+}
+
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', validateLoginForm);
+}
+
 function togglePasswordVisibility(inputId, btn) {
     const input = document.getElementById(inputId);
     const icon = btn.querySelector('i');
