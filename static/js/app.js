@@ -2,7 +2,7 @@
 // BayBay - Application JavaScript
 // =====================================================
 
-// Intercepteur global fetch pour injecter le jeton CSRF sur toutes les requêtes POST/PUT/DELETE
+// Intercepteur global fetch & formulaires pour injecter le jeton CSRF sur toutes les requêtes POST/PUT/DELETE
 (function() {
     const originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
@@ -23,6 +23,24 @@
         }
         return originalFetch(url, options);
     };
+
+    // Injection automatique dans tout formulaire POST HTML standard
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form && form.tagName === 'FORM' && (form.method || '').toUpperCase() === 'POST') {
+            if (!form.querySelector('input[name="csrf_token"]')) {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const token = csrfMeta ? csrfMeta.getAttribute('content') : '';
+                if (token) {
+                    const hidden = document.createElement('input');
+                    hidden.type = 'hidden';
+                    hidden.name = 'csrf_token';
+                    hidden.value = token;
+                    form.appendChild(hidden);
+                }
+            }
+        }
+    }, true);
 })();
 
 // Modal teleportation registry: original parent per modal id
