@@ -2,7 +2,7 @@
 {% block title %}Créer un compte - BayBay{% endblock %}
 
 {% block content %}
-<div class="glass-card max-w-[440px] mx-auto my-[60px] p-8 text-center">
+<div class="glass-card max-w-[460px] mx-auto my-[50px] p-8 text-center">
     <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl mx-auto mb-4 shadow-lg shadow-blue-500/20">
         <i class="fas fa-user-plus"></i>
     </div>
@@ -21,7 +21,7 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('register') }}" class="space-y-4 text-left" id="registerForm">
+    <form method="POST" action="{{ url_for('register') }}" class="space-y-4 text-left" id="registerForm" onsubmit="return validateBeforeSubmit(event)">
         <div>
             <label for="email" class="block text-xs font-semibold text-slate-300 mb-1.5">Adresse email</label>
             <input type="email" id="email" name="email" value="{{ request.form.get('email', '') }}" placeholder="nom@domaine.com" required pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="L'adresse email doit contenir un '@' et un point" class="w-full" autocomplete="email">
@@ -47,7 +47,7 @@
             </div>
         </div>
 
-        <!-- Règles de sécurité du mot de passe -->
+        <!-- Règles de sécurité du mot de passe avec SVGs et Badges -->
         <div id="password-rules-box" class="space-y-1.5 p-3.5 rounded-2xl bg-black/60 border border-white/15 mt-3 shadow-inner">
             <div class="flex items-center justify-between mb-2">
                 <span class="font-bold text-slate-200 text-[11px] uppercase tracking-wider">Exigences de sécurité :</span>
@@ -103,9 +103,9 @@
             </div>
         </div>
 
-        <button type="submit" id="submitBtn" class="w-full cursor-pointer mt-4 py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2">
+        <button type="submit" id="submitBtn" disabled class="w-full cursor-not-allowed opacity-50 mt-4 py-3 bg-blue-600 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2">
             <i class="fas fa-paper-plane text-xs"></i>
-            <span>Continuer et recevoir mon code</span>
+            <span id="submitBtnText">Remplir les exigences pour continuer</span>
         </button>
     </form>
 
@@ -130,10 +130,23 @@ function togglePasswordVisibility(inputId, btn) {
     }
 }
 
+let isAllValid = false;
+
+function validateBeforeSubmit(e) {
+    if (!isAllValid) {
+        if (e) e.preventDefault();
+        alert("Veuillez remplir toutes les exigences de mot de passe avant de continuer.");
+        return false;
+    }
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const pwInput = document.getElementById('reg_password');
     const confirmInput = document.getElementById('confirm_password');
     const progressText = document.getElementById('rules-progress-text');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
 
     const svgCross = '<svg class="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
     const svgCheck = '<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
@@ -183,16 +196,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 progressText.className = "text-[11px] font-bold text-red-400";
             }
         }
+
+        if (validCount === 6) {
+            isAllValid = true;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full cursor-pointer mt-4 py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2";
+            }
+            if (submitBtnText) submitBtnText.textContent = "Continuer et recevoir mon code";
+        } else {
+            isAllValid = false;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.className = "w-full cursor-not-allowed opacity-50 mt-4 py-3 bg-blue-600 font-bold rounded-xl shadow-lg shadow-blue-600/30 transition-all text-white flex items-center justify-center gap-2";
+            }
+            if (submitBtnText) submitBtnText.textContent = `Remplir les exigences (${validCount}/6)`;
+        }
     }
 
-    if (pwInput) {
-        pwInput.addEventListener('input', checkRules);
-        pwInput.addEventListener('keyup', checkRules);
-    }
-    if (confirmInput) {
-        confirmInput.addEventListener('input', checkRules);
-        confirmInput.addEventListener('keyup', checkRules);
-    }
+    ['input', 'keyup', 'change', 'paste', 'cut'].forEach(evt => {
+        if (pwInput) pwInput.addEventListener(evt, () => setTimeout(checkRules, 10));
+        if (confirmInput) confirmInput.addEventListener(evt, () => setTimeout(checkRules, 10));
+    });
+
     checkRules();
 });
 </script>
