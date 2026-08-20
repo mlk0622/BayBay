@@ -63,6 +63,8 @@ load_dotenv(os.path.join(INTERNAL_DIR, '.env'))
 load_dotenv(os.path.join(USER_DATA_DIR, '.env'))
 
 app = Flask(__name__, template_folder=TEMPLATE_FOLDER, static_folder=STATIC_FOLDER)
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
 @app.after_request
 def add_header(response):
@@ -84,6 +86,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=30)
 app.config['REMEMBER_COOKIE_HTTPONLY'] = True
 app.config['REMEMBER_COOKIE_SAMESITE'] = 'Lax'
@@ -1810,7 +1814,7 @@ def login():
             flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')
             return redirect(url_for('login'))
 
-        user = User.query.filter(User.email == email).first()
+        user = User.query.filter((func.lower(User.email) == email) | (func.lower(User.pseudo) == email)).first()
         if user and bcrypt.check_password_hash(user.password, password):
             login_user(user, remember=True, duration=timedelta(days=30))
             return redirect(url_for('dashboard'))
