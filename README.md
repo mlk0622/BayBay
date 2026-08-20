@@ -151,7 +151,7 @@ Le fichier d'installation `Bay.Bay.Setup.4.0.exe` sera généré à la racine.
 - **Malik Bouaissi** — *Étudiant en 2ème année à l'EFREI Paris (École d'ingénieurs du numérique)*
   - Portfolio : [mb-site.com](https://mb-site.com)
   - GitHub : [@mlk0622](https://github.com/mlk0622)
-  - Email : `bouaissimalik@gmail.com`
+  - Email : `contact@mb-site.com`
 
 ---
 
