@@ -4,7 +4,7 @@ import smtplib
 import calendar
 import subprocess
 from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, make_response, send_file, \
-    after_this_request, has_request_context, abort
+    after_this_request, has_request_context, abort, session
 import json
 import re
 import html
@@ -24,7 +24,7 @@ from sqlalchemy.exc import IntegrityError
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
 
-from models import db, User, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, \
+from models import db, User, EmailVerification, SCI, BienImmobilier, Appartement, Locataire, Paiement, AppelLoyer, Quittance, \
     ProgrammationAppel, ConfigEmail, DocumentLocataire, EtatDesLieux, PhotoEtatLieux, PrefillPdfHistorique, \
     StatutPaiement, StatutLocataire, TypeEtatLieux, Garant
 
@@ -837,6 +837,174 @@ def remplir_etat_des_lieux_modele(pdf_modele_path, pdf_sortie_path, donnees):
         return False, str(e)
 
 
+def validate_password_strength(password):
+    """
+    Vérifie la robustesse du mot de passe selon les règles :
+    - Au moins 8 caractères
+    - Au moins 1 majuscule (A-Z)
+    - Au moins 1 minuscule (a-z)
+    - Au moins 1 chiffre (0-9)
+    - Au moins 1 caractère spécial
+    """
+    if not password or len(password) < 8:
+        return False, "Le mot de passe doit contenir au moins 8 caractères."
+    if not re.search(r'[A-Z]', password):
+        return False, "Le mot de passe doit contenir au moins une lettre majuscule (A-Z)."
+    if not re.search(r'[a-z]', password):
+        return False, "Le mot de passe doit contenir au moins une lettre minuscule (a-z)."
+    if not re.search(r'[0-9]', password):
+        return False, "Le mot de passe doit contenir au moins un chiffre (0-9)."
+    if not re.search(r'[^A-Za-z0-9]', password):
+        return False, "Le mot de passe doit contenir au moins un caractère spécial (ex: @, #, $, %, !, ?, *, &)."
+    return True, ""
+
+
+def _mask_email(email):
+    """Masque partiellement l'email pour l'affichage public (ex: m***k@gmail.com)."""
+    if not email or '@' not in email:
+        return email
+    try:
+        user_part, domain = email.split('@', 1)
+        if len(user_part) <= 2:
+            masked_user = user_part[0] + '*'
+        else:
+            masked_user = user_part[0] + '***' + user_part[-1]
+        return f"{masked_user}@{domain}"
+    except Exception:
+        return email
+
+
+def send_system_email(destinataire, sujet, html_corps, text_corps=None):
+    """
+    Envoie un email système (code de vérification, réinitialisation de mot de passe)
+    via les paramètres SMTP sécurisés configurés dans l'environnement (.env).
+    """
+    smtp_host = os.environ.get('SMTP_HOST', 'smtp-relay.brevo.com').strip()
+    try:
+        smtp_port = int(os.environ.get('SMTP_PORT', 587))
+    except (ValueError, TypeError):
+        smtp_port = 587
+
+    smtp_user = os.environ.get('SMTP_USER', '').strip()
+    smtp_pass = os.environ.get('SMTP_PASSWORD', '').strip()
+    smtp_from = os.environ.get('SMTP_FROM', 'verification@mb-site.com').strip()
+    smtp_from_name = os.environ.get('SMTP_FROM_NAME', 'BayBay').strip()
+
+    login_user = smtp_user if smtp_user else smtp_from
+
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = sujet
+        msg['From'] = f"{smtp_from_name} <{smtp_from}>" if smtp_from_name else smtp_from
+        msg['To'] = destinataire
+
+        if text_corps:
+            msg.attach(MIMEText(text_corps, 'plain', 'utf-8'))
+        msg.attach(MIMEText(html_corps, 'html', 'utf-8'))
+
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=15)
+        else:
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=15)
+            server.starttls()
+
+        if smtp_pass:
+            server.login(login_user, smtp_pass)
+
+        server.send_message(msg)
+        server.quit()
+        return True, "Email envoyé avec succès"
+    except Exception as e:
+        error_msg = str(e)
+        print(f"[SMTP System Email Error] Destinataire: {destinataire} - Erreur: {error_msg}")
+        return False, error_msg
+
+
+def _build_verification_email_html(code):
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',sans-serif; color:#f8fafc; }}
+.wrapper {{ width:100%; background:radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 50%, #070b12 100%); padding:40px 15px; }}
+.card {{ max-width:520px; margin:0 auto; background:rgba(24,24,27,0.75); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 30px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); }}
+.logo {{ font-size:24px; font-weight:900; color:#ffffff; margin-bottom:20px; letter-spacing:-0.5px; }}
+.logo span {{ color:#3b82f6; }}
+.badge {{ display:inline-block; padding:5px 14px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); border-radius:999px; color:#93c5fd; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }}
+.title {{ font-size:22px; font-weight:800; color:#ffffff; margin-top:0; margin-bottom:10px; }}
+.desc {{ font-size:14px; color:#94a3b8; line-height:1.6; margin-bottom:24px; }}
+.code-box {{ background:rgba(59,130,246,0.08); border:2px dashed #3b82f6; border-radius:18px; padding:18px; font-size:36px; font-weight:900; letter-spacing:10px; color:#60a5fa; margin:20px 0; font-family:monospace; }}
+.info {{ font-size:13px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-top:24px; text-align:left; line-height:1.5; }}
+.footer {{ margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#64748b; }}
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <div class="logo">🏠 Bay<span>Bay</span></div>
+        <div class="badge">Vérification de sécurité</div>
+        <h1 class="title">Votre code de confirmation</h1>
+        <p class="desc">Merci pour votre inscription sur <strong>BayBay</strong>. Pour finaliser la création de votre compte, veuillez saisir le code à 6 chiffres suivant :</p>
+        <div class="code-box">{code}</div>
+        <p style="font-size:13px; color:#94a3b8; margin:0;">Ce code de sécurité est valable pendant <strong>15 minutes</strong>.</p>
+        <div class="info">
+            🔒 <strong>Sécurité de votre compte :</strong> Ne partagez jamais ce code. Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sérénité.
+        </div>
+        <div class="footer">
+            © 2026 BayBay — Gestion Locative Sécurisée • mb-site.com
+        </div>
+    </div>
+</div>
+</body>
+</html>"""
+
+
+def _build_reset_password_email_html(reset_url, code):
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',sans-serif; color:#f8fafc; }}
+.wrapper {{ width:100%; background:radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 50%, #070b12 100%); padding:40px 15px; }}
+.card {{ max-width:520px; margin:0 auto; background:rgba(24,24,27,0.75); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 30px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); }}
+.logo {{ font-size:24px; font-weight:900; color:#ffffff; margin-bottom:20px; letter-spacing:-0.5px; }}
+.logo span {{ color:#3b82f6; }}
+.badge {{ display:inline-block; padding:5px 14px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); border-radius:999px; color:#fca5a5; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }}
+.title {{ font-size:22px; font-weight:800; color:#ffffff; margin-top:0; margin-bottom:10px; }}
+.desc {{ font-size:14px; color:#94a3b8; line-height:1.6; margin-bottom:24px; }}
+.btn {{ display:inline-block; background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color:#ffffff !important; font-weight:700; font-size:15px; text-decoration:none; padding:14px 28px; border-radius:14px; box-shadow:0 10px 25px -5px rgba(59,130,246,0.5); margin:10px 0 20px 0; }}
+.code-box {{ background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); border-radius:14px; padding:14px; font-size:24px; font-weight:800; letter-spacing:6px; color:#60a5fa; margin:16px 0; font-family:monospace; }}
+.info {{ font-size:13px; color:#cbd5e1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; margin-top:24px; text-align:left; line-height:1.5; }}
+.footer {{ margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:11px; color:#64748b; }}
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="card">
+        <div class="logo">🏠 Bay<span>Bay</span></div>
+        <div class="badge">Réinitialisation de mot de passe</div>
+        <h1 class="title">Mot de passe oublié ?</h1>
+        <p class="desc">Vous avez demandé la réinitialisation de votre mot de passe BayBay. Cliquez sur le bouton ci-dessous pour choisir votre nouveau mot de passe :</p>
+        <div>
+            <a href="{reset_url}" class="btn">Réinitialiser mon mot de passe</a>
+        </div>
+        <p style="font-size:13px; color:#94a3b8; margin:15px 0 5px 0;">Ou saisissez directement ce code à 6 chiffres sur l'application :</p>
+        <div class="code-box">{code}</div>
+        <p style="font-size:13px; color:#94a3b8; margin:0;">Ce lien et ce code expirent dans <strong>15 minutes</strong>.</p>
+        <div class="info">
+            🔒 <strong>Important :</strong> Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité. Votre mot de passe actuel reste inchangé.
+        </div>
+        <div class="footer">
+            © 2026 BayBay — Gestion Locative Sécurisée • mb-site.com
+        </div>
+    </div>
+</div>
+</body>
+</html>"""
+
+
 def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jointe=None, serveur='smtp.gmail.com',
                   port=587, use_tls=True):
     try:
@@ -1326,44 +1494,266 @@ def register():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = (request.form.get('password') or '').strip()
+        confirm_password = (request.form.get('confirm_password') or '').strip()
 
         if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
             flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')
-            return redirect(url_for('register'))
+            return render_template('register.html')
 
-        if len(password) < 6:
-            flash('Le mot de passe doit contenir au moins 6 caractères', 'error')
-            return redirect(url_for('register'))
+        if password != confirm_password:
+            flash('Les deux mots de passe saisis ne sont pas identiques.', 'error')
+            return render_template('register.html')
 
-        pseudo = email
+        is_valid_pw, pw_error = validate_password_strength(password)
+        if not is_valid_pw:
+            flash(pw_error, 'error')
+            return render_template('register.html')
 
-        if User.query.filter_by(email=email).first():
-            flash('Cette adresse email est déjà utilisée', 'error')
-            return redirect(url_for('register'))
+        if User.query.filter_by(email=email).first() or User.query.filter_by(pseudo=email).first():
+            flash('Cette adresse email est déjà associée à un compte BayBay. Veuillez vous connecter.', 'error')
+            return redirect(url_for('login'))
 
-        if User.query.filter_by(pseudo=pseudo).first():
-            flash('Cette adresse email est déjà utilisée', 'error')
-            return redirect(url_for('register'))
+        # Invalider d'anciens codes non utilisés pour cet email
+        EmailVerification.query.filter_by(email=email, purpose='register', is_used=False).update({'is_used': True})
 
+        # Génération du code à 6 chiffres et du jeton de sécurité
+        code = f"{secrets.randbelow(900000) + 100000}"
+        token = secrets.token_urlsafe(32)
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
-        new_user = User(pseudo=pseudo, email=email, password=hashed_pw)
+        expires_at = datetime.utcnow() + timedelta(minutes=15)
+
+        verification = EmailVerification(
+            email=email,
+            code=code,
+            token=token,
+            password_hash=hashed_pw,
+            purpose='register',
+            expires_at=expires_at
+        )
+        db.session.add(verification)
+        db.session.commit()
+
+        # Envoi du code par email
+        email_sent, email_err = send_system_email(
+            email,
+            "Votre code de confirmation - BayBay",
+            _build_verification_email_html(code),
+            f"Votre code de confirmation BayBay est : {code} (valable 15 minutes)."
+        )
+
+        session['pending_verification_token'] = token
+        if not email_sent:
+            flash(f"Code généré avec succès. Note SMTP : {email_err}", 'error')
+        else:
+            flash(f"Un code de validation à 6 chiffres a été envoyé à {email}.", 'success')
+
+        return redirect(url_for('verify_email', token=token))
+
+    return render_template('register.html')
+
+
+@app.route('/verify-email', methods=['GET', 'POST'])
+def verify_email():
+    token = request.args.get('token') or request.form.get('token') or session.get('pending_verification_token')
+    if not token:
+        flash("Aucune demande de vérification en cours.", 'error')
+        return redirect(url_for('register'))
+
+    verification = EmailVerification.query.filter_by(token=token, purpose='register', is_used=False).first()
+    if not verification:
+        flash("Cette demande de vérification est introuvable ou a déjà été validée.", 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        code = (request.form.get('code') or '').strip().replace(' ', '')
+
+        if datetime.utcnow() > verification.expires_at:
+            flash("Ce code a expiré (délai de 15 minutes dépassé). Veuillez demander un nouveau code ci-dessous.", 'error')
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+
+        if verification.attempts >= 5:
+            flash("Trop de tentatives infructueuses. Veuillez demander un nouveau code.", 'error')
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+
+        if verification.code != code:
+            verification.attempts += 1
+            db.session.commit()
+            flash("Code de vérification incorrect. Veuillez vérifier vos emails et réessayer.", 'error')
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+
+        # Code valide : Vérifier si l'utilisateur existe déjà
+        if User.query.filter_by(email=verification.email).first():
+            verification.is_used = True
+            db.session.commit()
+            flash("Un compte existe déjà avec cette adresse email. Veuillez vous connecter.", 'error')
+            return redirect(url_for('login'))
+
+        # Création et activation définitive du compte utilisateur
+        new_user = User(
+            pseudo=verification.email,
+            email=verification.email,
+            password=verification.password_hash
+        )
         db.session.add(new_user)
+        verification.is_used = True
         try:
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
-            flash('Impossible de créer le compte : adresse déjà utilisée', 'error')
-            return redirect(url_for('register'))
-        except Exception:
-            db.session.rollback()
-            flash('Erreur interne lors de la création du compte', 'error')
-            return redirect(url_for('register'))
+            flash("Erreur lors de la création du compte : utilisateur déjà existant.", 'error')
+            return redirect(url_for('login'))
 
-        # Connexion automatique directe après création de compte
+        session.pop('pending_verification_token', None)
         login_user(new_user, remember=True, duration=timedelta(days=30))
-        flash('Compte créé avec succès ! Bienvenue sur BayBay.', 'success')
+        flash("Votre adresse email a été vérifiée avec succès ! Bienvenue sur BayBay.", 'success')
         return redirect(url_for('dashboard'))
-    return render_template('register.html')
+
+    return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+
+
+@app.route('/resend-verification-code', methods=['POST'])
+def resend_verification_code():
+    token = request.form.get('token') or session.get('pending_verification_token')
+    if not token:
+        flash("Aucune demande de vérification trouvée.", 'error')
+        return redirect(url_for('register'))
+
+    verification = EmailVerification.query.filter_by(token=token, purpose='register', is_used=False).first()
+    if not verification:
+        flash("Demande de vérification expirée. Veuillez vous réinscrire.", 'error')
+        return redirect(url_for('register'))
+
+    # Générer un nouveau code
+    new_code = f"{secrets.randbelow(900000) + 100000}"
+    verification.code = new_code
+    verification.expires_at = datetime.utcnow() + timedelta(minutes=15)
+    verification.attempts = 0
+    db.session.commit()
+
+    sent, err = send_system_email(
+        verification.email,
+        "Votre nouveau code de confirmation - BayBay",
+        _build_verification_email_html(new_code),
+        f"Votre nouveau code BayBay est : {new_code}"
+    )
+
+    if sent:
+        flash(f"Un nouveau code a été envoyé à {verification.email}.", 'success')
+    else:
+        flash(f"Code renouvelé. Diagnostic d'envoi : {err}", 'error')
+
+    return redirect(url_for('verify_email', token=token))
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = (request.form.get('email') or '').strip().lower()
+
+        if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
+            flash('Veuillez entrer une adresse email valide.', 'error')
+            return render_template('forgot_password.html')
+
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # Invalider d'anciens jetons de réinitialisation
+            EmailVerification.query.filter_by(email=email, purpose='reset_password', is_used=False).update({'is_used': True})
+
+            code = f"{secrets.randbelow(900000) + 100000}"
+            token = secrets.token_urlsafe(32)
+            expires_at = datetime.utcnow() + timedelta(minutes=15)
+
+            reset_entry = EmailVerification(
+                email=email,
+                code=code,
+                token=token,
+                purpose='reset_password',
+                expires_at=expires_at
+            )
+            db.session.add(reset_entry)
+            db.session.commit()
+
+            # Construction de l'URL absolue de réinitialisation
+            reset_url = url_for('reset_password', token=token, _external=True)
+
+            sent, err = send_system_email(
+                email,
+                "Réinitialisation de votre mot de passe - BayBay",
+                _build_reset_password_email_html(reset_url, code),
+                f"Lien de réinitialisation de votre mot de passe : {reset_url}\nOu code à 6 chiffres : {code} (valable 15 minutes)."
+            )
+
+        flash("Si cette adresse email correspond à un compte, un lien et un code de réinitialisation vous ont été envoyés.", 'success')
+        return redirect(url_for('verify_reset_code', email=email))
+
+    return render_template('forgot_password.html')
+
+
+@app.route('/verify-reset-code', methods=['GET', 'POST'])
+def verify_reset_code():
+    email = (request.args.get('email') or request.form.get('email') or '').strip().lower()
+
+    if request.method == 'POST':
+        code = (request.form.get('code') or '').strip().replace(' ', '')
+
+        if not email or not code:
+            flash("Veuillez saisir votre adresse email et le code reçu.", 'error')
+            return render_template('verify_reset_code.html', email=email)
+
+        record = EmailVerification.query.filter_by(
+            email=email,
+            code=code,
+            purpose='reset_password',
+            is_used=False
+        ).order_by(EmailVerification.id.desc()).first()
+
+        if not record or datetime.utcnow() > record.expires_at:
+            flash("Code de réinitialisation incorrect ou expiré.", 'error')
+            return render_template('verify_reset_code.html', email=email)
+
+        return redirect(url_for('reset_password', token=record.token))
+
+    return render_template('verify_reset_code.html', email=email)
+
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    token = request.args.get('token') or request.form.get('token')
+    if not token:
+        flash("Jeton de réinitialisation manquant ou invalide.", 'error')
+        return redirect(url_for('forgot_password'))
+
+    record = EmailVerification.query.filter_by(token=token, purpose='reset_password', is_used=False).first()
+    if not record or datetime.utcnow() > record.expires_at:
+        flash("Ce lien de réinitialisation est invalide ou a expiré (validité 15 minutes).", 'error')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        password = (request.form.get('password') or '').strip()
+        confirm_password = (request.form.get('confirm_password') or '').strip()
+
+        if password != confirm_password:
+            flash("Les deux mots de passe ne sont pas identiques.", 'error')
+            return render_template('reset_password.html', token=token)
+
+        is_valid_pw, pw_error = validate_password_strength(password)
+        if not is_valid_pw:
+            flash(pw_error, 'error')
+            return render_template('reset_password.html', token=token)
+
+        user = User.query.filter_by(email=record.email).first()
+        if not user:
+            flash("Utilisateur introuvable.", 'error')
+            return redirect(url_for('login'))
+
+        user.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        record.is_used = True
+        db.session.commit()
+
+        flash("Votre mot de passe a été modifié avec succès ! Vous pouvez maintenant vous connecter.", 'success')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', token=token)
 
 
 @app.route('/login', methods=['GET', 'POST'])

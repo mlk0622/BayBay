@@ -45,6 +45,21 @@ class User(db.Model, UserMixin):
     biens_directs = db.relationship('BienImmobilier', foreign_keys='BienImmobilier.user_id', backref='direct_owner', lazy=True, cascade='all, delete-orphan')
 
 
+# --- Table de vérification d'email & réinitialisation de mot de passe ---
+class EmailVerification(db.Model):
+    __tablename__ = 'email_verification'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(200), index=True, nullable=False)
+    code = db.Column(db.String(6), nullable=False)
+    token = db.Column(db.String(100), unique=True, index=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True)
+    purpose = db.Column(db.String(30), nullable=False, default='register')  # 'register' ou 'reset_password'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    is_used = db.Column(db.Boolean, default=False)
+    attempts = db.Column(db.Integer, default=0)
+
+
 class SCI(db.Model):
     __tablename__ = 'sci'
 

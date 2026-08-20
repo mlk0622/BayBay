@@ -81,9 +81,10 @@ try:
         "/home/baybay/baybay/venv/bin/pip install -r /home/baybay/baybay/requirements.txt",
         "/home/baybay/baybay/venv/bin/pip install gunicorn",
         
-        # 6. Créer le fichier .env
-        "echo 'DATABASE_URL=mysql+pymysql://baybay:Zigotown*20251360*Efrei2030@88.190.118.23:33006/mabase' > /home/baybay/baybay/.env",
-        "echo 'SECRET_KEY=baybay-cloud-secure-key-2026' >> /home/baybay/baybay/.env",
+        # 6. Synchroniser mb-site sur /var/www/html pour le site web mb-site.com
+        "sudo -S mkdir -p /var/www/html",
+        "sudo -S cp -r /home/baybay/baybay/mb-site/* /var/www/html/",
+        "sudo -S chown -R www-data:www-data /var/www/html",
         
         # 7. Créer le dossier systemd utilisateur s'il n'existe pas
         "mkdir -p /home/baybay/.config/systemd/user",
@@ -122,7 +123,25 @@ EOF""",
         "sudo -S systemctl status nginx --no-pager | head -n 10"
     ]
     
-    success = run_ssh_commands(client, commands)
+    # 1. Exécuter la préparation et le clone
+    success = run_ssh_commands(client, commands[:5])
+    if not success:
+        print("\n❌ Échec de la préparation.")
+        client.close()
+        sys.exit(1)
+
+    # 2. Transférer le fichier .env chiffré/sécurisé via SFTP (sans passer par git)
+    print("\n🔒 Transfert sécurisé du fichier .env via SFTP chiffré...")
+    sftp = client.open_sftp()
+    if os.path.exists('.env'):
+        sftp.put('.env', '/home/baybay/baybay/.env')
+        print("✅ Fichier .env transféré avec succès !")
+    else:
+        print("⚠️ Fichier local .env non trouvé.")
+    sftp.close()
+
+    # 3. Exécuter le reste des commandes (systemd, gunicorn, nginx, mb-site)
+    success = run_ssh_commands(client, commands[5:])
     if success:
         print("\n🎉 DÉPLOIEMENT TERMINÉ AVEC SUCCÈS ! LE SERVEUR EST EN LIGNE SUR LE PORT 33081 !")
     else:
@@ -132,3 +151,4 @@ EOF""",
 except Exception as e:
     print("Erreur globale :", e)
     sys.exit(1)
+
