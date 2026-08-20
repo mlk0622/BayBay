@@ -54,12 +54,17 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function initVerifyForm() {
     let cooldown = parseInt("{{ cooldown|default(60) }}", 10);
     if (isNaN(cooldown) || cooldown < 0) cooldown = 0;
 
     const resendBtn = document.getElementById('resendBtn');
     const resendText = document.getElementById('resendText');
+
+    if (!resendBtn) {
+        setTimeout(initVerifyForm, 50);
+        return;
+    }
 
     function updateCooldown() {
         if (cooldown > 0) {
@@ -74,6 +79,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     updateCooldown();
-});
+})();
 </script>
 {% endblock %}

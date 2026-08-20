@@ -135,18 +135,23 @@ let isAllValid = false;
 function validateBeforeSubmit(e) {
     if (!isAllValid) {
         if (e) e.preventDefault();
-        alert("Veuillez remplir toutes les exigences de mot de passe avant de continuer.");
         return false;
     }
     return true;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+(function initRegisterForm() {
     const pwInput = document.getElementById('reg_password');
     const confirmInput = document.getElementById('confirm_password');
     const progressText = document.getElementById('rules-progress-text');
     const submitBtn = document.getElementById('submitBtn');
     const submitBtnText = document.getElementById('submitBtnText');
+
+    if (!pwInput) {
+        // DOM pas encore prêt, réessayer dans 50ms
+        setTimeout(initRegisterForm, 50);
+        return;
+    }
 
     const svgCross = '<svg class="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
     const svgCheck = '<svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
@@ -190,11 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (progressText) {
             progressText.textContent = `${validCount}/6 validées`;
-            if (validCount === 6) {
-                progressText.className = "text-[11px] font-bold text-emerald-400";
-            } else {
-                progressText.className = "text-[11px] font-bold text-red-400";
-            }
+            progressText.className = validCount === 6
+                ? "text-[11px] font-bold text-emerald-400"
+                : "text-[11px] font-bold text-red-400";
         }
 
         if (validCount === 6) {
@@ -220,6 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     checkRules();
-});
+})();
 </script>
 {% endblock %}
