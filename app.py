@@ -937,8 +937,6 @@ def _build_verification_email_html(code):
 body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',sans-serif; color:#f8fafc; }}
 .wrapper {{ width:100%; background:radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 50%, #070b12 100%); padding:40px 15px; }}
 .card {{ max-width:520px; margin:0 auto; background:rgba(24,24,27,0.75); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 30px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); }}
-.logo {{ font-size:24px; font-weight:900; color:#ffffff; margin-bottom:20px; letter-spacing:-0.5px; }}
-.logo span {{ color:#3b82f6; }}
 .badge {{ display:inline-block; padding:5px 14px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); border-radius:999px; color:#93c5fd; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }}
 .title {{ font-size:22px; font-weight:800; color:#ffffff; margin-top:0; margin-bottom:10px; }}
 .desc {{ font-size:14px; color:#94a3b8; line-height:1.6; margin-bottom:24px; }}
@@ -950,7 +948,18 @@ body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system
 <body>
 <div class="wrapper">
     <div class="card">
-        <div class="logo">🏠 Bay<span>Bay</span></div>
+        <div style="margin-bottom:20px; text-align:center;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                    <td style="vertical-align:middle; padding-right:10px;">
+                        <img src="https://baybay.mb-site.com/static/images/door_logo.png" alt="BayBay Logo" width="38" height="38" style="width:38px; height:38px; display:block; border:0; outline:none;" />
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <span style="font-size:24px; font-weight:900; color:#ffffff; letter-spacing:-0.5px; line-height:1; display:block;">Bay<span style="color:#3b82f6;">Bay</span></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <div class="badge">Vérification de sécurité</div>
         <h1 class="title">Votre code de confirmation</h1>
         <p class="desc">Merci pour votre inscription sur <strong>BayBay</strong>. Pour finaliser la création de votre compte, veuillez saisir le code à 6 chiffres suivant :</p>
@@ -977,8 +986,6 @@ def _build_reset_password_email_html(code):
 body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter','Segoe UI',sans-serif; color:#f8fafc; }}
 .wrapper {{ width:100%; background:radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 50%, #070b12 100%); padding:40px 15px; }}
 .card {{ max-width:520px; margin:0 auto; background:rgba(24,24,27,0.75); border:1px solid rgba(255,255,255,0.18); border-radius:24px; padding:36px 30px; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6); }}
-.logo {{ font-size:24px; font-weight:900; color:#ffffff; margin-bottom:20px; letter-spacing:-0.5px; }}
-.logo span {{ color:#3b82f6; }}
 .badge {{ display:inline-block; padding:5px 14px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); border-radius:999px; color:#fca5a5; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px; }}
 .title {{ font-size:22px; font-weight:800; color:#ffffff; margin-top:0; margin-bottom:10px; }}
 .desc {{ font-size:14px; color:#94a3b8; line-height:1.6; margin-bottom:24px; }}
@@ -990,7 +997,18 @@ body {{ margin:0; padding:0; background-color:#070b12; font-family:-apple-system
 <body>
 <div class="wrapper">
     <div class="card">
-        <div class="logo">🏠 Bay<span>Bay</span></div>
+        <div style="margin-bottom:20px; text-align:center;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                <tr>
+                    <td style="vertical-align:middle; padding-right:10px;">
+                        <img src="https://baybay.mb-site.com/static/images/door_logo.png" alt="BayBay Logo" width="38" height="38" style="width:38px; height:38px; display:block; border:0; outline:none;" />
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <span style="font-size:24px; font-weight:900; color:#ffffff; letter-spacing:-0.5px; line-height:1; display:block;">Bay<span style="color:#3b82f6;">Bay</span></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <div class="badge">Réinitialisation de mot de passe</div>
         <h1 class="title">Votre code de sécurité</h1>
         <p class="desc">Vous avez demandé la réinitialisation de votre mot de passe <strong>BayBay</strong>. Saisissez le code suivant sur la page de réinitialisation :</p>
