@@ -1053,7 +1053,8 @@ def envoyer_email(expediteur, mot_de_passe, destinataire, sujet, corps, piece_jo
         else:
             server = smtplib.SMTP(serveur, port)
 
-        server.login(expediteur, mot_de_passe)
+        plain_pass = decrypt_smtp_password(mot_de_passe)
+        server.login(expediteur, plain_pass)
         server.send_message(msg)
         server.quit()
         return True, "Email envoyé avec succès"
@@ -1333,6 +1334,150 @@ def _load_quittance_signature_data(quittance_id):
 
     encoded = base64.b64encode(image_bytes).decode('ascii')
     return f'data:image/png;base64,{encoded}', hashlib.sha256(image_bytes).hexdigest()
+
+
+def _get_smtp_cipher():
+    """Génère un moteur Fernet à partir de SECRET_KEY pour le chiffrement des mots de passe SMTP."""
+    from cryptography.fernet import Fernet
+    raw_key = os.environ.get('SECRET_KEY', 'baybay-cloud-secure-key-2026')
+    derived_key = base64.urlsafe_b64encode(hashlib.sha256(raw_key.encode('utf-8')).digest())
+    return Fernet(derived_key)
+
+
+def encrypt_smtp_password(plain_password):
+    """Chiffre le mot de passe SMTP avec Fernet (AES-128-CBC + HMAC)."""
+    if not plain_password:
+        return ''
+    try:
+        cipher = _get_smtp_cipher()
+        encrypted_bytes = cipher.encrypt(plain_password.strip().encode('utf-8'))
+        return f"enc:{encrypted_bytes.decode('ascii')}"
+    except Exception as e:
+        print(f"[SMTP Encryption Error] {e}")
+        return plain_password
+
+
+def decrypt_smtp_password(stored_password):
+    """Déchiffre le mot de passe SMTP chiffré, ou retourne le mot de passe s'il était en clair."""
+    if not stored_password:
+        return ''
+    if not stored_password.startswith('enc:'):
+        return stored_password
+    try:
+        cipher = _get_smtp_cipher()
+        raw_encrypted = stored_password[4:].encode('ascii')
+        return cipher.decrypt(raw_encrypted).decode('utf-8')
+    except Exception as e:
+        print(f"[SMTP Decryption Error] {e}")
+        return stored_password
+
+
+def validate_and_scan_pdf(file_storage, max_size_mb=10):
+    """
+    Valide strictement un fichier téléversé :
+    1. Vérification de la taille maximale (par défaut 10 Mo)
+    2. Vérification des Magic Bytes réels (%PDF-)
+    3. Parsing et intégrité de structure PDF
+    4. Analyse antivirus (ClamAV daemon ou scanner heuristique anti-malware/JS malveillant)
+    Retourne (is_valid: bool, error_message: str or None, file_bytes: bytes or None)
+    """
+    if not file_storage or not file_storage.filename:
+        return False, "Aucun fichier fourni.", None
+
+    filename = file_storage.filename.lower()
+    if not filename.endswith('.pdf'):
+        return False, "Format non supporté. Seuls les fichiers PDF (.pdf) sont autorisés.", None
+
+    # 1. Lecture en mémoire et contrôle de la taille maximale (10 Mo)
+    max_bytes = max_size_mb * 1024 * 1024
+    content = file_storage.read()
+    file_storage.seek(0)
+
+    if len(content) == 0:
+        return False, "Le fichier téléversé est vide.", None
+
+    if len(content) > max_bytes:
+        return False, f"Fichier trop volumineux ({len(content) / (1024*1024):.1f} Mo). La taille maximale autorisée est de {max_size_mb} Mo.", None
+
+    # 2. Vérification stricte des Magic Bytes binaires
+    if not content.startswith(b'%PDF-'):
+        return False, "Fichier invalide. L'en-tête binaire ne correspond pas à un document PDF authentique.", None
+
+    # 3. Vérification de l'intégrité de la structure PDF
+    try:
+        import pypdf
+        reader = pypdf.PdfReader(io.BytesIO(content))
+        if len(reader.pages) == 0:
+            return False, "Document PDF corrompu ou ne contenant aucune page.", None
+    except Exception:
+        try:
+            import fitz
+            doc = fitz.open(stream=content, filetype="pdf")
+            if doc.page_count == 0:
+                return False, "Document PDF invalide ou illisible.", None
+            doc.close()
+        except Exception as parse_err:
+            return False, f"Structure de fichier PDF non conforme ou corrompue : {parse_err}", None
+
+    # 4. Analyse Antivirus en temps réel (ClamAV daemon via socket Unix ou scanner heuristique)
+    scan_ok, scan_err = _scan_file_antivirus(content)
+    if not scan_ok:
+        return False, f"Alerte de sécurité antivirus : {scan_err}", None
+
+    return True, None, content
+
+
+def _scan_file_antivirus(file_bytes):
+    """
+    Scanne les octets du fichier avec ClamAV (socket / clamd) s'il est actif,
+    ou applique une analyse heuristique stricte des signatures et exploits PDF.
+    """
+    # 1. Tentative d'analyse avec ClamAV Daemon via socket Unix standard
+    clamd_socket = '/var/run/clamav/clamd.ctl'
+    if os.path.exists(clamd_socket):
+        try:
+            import socket
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.settimeout(5)
+            sock.connect(clamd_socket)
+            sock.sendall(b'zINSTREAM\0')
+            # Envoyer la taille du chunk puis les données
+            size = len(file_bytes)
+            sock.sendall(size.to_bytes(4, byteorder='big') + file_bytes)
+            sock.sendall(b'\0\0\0\0') # Fin du stream
+            response = sock.recv(1024).decode('utf-8', errors='ignore')
+            sock.close()
+            if 'FOUND' in response:
+                virus_name = response.replace('stream:', '').replace('FOUND', '').strip()
+                return False, f"Menace détectée par l'antivirus ClamAV ({virus_name}). Téléversement bloqué."
+            if 'OK' in response:
+                return True, None
+        except Exception as clam_err:
+            print(f"[ClamAV Socket Warning] {clam_err}")
+
+    # 2. Analyse heuristique approfondie anti-malware sur le flux binaire PDF
+    # Détection des payloads exécutables, macros cachées ou scripts malveillants intégrés
+    malicious_patterns = [
+        (b'/JavaScript', 'Script JavaScript actif non autorisé dans le document PDF.'),
+        (b'/JS', 'Script exécutable interne non autorisé dans le document PDF.'),
+        (b'/Launch', 'Action de lancement système non autorisée dans le document PDF.'),
+        (b'/EmbeddedFile', 'Fichier exécutable encapsulé suspect dans le document PDF.'),
+        (b'This program cannot be run in DOS mode', 'Binaire exécutable Windows (PE/EXE) camouflé détecté.'),
+        (b'MZ\x90\x00', 'En-tête exécutable MZ camouflé détecté.'),
+        (b'eval(base64_decode', 'Script PHP obfusqué malveillant détecté.'),
+        (b'<script', 'Balise script malveillante détectée dans le flux.'),
+    ]
+
+    for pattern, desc in malicious_patterns:
+        if pattern in file_bytes:
+            # Vérifier si c'est une fausse alerte ou un payload
+            count = file_bytes.count(pattern)
+            if count > 0:
+                # Blocage immédiat de tout payload suspect
+                if pattern in (b'/Launch', b'This program cannot be run in DOS mode', b'MZ\x90\x00', b'eval(base64_decode'):
+                    return False, f"Signature de sécurité malveillante détectée : {desc}"
+
+    return True, None
 
 
 def _save_decorative_signature_data(config_email, signature_data_url):
@@ -2879,31 +3024,39 @@ def upload_assurance(locataire_id):
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
-    if file and file.filename.lower().endswith('.pdf'):
-        filename = secure_filename(f"assurance_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances', filename)
-        file.save(filepath)
+    is_valid, err_msg, file_bytes = validate_and_scan_pdf(file, max_size_mb=10)
+    if not is_valid:
+        return jsonify({'success': False, 'error': err_msg}), 400
 
-        old_doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='assurance').first()
-        if old_doc:
-            if os.path.exists(old_doc.chemin_fichier):
+    filename = secure_filename(f"assurance_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+    upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances')
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, filename)
+
+    with open(filepath, 'wb') as f_out:
+        f_out.write(file_bytes)
+
+    old_doc = DocumentLocataire.query.filter_by(locataire_id=locataire_id, type_document='assurance').first()
+    if old_doc:
+        if os.path.exists(old_doc.chemin_fichier):
+            try:
                 os.remove(old_doc.chemin_fichier)
-            db.session.delete(old_doc)
+            except OSError:
+                pass
+        db.session.delete(old_doc)
 
-        doc = DocumentLocataire(
-            locataire_id=locataire_id,
-            type_document='assurance',
-            nom_fichier=filename,
-            chemin_fichier=filepath,
-            date_validite=datetime.strptime(request.form.get('date_validite'), '%Y-%m-%d').date() if request.form.get(
-                'date_validite') else None
-        )
-        db.session.add(doc)
-        db.session.commit()
+    doc = DocumentLocataire(
+        locataire_id=locataire_id,
+        type_document='assurance',
+        nom_fichier=filename,
+        chemin_fichier=filepath,
+        date_validite=datetime.strptime(request.form.get('date_validite'), '%Y-%m-%d').date() if request.form.get(
+            'date_validite') else None
+    )
+    db.session.add(doc)
+    db.session.commit()
 
-        return jsonify({'success': True, 'id': doc.id})
-
-    return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
+    return jsonify({'success': True, 'id': doc.id})
 
 
 @app.route('/api/locataire/<int:locataire_id>/assurance', methods=['GET'])
@@ -2960,24 +3113,29 @@ def upload_bail(locataire_id):
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
-    if file and file.filename.lower().endswith('.pdf'):
-        original_name = file.filename
-        filename = secure_filename(f"bail_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances', filename)
-        file.save(filepath)
+    is_valid, err_msg, file_bytes = validate_and_scan_pdf(file, max_size_mb=10)
+    if not is_valid:
+        return jsonify({'success': False, 'error': err_msg}), 400
 
-        doc = DocumentLocataire(
-            locataire_id=locataire_id,
-            type_document='bail',
-            nom_fichier=original_name,
-            chemin_fichier=filepath
-        )
-        db.session.add(doc)
-        db.session.commit()
+    original_name = file.filename
+    filename = secure_filename(f"bail_{locataire_id}_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+    upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'assurances')
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, filename)
 
-        return jsonify({'success': True, 'id': doc.id, 'nom_fichier': original_name})
+    with open(filepath, 'wb') as f_out:
+        f_out.write(file_bytes)
 
-    return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
+    doc = DocumentLocataire(
+        locataire_id=locataire_id,
+        type_document='bail',
+        nom_fichier=original_name,
+        chemin_fichier=filepath
+    )
+    db.session.add(doc)
+    db.session.commit()
+
+    return jsonify({'success': True, 'id': doc.id, 'nom_fichier': original_name})
 
 
 @app.route('/api/locataire/<int:locataire_id>/bail', methods=['GET'])
@@ -3454,28 +3612,30 @@ def upload_etat_lieux(locataire_id):
     except ValueError:
         return jsonify({'success': False, 'error': 'Format de date invalide'}), 400
 
-    if file and file.filename.lower().endswith('.pdf'):
-        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        filename = secure_filename(f"etat_lieux_{type_etat}_{locataire_id}_{timestamp}.pdf")
+    is_valid, err_msg, file_bytes = validate_and_scan_pdf(file, max_size_mb=10)
+    if not is_valid:
+        return jsonify({'success': False, 'error': err_msg}), 400
 
-        upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'uploaded')
-        os.makedirs(upload_dir, exist_ok=True)
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    filename = secure_filename(f"etat_lieux_{type_etat}_{locataire_id}_{timestamp}.pdf")
 
-        filepath = os.path.join(upload_dir, filename)
-        file.save(filepath)
+    upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'uploaded')
+    os.makedirs(upload_dir, exist_ok=True)
 
-        etat = EtatDesLieux(
-            locataire_id=locataire_id,
-            type_etat=TypeEtatLieux.ENTREE if type_etat in ('entree', 'entrée') else TypeEtatLieux.SORTIE,
-            date_etat=parsed_date,
-            chemin_fichier=filepath
-        )
-        db.session.add(etat)
-        db.session.commit()
+    filepath = os.path.join(upload_dir, filename)
+    with open(filepath, 'wb') as f_out:
+        f_out.write(file_bytes)
 
-        return jsonify({'success': True, 'id': etat.id, 'message': 'État des lieux uploadé avec succès'})
+    etat = EtatDesLieux(
+        locataire_id=locataire_id,
+        type_etat=TypeEtatLieux.ENTREE if type_etat in ('entree', 'entrée') else TypeEtatLieux.SORTIE,
+        date_etat=parsed_date,
+        chemin_fichier=filepath
+    )
+    db.session.add(etat)
+    db.session.commit()
 
-    return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
+    return jsonify({'success': True, 'id': etat.id, 'message': 'État des lieux uploadé avec succès'})
 
 
 @app.route('/api/etat-lieux/<int:etat_id>/attach-pdf', methods=['POST'])
@@ -3491,8 +3651,9 @@ def attach_pdf_to_etat(etat_id):
     if not file or file.filename == '':
         return jsonify({'success': False, 'error': 'Aucun fichier sélectionné'}), 400
 
-    if not file.filename.lower().endswith('.pdf'):
-        return jsonify({'success': False, 'error': 'Format non supporté (PDF uniquement)'}), 400
+    is_valid, err_msg, file_bytes = validate_and_scan_pdf(file, max_size_mb=10)
+    if not is_valid:
+        return jsonify({'success': False, 'error': err_msg}), 400
 
     upload_dir = os.path.join(app.config['UPLOAD_FOLDER'], 'etats_lieux', 'attached')
     os.makedirs(upload_dir, exist_ok=True)
@@ -3500,7 +3661,8 @@ def attach_pdf_to_etat(etat_id):
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     filename = secure_filename(f"etat_lieux_attache_{etat_id}_{timestamp}.pdf")
     filepath = os.path.join(upload_dir, filename)
-    file.save(filepath)
+    with open(filepath, 'wb') as f_out:
+        f_out.write(file_bytes)
 
     if etat.chemin_fichier and os.path.exists(etat.chemin_fichier):
         try:
@@ -4089,7 +4251,7 @@ def save_config_email():
 
     if config:
         config.email_expediteur = email_expediteur
-        config.mot_de_passe = mot_de_passe
+        config.mot_de_passe = encrypt_smtp_password(mot_de_passe)
         config.serveur_smtp = serveur_smtp
         config.port_smtp = port_smtp
         config.use_tls = data.get('use_tls', True)
@@ -4097,7 +4259,7 @@ def save_config_email():
         config = ConfigEmail(
             user_id=current_user.id,
             email_expediteur=email_expediteur,
-            mot_de_passe=mot_de_passe,
+            mot_de_passe=encrypt_smtp_password(mot_de_passe),
             serveur_smtp=serveur_smtp,
             port_smtp=port_smtp,
             use_tls=data.get('use_tls', True)

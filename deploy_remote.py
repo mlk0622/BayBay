@@ -65,9 +65,11 @@ try:
     
     # Liste des commandes à lancer sur le serveur
     commands = [
-        # 1. Mettre à jour les paquets et installer les dépendances requises via sudo
+        # 1. Mettre à jour les paquets et installer les dépendances requises via sudo (y compris ClamAV antivirus)
         "sudo -S apt-get update",
-        "sudo -S apt-get install -y git python3-venv python3-pip python3-full build-essential pkg-config libcairo2-dev python3-dev",
+        "sudo -S apt-get install -y git python3-venv python3-pip python3-full build-essential pkg-config libcairo2-dev python3-dev clamav clamav-daemon",
+        "sudo -S systemctl enable clamav-daemon || true",
+        "sudo -S systemctl start clamav-daemon || true",
         
         # 2. Nettoyer l'ancien dossier
         "rm -rf /home/baybay/baybay",
