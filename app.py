@@ -1838,11 +1838,44 @@ def reset_password():
     return render_template('reset_password.html', email=email, cooldown=cooldown)
 
 
+def _verify_turnstile(response_token, remote_ip=None):
+    secret_key = os.environ.get('TURNSTILE_SECRET_KEY', '0x4AAAAAAEWViEuev_p3GgaMwS2-1qsDI4I').strip()
+    if not secret_key or not response_token:
+        return False
+    try:
+        import urllib.request
+        import urllib.parse
+        payload = urllib.parse.urlencode({
+            'secret': secret_key,
+            'response': response_token,
+            'remoteip': remote_ip or ''
+        }).encode('utf-8')
+        req = urllib.request.Request(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            data=payload,
+            headers={'Content-Type': 'application/x-www-form-urlencoded'}
+        )
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            return bool(data.get('success'))
+    except Exception as e:
+        print(f"[Turnstile Verification Error] {e}")
+        return True
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = (request.form.get('email') or '').strip().lower()
         password = (request.form.get('password') or '').strip()
+        turnstile_token = request.form.get('cf-turnstile-response', '').strip()
+
+        # Validation du Captcha Cloudflare Turnstile
+        client_ip = request.headers.get('CF-Connecting-IP') or request.headers.get('X-Forwarded-For') or request.remote_addr
+        if turnstile_token:
+            if not _verify_turnstile(turnstile_token, client_ip):
+                flash('Échec de la vérification de sécurité (Captcha). Veuillez réessayer.', 'error')
+                return render_template('login.html')
 
         if not email or '@' not in email or '.' not in email or not _is_valid_email(email):
             flash('Veuillez entrer une adresse email valide avec un @ et un point (ex: nom@domaine.com)', 'error')
