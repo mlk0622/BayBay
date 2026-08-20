@@ -1059,25 +1059,40 @@
                     return;
                 }
 
-                // Exclude external, logout, API calls
-                if (href.includes('://') || href.startsWith('/api') || href.includes('logout') || href.includes('switch-account')) {
+                // Exclude external, logout, API calls and standalone auth/public pages
+                const authPaths = [
+                    '/login', '/register', '/logout', '/forgot-password', 
+                    '/reset-password', '/verify-email', '/verify-reset-code', 
+                    '/resend-verification-code', '/presentation', '/landing', 
+                    '/a-propos', '/about'
+                ];
+                const urlObj = new URL(link.href, window.location.origin);
+                if (href.includes('://') && urlObj.origin !== window.location.origin) {
+                    return;
+                }
+                if (href.startsWith('/api') || href.includes('logout') || href.includes('switch-account') || authPaths.some(p => urlObj.pathname === p || urlObj.pathname.startsWith(p))) {
                     return;
                 }
                 
-                const urlObj = new URL(link.href, window.location.origin);
                 if (urlObj.origin !== window.location.origin) return;
 
                 e.preventDefault();
                 loadPageViaAjax(link.href, link);
             });
 
-            // Intercept non-AJAX form submissions (search/filters)
+            // Intercept non-AJAX form submissions (search/filters GET ONLY)
             document.addEventListener('submit', (e) => {
                 const form = e.target.closest('form');
                 if (!form) return;
                 
-                // Exclude forms inside modals or custom API forms
+                // Exclude forms inside modals, custom API forms, or forms marked data-no-spa
                 if (form.closest('[id$="Modal"]') || form.closest('[id$="modal"]') || form.dataset.noSpa || form.getAttribute('data-no-spa') || (form.id && form.id.endsWith('Form'))) {
+                    return;
+                }
+                
+                const method = (form.getAttribute('method') || 'GET').toUpperCase();
+                // NEVER intercept POST forms! Let standard POST proceed naturally.
+                if (method !== 'GET') {
                     return;
                 }
                 
@@ -1085,47 +1100,23 @@
                 const actionUrl = new URL(action, window.location.origin);
                 
                 if (actionUrl.origin !== window.location.origin) return;
-                if (actionUrl.pathname === '/login' || actionUrl.pathname === '/register' || actionUrl.pathname === '/logout') {
-                    return;
-                }
-                if (actionUrl.pathname.startsWith('/api/') || form.getAttribute('enctype') === 'multipart/form-data') {
-                    return;
-                }
                 
                 e.preventDefault();
                 
-                const method = (form.getAttribute('method') || 'GET').toUpperCase();
                 const formData = new FormData(form);
-                
                 let fetchUrl = actionUrl.href;
-                let fetchOptions = { method: method };
                 
-                if (method === 'GET') {
-                    const params = new URLSearchParams();
-                    for (const [key, value] of formData.entries()) {
-                        if (typeof value === 'string') params.append(key, value);
-                    }
-                    const searchStr = params.toString();
-                    if (searchStr) {
-                        fetchUrl += (fetchUrl.includes('?') ? '&' : '?') + searchStr;
-                    }
-                } else {
-                    const params = new URLSearchParams();
-                    for (const [key, value] of formData.entries()) {
-                        if (typeof value === 'string') params.append(key, value);
-                    }
-                    fetchOptions.body = params;
-                    fetchOptions.headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    };
+                const params = new URLSearchParams();
+                for (const [key, value] of formData.entries()) {
+                    if (typeof value === 'string') params.append(key, value);
                 }
-                
-                if (method !== 'GET') {
-                    invalidateCache();
+                const searchStr = params.toString();
+                if (searchStr) {
+                    fetchUrl += (fetchUrl.includes('?') ? '&' : '?') + searchStr;
                 }
                 
                 isTransitioning = false;
-                loadPageViaAjax(fetchUrl, null, method !== 'GET');
+                loadPageViaAjax(fetchUrl, null, false);
             });
 
             // Popstate (Back / Forward browser buttons)

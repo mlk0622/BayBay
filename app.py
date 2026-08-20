@@ -898,7 +898,7 @@ def send_system_email(destinataire, sujet, html_corps, text_corps=None):
     smtp_from = os.environ.get('SMTP_FROM', 'verification@mb-site.com').strip()
     smtp_from_name = os.environ.get('SMTP_FROM_NAME', 'BayBay').strip()
 
-    login_user = smtp_user if smtp_user else smtp_from
+    smtp_login_id = smtp_user if smtp_user else smtp_from
 
     try:
         msg = MIMEMultipart('alternative')
@@ -917,7 +917,7 @@ def send_system_email(destinataire, sujet, html_corps, text_corps=None):
             server.starttls()
 
         if smtp_pass:
-            server.login(login_user, smtp_pass)
+            server.login(smtp_login_id, smtp_pass)
 
         server.send_message(msg)
         server.quit()
@@ -1741,7 +1741,7 @@ def forgot_password():
             return render_template('forgot_password.html')
 
         flash(f"Code envoyé à {user.email}. Saisissez-le ci-dessous avec votre nouveau mot de passe.", 'success')
-        return render_template('reset_password.html', email=user.email, cooldown=60)
+        return redirect(url_for('reset_password', email=user.email))
 
     return render_template('forgot_password.html')
 
