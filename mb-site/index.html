@@ -116,9 +116,11 @@
                 <span class="text-xl font-bold text-white tracking-tight">Malik B.</span>
             </a>
 
-            <!-- Nav Links : Projets & BayBay -->
-            <nav class="flex items-center gap-8 text-sm font-medium text-slate-300">
+            <!-- Nav Links : Accueil, Projets, À propos & BayBay -->
+            <nav class="flex items-center gap-5 sm:gap-7 text-sm font-medium text-slate-300">
+                <a href="/" class="nav-link-accueil hover:text-white transition-colors">Accueil</a>
                 <a href="/projets.html" class="nav-link-projets hover:text-white transition-colors">Projets</a>
+                <a href="/#apropos" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
                 <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
             </nav>
 
@@ -163,8 +165,8 @@
 
             </section>
 
-            <!-- ================= PRÉSENTATION ================= -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+            <!-- ================= PRÉSENTATION & À PROPOS ================= -->
+            <section id="section-apropos" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 scroll-mt-24">
                 
                 <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-6">
                     
@@ -496,9 +498,11 @@
                 <span class="font-bold text-white">Malik B.</span>
                 <span>— © 2026 mb-site.com. Tous droits réservés.</span>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
+                <a href="/" class="nav-link-accueil hover:text-white transition-colors">Accueil</a>
                 <a href="/projets.html" class="nav-link-projets hover:text-white transition-colors">Projets</a>
-                <a href="https://baybay.mb-site.com" class="hover:text-white transition-colors">BayBay</a>
+                <a href="/#apropos" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
+                <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
                 <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors">GitHub</a>
                 <a href="mailto:contact@mb-site.com" class="hover:text-white transition-colors">Contact</a>
             </div>
@@ -510,44 +514,76 @@
         (function() {
             const homeView = document.getElementById('view-home');
             const projectsView = document.getElementById('view-projects');
+            const navAccueilLinks = document.querySelectorAll('.nav-link-accueil');
             const navProjetsLinks = document.querySelectorAll('.nav-link-projets');
+            const navAproposLinks = document.querySelectorAll('.nav-link-apropos');
             let isAnimating = false;
 
-            function setNavHighlight(isProjets) {
-                navProjetsLinks.forEach(link => {
-                    if (isProjets) {
-                        link.classList.remove('hover:text-white', 'text-slate-300');
-                        link.classList.add('text-white', 'font-semibold');
-                    } else {
-                        link.classList.remove('text-white', 'font-semibold');
-                        link.classList.add('hover:text-white', 'text-slate-300');
-                    }
+            function setNavHighlight(activeTab) {
+                const allLinks = [
+                    { links: navAccueilLinks, tab: 'accueil' },
+                    { links: navProjetsLinks, tab: 'projets' },
+                    { links: navAproposLinks, tab: 'apropos' }
+                ];
+
+                allLinks.forEach(({ links, tab }) => {
+                    const isActive = (tab === activeTab);
+                    links.forEach(link => {
+                        if (isActive) {
+                            link.classList.remove('hover:text-white', 'text-slate-300');
+                            link.classList.add('text-white', 'font-semibold');
+                        } else {
+                            link.classList.remove('text-white', 'font-semibold');
+                            link.classList.add('hover:text-white', 'text-slate-300');
+                        }
+                    });
                 });
             }
 
-            function transitionTo(targetView, updateHistory = true, instant = false) {
+            function transitionTo(targetView, updateHistory = true, instant = false, scrollToId = null) {
                 if (isAnimating) return;
-                const isProjets = targetView === 'projets';
+                const isProjets = (targetView === 'projets');
                 const current = isProjets ? homeView : projectsView;
                 const next = isProjets ? projectsView : homeView;
 
                 document.title = isProjets 
                     ? "Mes Projets — Malik B. (mb-site.com)" 
-                    : "Malik B. — mb-site.com";
+                    : (targetView === 'apropos' ? "À propos — Malik B. (mb-site.com)" : "Malik B. — mb-site.com");
 
-                setNavHighlight(isProjets);
+                setNavHighlight(targetView);
+
+                const performScroll = () => {
+                    if (scrollToId) {
+                        const targetEl = document.getElementById(scrollToId);
+                        if (targetEl) {
+                            targetEl.scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                    }
+                    window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
+                };
+
+                // Si on est déjà sur la vue demandée
+                if ((isProjets && !projectsView.classList.contains('view-hidden')) ||
+                    (!isProjets && !homeView.classList.contains('view-hidden'))) {
+                    performScroll();
+                    if (updateHistory) {
+                        const targetHash = isProjets ? '#projets' : (targetView === 'apropos' ? '#apropos' : '');
+                        history.pushState({ view: targetView }, '', targetHash || '/');
+                    }
+                    return;
+                }
 
                 if (instant) {
                     current.classList.remove('view-visible');
                     current.classList.add('view-hidden');
                     next.classList.remove('view-hidden');
                     next.classList.add('view-visible');
+                    performScroll();
                     return;
                 }
 
                 isAnimating = true;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-
                 current.style.opacity = '0';
                 current.style.transform = 'translateY(-6px)';
 
@@ -566,6 +602,7 @@
 
                     next.style.opacity = '1';
                     next.style.transform = 'translateY(0)';
+                    performScroll();
 
                     setTimeout(() => {
                         next.style.opacity = '';
@@ -574,14 +611,13 @@
                     }, 250);
 
                     if (updateHistory) {
-                        const targetHash = isProjets ? '#projets' : '';
-                        const targetUrl = window.location.pathname.replace(/\/projets(\.html)?$/, '/') + targetHash;
-                        history.pushState({ view: targetView }, '', targetUrl || '/');
+                        const targetHash = isProjets ? '#projets' : (targetView === 'apropos' ? '#apropos' : '');
+                        history.pushState({ view: targetView }, '', targetHash || '/');
                     }
                 }, 180);
             }
 
-            // Intercepter tous les liens internes vers projets ou accueil
+            // Intercepter tous les liens internes vers projets, accueil ou à propos
             document.addEventListener('click', function(e) {
                 const link = e.target.closest('a');
                 if (!link) return;
@@ -589,31 +625,38 @@
                 const href = link.getAttribute('href');
                 if (!href) return;
 
-                if (href === '/projets.html' || href === 'projets.html' || href === '#projets') {
+                if (href === '/projets.html' || href === 'projets.html' || href === '#projets' || href === '/#projets') {
                     e.preventDefault();
                     transitionTo('projets', true);
-                } else if (href === '/' || href === '/index.html' || href === '#accueil') {
-                    // Si on est déjà sur la vue projets, transition fluide vers accueil
-                    if (!projectsView.classList.contains('view-hidden')) {
-                        e.preventDefault();
-                        transitionTo('accueil', true);
-                    }
+                } else if (href === '#apropos' || href === '/#apropos' || href === '/projets.html#apropos') {
+                    e.preventDefault();
+                    transitionTo('apropos', true, false, 'section-apropos');
+                } else if (href === '/' || href === '/index.html' || href === '#accueil' || href === '/#accueil') {
+                    e.preventDefault();
+                    transitionTo('accueil', true);
                 }
             });
 
             // Gérer le bouton retour / suivant du navigateur
             window.addEventListener('popstate', function(e) {
-                if (e.state && e.state.view) {
-                    transitionTo(e.state.view, false);
+                const hash = window.location.hash;
+                if (hash === '#projets') {
+                    transitionTo('projets', false);
+                } else if (hash === '#apropos') {
+                    transitionTo('apropos', false, false, 'section-apropos');
                 } else {
-                    const isProjets = window.location.hash === '#projets' || window.location.pathname.includes('projets');
-                    transitionTo(isProjets ? 'projets' : 'accueil', false);
+                    transitionTo('accueil', false);
                 }
             });
 
-            // Vérification à l'ouverture de page
-            if (window.location.hash === '#projets' || window.location.pathname.includes('projets')) {
+            // Vérification à l'ouverture de page selon le hash
+            const initialHash = window.location.hash;
+            if (initialHash === '#projets' || window.location.pathname.includes('projets')) {
                 transitionTo('projets', false, true);
+            } else if (initialHash === '#apropos') {
+                transitionTo('apropos', false, true, 'section-apropos');
+            } else {
+                setNavHighlight('accueil');
             }
         })();
     </script>

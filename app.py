@@ -1564,22 +1564,26 @@ def verify_email():
         flash("Cette demande de vérification est introuvable ou a déjà été validée.", 'error')
         return redirect(url_for('login'))
 
+    now = datetime.utcnow()
+    elapsed = int((now - verification.created_at).total_seconds()) if verification.created_at else 60
+    cooldown = max(0, 60 - elapsed)
+
     if request.method == 'POST':
         code = (request.form.get('code') or '').strip().replace(' ', '')
 
         if datetime.utcnow() > verification.expires_at:
             flash("Ce code a expiré (délai de 15 minutes dépassé). Veuillez demander un nouveau code ci-dessous.", 'error')
-            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         if verification.attempts >= 5:
             flash("Trop de tentatives infructueuses. Veuillez demander un nouveau code.", 'error')
-            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         if verification.code != code:
             verification.attempts += 1
             db.session.commit()
             flash("Code de vérification incorrect. Veuillez vérifier vos emails et réessayer.", 'error')
-            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         # Code valide : Vérifier si l'utilisateur existe déjà
         if User.query.filter_by(email=verification.email).first():
@@ -1608,7 +1612,7 @@ def verify_email():
         flash("Votre adresse email a été vérifiée avec succès ! Bienvenue sur BayBay.", 'success')
         return redirect(url_for('dashboard'))
 
-    return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email))
+    return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
 
 @app.route('/resend-verification-code', methods=['POST'])
@@ -1623,9 +1627,16 @@ def resend_verification_code():
         flash("Demande de vérification expirée. Veuillez vous réinscrire.", 'error')
         return redirect(url_for('register'))
 
-    # Générer un nouveau code
+    now = datetime.utcnow()
+    if verification.created_at and (now - verification.created_at).total_seconds() < 60:
+        remaining = int(60 - (now - verification.created_at).total_seconds())
+        flash(f"Veuillez patienter encore {remaining} seconde(s) avant de demander un nouveau code.", 'error')
+        return redirect(url_for('verify_email', token=token))
+
+    # Générer un nouveau code et redémarrer le compteur
     new_code = f"{secrets.randbelow(900000) + 100000}"
     verification.code = new_code
+    verification.created_at = datetime.utcnow()
     verification.expires_at = datetime.utcnow() + timedelta(minutes=15)
     verification.attempts = 0
     db.session.commit()
@@ -1656,18 +1667,27 @@ def forgot_password():
 
         user = User.query.filter_by(email=email).first()
         if user:
+            # Vérifier si une demande a déjà été faite il y a moins de 60 secondes
+            recent = EmailVerification.query.filter_by(email=email, purpose='reset_password', is_used=False).order_by(EmailVerification.id.desc()).first()
+            if recent and recent.created_at and (datetime.utcnow() - recent.created_at).total_seconds() < 60:
+                remaining = int(60 - (datetime.utcnow() - recent.created_at).total_seconds())
+                flash(f"Un code a déjà été envoyé. Veuillez patienter {remaining}s avant d'en redemander un.", 'error')
+                return redirect(url_for('verify_reset_code', email=email))
+
             # Invalider d'anciens jetons de réinitialisation
             EmailVerification.query.filter_by(email=email, purpose='reset_password', is_used=False).update({'is_used': True})
 
             code = f"{secrets.randbelow(900000) + 100000}"
             token = secrets.token_urlsafe(32)
-            expires_at = datetime.utcnow() + timedelta(minutes=15)
+            now = datetime.utcnow()
+            expires_at = now + timedelta(minutes=15)
 
             reset_entry = EmailVerification(
                 email=email,
                 code=code,
                 token=token,
                 purpose='reset_password',
+                created_at=now,
                 expires_at=expires_at
             )
             db.session.add(reset_entry)
@@ -1693,27 +1713,31 @@ def forgot_password():
 def verify_reset_code():
     email = (request.args.get('email') or request.form.get('email') or '').strip().lower()
 
+    record = EmailVerification.query.filter_by(
+        email=email,
+        purpose='reset_password',
+        is_used=False
+    ).order_by(EmailVerification.id.desc()).first() if email else None
+
+    cooldown = 0
+    if record and record.created_at:
+        elapsed = int((datetime.utcnow() - record.created_at).total_seconds())
+        cooldown = max(0, 60 - elapsed)
+
     if request.method == 'POST':
         code = (request.form.get('code') or '').strip().replace(' ', '')
 
         if not email or not code:
             flash("Veuillez saisir votre adresse email et le code reçu.", 'error')
-            return render_template('verify_reset_code.html', email=email)
+            return render_template('verify_reset_code.html', email=email, cooldown=cooldown)
 
-        record = EmailVerification.query.filter_by(
-            email=email,
-            code=code,
-            purpose='reset_password',
-            is_used=False
-        ).order_by(EmailVerification.id.desc()).first()
-
-        if not record or datetime.utcnow() > record.expires_at:
+        if not record or record.code != code or datetime.utcnow() > record.expires_at:
             flash("Code de réinitialisation incorrect ou expiré.", 'error')
-            return render_template('verify_reset_code.html', email=email)
+            return render_template('verify_reset_code.html', email=email, cooldown=cooldown)
 
         return redirect(url_for('reset_password', token=record.token))
 
-    return render_template('verify_reset_code.html', email=email)
+    return render_template('verify_reset_code.html', email=email, cooldown=cooldown)
 
 
 @app.route('/reset-password', methods=['GET', 'POST'])

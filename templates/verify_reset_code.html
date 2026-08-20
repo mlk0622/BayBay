@@ -39,10 +39,13 @@
     </form>
 
     <div class="mt-6 pt-5 border-t border-white/10 flex flex-col gap-3 text-xs text-slate-400">
-        <a href="{{ url_for('forgot_password') }}" class="text-blue-400 hover:text-blue-300 hover:underline font-semibold">
-            <i class="fas fa-rotate-right mr-1"></i>
-            <span>Renvoyer une demande de réinitialisation</span>
-        </a>
+        <form method="POST" action="{{ url_for('forgot_password') }}" id="resendResetForm">
+            <input type="hidden" name="email" value="{{ email or '' }}">
+            <button type="submit" id="resendResetBtn" class="text-blue-400 hover:text-blue-300 hover:underline font-semibold cursor-pointer bg-transparent border-0 p-0 text-xs disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline transition-all flex items-center justify-center mx-auto gap-1.5">
+                <i class="fas fa-rotate-right"></i>
+                <span id="resendResetText">Renvoyer une demande de réinitialisation</span>
+            </button>
+        </form>
 
         <a href="{{ url_for('login') }}" class="text-slate-400 hover:text-white transition-colors">
             <i class="fas fa-arrow-left mr-1"></i>
@@ -50,4 +53,28 @@
         </a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let cooldown = parseInt("{{ cooldown|default(60) }}", 10);
+    if (isNaN(cooldown) || cooldown < 0) cooldown = 0;
+
+    const resendBtn = document.getElementById('resendResetBtn');
+    const resendText = document.getElementById('resendResetText');
+
+    function updateCooldown() {
+        if (cooldown > 0) {
+            resendBtn.disabled = true;
+            resendText.textContent = `Renvoyer un code possible dans ${cooldown}s`;
+            cooldown--;
+            setTimeout(updateCooldown, 1000);
+        } else {
+            resendBtn.disabled = false;
+            resendText.textContent = "Renvoyer une demande de réinitialisation";
+        }
+    }
+
+    updateCooldown();
+});
+</script>
 {% endblock %}
