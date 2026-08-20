@@ -48,30 +48,30 @@
         </div>
 
         <!-- Règles de sécurité du mot de passe -->
-        <div id="password-rules-box" class="text-xs space-y-2 p-3.5 rounded-xl bg-black/40 border border-white/10 mt-3">
-            <p class="font-bold text-slate-300 text-[11px] uppercase tracking-wider mb-2">Exigences de sécurité :</p>
-            <div id="rule-length" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+        <div id="password-rules-box" class="text-xs space-y-2 p-3.5 rounded-xl bg-black/50 border border-white/10 mt-3">
+            <p class="font-bold text-slate-200 text-[11px] uppercase tracking-wider mb-2">Exigences de sécurité :</p>
+            <div id="rule-length" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Au moins 8 caractères</span>
             </div>
-            <div id="rule-upper" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+            <div id="rule-upper" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Au moins 1 lettre majuscule (A-Z)</span>
             </div>
-            <div id="rule-lower" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+            <div id="rule-lower" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Au moins 1 lettre minuscule (a-z)</span>
             </div>
-            <div id="rule-digit" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+            <div id="rule-digit" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Au moins 1 chiffre (0-9)</span>
             </div>
-            <div id="rule-special" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+            <div id="rule-special" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Au moins 1 caractère spécial (!, @, #, $, %, &, *, ...)</span>
             </div>
-            <div id="rule-match" class="flex items-center gap-2 text-slate-400 transition-colors duration-200">
-                <i class="fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0"></i>
+            <div id="rule-match" class="flex items-center gap-2 text-red-400 transition-colors duration-200">
+                <i class="fas fa-times-circle text-red-500 text-xs w-4 shrink-0"></i>
                 <span>Les deux mots de passe correspondent</span>
             </div>
         </div>
@@ -112,11 +112,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!row) return;
         const icon = row.querySelector('i');
         if (isValid) {
-            row.className = "flex items-center gap-2 text-emerald-400 font-medium transition-colors duration-200";
-            icon.className = "fas fa-check-circle text-emerald-400 text-xs w-4 shrink-0 transition-transform duration-200 scale-110";
+            row.className = "flex items-center gap-2 text-emerald-400 font-semibold transition-colors duration-200";
+            icon.className = "fas fa-check-circle text-emerald-400 text-xs w-4 shrink-0";
         } else {
-            row.className = "flex items-center gap-2 text-slate-400 transition-colors duration-200";
-            icon.className = "fas fa-circle-xmark text-red-500 text-xs w-4 shrink-0";
+            row.className = "flex items-center gap-2 text-red-400 transition-colors duration-200";
+            icon.className = "fas fa-times-circle text-red-500 text-xs w-4 shrink-0";
         }
     }
 
@@ -134,6 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     pwInput.addEventListener('input', checkRules);
     confirmInput.addEventListener('input', checkRules);
+    checkRules();
 });
 </script>
 {% endblock %}

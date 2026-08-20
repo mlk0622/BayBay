@@ -19,7 +19,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from werkzeug.utils import secure_filename
-from sqlalchemy import text, inspect
+from sqlalchemy import text, inspect, func
 from sqlalchemy.exc import IntegrityError
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
@@ -1556,12 +1556,12 @@ def register():
 def verify_email():
     token = request.args.get('token') or request.form.get('token') or session.get('pending_verification_token')
     if not token:
-        flash("Aucune demande de vérification en cours.", 'error')
+        flash("Aucune demande de vérification en cours. Veuillez vous inscrire.", 'error')
         return redirect(url_for('register'))
 
     verification = EmailVerification.query.filter_by(token=token, purpose='register', is_used=False).first()
     if not verification:
-        flash("Cette demande de vérification est introuvable ou a déjà été validée.", 'error')
+        flash("Cette demande de vérification est introuvable ou a déjà été validée. Veuillez vous connecter.", 'error')
         return redirect(url_for('login'))
 
     now = datetime.utcnow()
@@ -1571,26 +1571,34 @@ def verify_email():
     if request.method == 'POST':
         code = (request.form.get('code') or '').strip().replace(' ', '')
 
+        if not code:
+            flash("Veuillez saisir le code à 6 chiffres reçu par email.", 'error')
+            return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
+
         if datetime.utcnow() > verification.expires_at:
             flash("Ce code a expiré (délai de 15 minutes dépassé). Veuillez demander un nouveau code ci-dessous.", 'error')
             return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         if verification.attempts >= 5:
-            flash("Trop de tentatives infructueuses. Veuillez demander un nouveau code.", 'error')
+            flash("Trop de tentatives infructueuses. Veuillez demander un nouveau code ci-dessous.", 'error')
             return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         if verification.code != code:
             verification.attempts += 1
             db.session.commit()
-            flash("Code de vérification incorrect. Veuillez vérifier vos emails et réessayer.", 'error')
+            restantes = max(0, 5 - verification.attempts)
+            flash(f"Code de vérification incorrect ({restantes} tentative(s) restante(s)). Vérifiez vos emails et réessayez.", 'error')
             return render_template('verify_email.html', token=token, email_preview=_mask_email(verification.email), cooldown=cooldown)
 
         # Code valide : Vérifier si l'utilisateur existe déjà
-        if User.query.filter_by(email=verification.email).first():
+        existing_user = User.query.filter((func.lower(User.email) == verification.email.lower()) | (func.lower(User.pseudo) == verification.email.lower())).first()
+        if existing_user:
             verification.is_used = True
             db.session.commit()
-            flash("Un compte existe déjà avec cette adresse email. Veuillez vous connecter.", 'error')
-            return redirect(url_for('login'))
+            session.pop('pending_verification_token', None)
+            login_user(existing_user, remember=True, duration=timedelta(days=30))
+            flash("Votre compte est vérifié avec succès ! Bienvenue sur BayBay.", 'success')
+            return redirect(url_for('dashboard'))
 
         # Création et activation définitive du compte utilisateur
         new_user = User(
@@ -1604,6 +1612,11 @@ def verify_email():
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
+            existing_user = User.query.filter_by(email=verification.email).first()
+            if existing_user:
+                login_user(existing_user, remember=True, duration=timedelta(days=30))
+                flash("Votre compte est activé ! Bienvenue sur BayBay.", 'success')
+                return redirect(url_for('dashboard'))
             flash("Erreur lors de la création du compte : utilisateur déjà existant.", 'error')
             return redirect(url_for('login'))
 
@@ -1665,46 +1678,53 @@ def forgot_password():
             flash('Veuillez entrer une adresse email valide.', 'error')
             return render_template('forgot_password.html')
 
-        user = User.query.filter_by(email=email).first()
-        if user:
-            # Vérifier si une demande a déjà été faite il y a moins de 60 secondes
-            recent = EmailVerification.query.filter_by(email=email, purpose='reset_password', is_used=False).order_by(EmailVerification.id.desc()).first()
-            if recent and recent.created_at and (datetime.utcnow() - recent.created_at).total_seconds() < 60:
-                remaining = int(60 - (datetime.utcnow() - recent.created_at).total_seconds())
-                flash(f"Un code a déjà été envoyé. Veuillez patienter {remaining}s avant d'en redemander un.", 'error')
-                return redirect(url_for('verify_reset_code', email=email))
+        user = User.query.filter((func.lower(User.email) == email) | (func.lower(User.pseudo) == email)).first()
+        if not user:
+            flash(f"Aucun compte BayBay n'est associé à l'adresse '{email}'. Veuillez vérifier votre saisie ou créer un compte.", 'error')
+            return render_template('forgot_password.html')
 
-            # Invalider d'anciens jetons de réinitialisation
-            EmailVerification.query.filter_by(email=email, purpose='reset_password', is_used=False).update({'is_used': True})
+        # Vérifier si une demande a déjà été faite il y a moins de 60 secondes
+        recent = EmailVerification.query.filter_by(email=user.email, purpose='reset_password', is_used=False).order_by(EmailVerification.id.desc()).first()
+        if recent and recent.created_at and (datetime.utcnow() - recent.created_at).total_seconds() < 60:
+            remaining = int(60 - (datetime.utcnow() - recent.created_at).total_seconds())
+            flash(f"Un code a déjà été envoyé. Veuillez patienter {remaining}s avant d'en redemander un.", 'error')
+            return redirect(url_for('verify_reset_code', email=user.email))
 
-            code = f"{secrets.randbelow(900000) + 100000}"
-            token = secrets.token_urlsafe(32)
-            now = datetime.utcnow()
-            expires_at = now + timedelta(minutes=15)
+        # Invalider d'anciens jetons de réinitialisation
+        EmailVerification.query.filter_by(email=user.email, purpose='reset_password', is_used=False).update({'is_used': True})
 
-            reset_entry = EmailVerification(
-                email=email,
-                code=code,
-                token=token,
-                purpose='reset_password',
-                created_at=now,
-                expires_at=expires_at
-            )
-            db.session.add(reset_entry)
-            db.session.commit()
+        code = f"{secrets.randbelow(900000) + 100000}"
+        token = secrets.token_urlsafe(32)
+        now = datetime.utcnow()
+        expires_at = now + timedelta(minutes=15)
 
-            # Construction de l'URL absolue de réinitialisation
-            reset_url = url_for('reset_password', token=token, _external=True)
+        reset_entry = EmailVerification(
+            email=user.email,
+            code=code,
+            token=token,
+            purpose='reset_password',
+            created_at=now,
+            expires_at=expires_at
+        )
+        db.session.add(reset_entry)
+        db.session.commit()
 
-            sent, err = send_system_email(
-                email,
-                "Réinitialisation de votre mot de passe - BayBay",
-                _build_reset_password_email_html(reset_url, code),
-                f"Lien de réinitialisation de votre mot de passe : {reset_url}\nOu code à 6 chiffres : {code} (valable 15 minutes)."
-            )
+        # Construction de l'URL absolue de réinitialisation
+        reset_url = url_for('reset_password', token=token, _external=True)
 
-        flash("Si cette adresse email correspond à un compte, un lien et un code de réinitialisation vous ont été envoyés.", 'success')
-        return redirect(url_for('verify_reset_code', email=email))
+        sent, err = send_system_email(
+            user.email,
+            "Réinitialisation de votre mot de passe - BayBay",
+            _build_reset_password_email_html(reset_url, code),
+            f"Lien de réinitialisation de votre mot de passe : {reset_url}\nOu code à 6 chiffres : {code} (valable 15 minutes)."
+        )
+
+        if not sent:
+            flash(f"Erreur lors de l'envoi de l'email : {err}", 'error')
+            return render_template('forgot_password.html')
+
+        flash(f"Un email contenant votre lien et code de réinitialisation a été envoyé à {user.email}.", 'success')
+        return redirect(url_for('verify_reset_code', email=user.email))
 
     return render_template('forgot_password.html')
 
