@@ -120,7 +120,7 @@
             <nav class="flex items-center gap-5 sm:gap-7 text-sm font-medium text-slate-300">
                 <a href="/" class="nav-link-accueil hover:text-white transition-colors">Accueil</a>
                 <a href="/projets.html" class="nav-link-projets hover:text-white transition-colors">Projets</a>
-                <a href="/#apropos" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
+                <a href="/apropos.html" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
                 <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
             </nav>
 
@@ -140,8 +140,8 @@
         <!-- ================= VUE ACCUEIL ================= -->
         <div id="view-home" class="view-section view-visible">
 
-            <!-- ================= HERO SECTION ================= -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-14 text-center relative z-10 fade-in-element">
+            <!-- HERO SECTION -->
+            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-14 text-center relative z-10">
                 
                 <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
                     Étudiant @ EFREI Paris
@@ -155,67 +155,136 @@
                     Étudiant en 2ème année à l'EFREI Paris, j'aime imaginer, coder et concrétiser des applications modernes en utilisant les meilleures technologies et un peu d'IA.
                 </p>
 
-                <!-- Bouton d'action unique vers les projets -->
-                <div class="flex items-center justify-center">
+                <!-- Boutons d'action rapides -->
+                <div class="flex flex-wrap items-center justify-center gap-4">
                     <a href="/projets.html" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/30 hover:-translate-y-0.5 transition-all">
                         <i class="fas fa-folder-open text-xs"></i>
                         <span>Découvrir mes projets</span>
+                    </a>
+                    <a href="/apropos.html" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white/5 hover:bg-white/15 border border-white/15 text-white font-bold text-sm shadow-xl hover:-translate-y-0.5 transition-all">
+                        <i class="fas fa-user text-xs text-blue-400"></i>
+                        <span>En savoir plus à propos de moi</span>
                     </a>
                 </div>
 
             </section>
 
-            <!-- ================= PRÉSENTATION & À PROPOS ================= -->
-            <section id="section-apropos" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 scroll-mt-24">
-                
-                <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-6">
-                    
-                    <!-- Profil & Titre -->
-                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 pb-6 border-b border-white/10">
-                        <img src="/favicon.png" alt="Malik B." class="w-16 h-16 rounded-2xl object-contain border border-white/20 shadow-lg shadow-blue-500/30 shrink-0">
-                        <div class="text-center sm:text-left space-y-1">
-                            <h2 class="text-2xl font-bold text-white">Malik B.</h2>
-                            <p class="text-blue-400 text-sm font-medium">Étudiant en 2ème année à l'EFREI Paris</p>
+            <!-- APERÇU RAPIDE & VALEURS -->
+            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="liquid-glass-card p-6 rounded-3xl border border-white/10 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg border border-blue-500/20">
+                            <i class="fas fa-graduation-cap"></i>
                         </div>
-                    </div>
-
-                    <!-- Récit général et authentique -->
-                    <div class="space-y-4 text-sm sm:text-base text-slate-300 leading-relaxed">
-                        <p>
-                            J'aime transformer des problématiques concrètes en logiciels élégants, performants et intuitifs. C'est ainsi que j'ai développé <strong class="text-white">BayBay</strong> de A à Z lorsque mon oncle cherchait une solution complète et moderne pour gérer son parc immobilier et ses SCI.
-                        </p>
-                        <p>
-                            Toujours curieux et motivé par l'apprentissage, je m'appuie sur les bases de l'informatique ainsi que sur les outils modernes d'Intelligence Artificielle pour concevoir et accélérer le développement de projets bien pensés.
+                        <h3 class="text-base font-bold text-white">Formation EFREI Paris</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            École d'ingénieurs du numérique. Bases algorithmiques solides, programmation C, structures de données et gestion de projets.
                         </p>
                     </div>
 
-                    <!-- Tags badges -->
-                    <div class="pt-2 flex flex-wrap gap-2.5">
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">📍 Paris</span>
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">🎓 EFREI Paris</span>
-                        <span class="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">💡 Projets & Logiciels</span>
+                    <div class="liquid-glass-card p-6 rounded-3xl border border-white/10 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg border border-purple-500/20">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-white">Projets Concrets</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Création d'outils réels comme BayBay (suite logicielle immobilière v4.0), compilateurs et applications multiplateformes.
+                        </p>
                     </div>
 
+                    <div class="liquid-glass-card p-6 rounded-3xl border border-white/10 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-lg border border-cyan-500/20">
+                            <i class="fas fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-white">Technologies & IA</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Allier rigueur de développement et accélération par l'Intelligence Artificielle pour produire un code propre et sécurisé.
+                        </p>
+                    </div>
                 </div>
-
             </section>
 
-            <!-- ================= COMPÉTENCES TECHNIQUES ================= -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-8">
+        </div>
+
+        <!-- ================= VUE À PROPOS (PAGE SÉPARÉE) ================= -->
+        <div id="view-about" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
+            
+            <!-- Header À Propos -->
+            <div class="text-center mb-12">
+                <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
+                    Présentation & Parcours
+                </span>
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mt-5 tracking-tight leading-tight">
+                    À Propos de <span class="gradient-text">Malik B.</span>
+                </h1>
+                <p class="text-slate-300 text-sm sm:text-base max-w-lg mx-auto mt-4 leading-relaxed">
+                    Étudiant ingénieur passionné par l'informatique, la conception de logiciels et le développement d'architectures modernes.
+                </p>
+            </div>
+
+            <!-- Grande Carte Profil & Récit -->
+            <div class="liquid-glass-card p-8 sm:p-12 rounded-3xl border border-white/20 shadow-2xl space-y-8 mb-10">
                 
-                <div class="text-center mb-8">
-                    <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
-                        Stack & Technologies
-                    </span>
-                    <h2 class="text-3xl sm:text-4xl font-black text-white mt-4">
-                        Compétences Techniques
-                    </h2>
-                    <p class="text-slate-400 text-sm max-w-lg mx-auto mt-2">
-                        Je sais coder en <span class="text-blue-400 font-semibold">C</span>, en <span class="text-purple-400 font-semibold">Python</span>, en <span class="text-amber-400 font-semibold">HTML / CSS / JavaScript</span> et en <span class="text-cyan-400 font-semibold">PHP</span>.
-                    </p>
+                <!-- Profil en-tête -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-white/10">
+                    <img src="/favicon.png" alt="Malik B." class="w-20 h-20 rounded-2xl object-contain border border-white/20 shadow-xl shadow-blue-500/20 shrink-0">
+                    <div class="text-center sm:text-left space-y-1.5">
+                        <h2 class="text-2xl sm:text-3xl font-black text-white">Malik Bouaissi</h2>
+                        <p class="text-blue-400 text-sm font-semibold">Étudiant en 2ème année à l'EFREI Paris • Développeur Logiciel & Web</p>
+                        <div class="pt-2 flex flex-wrap justify-center sm:justify-start gap-2.5">
+                            <span class="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">📍 Paris, France</span>
+                            <span class="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">🎓 EFREI Paris (Promo 2029)</span>
+                            <span class="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-xs font-semibold text-slate-300">💡 Conception Logicielle</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Grille des Compétences -->
+                <!-- Récit complet -->
+                <div class="space-y-5 text-sm sm:text-base text-slate-300 leading-relaxed">
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-bullseye text-blue-400 text-sm"></i>
+                            <span>Ma Vision & Mon Approche</span>
+                        </h3>
+                        <p>
+                            J'aime transformer des problématiques concrètes du monde réel en solutions logicielles complètes, fluides et sécurisées. Pour moi, le développement ne se résume pas à empiler des lignes de code : il s'agit de bâtir des outils intuitifs qui simplifient véritablement le quotidien de leurs utilisateurs.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-cube text-purple-400 text-sm"></i>
+                            <span>L'Histoire de BayBay</span>
+                        </h3>
+                        <p>
+                            C'est dans cet esprit que j'ai conçu et développé l'écosystème <strong class="text-white">BayBay</strong> de bout en bout. Lorsque mon oncle cherchait un moyen centralisé et moderne de gérer son parc locatif et ses SCI sans dépendre d'abonnements exorbitants, j'ai pris en main l'architecture complète : application bureau Windows avec Electron.js, serveur Cloud Python/Flask, gestion automatisée des quittances ALUR et chiffrement fort AES-256.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-brain text-cyan-400 text-sm"></i>
+                            <span>Apprentissage Continu & Intelligence Artificielle</span>
+                        </h3>
+                        <p>
+                            Toujours curieux et passionné par les technologies émergentes, je combine les fondations académiques de l'informatique (algorithmique, gestion mémoire en C, bases de données relationnelles) avec l'intégration intelligente des outils d'IA pour accélérer et fiabiliser la production logicielle.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Grille des Compétences Détaillées -->
+            <div class="space-y-6">
+                <div class="text-center mb-6">
+                    <span class="text-purple-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30">
+                        Expertises & Savoir-Faire
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mt-3">
+                        Compétences Techniques
+                    </h2>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     
                     <!-- 1. Développement Web -->
@@ -225,102 +294,105 @@
                                 <i class="fas fa-globe"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-white">Développement Web</h3>
-                                <p class="text-xs text-blue-400 font-medium">React & TypeScript, PHP, Python</p>
+                                <h3 class="text-lg font-bold text-white">Développement Web & API</h3>
+                                <p class="text-xs text-blue-400 font-medium">Python (Flask), PHP, JavaScript, React</p>
                             </div>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                            Création d'applications web réactives et de serveurs robustes. Architecture backend avec Python (Flask / API) et PHP, intégration frontend avec React et TypeScript.
+                            Architecture backend avec Python (Flask, API REST) et PHP, intégration frontend réactive avec HTML5, Tailwind CSS, JavaScript et React.
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">React</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">TypeScript</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">PHP</span>
                             <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Python (Flask)</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">PHP</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">JavaScript ES6+</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">React</span>
                         </div>
                     </div>
 
-                    <!-- 2. Développement HTML/CSS & Desktop -->
+                    <!-- 2. Desktop & UI/UX -->
                     <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl border border-purple-500/20">
                                 <i class="fas fa-desktop"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-white">Développement HTML/CSS</h3>
-                                <p class="text-xs text-purple-400 font-medium">Applications & Plateformes</p>
+                                <h3 class="text-lg font-bold text-white">Desktop & UI/UX Design</h3>
+                                <p class="text-xs text-purple-400 font-medium">Electron.js, Dark Glassmorphism, NSIS</p>
                             </div>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                            Intégration responsive haute fidélité, animations fluides et applications logicielles desktop multiplateformes avec Electron.js.
+                            Création d'applications logicielles bureau natives Windows (Electron.js, installeur NSIS, auto-updates) et design Dark Glassmorphism raffiné.
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">HTML5</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">CSS3 / Tailwind</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">JavaScript</span>
                             <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Electron.js</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Tailwind CSS</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">UI/UX Glass</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">NSIS Compiler</span>
                         </div>
                     </div>
 
-                    <!-- 3. Base de données -->
+                    <!-- 3. Base de données & Sécurité -->
                     <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20">
-                                <i class="fas fa-database"></i>
+                                <i class="fas fa-shield-halved"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-white">Bases de Données</h3>
-                                <p class="text-xs text-emerald-400 font-medium">SQL, NoSQL</p>
+                                <h3 class="text-lg font-bold text-white">Bases de Données & Sécurité</h3>
+                                <p class="text-xs text-emerald-400 font-medium">SQL, MariaDB, Chiffrement AES-256</p>
                             </div>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                            Modélisation relationnelle, optimisation de requêtes et persistance des données sous MySQL, MariaDB, SQLite et architectures NoSQL.
+                            Modélisation relationnelle (MySQL, MariaDB, SQLite), ORM SQLAlchemy, hachage Bcrypt, chiffrement symétrique AES-256 et sécurisation CSRF/XSS.
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">MySQL</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">MySQL / MariaDB</span>
                             <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">SQLite</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">SQLAlchemy</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">NoSQL</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">AES-256</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Bcrypt</span>
                         </div>
                     </div>
 
-                    <!-- 4. UI/UX Design & Langage C -->
+                    <!-- 4. Langage C & Algorithmique -->
                     <div class="liquid-glass-card p-6 sm:p-8 rounded-3xl border border-white/20 shadow-xl space-y-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl border border-amber-500/20">
-                                <i class="fas fa-palette"></i>
+                                <i class="fas fa-microchip"></i>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-white">UI/UX & Algorithmique</h3>
-                                <p class="text-xs text-amber-400 font-medium">Interfaces modernes & C</p>
+                                <h3 class="text-lg font-bold text-white">Langage C & Compilation</h3>
+                                <p class="text-xs text-amber-400 font-medium">Compilateur SimplCT, AST, Mémoire</p>
                             </div>
                         </div>
                         <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                            Conception d'interfaces soignées (Dark Glassmorphism, ergonomie réactive) et programmation bas niveau / algorithmique en langage C à l'EFREI Paris.
+                            Programmation bas niveau en langage C (EFREI Paris), analyse lexicale et syntaxique (Lexer / Parser / AST), gestion manuelle de la mémoire (malloc/free).
                         </p>
                         <div class="flex flex-wrap gap-2 pt-2">
                             <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Langage C</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Dark Glassmorphism</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">UI/UX</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Algorithmique</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Compilateur AST</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Gestion mémoire</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-slate-300">Makefile & Git</span>
                         </div>
                     </div>
 
                 </div>
+            </div>
 
-                <!-- Bouton vers la page projets -->
-                <div class="pt-6 text-center">
-                    <a href="/projets.html" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/25 hover:-translate-y-0.5 transition-all">
-                        <span>Accéder à la page de mes projets</span>
-                        <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
-
-            </section>
+            <!-- Boutons d'action en bas de page À propos -->
+            <div class="pt-10 flex flex-wrap items-center justify-center gap-4">
+                <a href="/projets.html" class="inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm shadow-xl shadow-purple-600/25 hover:-translate-y-0.5 transition-all">
+                    <span>Découvrir mes projets</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <a href="/" class="inline-flex items-center gap-2 px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-semibold text-sm transition-all">
+                    <i class="fas fa-arrow-left text-xs"></i>
+                    <span>Retour à l'accueil</span>
+                </a>
+            </div>
 
         </div>
 
-        <!-- ================= VUE PROJETS ================= -->
+        <!-- ================= VUE PROJETS (PAGE SÉPARÉE) ================= -->
         <div id="view-projects" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
             
             <!-- Header Projets -->
@@ -478,9 +550,14 @@
 
             </div>
 
-            <!-- Bouton retour accueil -->
-            <div class="pt-10 text-center">
-                <a href="/" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold text-sm transition-colors">
+            <!-- Boutons retour -->
+            <div class="pt-10 flex flex-wrap items-center justify-center gap-6">
+                <a href="/apropos.html" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-semibold text-sm transition-colors">
+                    <i class="fas fa-user text-xs"></i>
+                    <span>En savoir plus à propos de moi</span>
+                </a>
+                <span class="text-slate-600">•</span>
+                <a href="/" class="inline-flex items-center gap-2 text-slate-400 hover:text-white font-semibold text-sm transition-colors">
                     <i class="fas fa-arrow-left text-xs"></i>
                     <span>Retour à l'accueil</span>
                 </a>
@@ -501,7 +578,7 @@
             <div class="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
                 <a href="/" class="nav-link-accueil hover:text-white transition-colors">Accueil</a>
                 <a href="/projets.html" class="nav-link-projets hover:text-white transition-colors">Projets</a>
-                <a href="/#apropos" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
+                <a href="/apropos.html" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
                 <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
                 <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors">GitHub</a>
                 <a href="mailto:contact@mb-site.com" class="hover:text-white transition-colors">Contact</a>
@@ -514,6 +591,14 @@
         (function() {
             const homeView = document.getElementById('view-home');
             const projectsView = document.getElementById('view-projects');
+            const aboutView = document.getElementById('view-about');
+            
+            const views = {
+                'accueil': homeView,
+                'projets': projectsView,
+                'apropos': aboutView
+            };
+
             const navAccueilLinks = document.querySelectorAll('.nav-link-accueil');
             const navProjetsLinks = document.querySelectorAll('.nav-link-projets');
             const navAproposLinks = document.querySelectorAll('.nav-link-apropos');
@@ -540,84 +625,93 @@
                 });
             }
 
-            function transitionTo(targetView, updateHistory = true, instant = false, scrollToId = null) {
-                if (isAnimating) return;
-                const isProjets = (targetView === 'projets');
-                const current = isProjets ? homeView : projectsView;
-                const next = isProjets ? projectsView : homeView;
+            function getActiveViewKey() {
+                if (projectsView && !projectsView.classList.contains('view-hidden')) return 'projets';
+                if (aboutView && !aboutView.classList.contains('view-hidden')) return 'apropos';
+                return 'accueil';
+            }
 
-                document.title = isProjets 
-                    ? "Mes Projets — Malik B. (mb-site.com)" 
-                    : (targetView === 'apropos' ? "À propos — Malik B. (mb-site.com)" : "Malik B. — mb-site.com");
+            function transitionTo(targetView, updateHistory = true, instant = false) {
+                if (!views[targetView]) targetView = 'accueil';
+                if (isAnimating) return;
+
+                const currentKey = getActiveViewKey();
+                const currentEl = views[currentKey];
+                const nextEl = views[targetView];
+
+                // Titre dynamique
+                if (targetView === 'projets') {
+                    document.title = "Mes Projets — Malik B. (mb-site.com)";
+                } else if (targetView === 'apropos') {
+                    document.title = "À Propos — Malik B. (mb-site.com)";
+                } else {
+                    document.title = "Malik B. — mb-site.com";
+                }
 
                 setNavHighlight(targetView);
 
-                const performScroll = () => {
-                    if (scrollToId) {
-                        const targetEl = document.getElementById(scrollToId);
-                        if (targetEl) {
-                            targetEl.scrollIntoView({ behavior: 'smooth' });
-                            return;
-                        }
-                    }
-                    window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
-                };
-
+                const targetHash = (targetView === 'projets') ? '#projets' : ((targetView === 'apropos') ? '#apropos' : '');
+                
                 // Si on est déjà sur la vue demandée
-                if ((isProjets && !projectsView.classList.contains('view-hidden')) ||
-                    (!isProjets && !homeView.classList.contains('view-hidden'))) {
-                    performScroll();
+                if (currentKey === targetView && nextEl.classList.contains('view-visible')) {
+                    window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
                     if (updateHistory) {
-                        const targetHash = isProjets ? '#projets' : (targetView === 'apropos' ? '#apropos' : '');
                         history.pushState({ view: targetView }, '', targetHash || '/');
                     }
                     return;
                 }
 
                 if (instant) {
-                    current.classList.remove('view-visible');
-                    current.classList.add('view-hidden');
-                    next.classList.remove('view-hidden');
-                    next.classList.add('view-visible');
-                    performScroll();
+                    Object.values(views).forEach(el => {
+                        if (el) {
+                            el.classList.remove('view-visible');
+                            el.classList.add('view-hidden');
+                        }
+                    });
+                    nextEl.classList.remove('view-hidden');
+                    nextEl.classList.add('view-visible');
+                    window.scrollTo({ top: 0, behavior: 'auto' });
                     return;
                 }
 
                 isAnimating = true;
-                current.style.opacity = '0';
-                current.style.transform = 'translateY(-6px)';
+                currentEl.style.opacity = '0';
+                currentEl.style.transform = 'translateY(-6px)';
 
                 setTimeout(() => {
-                    current.classList.remove('view-visible');
-                    current.classList.add('view-hidden');
-                    current.style.opacity = '';
-                    current.style.transform = '';
+                    Object.values(views).forEach(el => {
+                        if (el) {
+                            el.classList.remove('view-visible');
+                            el.classList.add('view-hidden');
+                            el.style.opacity = '';
+                            el.style.transform = '';
+                        }
+                    });
 
-                    next.classList.remove('view-hidden');
-                    next.classList.add('view-visible');
-                    next.style.opacity = '0';
-                    next.style.transform = 'translateY(10px)';
+                    nextEl.classList.remove('view-hidden');
+                    nextEl.classList.add('view-visible');
+                    nextEl.style.opacity = '0';
+                    nextEl.style.transform = 'translateY(10px)';
 
-                    void next.offsetWidth;
+                    void nextEl.offsetWidth; // Force reflow
 
-                    next.style.opacity = '1';
-                    next.style.transform = 'translateY(0)';
-                    performScroll();
+                    nextEl.style.opacity = '1';
+                    nextEl.style.transform = 'translateY(0)';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
 
                     setTimeout(() => {
-                        next.style.opacity = '';
-                        next.style.transform = '';
+                        nextEl.style.opacity = '';
+                        nextEl.style.transform = '';
                         isAnimating = false;
                     }, 250);
 
                     if (updateHistory) {
-                        const targetHash = isProjets ? '#projets' : (targetView === 'apropos' ? '#apropos' : '');
                         history.pushState({ view: targetView }, '', targetHash || '/');
                     }
                 }, 180);
             }
 
-            // Intercepter tous les liens internes vers projets, accueil ou à propos
+            // Intercepter tous les clics de liens internes
             document.addEventListener('click', function(e) {
                 const link = e.target.closest('a');
                 if (!link) return;
@@ -628,33 +722,34 @@
                 if (href === '/projets.html' || href === 'projets.html' || href === '#projets' || href === '/#projets') {
                     e.preventDefault();
                     transitionTo('projets', true);
-                } else if (href === '#apropos' || href === '/#apropos' || href === '/projets.html#apropos') {
+                } else if (href === '/apropos.html' || href === 'apropos.html' || href === '/a-propos.html' || href === '#apropos' || href === '/#apropos' || href === '#section-apropos') {
                     e.preventDefault();
-                    transitionTo('apropos', true, false, 'section-apropos');
+                    transitionTo('apropos', true);
                 } else if (href === '/' || href === '/index.html' || href === '#accueil' || href === '/#accueil') {
                     e.preventDefault();
                     transitionTo('accueil', true);
                 }
             });
 
-            // Gérer le bouton retour / suivant du navigateur
+            // Boutons Précédent / Suivant du navigateur
             window.addEventListener('popstate', function(e) {
                 const hash = window.location.hash;
                 if (hash === '#projets') {
                     transitionTo('projets', false);
                 } else if (hash === '#apropos') {
-                    transitionTo('apropos', false, false, 'section-apropos');
+                    transitionTo('apropos', false);
                 } else {
                     transitionTo('accueil', false);
                 }
             });
 
-            // Vérification à l'ouverture de page selon le hash
+            // Initialisation au chargement de la page
             const initialHash = window.location.hash;
-            if (initialHash === '#projets' || window.location.pathname.includes('projets')) {
+            const path = window.location.pathname;
+            if (initialHash === '#projets' || path.includes('projets')) {
                 transitionTo('projets', false, true);
-            } else if (initialHash === '#apropos') {
-                transitionTo('apropos', false, true, 'section-apropos');
+            } else if (initialHash === '#apropos' || path.includes('apropos') || path.includes('a-propos')) {
+                transitionTo('apropos', false, true);
             } else {
                 setNavHighlight('accueil');
             }
