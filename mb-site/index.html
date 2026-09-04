@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Malik B. — mb-site.com</title>
-    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris. Conception et développement de logiciels, applications web et outils performants.">
+    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris. Conception et développement de logiciels, applications web et outils système.">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
 
-    <!-- Google Fonts : Open Sans & Roboto -->
+    <!-- Fonts : Merriweather (serif) & Open Sans (sans-serif) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,29 +22,18 @@
             theme: {
                 extend: {
                     colors: {
-                        google: {
-                            blue: '#4285F4',
-                            blueDark: '#1a73e8',
-                            blueHover: '#1557d0',
-                            red: '#EA4335',
-                            redDark: '#d93025',
-                            yellow: '#FBBC05',
-                            yellowDark: '#b06000',
-                            green: '#34A853',
-                            greenDark: '#188038',
-                            gray50: '#f8f9fa',
-                            gray100: '#f1f3f4',
-                            gray200: '#e8eaed',
-                            gray300: '#dadce0',
-                            gray400: '#bdc1c6',
-                            gray600: '#70757a',
-                            gray700: '#5f6368',
-                            gray800: '#3c4043',
-                            gray900: '#202124',
+                        brand: {
+                            blue: '#5f8ee4',      // Action color (Cornflower Blue)
+                            dark: '#19191a',      // Dark Blue / Near Black
+                            red: '#e4655f',       // Red / Alert
+                            grey: '#e6e6e6',      // Light Grey
+                            white: '#ffffff',     // White
+                            green: '#6fce72',     // Success green
                         }
                     },
                     fontFamily: {
-                        sans: ['"Google Sans"', '"Open Sans"', 'Roboto', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+                        serif: ['"Merriweather"', 'Georgia', 'serif'],
+                        sans: ['"Open Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
                     }
                 }
             }
@@ -67,10 +56,14 @@
             display: flex;
             flex-direction: column;
             background-color: #ffffff;
-            color: #202124;
-            font-family: "Google Sans", "Open Sans", Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #19191a;
+            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, .font-serif-title {
+            font-family: "Merriweather", Georgia, serif;
         }
 
         main {
@@ -86,17 +79,27 @@
             flex-shrink: 0;
         }
 
-        /* Google Cards */
-        .google-card {
+        /* Square Geometric Cards */
+        .square-card {
             background-color: #ffffff;
-            border: 1px solid #dadce0;
-            border-radius: 16px;
-            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e6e6e6;
+            border-radius: 0px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
 
-        .google-card:hover {
-            border-color: #bdc1c6;
-            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.15), 0 4px 8px 3px rgba(60,64,67,0.08);
+        .square-card:hover {
+            border-color: #19191a;
+        }
+
+        /* Square action buttons */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0px;
+            font-family: "Open Sans", sans-serif;
+            font-weight: 600;
+            transition: all 0.15s ease;
         }
 
         /* Fluid view transition styles */
@@ -126,46 +129,33 @@
         }
     </style>
 </head>
-<body class="min-h-screen min-h-[100dvh] flex flex-col bg-white text-google-gray900">
+<body class="min-h-screen min-h-[100dvh] flex flex-col bg-white text-brand-dark">
 
-    <!-- Ligne 4 couleurs signature Google -->
-    <div class="h-1 w-full flex flex-shrink-0">
-        <div class="h-full flex-1 bg-google-blue"></div>
-        <div class="h-full flex-1 bg-google-red"></div>
-        <div class="h-full flex-1 bg-google-yellow"></div>
-        <div class="h-full flex-1 bg-google-green"></div>
-    </div>
+    <!-- Barre d'accentuation carrée géométrique Cornflower Blue -->
+    <div class="h-1 w-full bg-brand-blue flex-shrink-0"></div>
 
-    <!-- Google-style Minimal Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-google-gray300 flex-shrink-0">
+    <!-- Header Rectangulaire & Structuré -->
+    <header class="sticky top-0 z-50 bg-white border-b border-brand-grey flex-shrink-0">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             
-            <!-- Brand avec Logo MB & points de couleur Google -->
-            <a href="/" class="flex items-center gap-3 group">
-                <img src="/favicon.png" alt="Logo MB" class="w-8 h-8 rounded-lg object-contain border border-google-gray300">
-                <div class="flex items-center gap-2">
-                    <span class="text-base sm:text-lg font-medium tracking-tight text-google-gray900">Malik B.</span>
-                    <div class="hidden sm:flex items-center gap-1 opacity-80">
-                        <span class="w-1.5 h-1.5 rounded-full bg-google-blue"></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-google-red"></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-google-yellow"></span>
-                        <span class="w-1.5 h-1.5 rounded-full bg-google-green"></span>
-                    </div>
-                </div>
+            <!-- Brand avec Logo MB carré -->
+            <a href="/" class="flex items-center gap-3">
+                <img src="/favicon.png" alt="Logo MB" class="w-8 h-8 rounded-none object-contain border border-brand-grey">
+                <span class="font-serif text-lg font-bold tracking-tight text-brand-dark">Malik B.</span>
             </a>
 
-            <!-- Navigation sobre -->
-            <nav class="flex items-center gap-1 sm:gap-2 text-sm">
-                <a href="/" class="nav-link-accueil px-3.5 py-1.5 rounded-full text-google-gray700 hover:text-google-gray900 hover:bg-google-gray100 transition-colors">Accueil</a>
-                <a href="/projets.html" class="nav-link-projets px-3.5 py-1.5 rounded-full text-google-gray700 hover:text-google-gray900 hover:bg-google-gray100 transition-colors">Projets</a>
-                <a href="/apropos.html" class="nav-link-apropos px-3.5 py-1.5 rounded-full text-google-gray700 hover:text-google-gray900 hover:bg-google-gray100 transition-colors">À propos</a>
-                <a href="https://baybay.mb-site.com" target="_blank" class="px-3.5 py-1.5 rounded-full text-google-gray700 hover:text-google-gray900 hover:bg-google-gray100 transition-colors">BayBay</a>
+            <!-- Navigation carrée épurée -->
+            <nav class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                <a href="/" class="nav-link-accueil px-3.5 py-1.5 text-brand-dark hover:bg-brand-grey/50 transition-colors">Accueil</a>
+                <a href="/projets.html" class="nav-link-projets px-3.5 py-1.5 text-brand-dark hover:bg-brand-grey/50 transition-colors">Projets</a>
+                <a href="/apropos.html" class="nav-link-apropos px-3.5 py-1.5 text-brand-dark hover:bg-brand-grey/50 transition-colors">À propos</a>
+                <a href="https://baybay.mb-site.com" target="_blank" class="px-3.5 py-1.5 text-brand-dark hover:bg-brand-grey/50 transition-colors">BayBay</a>
             </nav>
 
-            <!-- Bouton GitHub -->
+            <!-- Bouton GitHub carré -->
             <div class="flex items-center">
-                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-google-gray300 text-google-gray800 hover:bg-google-gray50 hover:border-google-gray400 transition-all text-xs font-medium">
-                    <svg class="w-4 h-4 fill-current text-google-gray900" viewBox="0 0 24 24" aria-hidden="true">
+                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="btn-action gap-2 px-3.5 py-1.5 border border-brand-dark text-brand-dark hover:bg-brand-dark hover:text-white text-xs">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                     </svg>
                     <span>GitHub</span>
@@ -181,57 +171,57 @@
         <!-- ================= VUE ACCUEIL ================= -->
         <div id="view-home" class="view-section view-visible flex-1 flex flex-col justify-center py-10 sm:py-16 w-full">
 
-            <!-- HERO SECTION (Sans pilule artificielle) -->
+            <!-- HERO SECTION (Typographie Merriweather, angles carrés, sans pilule) -->
             <section class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
 
-                <h1 class="text-3xl sm:text-5xl font-medium text-google-gray900 tracking-tight leading-tight mb-4">
-                    Conception de <span class="text-google-blue">logiciels</span>, <br class="hidden sm:inline">
-                    systèmes <span class="text-google-green">fiables</span> & <span class="text-google-red">performants</span>.
+                <h1 class="font-serif text-3xl sm:text-5xl font-bold text-brand-dark tracking-tight leading-tight mb-4">
+                    Conception de logiciels, <br class="hidden sm:inline">
+                    systèmes <span class="text-brand-blue underline decoration-brand-blue/30 underline-offset-4">fiables</span> & <span class="text-brand-red underline decoration-brand-red/30 underline-offset-4">performants</span>.
                 </h1>
 
-                <p class="text-base sm:text-lg text-google-gray700 max-w-2xl mx-auto leading-relaxed mb-8">
-                    Étudiant en 2ème année à l'EFREI Paris (Promo 2029), je conçois et réalise des applications concrètes, des outils système et des architectures web en privilégiant la rigueur technique, la clarté du code et l'ergonomie.
+                <p class="text-base sm:text-lg text-brand-dark/80 max-w-2xl mx-auto leading-relaxed mb-8">
+                    Étudiant en 2ème année à l'EFREI Paris (Promo 2029), je conçois et réalise des applications concrètes, des outils système et des architectures logicielles avec rigueur technique, clarté du code et efficacité.
                 </p>
 
-                <!-- Boutons d'action Google style -->
+                <!-- Boutons d'action carrés -->
                 <div class="flex flex-wrap items-center justify-center gap-3">
-                    <a href="/projets.html" class="inline-flex items-center px-6 py-2.5 rounded-full bg-google-blue hover:bg-google-blueHover text-white text-sm font-medium transition-all shadow-sm">
+                    <a href="/projets.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue">
                         <span>Consulter les projets</span>
                     </a>
-                    <a href="/apropos.html" class="inline-flex items-center px-6 py-2.5 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-sm font-medium transition-all">
+                    <a href="/apropos.html" class="btn-action px-6 py-3 bg-white hover:bg-brand-grey/40 text-brand-dark text-sm border border-brand-dark">
                         <span>En savoir plus à propos de moi</span>
                     </a>
                 </div>
 
             </section>
 
-            <!-- APERÇU RAPIDE & 3 PILIERS AUX COULEURS DE GOOGLE -->
+            <!-- 3 BLOCS CARRÉS DE STRUCTURE -->
             <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 w-full">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     
-                    <!-- Carte 1 : Bleu Google -->
-                    <div class="google-card p-6 border-t-4 border-t-google-blue">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark mb-2">Formation académique</div>
-                        <h2 class="text-base font-medium text-google-gray900 mb-2">EFREI Paris</h2>
-                        <p class="text-xs text-google-gray700 leading-relaxed">
+                    <!-- Bloc 1 : Formation (Accent Cornflower Blue) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-blue">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue mb-2">Formation académique</div>
+                        <h2 class="font-serif text-lg font-bold text-brand-dark mb-2">EFREI Paris</h2>
+                        <p class="text-xs text-brand-dark/75 leading-relaxed">
                             École d'ingénieurs du numérique. Bases algorithmiques solides, programmation système en C, structures de données et gestion de projets.
                         </p>
                     </div>
 
-                    <!-- Carte 2 : Vert Google -->
-                    <div class="google-card p-6 border-t-4 border-t-google-green">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark mb-2">Réalisations concrètes</div>
-                        <h2 class="text-base font-medium text-google-gray900 mb-2">Projets logiciels</h2>
-                        <p class="text-xs text-google-gray700 leading-relaxed">
-                            Développement d'outils réels comme BayBay (suite logicielle de gestion locative v4.0), compilateur en langage C et simulations interactives.
+                    <!-- Bloc 2 : Réalisations (Accent Vert Success) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-green">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-[#439646] mb-2">Réalisations concrètes</div>
+                        <h2 class="font-serif text-lg font-bold text-brand-dark mb-2">Projets logiciels</h2>
+                        <p class="text-xs text-brand-dark/75 leading-relaxed">
+                            Développement d'outils réels : suite de gestion locative BayBay v4.0, compilateur en langage C et simulations interactives.
                         </p>
                     </div>
 
-                    <!-- Carte 3 : Rouge Google -->
-                    <div class="google-card p-6 border-t-4 border-t-google-red">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark mb-2">Méthodologie</div>
-                        <h2 class="text-base font-medium text-google-gray900 mb-2">Qualité & Rigueur</h2>
-                        <p class="text-xs text-google-gray700 leading-relaxed">
+                    <!-- Bloc 3 : Rigueur (Accent Rouge Alert) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-red">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red mb-2">Méthodologie</div>
+                        <h2 class="font-serif text-lg font-bold text-brand-dark mb-2">Qualité & Rigueur</h2>
+                        <p class="text-xs text-brand-dark/75 leading-relaxed">
                             Conception modulaire, optimisation des performances, respect des standards de sécurité et gestion collaborative avec Git.
                         </p>
                     </div>
@@ -246,30 +236,30 @@
             
             <!-- Header À Propos (Sans pilule artificielle) -->
             <div class="text-center mb-10">
-                <h1 class="text-3xl sm:text-4xl font-medium text-google-gray900 tracking-tight">
+                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-brand-dark tracking-tight">
                     À Propos de Malik B.
                 </h1>
-                <p class="text-google-gray700 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
+                <p class="text-brand-dark/75 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
                     Étudiant ingénieur passionné par la programmation informatique et l'architecture de solutions logicielles.
                 </p>
             </div>
 
-            <!-- Carte Profil -->
-            <div class="google-card p-6 sm:p-8 mb-8 border-l-4 border-l-google-blue">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-google-gray200">
-                    <img src="/favicon.png" alt="Malik B." class="w-16 h-16 rounded-xl object-contain border border-google-gray300 flex-shrink-0">
+            <!-- Carte Profil Carrée -->
+            <div class="square-card p-6 sm:p-8 mb-8 border-l-4 border-l-brand-blue">
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-brand-grey">
+                    <img src="/favicon.png" alt="Malik B." class="w-16 h-16 rounded-none object-contain border border-brand-grey flex-shrink-0">
                     <div class="text-center sm:text-left">
-                        <h2 class="text-xl sm:text-2xl font-medium text-google-gray900">Malik Bouaissi</h2>
-                        <p class="text-google-blueDark text-sm font-medium mt-0.5">Étudiant en 2ème année à l'EFREI Paris • Développeur Logiciel & Web</p>
-                        <div class="pt-3 flex flex-wrap justify-center sm:justify-start gap-2 text-xs text-google-gray700">
-                            <span class="px-2.5 py-1 rounded-md bg-google-gray100 border border-google-gray200">Paris, France</span>
-                            <span class="px-2.5 py-1 rounded-md bg-google-gray100 border border-google-gray200">EFREI Paris (Promo 2029)</span>
-                            <span class="px-2.5 py-1 rounded-md bg-google-gray100 border border-google-gray200">Conception Logicielle</span>
+                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-brand-dark">Malik Bouaissi</h2>
+                        <p class="text-brand-blue text-sm font-semibold mt-0.5">Étudiant en 2ème année à l'EFREI Paris • Développeur Logiciel & Web</p>
+                        <div class="pt-3 flex flex-wrap justify-center sm:justify-start gap-2 text-xs">
+                            <span class="px-2.5 py-1 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Paris, France</span>
+                            <span class="px-2.5 py-1 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">EFREI Paris (Promo 2029)</span>
+                            <span class="px-2.5 py-1 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Conception Logicielle</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="pt-6 space-y-4 text-sm text-google-gray800 leading-relaxed">
+                <div class="pt-6 space-y-4 text-sm text-brand-dark/85 leading-relaxed">
                     <p>
                         Actuellement en 2ème année à l'EFREI Paris (école d'ingénieurs des technologies du numérique), je concentre mes apprentissages et mes projets personnels sur le développement logiciel, la conception d'architectures applicatives et les bases de données.
                     </p>
@@ -279,85 +269,85 @@
                 </div>
             </div>
 
-            <!-- 4 Piliers techniques aux 4 couleurs Google -->
+            <!-- 4 Domaines de compétences avec carrés géométriques -->
             <div class="mb-10">
-                <h2 class="text-xl font-medium text-google-gray900 mb-4">Domaines de compétences</h2>
+                <h2 class="font-serif text-xl font-bold text-brand-dark mb-4">Domaines de compétences</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <!-- Pilier 1 : Bleu -->
-                    <div class="google-card p-6 border-t-4 border-t-google-blue">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark mb-1">Web & API</div>
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Architectures Web & REST</h3>
-                        <p class="text-xs text-google-gray600 mb-3">Python/Flask, PHP, JavaScript ES6+, API REST</p>
-                        <p class="text-xs text-google-gray700 leading-relaxed mb-3">
+                    <!-- Domaine 1 : Web (Cornflower Blue) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-blue">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue mb-1">Web & API</div>
+                        <h3 class="font-serif text-base font-bold text-brand-dark mb-1">Architectures Web & REST</h3>
+                        <p class="text-xs text-brand-dark/60 mb-3">Python/Flask, PHP, JavaScript ES6+, API REST</p>
+                        <p class="text-xs text-brand-dark/80 leading-relaxed mb-3">
                             Développement de backends robustes, gestion des sessions, sécurisation des accès et interfaces dynamiques.
                         </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs text-google-gray800">
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Python 3.11</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Flask</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">PHP</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">JavaScript</span>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Python 3.11</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Flask</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">PHP</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">JavaScript</span>
                         </div>
                     </div>
 
-                    <!-- Pilier 2 : Rouge -->
-                    <div class="google-card p-6 border-t-4 border-t-google-red">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark mb-1">Desktop & Client</div>
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Applications Bureau & Ergonomie</h3>
-                        <p class="text-xs text-google-gray600 mb-3">Electron.js, packaging natif, synchronisation locale/cloud</p>
-                        <p class="text-xs text-google-gray700 leading-relaxed mb-3">
+                    <!-- Domaine 2 : Desktop (Red) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-red">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red mb-1">Desktop & Client</div>
+                        <h3 class="font-serif text-base font-bold text-brand-dark mb-1">Applications Bureau & Ergonomie</h3>
+                        <p class="text-xs text-brand-dark/60 mb-3">Electron.js, packaging natif, synchronisation locale/cloud</p>
+                        <p class="text-xs text-brand-dark/80 leading-relaxed mb-3">
                             Conception d'applications de bureau avec installeur Windows (NSIS), intégration multi-plateformes et mise à jour automatique.
                         </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs text-google-gray800">
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Electron.js</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Node.js</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">NSIS</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">PyInstaller</span>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Electron.js</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Node.js</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">NSIS</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">PyInstaller</span>
                         </div>
                     </div>
 
-                    <!-- Pilier 3 : Jaune -->
-                    <div class="google-card p-6 border-t-4 border-t-google-yellow">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-yellowDark mb-1">Données & Sécurité</div>
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Bases de Données Relationnelles</h3>
-                        <p class="text-xs text-google-gray600 mb-3">SQL, MariaDB, SQLite, SQLAlchemy, Chiffrement</p>
-                        <p class="text-xs text-google-gray700 leading-relaxed mb-3">
+                    <!-- Domaine 3 : Données (Dark) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-dark">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-dark mb-1">Données & Sécurité</div>
+                        <h3 class="font-serif text-base font-bold text-brand-dark mb-1">Bases de Données Relationnelles</h3>
+                        <p class="text-xs text-brand-dark/60 mb-3">SQL, MariaDB, SQLite, SQLAlchemy, Chiffrement</p>
+                        <p class="text-xs text-brand-dark/80 leading-relaxed mb-3">
                             Modélisation relationnelle rigoureuse, transactions sécurisées, hachage Bcrypt et protection contre les vulnérabilités courantes.
                         </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs text-google-gray800">
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">MariaDB</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">SQLite</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Bcrypt</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">SQLAlchemy</span>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">MariaDB</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">SQLite</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Bcrypt</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">SQLAlchemy</span>
                         </div>
                     </div>
 
-                    <!-- Pilier 4 : Vert -->
-                    <div class="google-card p-6 border-t-4 border-t-google-green">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark mb-1">Bas Niveau</div>
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Langage C & Programmation Système</h3>
-                        <p class="text-xs text-google-gray600 mb-3">Compilateur SimplCT, analyse syntaxique, gestion mémoire</p>
-                        <p class="text-xs text-google-gray700 leading-relaxed mb-3">
+                    <!-- Domaine 4 : Bas Niveau (Green) -->
+                    <div class="square-card p-6 border-t-4 border-t-brand-green">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-[#439646] mb-1">Systèmes & C</div>
+                        <h3 class="font-serif text-base font-bold text-brand-dark mb-1">Langage C & Programmation Système</h3>
+                        <p class="text-xs text-brand-dark/60 mb-3">Compilateur SimplCT, analyse syntaxique, gestion mémoire</p>
+                        <p class="text-xs text-brand-dark/80 leading-relaxed mb-3">
                             Programmation bas niveau, analyse lexicale et syntaxique (AST), gestion manuelle de la mémoire (malloc/free) et outillage Unix.
                         </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs text-google-gray800">
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Langage C</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Compilateur AST</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Pointeurs</span>
-                            <span class="px-2 py-0.5 rounded bg-google-gray100 border border-google-gray200">Makefile</span>
+                        <div class="flex flex-wrap gap-1.5 text-xs">
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Langage C</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Compilateur AST</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Pointeurs</span>
+                            <span class="px-2 py-0.5 bg-brand-grey/40 border border-brand-grey text-brand-dark font-mono">Makefile</span>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-            <!-- Boutons navigation -->
+            <!-- Boutons navigation carrés -->
             <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
-                <a href="/projets.html" class="inline-flex items-center px-6 py-2.5 rounded-full bg-google-blue hover:bg-google-blueHover text-white text-sm font-medium transition-all shadow-sm">
+                <a href="/projets.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue">
                     <span>Consulter les projets</span>
                 </a>
-                <a href="/" class="inline-flex items-center px-6 py-2.5 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-sm font-medium transition-all">
+                <a href="/" class="btn-action px-6 py-3 bg-white hover:bg-brand-grey/40 text-brand-dark text-sm border border-brand-dark">
                     <span>Retour à l'accueil</span>
                 </a>
             </div>
@@ -369,37 +359,37 @@
             
             <!-- Header Projets (Sans pilule artificielle) -->
             <div class="text-center mb-10">
-                <h1 class="text-3xl sm:text-4xl font-medium text-google-gray900 tracking-tight">
+                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-brand-dark tracking-tight">
                     Projets Réalisés
                 </h1>
-                <p class="text-google-gray700 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
+                <p class="text-brand-dark/75 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
                     Sélection d'applications logicielles conçues en autonomie et dans le cadre du cursus d'ingénieur à l'EFREI Paris.
                 </p>
             </div>
 
             <div class="space-y-6">
                 
-                <!-- Projet 1 : BayBay (Bleu Google) -->
-                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-blue">
+                <!-- Projet 1 : BayBay (Accent Cornflower Blue) -->
+                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-blue">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue">
                             Logiciel de Gestion Locative • v4.0
                         </div>
-                        <div class="text-xs text-google-gray600">
-                            Auteur : <span class="font-medium text-google-gray800">Malik Bouaissi</span>
+                        <div class="text-xs text-brand-dark/70 font-mono">
+                            Auteur : <span class="font-semibold text-brand-dark">Malik Bouaissi</span>
                         </div>
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl font-medium text-google-gray900 mb-2">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-brand-dark mb-2">
                         BayBay — Plateforme SaaS & Application Bureau
                     </h2>
                     
-                    <p class="text-xs sm:text-sm text-google-gray700 leading-relaxed mb-4">
+                    <p class="text-xs sm:text-sm text-brand-dark/80 leading-relaxed mb-4">
                         Suite logicielle complète de gestion immobilière conçue pour les bailleurs particuliers et les SCI. Le système fonctionne en environnement hybride : une application de bureau Windows autonome (Electron.js + serveur local) et une plateforme SaaS connectée avec synchronisation, génération de quittances conformes à la loi ALUR et envoi automatisé des avis d'échéance par email.
                     </p>
 
-                    <div class="p-4 rounded-xl bg-google-gray50 border border-google-gray200 text-xs text-google-gray700 mb-5 space-y-1.5">
-                        <div class="font-medium text-google-gray900 mb-1">Architecture & Caractéristiques :</div>
+                    <div class="p-4 bg-brand-grey/30 border border-brand-grey text-xs text-brand-dark/85 mb-5 space-y-1.5">
+                        <div class="font-bold text-brand-dark mb-1">Architecture & Caractéristiques :</div>
                         <ul class="space-y-1 pl-1">
                             <li>• Modèle relationnel complet sous SQLAlchemy (bailleurs, biens, baux, locataires, états des lieux).</li>
                             <li>• Moteur d'export PDF conforme à la réglementation ALUR avec identifiant unique vérifiable en ligne.</li>
@@ -408,11 +398,11 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://baybay.mb-site.com" target="_blank" class="inline-flex items-center px-4 py-2 rounded-full bg-google-blue hover:bg-google-blueHover text-white text-xs font-medium transition-all shadow-sm">
+                        <a href="https://baybay.mb-site.com" target="_blank" class="btn-action px-4 py-2 bg-brand-blue hover:bg-[#4d7bc9] text-white text-xs border border-brand-blue">
                             <span>Accéder à BayBay</span>
                         </a>
-                        <a href="https://github.com/mlk0622/BayBay" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-xs font-medium transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current text-google-gray900" viewBox="0 0 24 24" aria-hidden="true">
+                        <a href="https://github.com/mlk0622/BayBay" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white hover:bg-brand-grey/40 text-brand-dark text-xs border border-brand-dark">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                             </svg>
                             <span>Dépôt GitHub</span>
@@ -420,29 +410,29 @@
                     </div>
                 </article>
 
-                <!-- Projet 2 : SimplCT (Rouge Google) -->
-                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-red">
+                <!-- Projet 2 : SimplCT (Accent Rouge) -->
+                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-red">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red">
                             Projet Systèmes & Compilation en C
                         </div>
-                        <div class="text-xs text-google-gray600">
+                        <div class="text-xs text-brand-dark/70 font-mono">
                             Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a> & 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-medium text-google-blueDark hover:underline">Malik Bouaissi</a>
+                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a> & 
+                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>
                         </div>
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl font-medium text-google-gray900 mb-2">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-brand-dark mb-2">
                         SimplCT — Compilateur & Arbre Syntaxique (AST)
                     </h2>
                     
-                    <p class="text-xs sm:text-sm text-google-gray700 leading-relaxed mb-4">
+                    <p class="text-xs sm:text-sm text-brand-dark/80 leading-relaxed mb-4">
                         Conception et implémentation intégrale d'un compilateur pour un sous-ensemble du langage C. Le projet couvre l'analyse lexicale avec tokenisation, l'analyse syntaxique avec construction d'un arbre de syntaxe abstraite (AST), le contrôle des types, la gestion d'une table des symboles hiérarchique et l'exécution mémoire.
                     </p>
 
-                    <div class="p-4 rounded-xl bg-google-gray50 border border-google-gray200 text-xs text-google-gray700 mb-5 space-y-1.5">
-                        <div class="font-medium text-google-gray900 mb-1">Concepts & Aspects techniques :</div>
+                    <div class="p-4 bg-brand-grey/30 border border-brand-grey text-xs text-brand-dark/85 mb-5 space-y-1.5">
+                        <div class="font-bold text-brand-dark mb-1">Concepts & Aspects techniques :</div>
                         <ul class="space-y-1 pl-1">
                             <li>• Analyseur lexical (Lexer) et parseur grammatical descendant récursif.</li>
                             <li>• Représentation intermédiaire sous forme d'AST et vérifications sémantiques.</li>
@@ -451,8 +441,8 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/wassity/simplCT" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-xs font-medium transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current text-google-gray900" viewBox="0 0 24 24" aria-hidden="true">
+                        <a href="https://github.com/wassity/simplCT" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white hover:bg-brand-grey/40 text-brand-dark text-xs border border-brand-dark">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                             </svg>
                             <span>Voir SimplCT sur GitHub</span>
@@ -460,31 +450,31 @@
                     </div>
                 </article>
 
-                <!-- Projet 3 : CroustyRun (Vert Google) -->
-                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-green">
+                <!-- Projet 3 : CroustyRun (Accent Vert Success) -->
+                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-green">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-[#439646]">
                             Simulation Physique & Écologie (Python)
                         </div>
-                        <div class="text-xs text-google-gray600">
+                        <div class="text-xs text-brand-dark/70 font-mono">
                             Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a>, 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-medium text-google-blueDark hover:underline">Malik Bouaissi</a>, 
-                            <a href="https://github.com/stevi2007" target="_blank" class="font-medium text-google-blueDark hover:underline">Antoine Picou</a> & 
-                            <a href="https://github.com/SuperCraft3M" target="_blank" class="font-medium text-google-blueDark hover:underline">Mathis Jacques--Llorens</a>
+                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a>, 
+                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>, 
+                            <a href="https://github.com/stevi2007" target="_blank" class="font-semibold text-brand-blue hover:underline">Antoine Picou</a> & 
+                            <a href="https://github.com/SuperCraft3M" target="_blank" class="font-semibold text-brand-blue hover:underline">Mathis Jacques--Llorens</a>
                         </div>
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl font-medium text-google-gray900 mb-2">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-brand-dark mb-2">
                         CroustyRun — Simulation Physique & Jeu Éducatif
                     </h2>
                     
-                    <p class="text-xs sm:text-sm text-google-gray700 leading-relaxed mb-4">
+                    <p class="text-xs sm:text-sm text-brand-dark/80 leading-relaxed mb-4">
                         Jeu vidéo éducatif et écologique développé en <strong>Python</strong>, conçu pour sensibiliser de manière ludique les enfants aux enjeux du tri des déchets et de l'empreinte carbone à travers une simulation physique interactive. Le projet intègre une démarche complète d'<strong>éco-conception logicielle</strong> (réduction mesurée de -34% de CO2e via CodeCarbon), des graphismes Pixel-Art faits main et un moteur cadencé à 60 FPS constants.
                     </p>
 
-                    <div class="p-4 rounded-xl bg-google-gray50 border border-google-gray200 text-xs text-google-gray700 mb-5 space-y-1.5">
-                        <div class="font-medium text-google-gray900 mb-1">Moteur & Éco-conception :</div>
+                    <div class="p-4 bg-brand-grey/30 border border-brand-grey text-xs text-brand-dark/85 mb-5 space-y-1.5">
+                        <div class="font-bold text-brand-dark mb-1">Moteur & Éco-conception :</div>
                         <ul class="space-y-1 pl-1">
                             <li>• Moteur physique en Python : gravité continue, calcul des trajectoires, échelles et détection précise des collisions (hitbox).</li>
                             <li>• Mesure d'empreinte avec <em>CodeCarbon</em> : baisse de la consommation de 18.5 Wh/h à 12.2 Wh/h (-34% de CO2e) et culling du rendu hors-champ.</li>
@@ -493,41 +483,41 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/SuperCraft3M/CroustyRun" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-xs font-medium transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current text-google-gray900" viewBox="0 0 24 24" aria-hidden="true">
+                        <a href="https://github.com/SuperCraft3M/CroustyRun" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white hover:bg-brand-grey/40 text-brand-dark text-xs border border-brand-dark">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                             </svg>
                             <span>Dépôt GitHub</span>
                         </a>
-                        <a href="https://croustyrun.supercraft.tech" target="_blank" class="inline-flex items-center px-4 py-2 rounded-full bg-google-gray100 hover:bg-google-gray200 text-google-gray800 text-xs font-medium transition-all">
+                        <a href="https://croustyrun.supercraft.tech" target="_blank" class="btn-action px-4 py-2 bg-brand-grey/40 hover:bg-brand-grey text-brand-dark text-xs border border-brand-grey">
                             <span>Site officiel & Démo</span>
                         </a>
                     </div>
                 </article>
 
-                <!-- Projet 4 : Poudelard (Jaune Google) -->
-                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-yellow">
+                <!-- Projet 4 : Poudelard (Accent Dark Blue) -->
+                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-dark">
                     <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-semibold uppercase tracking-wider text-google-yellowDark">
+                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-dark">
                             Projet Académique EFREI Paris • SC1
                         </div>
-                        <div class="text-xs text-google-gray600">
+                        <div class="text-xs text-brand-dark/70 font-mono">
                             Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a> & 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-medium text-google-blueDark hover:underline">Malik Bouaissi</a>
+                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a> & 
+                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>
                         </div>
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl font-medium text-google-gray900 mb-2">
+                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-brand-dark mb-2">
                         Poudelard — Simulation & Logique Objet
                     </h2>
                     
-                    <p class="text-xs sm:text-sm text-google-gray700 leading-relaxed mb-4">
+                    <p class="text-xs sm:text-sm text-brand-dark/80 leading-relaxed mb-4">
                         Projet académique de programmation orientée objet et d'ingénierie logicielle réalisé à l'EFREI Paris. Modélisation complète d'un environnement interactif avec gestion des entités, hiérarchie de classes, boucle d'événements et structures de données avancées.
                     </p>
 
-                    <div class="p-4 rounded-xl bg-google-gray50 border border-google-gray200 text-xs text-google-gray700 mb-5 space-y-1.5">
-                        <div class="font-medium text-google-gray900 mb-1">Principes mis en œuvre :</div>
+                    <div class="p-4 bg-brand-grey/30 border border-brand-grey text-xs text-brand-dark/85 mb-5 space-y-1.5">
+                        <div class="font-bold text-brand-dark mb-1">Principes mis en œuvre :</div>
                         <ul class="space-y-1 pl-1">
                             <li>• Encapsulation, héritage, polymorphisme et modularité du code.</li>
                             <li>• Traitement dynamique des événements et des flux de simulation.</li>
@@ -536,8 +526,8 @@
                     </div>
 
                     <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-xs font-medium transition-all">
-                            <svg class="w-3.5 h-3.5 fill-current text-google-gray900" viewBox="0 0 24 24" aria-hidden="true">
+                        <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white hover:bg-brand-grey/40 text-brand-dark text-xs border border-brand-dark">
+                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                             </svg>
                             <span>Voir Poudelard sur GitHub</span>
@@ -547,12 +537,12 @@
 
             </div>
 
-            <!-- Boutons navigation -->
+            <!-- Boutons navigation carrés -->
             <div class="flex flex-wrap items-center justify-center gap-3 pt-8">
-                <a href="/apropos.html" class="inline-flex items-center px-6 py-2.5 rounded-full bg-google-blue hover:bg-google-blueHover text-white text-sm font-medium transition-all shadow-sm">
+                <a href="/apropos.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue">
                     <span>En savoir plus à propos de moi</span>
                 </a>
-                <a href="/" class="inline-flex items-center px-6 py-2.5 rounded-full bg-white hover:bg-google-gray50 border border-google-gray300 text-google-gray800 text-sm font-medium transition-all">
+                <a href="/" class="btn-action px-6 py-3 bg-white hover:bg-brand-grey/40 text-brand-dark text-sm border border-brand-dark">
                     <span>Retour à l'accueil</span>
                 </a>
             </div>
@@ -561,32 +551,26 @@
 
     </main>
 
-    <!-- Footer sobre style Google avec ligne 4 couleurs -->
-    <footer class="mt-auto flex-shrink-0 border-t border-google-gray300 bg-google-gray50 text-xs text-google-gray700">
-        <div class="h-0.5 w-full flex">
-            <div class="h-full flex-1 bg-google-blue"></div>
-            <div class="h-full flex-1 bg-google-red"></div>
-            <div class="h-full flex-1 bg-google-yellow"></div>
-            <div class="h-full flex-1 bg-google-green"></div>
-        </div>
+    <!-- Footer carré structuré -->
+    <footer class="mt-auto flex-shrink-0 border-t border-brand-grey bg-[#fafafa] text-xs text-brand-dark/70">
         <div class="max-w-5xl mx-auto py-6 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
-                <img src="/favicon.png" alt="Logo MB" class="w-5 h-5 rounded object-contain border border-google-gray300">
-                <span class="font-medium text-google-gray900">Malik B.</span>
+                <img src="/favicon.png" alt="Logo MB" class="w-5 h-5 rounded-none object-contain border border-brand-grey">
+                <span class="font-serif font-bold text-brand-dark">Malik B.</span>
                 <span>— © 2026 mb-site.com. Tous droits réservés.</span>
             </div>
             <div class="flex items-center gap-3 sm:gap-5 flex-wrap justify-center text-xs">
-                <a href="/" class="nav-link-accueil hover:text-google-gray900 transition-colors">Accueil</a>
-                <a href="/projets.html" class="nav-link-projets hover:text-google-gray900 transition-colors">Projets</a>
-                <a href="/apropos.html" class="nav-link-apropos hover:text-google-gray900 transition-colors">À propos</a>
-                <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-google-gray900 transition-colors">BayBay</a>
-                <a href="https://github.com/mlk0622" target="_blank" class="hover:text-google-gray900 transition-colors inline-flex items-center gap-1">
+                <a href="/" class="nav-link-accueil hover:text-brand-dark transition-colors">Accueil</a>
+                <a href="/projets.html" class="nav-link-projets hover:text-brand-dark transition-colors">Projets</a>
+                <a href="/apropos.html" class="nav-link-apropos hover:text-brand-dark transition-colors">À propos</a>
+                <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-brand-dark transition-colors">BayBay</a>
+                <a href="https://github.com/mlk0622" target="_blank" class="hover:text-brand-dark transition-colors inline-flex items-center gap-1 font-medium">
                     <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                     </svg>
                     <span>GitHub</span>
                 </a>
-                <a href="mailto:contact@mb-site.com" class="hover:text-google-gray900 transition-colors">Contact</a>
+                <a href="mailto:contact@mb-site.com" class="hover:text-brand-dark transition-colors">Contact</a>
             </div>
         </div>
     </footer>
@@ -620,11 +604,11 @@
                     const isActive = (tab === activeTab);
                     links.forEach(link => {
                         if (isActive) {
-                            link.classList.remove('text-google-gray700', 'hover:bg-google-gray100');
-                            link.classList.add('bg-blue-50', 'text-google-blueDark', 'font-medium');
+                            link.classList.remove('text-brand-dark', 'hover:bg-brand-grey/50');
+                            link.classList.add('bg-brand-dark', 'text-white', 'font-semibold');
                         } else {
-                            link.classList.remove('bg-blue-50', 'text-google-blueDark', 'font-medium');
-                            link.classList.add('text-google-gray700', 'hover:bg-google-gray100');
+                            link.classList.remove('bg-brand-dark', 'text-white', 'font-semibold');
+                            link.classList.add('text-brand-dark', 'hover:bg-brand-grey/50');
                         }
                     });
                 });
@@ -644,7 +628,7 @@
                 const currentEl = views[currentKey];
                 const nextEl = views[targetView];
 
-                // Titre dynamique sobre
+                // Titre dynamique
                 if (targetView === 'projets') {
                     document.title = "Projets — Malik B. (mb-site.com)";
                 } else if (targetView === 'apropos') {
@@ -681,7 +665,7 @@
 
                 isAnimating = true;
                 
-                // Désactiver temporairement scroll-behavior pour saut instantané à 0 sans glitch
+                // Saut instantané à 0
                 document.documentElement.style.scrollBehavior = 'auto';
                 window.scrollTo(0, 0);
 
