@@ -1,761 +1,745 @@
-<!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<!doctype html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Malik B. — mb-site.com</title>
-    <meta name="description" content="Site personnel de Malik B., étudiant en 2ème année à l'EFREI Paris. Conception et développement de logiciels, applications web et outils système.">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <link rel="apple-touch-icon" href="/favicon.png">
-
-    <!-- Fonts : Merriweather (serif) & Open Sans (sans-serif) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        nardo: {
-                            DEFAULT: '#686d76',   // Gris Nardo officiel
-                            light: '#7e848d',
-                            dark: '#52575f',
-                            darker: '#3d4249',
-                        },
-                        brand: {
-                            blue: '#5f8ee4',      // Action color (Cornflower Blue)
-                            dark: '#19191a',      // Dark Blue / Deep Black
-                            red: '#e4655f',       // Red / Alert
-                            grey: '#e6e6e6',      // Light Grey
-                            white: '#ffffff',     // White
-                            green: '#6fce72',     // Success green
-                        }
-                    },
-                    fontFamily: {
-                        serif: ['"Merriweather"', 'Georgia', 'serif'],
-                        sans: ['"Open Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            height: 100%;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100%;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            background-color: #686d76; /* Gris Nardo */
-            color: #ffffff;
-            font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        h1, h2, h3, .font-serif-title {
-            font-family: "Merriweather", Georgia, serif;
-        }
-
-        main {
-            flex: 1 0 auto;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            position: relative;
-        }
-
-        footer {
-            margin-top: auto !important;
-            flex-shrink: 0;
-        }
-
-        /* Square Geometric Cards sur fond Gris Nardo */
-        .square-card {
-            background-color: #19191a;
-            border: 1px solid #4a5059;
-            border-radius: 0px;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .square-card:hover {
-            border-color: #5f8ee4;
-        }
-
-        /* Square action buttons */
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0px;
-            font-family: "Open Sans", sans-serif;
-            font-weight: 600;
-            transition: all 0.15s ease;
-        }
-
-        /* Fluid view transition styles */
-        .view-section {
-            transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
-        }
-
-        .view-hidden {
-            display: none !important;
-        }
-
-        .view-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        #view-home.view-visible {
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #view-projects.view-visible,
-        #view-about.view-visible {
-            display: block !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Portfolio de Malik Bouaissi, étudiant ingénieur en 2ème année à l'EFREI Paris (Promo 2029). Spécialiste en ingénierie logicielle, compilateurs C, architectures hybrides et éco-conception.">
+  <meta name="author" content="Malik Bouaissi">
+  <meta property="og:title" content="Malik Bouaissi | Ingénierie Logicielle & Systèmes | EFREI Paris">
+  <meta property="og:description" content="Portfolio et projets d'ingénierie logicielle : BayBay v4.0, Compilateur SimplCT, CroustyRun, Poudelard.">
+  <meta property="og:image" content="https://mb-site.com/logo.png">
+  <meta property="og:url" content="https://mb-site.com">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  
+  <!-- google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <title>Malik Bouaissi | Ingénierie Logicielle & Systèmes | EFREI Paris</title>
 </head>
-<body class="min-h-screen min-h-[100dvh] flex flex-col bg-nardo text-white">
-
-    <!-- Barre d'accentuation Cornflower Blue -->
-    <div class="h-1 w-full bg-brand-blue flex-shrink-0"></div>
-
-    <!-- Header Rectangulaire & Structuré Dark Blue -->
-    <header class="sticky top-0 z-50 bg-brand-dark/95 backdrop-blur-md border-b border-nardo-dark flex-shrink-0">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-            
-            <!-- Brand avec Logo MB carré -->
-            <a href="/" class="flex items-center gap-3">
-                <img src="/favicon.png" alt="Logo MB" class="w-8 h-8 rounded-none object-contain border border-nardo-dark">
-                <span class="font-serif text-lg font-bold tracking-tight text-white">Malik B.</span>
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header class="f-header position-absolute bg-transparent js-f-header" data-theme="dark">
+    <div class="f-header__mobile-content container max-width-lg">
+      <a href="index.html" class="f-header__logo flex items-center gap-xxs text-decoration-none">
+        <span class="inline-flex items-center justify-center width-md height-md radius-50% bg-primary text-sm font-bold color-white">MB</span>
+        <span class="text-md font-bold color-contrast-higher margin-left-xxs">Malik Bouaissi</span>
+      </a>
+  
+      <button class="reset anim-menu-btn js-anim-menu-btn f-header__nav-control js-tab-focus" aria-label="Basculer le menu">
+        <i class="anim-menu-btn__icon anim-menu-btn__icon--close" aria-hidden="true"></i>
+      </button>
+    </div>
+  
+    <div class="f-header__nav" role="navigation">
+      <div class="f-header__nav-grid justify-between@md container max-width-lg">
+        <div class="f-header__nav-logo-wrapper flex-grow flex-basis-0">
+          <a href="index.html" class="f-header__logo flex items-center gap-xxs text-decoration-none">
+            <span class="inline-flex items-center justify-center width-md height-md radius-50% bg-primary text-sm font-bold color-white">MB</span>
+            <span class="text-md font-bold color-contrast-higher margin-left-xxs">Malik Bouaissi</span>
+          </a>
+        </div>
+    
+        <ul class="f-header__list flex-grow flex-basis-0 justify-center@md">
+          <li class="f-header__item"><a href="#hero" class="f-header__link">Accueil</a></li>
+          <li class="f-header__item">
+            <a href="#projets" class="f-header__link">
+              <span>Projets</span>
+              <svg class="f-header__dropdown-icon icon" aria-hidden="true" viewBox="0 0 12 12"><path d="M9.943,4.269A.5.5,0,0,0,9.5,4h-7a.5.5,0,0,0-.41.787l3.5,5a.5.5,0,0,0,.82,0l3.5-5A.5.5,0,0,0,9.943,4.269Z"/></svg>
             </a>
+            <ul class="f-header__dropdown">
+              <li><a href="#baybay" class="f-header__dropdown-link">BayBay v4.0 (Gestion Locative)</a></li>
+              <li><a href="#simplct" class="f-header__dropdown-link">SimplCT (Compilateur C)</a></li>
+              <li><a href="#croustyrun" class="f-header__dropdown-link">CroustyRun (Éco-conception 60 FPS)</a></li>
+              <li><a href="#poudelard" class="f-header__dropdown-link">Poudelard (Simulation POO)</a></li>
+            </ul>
+          </li>
+          <li class="f-header__item"><a href="#parcours" class="f-header__link">Parcours & EFREI</a></li>
+          <li class="f-header__item"><a href="#competences" class="f-header__link">Compétences</a></li>
+          <li class="f-header__item"><a href="#contact" class="f-header__link">Contact</a></li>
+        </ul>
+    
+        <ul class="f-header__list flex-grow flex-basis-0 justify-end@md items-center gap-xs">
+          <li class="f-header__item">
+            <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="f-header__link f-header__link--icon" aria-label="GitHub de Malik Bouaissi">
+              <svg class="icon" viewBox="0 0 32 32"><path d="M16 2a14 14 0 0 0-4.43 27.28c.7.13 1-.3 1-.67v-2.38c-3.89.84-4.71-1.88-4.71-1.88a3.7 3.7 0 0 0-1.55-2.05c-1.27-.87.1-.85.1-.85a2.93 2.93 0 0 1 2.14 1.44 3 3 0 0 0 4.06 1.16 3 3 0 0 1 .89-1.87c-3.11-.35-6.38-1.55-6.38-6.91a5.41 5.41 0 0 1 1.44-3.76 5 5 0 0 1 .14-3.71s1.17-.38 3.85 1.43a13.3 13.3 0 0 1 7 0c2.67-1.81 3.84-1.43 3.84-1.43a5 5 0 0 1 .14 3.71 5.4 5.4 0 0 1 1.44 3.76c0 5.38-3.28 6.55-6.4 6.9a3.34 3.34 0 0 1 .95 2.59v3.85c0 .38.26.81 1 .66A14 14 0 0 0 16 2z" fill="currentColor"/></svg>
+              <span class="margin-left-xxs">GitHub</span>
+            </a>
+          </li>
+          <li class="f-header__item">
+            <a href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">
+              BayBay SaaS
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
 
-            <!-- Navigation carrée épurée -->
-            <nav class="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                <a href="/" class="nav-link-accueil px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/10 transition-colors">Accueil</a>
-                <a href="/projets.html" class="nav-link-projets px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/10 transition-colors">Projets</a>
-                <a href="/apropos.html" class="nav-link-apropos px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/10 transition-colors">À propos</a>
-                <a href="https://baybay.mb-site.com" target="_blank" class="px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/10 transition-colors">BayBay</a>
-            </nav>
-
-            <!-- Bouton GitHub carré -->
-            <div class="flex items-center">
-                <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="btn-action gap-2 px-3.5 py-1.5 border border-white/40 text-white hover:bg-white hover:text-brand-dark text-xs">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                    </svg>
-                    <span>GitHub</span>
-                </a>
-            </div>
-
+  <!-- ==================== HERO SECTION ==================== -->
+  <section id="hero" class="diagonal-section-bottom bg-contrast-lower bg-opacity-50%" style="background-image: url('assets/img/hero-diagonal-img-1.jpg');" data-theme="dark">
+    <div class="container max-width-adaptive-md padding-y-xxl">
+      <div class="text-center padding-top-lg">
+        <div class="inline-flex items-center gap-xxs padding-x-sm padding-y-xxs radius-full bg-contrast-higher bg-opacity-10% border border-contrast-higher border-opacity-10% text-xs letter-spacing-md text-uppercase margin-bottom-sm">
+          <span>Étudiant Ingénieur • EFREI Paris Promo 2029</span>
         </div>
-    </header>
+  
+        <div class="text-component margin-bottom-md">
+          <h1 class="text-shadow-sm text-xxxl">Malik Bouaissi — <em>Ingénierie Logicielle</em> & Systèmes</h1>
+          <p class="text-lg opacity-90% max-width-sm margin-x-auto">
+            Passionné par la conception de systèmes bas-niveau, la théorie des compilateurs, l'éco-conception logicielle et le déploiement d'architectures hybrides et cloud performantes.
+          </p>
+        </div>
+    
+        <div class="flex flex-wrap flex-center gap-sm">
+          <a class="btn btn--primary shadow-md" href="#projets">Explorer les réalisations</a>
+          <a class="btn btn--subtle" href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer">
+            <span>Découvrir BayBay v4.0</span>
+            <svg class="icon margin-left-xxs" viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="8" x2="14" y2="8"/><polyline points="9 3 14 8 9 13"/></g></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col w-full">
+  <!-- ==================== TESTIMONIAL / PHILOSOPHY ==================== -->
+  <section class="testimonial position-relative z-index-1 padding-y-xl">
+    <div class="container max-width-adaptive-sm">
+      <figure class="flex justify-center margin-bottom-md reveal-fx reveal-fx--scale">
+        <img class="block width-xxl height-xxl radius-50% border border-bg border-2 shadow-sm object-cover" src="logo.png" alt="Malik Bouaissi">
+      </figure>
+  
+      <div class="testimonial__block-wrapper margin-bottom-md">
+        <blockquote class="text-lg text-center line-height-md font-secondary">
+          « Concevoir des logiciels robustes et efficients : de l'analyse lexicale d'un compilateur en C jusqu'aux architectures logicielles complètes en production, avec un engagement constant pour la rigueur algorithmique et la performance. »
+        </blockquote>
+  
+        <svg class="icon icon--xxl color-contrast-higher opacity-10%" aria-hidden="true" viewBox="0 0 64 64"><polygon fill="currentColor" points="2 36 17 2 26 2 15 36 26 36 26 62 2 62 2 36"/><polygon fill="currentColor" points="38 36 53 2 62 2 51 36 62 36 62 62 38 62 38 36"/></svg>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-uppercase letter-spacing-md font-bold"><strong>Malik Bouaissi</strong></p>
+        <p class="color-contrast-medium margin-top-xxxxs text-sm">Élève-Ingénieur en 2ème année • EFREI Paris</p>
+      </div>
+    </div>
+  </section>
 
-        <!-- ================= VUE ACCUEIL ================= -->
-        <div id="view-home" class="view-section view-visible flex-1 flex flex-col justify-center py-10 sm:py-16 w-full">
+  <!-- ==================== TEXT FEATURE / ABOUT INTRO ==================== -->
+  <section id="apropos" class="position-relative z-index-1 padding-top-xl padding-bottom-xxl" data-theme="secondary">
+    <div class="container max-width-adaptive-lg position-relative z-index-2">
+      <div class="grid gap-md">
+        <div class="col-4@md">
+          <div class="text-sm color-contrast-medium margin-bottom-xxs text-uppercase letter-spacing-sm">Profil & Vision</div>
+          <h2 class="text-xl text-xxl@md font-primary">Rigueur technique, performance & utilité concrète.</h2>
+        </div>
+      
+        <div class="col-8@md">
+          <div class="padding-left-md@md">
+            <div class="text-component">
+              <p>
+                Actuellement en 2ème année à l'<strong>EFREI Paris</strong> (Promotion 2029), je concentre mes travaux sur la programmation système en C, l'architecture logicielle modulaire et l'optimisation des ressources informatiques.
+              </p>
+              <p>
+                Qu'il s'agisse d'écrire une toolchain de compilation complète (analyse lexicale, syntaxique, AST et vérification mémoire avec Valgrind), de développer un moteur de jeu 2D éco-conçu monitoré avec CodeCarbon (-34% CO2e), ou de déployer la suite de gestion locative <strong>BayBay v4.0</strong> exploitée en production, je privilégie toujours la clarté architecturale et la robustesse du code.
+              </p>
+            </div>
+  
+            <div class="flex flex-wrap gap-xs margin-top-md">
+              <span class="badge badge--primary">C (C99/C11)</span>
+              <span class="badge badge--subtle">Python</span>
+              <span class="badge badge--subtle">Systèmes Linux</span>
+              <span class="badge badge--subtle">Electron.js</span>
+              <span class="badge badge--subtle">Éco-conception logicielle</span>
+              <span class="badge badge--subtle">Compilation & AST</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <!-- HERO SECTION -->
-            <section class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+    <!-- Geometric background decoration from Virgo template -->
+    <figure class="bg-decoration z-index-1" aria-hidden="true">
+      <svg class="bg-decoration__svg color-contrast-higher opacity-40%" viewBox="0 0 1920 450" fill="none">
+        <rect opacity="0.5" x="610.131" y="-440" width="128" height="836.003" transform="rotate(46.8712 610.131 -440)" fill="url(#bg-dec-1)" />
+        <rect opacity="0.5" x="1899.13" y="-262" width="128" height="836.003" transform="rotate(46.8712 1899.13 -262)" fill="url(#bg-dec-2)" />
+        <rect opacity="0.5" x="800.131" y="-418" width="128" height="836.003" transform="rotate(46.8712 800.131 -418)" fill="url(#bg-dec-1)" />
+        <defs>
+          <linearGradient id="bg-dec-1" x1="674.131" y1="-440" x2="674.131" y2="396.003" gradientUnits="userSpaceOnUse">
+            <stop stop-color="currentColor" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="0" />
+          </linearGradient>
+          <linearGradient id="bg-dec-2" x1="1963.13" y1="-262" x2="1963.13" y2="574.003" gradientUnits="userSpaceOnUse">
+            <stop stop-color="currentColor" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </figure>
+  </section>
 
-                <h1 class="font-serif text-3xl sm:text-5xl font-bold text-white tracking-tight leading-tight mb-4 drop-shadow-sm">
-                    Conception de logiciels, <br class="hidden sm:inline">
-                    systèmes <span class="text-brand-blue underline decoration-brand-blue/50 underline-offset-4">fiables</span> & <span class="text-brand-red underline decoration-brand-red/50 underline-offset-4">performants</span>.
-                </h1>
+  <!-- ==================== FLAGSHIP PROJECT: BAYBAY v4.0 (DEVICES) ==================== -->
+  <section id="baybay" class="position-relative z-index-1 padding-y-xxl" data-theme="dark">
+    <div class="container max-width-adaptive-lg position-relative z-index-2">
+      <div class="grid gap-lg items-center">
+        <div class="col-5@md">
+          <div class="text-component">
+            <div class="inline-flex items-center gap-xxs text-xs font-semibold color-primary text-uppercase letter-spacing-sm">
+              <span>Projet Phare • Production</span>
+            </div>
+            <h2 class="text-xxl font-primary">BayBay v4.0 — Gestion Locative Hybride</h2>
+            <p class="color-contrast-medium">
+              Suite logicielle complète d'automatisation immobilière combinant une application de bureau Windows (Electron.js + Python standalone) et une plateforme cloud SaaS hébergée sur serveur dédié.
+            </p>
+            <ul class="list-v2 text-sm color-contrast-medium">
+              <li><strong>Quittances conformes Loi ALUR :</strong> Génération automatisée avec clé de vérification publique en ligne et signature cryptographique SHA-256.</li>
+              <li><strong>Automatisation SMTP :</strong> Envoi planifié des appels de loyer, relances et quittances par e-mail avec accusé de réception.</li>
+              <li><strong>Calculs légaux & Fiscaux :</strong> Révision indicielle INSEE/IRL, calcul des provisions de charges et pré-remplissage de la déclaration 2044.</li>
+            </ul>
+          </div>
+  
+          <div class="margin-top-md">
+            <div class="flex flex-wrap gap-xs items-center">
+              <a class="btn btn--primary" href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer">Accéder au SaaS BayBay</a>
+              <a class="btn btn--subtle" href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer">Code GitHub</a>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Device mockups from Virgo template -->
+        <div class="col-7@md">
+          <div class="device-group-3">
+            <div class="dev-phone dev-phone--top-light" aria-label="Aperçu mobile BayBay">
+              <div class="dev-phone__body">
+                <div class="dev-phone__media bg-contrast-lower flex flex-column items-center justify-center padding-sm text-center">
+                  <div class="dev-phone__notch"></div>
+                  <div class="width-lg height-lg radius-50% bg-primary flex items-center justify-center color-white font-bold margin-bottom-xs">BB</div>
+                  <h4 class="text-sm font-bold color-contrast-higher">BayBay Mobile</h4>
+                  <p class="text-xs color-contrast-medium margin-top-xxxxs">Vérification instantanée des quittances par QR Code en ligne.</p>
+                  <div class="margin-top-xs padding-xs bg-contrast-higher bg-opacity-5% radius-sm width-100%">
+                    <div class="text-xs font-mono color-primary">ALUR-2026-OK</div>
+                    <div class="text-xxs color-contrast-medium">SHA256: 9e3b...8f41</div>
+                  </div>
+                </div>
+              </div>
+              <div class="dev-phone__shadow"></div>
+            </div>
+  
+            <div class="dev-desktop" aria-label="Aperçu desktop BayBay v4.0">
+              <div class="dev-desktop__body">
+                <div class="dev-desktop__media bg-contrast-lower flex flex-column">
+                  <div class="padding-xs bg-contrast-medium bg-opacity-10% flex items-center justify-between border-bottom">
+                    <div class="flex gap-xxxs">
+                      <span class="width-xxs height-xxs radius-50% bg-error opacity-70% inline-block"></span>
+                      <span class="width-xxs height-xxs radius-50% bg-warning opacity-70% inline-block"></span>
+                      <span class="width-xxs height-xxs radius-50% bg-success opacity-70% inline-block"></span>
+                    </div>
+                    <span class="text-xxs font-mono color-contrast-medium">baybay.mb-site.com</span>
+                    <span class="width-xs"></span>
+                  </div>
+                  <div class="padding-md flex-grow flex flex-column justify-between">
+                    <div>
+                      <div class="flex items-center justify-between margin-bottom-xs">
+                        <span class="text-xs font-bold color-contrast-higher">Tableau de Bord Propriétaire</span>
+                        <span class="badge badge--primary text-xxs">v4.0 Hybride</span>
+                      </div>
+                      <div class="grid gap-xs margin-bottom-sm">
+                        <div class="col-4 bg-contrast-higher bg-opacity-5% padding-xs radius-sm">
+                          <div class="text-xxs color-contrast-medium">Loyers perçus</div>
+                          <div class="text-sm font-bold color-success">100% à jour</div>
+                        </div>
+                        <div class="col-4 bg-contrast-higher bg-opacity-5% padding-xs radius-sm">
+                          <div class="text-xxs color-contrast-medium">Quittances</div>
+                          <div class="text-sm font-bold color-primary">Générées auto</div>
+                        </div>
+                        <div class="col-4 bg-contrast-higher bg-opacity-5% padding-xs radius-sm">
+                          <div class="text-xxs color-contrast-medium">Calcul IRL</div>
+                          <div class="text-sm font-bold color-contrast-higher">Indexé INSEE</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-xxs color-contrast-medium border-top padding-top-xxs flex justify-between">
+                      <span>Electron.js + Python standalone • Nginx Cloud SaaS</span>
+                      <span class="color-success">● En ligne</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="dev-desktop__base">
+                <div class="dev-desktop__base-top"></div>
+                <div class="dev-desktop__base-bottom"></div>
+                <div class="dev-desktop__shadow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-                <p class="text-base sm:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed mb-8">
-                    Étudiant en 2ème année à l'EFREI Paris (Promo 2029), je conçois et réalise des applications concrètes, des outils système et des architectures logicielles avec rigueur technique, clarté du code et efficacité.
+    <!-- Geometric decoration -->
+    <figure class="bg-decoration z-index-1 flip-x flip-y" aria-hidden="true">
+      <svg class="bg-decoration__svg color-contrast-low" viewBox="0 0 1920 450" fill="none">
+        <rect opacity="0.5" x="1952.45" y="45.1172" width="175.38" height="1451.58" transform="rotate(99.6416 1952.45 45.1172)" fill="url(#bg-dec-3)" />
+        <circle opacity="0.5" r="38" transform="matrix(-1 0 0 1 1583 171)" fill="url(#bg-dec-radial)" />
+        <defs>
+          <linearGradient id="bg-dec-3" x1="2040.14" y1="45.1172" x2="2040.14" y2="1496.7" gradientUnits="userSpaceOnUse">
+            <stop stop-color="currentColor" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="0" />
+          </linearGradient>
+          <radialGradient id="bg-dec-radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="scale(38)">
+            <stop stop-color="var(--color-primary)" stop-opacity="0" />
+            <stop offset="1" stop-color="var(--color-primary)" />
+          </radialGradient>
+        </defs>
+      </svg>
+    </figure>
+  </section>
+
+  <!-- ==================== BI-COLOR FEATURE: SIMPLCT & CROUSTYRUN ==================== -->
+  <section id="projets" class="feature-v10">
+    <!-- SimplCT: Compiler Project -->
+    <div id="simplct" class="padding-y-xl padding-top-xxl@md padding-bottom-0@md" data-theme="secondary">
+      <div class="container max-width-adaptive-lg">
+        <div class="grid">
+          <figure class="col-6@md reveal-fx reveal-fx--clip-x">
+            <img class="block width-100% height-100% object-cover" src="assets/img/feature-v10-img-1.jpg" alt="SimplCT Compiler">
+          </figure>
+  
+          <div class="bg-contrast-lower bg-opacity-50% col-6@md">
+            <div class="text-component text-space-y-md height-100% flex flex-column padding-md padding-lg@md">
+              <div class="text-xs color-contrast-medium text-uppercase letter-spacing-sm font-semibold">
+                Théorie des Langages & Systèmes
+              </div>
+              <h3 class="text-xl text-xxl@md font-primary">SimplCT — Compilateur C Complet</h3>
+              <p class="text-sm color-contrast-medium">
+                <strong>Par Mohammed Belfar & Malik Bouaissi</strong>
+              </p>
+              <p>
+                Développement d'une chaîne de compilation complète pour un sous-ensemble du langage C.
+              </p>
+              <ul class="text-sm color-contrast-medium list list--bullet">
+                <li><strong>Lexer & Parser :</strong> Analyse lexicale par flux de tokens et analyseur syntaxique à descente récursive.</li>
+                <li><strong>AST & Typage :</strong> Construction de l'arbre syntaxique abstrait, table des symboles avec résolution de portées lexicales (scopes) et vérification de type statique.</li>
+                <li><strong>Qualité & Mémoire :</strong> Zéro fuite mémoire certifiée par Valgrind (0 leak, 0 error) et suite de tests automatisée.</li>
+              </ul>
+              <p class="margin-top-auto pt-sm">
+                <a href="https://github.com/wassity/simplCT" target="_blank" rel="noopener noreferrer" class="feature-v10__link">
+                  <i>Consulter le code source sur GitHub &rarr;</i>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- CroustyRun: Eco-conception Project -->
+    <div id="croustyrun" class="bg padding-y-xl padding-bottom-xxl@md padding-top-0@md" data-theme="dark">
+      <div class="container max-width-adaptive-lg">
+        <div class="grid">
+          <figure class="col-6@md order-2@md reveal-fx reveal-fx--clip-x">
+            <img class="block width-100% height-100% object-cover" src="assets/img/feature-v10-img-2.jpg" alt="CroustyRun Eco-Game">
+          </figure>
+  
+          <div class="bg-dark col-6@md order-1@md">
+            <div class="text-component text-space-y-md height-100% flex flex-column padding-md padding-lg@md">
+              <div class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">
+                Éco-conception & Green IT
+              </div>
+              <h3 class="text-xl text-xxl@md font-primary">CroustyRun — Jeu Éco-conçu 60 FPS</h3>
+              <p class="text-sm color-contrast-medium">
+                <strong>Par Mohammed Belfar, Malik Bouaissi, Antoine Picou & Mathis Jacques--Llorens</strong>
+              </p>
+              <p>
+                Jeu vidéo 2D en Python intégrant un moteur physique temps réel et une démarche poussée de réduction d'empreinte environnementale.
+              </p>
+              <ul class="text-sm color-contrast-medium list list--bullet">
+                <li><strong>Mesure d'impact CodeCarbon :</strong> Réduction de 34% des émissions de CO2e grâce à un profiling fin de la boucle de rendu et de la mémoire CPU/RAM.</li>
+                <li><strong>Graphismes 100% Artisanaux :</strong> Pixel-Art original dessiné entièrement à la main, sans recours aux générateurs IA.</li>
+                <li><strong>Fluidité constante :</strong> 60 FPS stables sur des configurations matérielles légères.</li>
+              </ul>
+              <div class="margin-top-auto pt-sm flex flex-wrap gap-sm items-center">
+                <a href="https://croustyrun.supercraft.tech" target="_blank" rel="noopener noreferrer" class="btn btn--primary btn--sm">
+                  Jouer / Site Officiel
+                </a>
+                <a href="https://github.com/SuperCraft3M/CroustyRun" target="_blank" rel="noopener noreferrer" class="feature-v10__link">
+                  <i>Code GitHub &rarr;</i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FEATURE 3: POUDELARD ==================== -->
+  <section id="poudelard" class="feature-v9">
+    <div class="grid">
+      <div class="feature-v9__block col-6@md" style="background-image: url('assets/img/feature-v9-img-1.jpg');">
+        <div class="feature-v9__content text-center max-width-xxxs">
+          <div class="text-component">
+            <span class="badge badge--subtle margin-bottom-xxs">Simulation Académique</span>
+            <h3 class="text-xxl color-inherit font-primary">Poudelard</h3>
+            <p class="opacity-90% text-sm">
+              Simulation logicielle orientée objet modélisant des entités autonomes et leurs interactions dans un monde dynamique à événements déterministes.
+            </p>
+            <p class="text-xs opacity-80%">Par Mohammed Belfar & Malik Bouaissi</p>
+          </div>
+  
+          <div class="margin-top-sm">
+            <a class="feature-v9__link" href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" rel="noopener noreferrer">
+              Voir sur GitHub &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+  
+      <div class="feature-v9__block col-6@md" style="background-image: url('assets/img/feature-v9-img-2.jpg');">
+        <div class="feature-v9__content text-center max-width-xxxs">
+          <div class="text-component">
+            <span class="badge badge--primary margin-bottom-xxs">Hub Open Source</span>
+            <h3 class="text-xxl color-inherit font-primary">Dépôts GitHub</h3>
+            <p class="opacity-90% text-sm">
+              Retrouvez l'ensemble de mes projets, commits, contributions open source et expérimentations logicielles sur mon profil GitHub.
+            </p>
+            <p class="text-xs opacity-80%">@mlk0622</p>
+          </div>
+  
+          <div class="margin-top-sm">
+            <a class="feature-v9__link" href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer">
+              Explorer le profil &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PARCOURS & TIMELINE ==================== -->
+  <div id="parcours" class="position-relative z-index-1 overflow-hidden padding-y-xxl bg-dark">
+    <div class="margin-bottom-lg">
+      <div class="text-center">
+        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Parcours & Évolution</span>
+        <h2 class="text-xxl font-primary margin-top-xxs">Chronologie des Réalisations</h2>
+        <p class="color-contrast-medium text-sm max-width-xs margin-x-auto margin-top-xxs">
+          Une progression académique et technique articulée autour de projets d'envergure.
+        </p>
+      </div>
+    </div>
+  
+    <div class="container max-width-adaptive-lg">
+      <div class="v-timeline js-v-timeline" data-animation="on">
+        <!-- Item 1: EFREI -->
+        <section class="v-timeline__section js-v-timeline__section">
+          <div class="v-timeline__marker bg-contrast-high border border-3 border-bg-dark" aria-hidden="true"></div>
+    
+          <div class="v-timeline__items-group">
+            <div class="v-timeline__item bg-light padding-md radius-md shadow-xs" data-theme="default">
+              <div class="v-timeline__date margin-bottom-xs">
+                <time class="v-timeline__date-value text-xs font-semibold color-primary" datetime="2024">2024 — Aujourd'hui</time>
+              </div>
+    
+              <div class="text-component">
+                <h3 class="text-md font-bold">EFREI Paris — Grande École d'Ingénieurs du Numérique</h3>
+                <p class="text-xs color-contrast-medium font-semibold">Cycle Ingénieur • Promotion 2029 (2ème année)</p>
+                <p class="text-sm color-contrast-higher margin-top-xxs">
+                  Approfondissement des fondamentaux de l'ingénierie logicielle : algorithmique avancée, structures de données, programmation système en C, architecture des processeurs, modélisation relationnelle et gestion de projets agiles en équipe.
                 </p>
-
-                <!-- Boutons d'action carrés -->
-                <div class="flex flex-wrap items-center justify-center gap-3">
-                    <a href="/projets.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue shadow-sm">
-                        <span>Consulter les projets</span>
-                    </a>
-                    <a href="/apropos.html" class="btn-action px-6 py-3 bg-brand-dark hover:bg-black text-white text-sm border border-nardo-dark">
-                        <span>En savoir plus à propos de moi</span>
-                    </a>
-                </div>
-
-            </section>
-
-            <!-- 3 BLOCS CARRÉS DE STRUCTURE -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 w-full">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    
-                    <!-- Bloc 1 : Formation (Accent Cornflower Blue) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-blue shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue mb-2">Formation académique</div>
-                        <h2 class="font-serif text-lg font-bold text-white mb-2">EFREI Paris</h2>
-                        <p class="text-xs text-white/75 leading-relaxed">
-                            École d'ingénieurs du numérique. Bases algorithmiques solides, programmation système en C, structures de données et gestion de projets.
-                        </p>
-                    </div>
-
-                    <!-- Bloc 2 : Réalisations (Accent Vert Success) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-green shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-green mb-2">Réalisations concrètes</div>
-                        <h2 class="font-serif text-lg font-bold text-white mb-2">Projets logiciels</h2>
-                        <p class="text-xs text-white/75 leading-relaxed">
-                            Développement d'outils réels : suite de gestion locative BayBay v4.0, compilateur en langage C et simulations interactives.
-                        </p>
-                    </div>
-
-                    <!-- Bloc 3 : Rigueur (Accent Rouge Alert) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-red shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red mb-2">Méthodologie</div>
-                        <h2 class="font-serif text-lg font-bold text-white mb-2">Qualité & Rigueur</h2>
-                        <p class="text-xs text-white/75 leading-relaxed">
-                            Conception modulaire, optimisation des performances, respect des standards de sécurité et gestion collaborative avec Git.
-                        </p>
-                    </div>
-
-                </div>
-            </section>
-
-        </div>
-
-        <!-- ================= VUE À PROPOS ================= -->
-        <div id="view-about" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
-            
-            <!-- Header À Propos -->
-            <div class="text-center mb-10">
-                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                    À Propos de Malik B.
-                </h1>
-                <p class="text-white/80 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
-                    Étudiant ingénieur passionné par la programmation informatique et l'architecture de solutions logicielles.
+              </div>
+            </div>
+          </div>
+        </section>
+  
+        <!-- Item 2: SimplCT -->
+        <section class="v-timeline__section js-v-timeline__section">
+          <div class="v-timeline__marker bg-contrast-high border border-3 border-bg-dark" aria-hidden="true"></div>
+    
+          <div class="v-timeline__items-group">
+            <div class="v-timeline__item bg-light padding-md radius-md shadow-xs" data-theme="default">
+              <div class="v-timeline__date margin-bottom-xs">
+                <time class="v-timeline__date-value text-xs font-semibold color-primary" datetime="2024">2024</time>
+              </div>
+    
+              <div class="text-component">
+                <h3 class="text-md font-bold">SimplCT — Compilateur C & Analyse Sémantique</h3>
+                <p class="text-xs color-contrast-medium font-semibold">Projet Systèmes avec Mohammed Belfar</p>
+                <p class="text-sm color-contrast-higher margin-top-xxs">
+                  Conception de bout en bout d'un compilateur en C : flux lexical, descente récursive, arbre AST, vérification des types et portées lexicales. Validation stricte avec Valgrind (0 fuite mémoire).
                 </p>
+              </div>
+              <div class="margin-top-sm">
+                <a class="btn btn--subtle btn--sm" href="https://github.com/wassity/simplCT" target="_blank" rel="noopener noreferrer">Dépôt GitHub</a>
+              </div>
             </div>
-
-            <!-- Carte Profil Carrée -->
-            <div class="square-card p-6 sm:p-8 mb-8 border-l-4 border-l-brand-blue shadow-lg">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-white/10">
-                    <img src="/favicon.png" alt="Malik B." class="w-16 h-16 rounded-none object-contain border border-nardo-dark flex-shrink-0">
-                    <div class="text-center sm:text-left">
-                        <h2 class="font-serif text-xl sm:text-2xl font-bold text-white">Malik Bouaissi</h2>
-                        <p class="text-brand-blue text-sm font-semibold mt-0.5">Étudiant en 2ème année à l'EFREI Paris • Développeur Logiciel & Web</p>
-                        <div class="pt-3 flex flex-wrap justify-center sm:justify-start gap-2 text-xs">
-                            <span class="px-2.5 py-1 bg-white/5 border border-white/10 text-white/90 font-mono">Paris, France</span>
-                            <span class="px-2.5 py-1 bg-white/5 border border-white/10 text-white/90 font-mono">EFREI Paris (Promo 2029)</span>
-                            <span class="px-2.5 py-1 bg-white/5 border border-white/10 text-white/90 font-mono">Conception Logicielle</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-6 space-y-4 text-sm text-white/85 leading-relaxed">
-                    <p>
-                        Actuellement en 2ème année à l'EFREI Paris (école d'ingénieurs des technologies du numérique), je concentre mes apprentissages et mes projets personnels sur le développement logiciel, la conception d'architectures applicatives et les bases de données.
-                    </p>
-                    <p>
-                        J'accorde une importance centrale à la construction d'outils réellement utiles et fonctionnels, à la compréhension fine des couches système (gestion mémoire en C, protocoles réseaux, sécurité) et à la production d'interfaces sobres, claires et réactives.
-                    </p>
-                </div>
-            </div>
-
-            <!-- 4 Domaines de compétences avec carrés géométriques -->
-            <div class="mb-10">
-                <h2 class="font-serif text-xl font-bold text-white mb-4">Domaines de compétences</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- Domaine 1 : Web (Cornflower Blue) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-blue shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue mb-1">Web & API</div>
-                        <h3 class="font-serif text-base font-bold text-white mb-1">Architectures Web & REST</h3>
-                        <p class="text-xs text-white/65 mb-3">Python/Flask, PHP, JavaScript ES6+, API REST</p>
-                        <p class="text-xs text-white/80 leading-relaxed mb-3">
-                            Développement de backends robustes, gestion des sessions, sécurisation des accès et interfaces dynamiques.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs">
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Python 3.11</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Flask</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">PHP</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">JavaScript</span>
-                        </div>
-                    </div>
-
-                    <!-- Domaine 2 : Desktop (Red) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-red shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red mb-1">Desktop & Client</div>
-                        <h3 class="font-serif text-base font-bold text-white mb-1">Applications Bureau & Ergonomie</h3>
-                        <p class="text-xs text-white/65 mb-3">Electron.js, packaging natif, synchronisation locale/cloud</p>
-                        <p class="text-xs text-white/80 leading-relaxed mb-3">
-                            Conception d'applications de bureau avec installeur Windows (NSIS), intégration multi-plateformes et mise à jour automatique.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs">
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Electron.js</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Node.js</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">NSIS</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">PyInstaller</span>
-                        </div>
-                    </div>
-
-                    <!-- Domaine 3 : Données (Dark / Border White) -->
-                    <div class="square-card p-6 border-t-4 border-t-white shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-white/90 mb-1">Données & Sécurité</div>
-                        <h3 class="font-serif text-base font-bold text-white mb-1">Bases de Données Relationnelles</h3>
-                        <p class="text-xs text-white/65 mb-3">SQL, MariaDB, SQLite, SQLAlchemy, Chiffrement</p>
-                        <p class="text-xs text-white/80 leading-relaxed mb-3">
-                            Modélisation relationnelle rigoureuse, transactions sécurisées, hachage Bcrypt et protection contre les vulnérabilités courantes.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs">
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">MariaDB</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">SQLite</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Bcrypt</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">SQLAlchemy</span>
-                        </div>
-                    </div>
-
-                    <!-- Domaine 4 : Bas Niveau (Green) -->
-                    <div class="square-card p-6 border-t-4 border-t-brand-green shadow-md">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-green mb-1">Systèmes & C</div>
-                        <h3 class="font-serif text-base font-bold text-white mb-1">Langage C & Programmation Système</h3>
-                        <p class="text-xs text-white/65 mb-3">Compilateur SimplCT, analyse syntaxique, gestion mémoire</p>
-                        <p class="text-xs text-white/80 leading-relaxed mb-3">
-                            Programmation bas niveau, analyse lexicale et syntaxique (AST), gestion manuelle de la mémoire (malloc/free) et outillage Unix.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 text-xs">
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Langage C</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Compilateur AST</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Pointeurs</span>
-                            <span class="px-2 py-0.5 bg-white/5 border border-white/10 text-white/90 font-mono">Makefile</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Boutons navigation carrés -->
-            <div class="flex flex-wrap items-center justify-center gap-3 pt-4">
-                <a href="/projets.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue shadow-sm">
-                    <span>Consulter les projets</span>
-                </a>
-                <a href="/" class="btn-action px-6 py-3 bg-brand-dark hover:bg-black text-white text-sm border border-nardo-dark">
-                    <span>Retour à l'accueil</span>
-                </a>
-            </div>
-
-        </div>
-
-        <!-- ================= VUE PROJETS ================= -->
-        <div id="view-projects" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
-            
-            <!-- Header Projets -->
-            <div class="text-center mb-10">
-                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                    Projets Réalisés
-                </h1>
-                <p class="text-white/80 text-sm sm:text-base max-w-lg mx-auto mt-2 leading-relaxed">
-                    Sélection d'applications logicielles conçues en autonomie et dans le cadre du cursus d'ingénieur à l'EFREI Paris.
+          </div>
+        </section>
+  
+        <!-- Item 3: CroustyRun -->
+        <section class="v-timeline__section js-v-timeline__section">
+          <div class="v-timeline__marker bg-contrast-high border border-3 border-bg-dark" aria-hidden="true"></div>
+    
+          <div class="v-timeline__items-group">
+            <div class="v-timeline__item bg-light padding-md radius-md shadow-xs" data-theme="default">
+              <div class="v-timeline__date margin-bottom-xs">
+                <time class="v-timeline__date-value text-xs font-semibold color-primary" datetime="2024">2024</time>
+              </div>
+    
+              <div class="text-component">
+                <h3 class="text-md font-bold">CroustyRun — Éco-conception & Benchmark Carbone</h3>
+                <p class="text-xs color-contrast-medium font-semibold">Projet d'Équipe avec M. Belfar, M. Jacques--Llorens & A. Picou</p>
+                <p class="text-sm color-contrast-higher margin-top-xxs">
+                  Création d'un jeu vidéo physique 60 FPS en Python avec instrumentation CodeCarbon (-34% CO2e), profiling des cycles CPU et création artistique 100% Pixel-Art manuel sans IA.
                 </p>
+              </div>
+              <div class="margin-top-sm">
+                <a class="btn btn--subtle btn--sm" href="https://croustyrun.supercraft.tech" target="_blank" rel="noopener noreferrer">Site officiel</a>
+              </div>
             </div>
-
-            <div class="space-y-6">
-                
-                <!-- Projet 1 : BayBay (Accent Cornflower Blue) -->
-                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-blue shadow-lg">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-blue">
-                            Logiciel de Gestion Locative • v4.0
-                        </div>
-                        <div class="text-xs text-white/70 font-mono">
-                            Auteur : <span class="font-semibold text-white">Malik Bouaissi</span>
-                        </div>
-                    </div>
-
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2">
-                        BayBay — Plateforme SaaS & Application Bureau
-                    </h2>
-                    
-                    <p class="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                        Suite logicielle complète de gestion immobilière conçue pour les bailleurs particuliers et les SCI. Le système fonctionne en environnement hybride : une application de bureau Windows autonome (Electron.js + serveur local) et une plateforme SaaS connectée avec synchronisation, génération de quittances conformes à la loi ALUR et envoi automatisé des avis d'échéance par email.
-                    </p>
-
-                    <div class="p-4 bg-white/5 border border-white/10 text-xs text-white/85 mb-5 space-y-1.5">
-                        <div class="font-bold text-white mb-1">Architecture & Caractéristiques :</div>
-                        <ul class="space-y-1 pl-1 text-white/75">
-                            <li>• Modèle relationnel complet sous SQLAlchemy (bailleurs, biens, baux, locataires, états des lieux).</li>
-                            <li>• Moteur d'export PDF conforme à la réglementation ALUR avec identifiant unique vérifiable en ligne.</li>
-                            <li>• Déploiement serveur continu sur Debian sous Nginx, Gunicorn et certificats SSL Cloudflare.</li>
-                        </ul>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://baybay.mb-site.com" target="_blank" class="btn-action px-4 py-2 bg-brand-blue hover:bg-[#4d7bc9] text-white text-xs border border-brand-blue shadow-sm">
-                            <span>Accéder à BayBay</span>
-                        </a>
-                        <a href="https://github.com/mlk0622/BayBay" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs border border-white/30">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                            </svg>
-                            <span>Dépôt GitHub</span>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Projet 2 : SimplCT (Accent Rouge) -->
-                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-red shadow-lg">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-red">
-                            Projet Systèmes & Compilation en C
-                        </div>
-                        <div class="text-xs text-white/70 font-mono">
-                            Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a> & 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>
-                        </div>
-                    </div>
-
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2">
-                        SimplCT — Compilateur & Arbre Syntaxique (AST)
-                    </h2>
-                    
-                    <p class="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                        Conception et implémentation intégrale d'un compilateur pour un sous-ensemble du langage C. Le projet couvre l'analyse lexicale avec tokenisation, l'analyse syntaxique avec construction d'un arbre de syntaxe abstraite (AST), le contrôle des types, la gestion d'une table des symboles hiérarchique et l'exécution mémoire.
-                    </p>
-
-                    <div class="p-4 bg-white/5 border border-white/10 text-xs text-white/85 mb-5 space-y-1.5">
-                        <div class="font-bold text-white mb-1">Concepts & Aspects techniques :</div>
-                        <ul class="space-y-1 pl-1 text-white/75">
-                            <li>• Analyseur lexical (Lexer) et parseur grammatical descendant récursif.</li>
-                            <li>• Représentation intermédiaire sous forme d'AST et vérifications sémantiques.</li>
-                            <li>• Gestion manuelle et rigoureuse de la mémoire sans fuite (valgrind / allocateurs C).</li>
-                        </ul>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/wassity/simplCT" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs border border-white/30">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                            </svg>
-                            <span>Voir SimplCT sur GitHub</span>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Projet 3 : CroustyRun (Accent Vert Success) -->
-                <article class="square-card p-6 sm:p-8 border-l-4 border-l-brand-green shadow-lg">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-brand-green">
-                            Simulation Physique & Écologie (Python)
-                        </div>
-                        <div class="text-xs text-white/70 font-mono">
-                            Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a>, 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>, 
-                            <a href="https://github.com/stevi2007" target="_blank" class="font-semibold text-brand-blue hover:underline">Antoine Picou</a> & 
-                            <a href="https://github.com/SuperCraft3M" target="_blank" class="font-semibold text-brand-blue hover:underline">Mathis Jacques--Llorens</a>
-                        </div>
-                    </div>
-
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2">
-                        CroustyRun — Simulation Physique & Jeu Éducatif
-                    </h2>
-                    
-                    <p class="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                        Jeu vidéo éducatif et écologique développé en <strong>Python</strong>, conçu pour sensibiliser de manière ludique les enfants aux enjeux du tri des déchets et de l'empreinte carbone à travers une simulation physique interactive. Le projet intègre une démarche complète d'<strong>éco-conception logicielle</strong> (réduction mesurée de -34% de CO2e via CodeCarbon), des graphismes Pixel-Art faits main et un moteur cadencé à 60 FPS constants.
-                    </p>
-
-                    <div class="p-4 bg-white/5 border border-white/10 text-xs text-white/85 mb-5 space-y-1.5">
-                        <div class="font-bold text-white mb-1">Moteur & Éco-conception :</div>
-                        <ul class="space-y-1 pl-1 text-white/75">
-                            <li>• Moteur physique en Python : gravité continue, calcul des trajectoires, échelles et détection précise des collisions (hitbox).</li>
-                            <li>• Mesure d'empreinte avec <em>CodeCarbon</em> : baisse de la consommation de 18.5 Wh/h à 12.2 Wh/h (-34% de CO2e) et culling du rendu hors-champ.</li>
-                            <li>• Résolution native 1280×720 à 60 FPS constants sans surcharge de ressources.</li>
-                        </ul>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/SuperCraft3M/CroustyRun" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs border border-white/30">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                            </svg>
-                            <span>Dépôt GitHub</span>
-                        </a>
-                        <a href="https://croustyrun.supercraft.tech" target="_blank" class="btn-action px-4 py-2 bg-brand-blue/20 hover:bg-brand-blue/30 text-white text-xs border border-brand-blue/40">
-                            <span>Site officiel & Démo</span>
-                        </a>
-                    </div>
-                </article>
-
-                <!-- Projet 4 : Poudelard (Accent Blanc / Argent) -->
-                <article class="square-card p-6 sm:p-8 border-l-4 border-l-white shadow-lg">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                        <div class="text-xs font-mono font-semibold uppercase tracking-wider text-white/90">
-                            Projet Académique EFREI Paris • SC1
-                        </div>
-                        <div class="text-xs text-white/70 font-mono">
-                            Équipe : 
-                            <a href="https://github.com/wassity" target="_blank" class="font-semibold text-brand-blue hover:underline">Mohammed Belfar</a> & 
-                            <a href="https://github.com/mlk0622" target="_blank" class="font-semibold text-brand-blue hover:underline">Malik Bouaissi</a>
-                        </div>
-                    </div>
-
-                    <h2 class="font-serif text-xl sm:text-2xl font-bold text-white mb-2">
-                        Poudelard — Simulation & Logique Objet
-                    </h2>
-                    
-                    <p class="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
-                        Projet académique de programmation orientée objet et d'ingénierie logicielle réalisé à l'EFREI Paris. Modélisation complète d'un environnement interactif avec gestion des entités, hiérarchie de classes, boucle d'événements et structures de données avancées.
-                    </p>
-
-                    <div class="p-4 bg-white/5 border border-white/10 text-xs text-white/85 mb-5 space-y-1.5">
-                        <div class="font-bold text-white mb-1">Principes mis en œuvre :</div>
-                        <ul class="space-y-1 pl-1 text-white/75">
-                            <li>• Encapsulation, héritage, polymorphisme et modularité du code.</li>
-                            <li>• Traitement dynamique des événements et des flux de simulation.</li>
-                            <li>• Organisation propre des modules et collaboration en binôme sous Git.</li>
-                        </ul>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-3">
-                        <a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" class="btn-action gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs border border-white/30">
-                            <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                            </svg>
-                            <span>Voir Poudelard sur GitHub</span>
-                        </a>
-                    </div>
-                </article>
-
+          </div>
+        </section>
+  
+        <!-- Item 4: BayBay v4.0 -->
+        <section class="v-timeline__section js-v-timeline__section">
+          <div class="v-timeline__marker bg-contrast-high border border-3 border-bg-dark" aria-hidden="true"></div>
+    
+          <div class="v-timeline__items-group">
+            <div class="v-timeline__item bg-light padding-md radius-md shadow-xs" data-theme="default">
+              <div class="v-timeline__date margin-bottom-xs">
+                <time class="v-timeline__date-value text-xs font-semibold color-primary" datetime="2023">2023 — 2024</time>
+              </div>
+    
+              <div class="text-component">
+                <h3 class="text-md font-bold">BayBay v4.0 — Suite Logicielle Hybride en Production</h3>
+                <p class="text-xs color-contrast-medium font-semibold">Application Desktop Windows & Plateforme SaaS Cloud</p>
+                <p class="text-sm color-contrast-higher margin-top-xxs">
+                  Développement et packaging d'une solution de gestion locative immobilière : génération ALUR, signature SHA-256, automatisation SMTP, configuration serveur dédié Linux Nginx et reverse proxy.
+                </p>
+              </div>
+              <div class="margin-top-sm">
+                <a class="btn btn--primary btn--sm" href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer">Accéder au SaaS</a>
+              </div>
             </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
 
-            <!-- Boutons navigation carrés -->
-            <div class="flex flex-wrap items-center justify-center gap-3 pt-8">
-                <a href="/apropos.html" class="btn-action px-6 py-3 bg-brand-blue hover:bg-[#4d7bc9] text-white text-sm border border-brand-blue shadow-sm">
-                    <span>En savoir plus à propos de moi</span>
-                </a>
-                <a href="/" class="btn-action px-6 py-3 bg-brand-dark hover:bg-black text-white text-sm border border-nardo-dark">
-                    <span>Retour à l'accueil</span>
-                </a>
+  <!-- ==================== SKILLS / COMPÉTENCES (LIST-V2) ==================== -->
+  <section id="competences" class="margin-y-xxl">
+    <div class="container max-width-adaptive-lg">
+      <div class="text-center margin-bottom-lg">
+        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Savoir-Faire & Outils</span>
+        <h2 class="text-xxl font-primary margin-top-xxs">Compétences Techniques</h2>
+      </div>
+
+      <div class="grid gap-md">
+        <div class="col-6@md">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100%">
+            <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+              <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">01</span>
+              Systèmes & Programmation Bas-Niveau
+            </h3>
+            <p class="text-sm color-contrast-medium margin-bottom-sm">
+              Conception d'architectures proches du matériel, gestion manuelle de la mémoire et compilation.
+            </p>
+            <div class="flex flex-wrap gap-xxs">
+              <span class="badge badge--subtle">C (C99 / C11)</span>
+              <span class="badge badge--subtle">Makefile</span>
+              <span class="badge badge--subtle">Valgrind (0 leak)</span>
+              <span class="badge badge--subtle">GDB</span>
+              <span class="badge badge--subtle">Assembleur x86</span>
+              <span class="badge badge--subtle">Linux / Bash</span>
             </div>
-
+          </div>
         </div>
 
-    </main>
-
-    <!-- Footer carré structuré Dark Blue -->
-    <footer class="mt-auto flex-shrink-0 border-t border-nardo-dark bg-brand-dark text-xs text-white/70">
-        <div class="max-w-5xl mx-auto py-6 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2.5">
-                <img src="/favicon.png" alt="Logo MB" class="w-5 h-5 rounded-none object-contain border border-nardo-dark">
-                <span class="font-serif font-bold text-white">Malik B.</span>
-                <span>— © 2026 mb-site.com. Tous droits réservés.</span>
+        <div class="col-6@md">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100%">
+            <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+              <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">02</span>
+              Ingénierie Logicielle & Backend
+            </h3>
+            <p class="text-sm color-contrast-medium margin-bottom-sm">
+              Développement d'APIs, manipulation de données relationnelles et architectures événementielles.
+            </p>
+            <div class="flex flex-wrap gap-xxs">
+              <span class="badge badge--subtle">Python</span>
+              <span class="badge badge--subtle">FastAPI / REST</span>
+              <span class="badge badge--subtle">SQLite</span>
+              <span class="badge badge--subtle">PostgreSQL</span>
+              <span class="badge badge--subtle">POO Avancée</span>
+              <span class="badge badge--subtle">ReportLab / PDF</span>
             </div>
-            <div class="flex items-center gap-3 sm:gap-5 flex-wrap justify-center text-xs">
-                <a href="/" class="nav-link-accueil hover:text-white transition-colors">Accueil</a>
-                <a href="/projets.html" class="nav-link-projets hover:text-white transition-colors">Projets</a>
-                <a href="/apropos.html" class="nav-link-apropos hover:text-white transition-colors">À propos</a>
-                <a href="https://baybay.mb-site.com" target="_blank" class="hover:text-white transition-colors">BayBay</a>
-                <a href="https://github.com/mlk0622" target="_blank" class="hover:text-white transition-colors inline-flex items-center gap-1 font-medium">
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                    </svg>
-                    <span>GitHub</span>
-                </a>
-                <a href="mailto:contact@mb-site.com" class="hover:text-white transition-colors">Contact</a>
-            </div>
+          </div>
         </div>
-    </footer>
 
-    <!-- Script de transition SPA fluide & instantané -->
-    <script>
-        (function() {
-            const homeView = document.getElementById('view-home');
-            const projectsView = document.getElementById('view-projects');
-            const aboutView = document.getElementById('view-about');
-            
-            const views = {
-                'accueil': homeView,
-                'projets': projectsView,
-                'apropos': aboutView
-            };
+        <div class="col-6@md">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100%">
+            <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+              <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">03</span>
+              Applications Hybrides & Web
+            </h3>
+            <p class="text-sm color-contrast-medium margin-bottom-sm">
+              Applications de bureau multiplateformes, interfaces soignées et déploiement d'infrastructures.
+            </p>
+            <div class="flex flex-wrap gap-xxs">
+              <span class="badge badge--subtle">Electron.js</span>
+              <span class="badge badge--subtle">JavaScript</span>
+              <span class="badge badge--subtle">HTML5 / Modern CSS</span>
+              <span class="badge badge--subtle">CodyFrame Framework</span>
+              <span class="badge badge--subtle">Nginx</span>
+              <span class="badge badge--subtle">Git / GitHub</span>
+            </div>
+          </div>
+        </div>
 
-            const navAccueilLinks = document.querySelectorAll('.nav-link-accueil');
-            const navProjetsLinks = document.querySelectorAll('.nav-link-projets');
-            const navAproposLinks = document.querySelectorAll('.nav-link-apropos');
-            let isAnimating = false;
+        <div class="col-6@md">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100%">
+            <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+              <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">04</span>
+              Éco-Conception & Méthodes
+            </h3>
+            <p class="text-sm color-contrast-medium margin-bottom-sm">
+              Optimisation des cycles de calcul, audit de consommation énergétique et travail collaboratif.
+            </p>
+            <div class="flex flex-wrap gap-xxs">
+              <span class="badge badge--subtle">CodeCarbon (-34% CO2e)</span>
+              <span class="badge badge--subtle">Green IT</span>
+              <span class="badge badge--subtle">Profiling CPU / RAM</span>
+              <span class="badge badge--subtle">Tests Unitaires</span>
+              <span class="badge badge--subtle">CI/CD Git</span>
+              <span class="badge badge--subtle">Revues de Code</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-            function setNavHighlight(activeTab) {
-                const allLinks = [
-                    { links: navAccueilLinks, tab: 'accueil' },
-                    { links: navProjetsLinks, tab: 'projets' },
-                    { links: navAproposLinks, tab: 'apropos' }
-                ];
+  <!-- ==================== CALL TO ACTION / BANNER ==================== -->
+  <section class="position-relative z-index-1 padding-top-xl padding-bottom-xl bg-contrast-lower bg-opacity-20%">
+    <div class="container max-width-adaptive-lg text-center">
+      <div class="text-xl text-xxl@md font-bold margin-bottom-sm">
+        <p class="color-contrast-higher font-primary">Curieux d'en savoir plus sur mes travaux ?</p>
+        <p class="color-contrast-medium font-secondary text-md margin-top-xxs">
+          Découvrez le code source complet de mes projets sur GitHub ou testez directement la suite BayBay v4.0.
+        </p>
+      </div>
+      <div class="flex flex-wrap flex-center gap-sm">
+        <a class="btn btn--primary" href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer">Accéder à BayBay SaaS</a>
+        <a class="btn btn--subtle" href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer">Consulter mon GitHub</a>
+      </div>
+    </div>
+  </section>
 
-                allLinks.forEach(({ links, tab }) => {
-                    const isActive = (tab === activeTab);
-                    links.forEach(link => {
-                        if (isActive) {
-                            link.classList.remove('text-white/80', 'hover:bg-white/10');
-                            link.classList.add('bg-brand-blue', 'text-white', 'font-semibold');
-                        } else {
-                            link.classList.remove('bg-brand-blue', 'text-white', 'font-semibold');
-                            link.classList.add('text-white/80', 'hover:bg-white/10');
-                        }
-                    });
-                });
-            }
+  <!-- ==================== CONTACT SECTION ==================== -->
+  <section id="contact" class="newsletter padding-y-xxl text-center" data-theme="soft">
+    <div class="container max-width-sm position-relative z-index-2">
+      <div class="text-component margin-bottom-md">
+        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Prendre Contact</span>
+        <h2 class="text-xxl font-primary">Échangeons Ensemble</h2>
+        <p class="color-contrast-medium text-md">
+          Étudiant ingénieur disponible pour des opportunités de stage, des échanges techniques ou des collaborations sur des projets ambitieux.
+        </p>
+      </div>
+  
+      <div class="flex flex-wrap flex-center gap-sm margin-top-md">
+        <a class="btn btn--primary" href="mailto:contact@mb-site.com">
+          <svg class="icon margin-right-xxs" viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5h-13a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1z"/><polyline points="15.5 4.5 8 9.5 0.5 4.5"/></g></svg>
+          contact@mb-site.com
+        </a>
+        <a class="btn btn--subtle" href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer">
+          <svg class="icon margin-right-xxs" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+          Profil GitHub
+        </a>
+      </div>
+    </div>
 
-            function getActiveViewKey() {
-                if (projectsView && !projectsView.classList.contains('view-hidden')) return 'projets';
-                if (aboutView && !aboutView.classList.contains('view-hidden')) return 'apropos';
-                return 'accueil';
-            }
+    <!-- Background decoration -->
+    <figure class="bg-decoration z-index-1" aria-hidden="true">
+      <svg class="bg-decoration__svg color-contrast-higher opacity-70%" viewBox="0 0 1920 450" fill="none">
+        <rect opacity="0.5" x="610.131" y="-440" width="128" height="836.003" transform="rotate(46.8712 610.131 -440)" fill="url(#bg-dec-contact)" />
+        <defs>
+          <linearGradient id="bg-dec-contact" x1="674.131" y1="-440" x2="674.131" y2="396.003" gradientUnits="userSpaceOnUse">
+            <stop stop-color="currentColor" />
+            <stop offset="1" stop-color="currentColor" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </figure>
+  </section>
 
-            function transitionTo(targetView, updateHistory = true, instant = false) {
-                if (!views[targetView]) targetView = 'accueil';
-                if (isAnimating) return;
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="main-footer position-relative z-index-1 padding-top-xl bg-contrast-lower bg-opacity-20%">
+    <div class="container max-width-lg">
+      <div class="grid gap-lg">
+        <div class="col-4@lg order-2@lg text-right@lg">
+          <a class="main-footer__logo inline-flex items-center gap-xxs text-decoration-none" href="index.html">
+            <span class="inline-flex items-center justify-center width-md height-md radius-50% bg-primary text-sm font-bold color-white">MB</span>
+            <span class="text-md font-bold color-contrast-higher">Malik Bouaissi</span>
+          </a>
+          <p class="text-xs color-contrast-medium margin-top-xs">
+            Étudiant en 2ème année à l'EFREI Paris (Promo 2029). Spécialiste ingénierie logicielle, systèmes et compilateurs.
+          </p>
+        </div>
+        
+        <nav class="col-8@lg order-1@lg">
+          <ul class="grid gap-lg">
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Projets</h4>
+              <ul class="grid gap-xs text-sm">
+                <li><a href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer" class="main-footer__link">BayBay v4.0 (SaaS)</a></li>
+                <li><a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="main-footer__link">BayBay (GitHub)</a></li>
+                <li><a href="https://github.com/wassity/simplCT" target="_blank" rel="noopener noreferrer" class="main-footer__link">SimplCT (Compilateur C)</a></li>
+                <li><a href="https://croustyrun.supercraft.tech" target="_blank" rel="noopener noreferrer" class="main-footer__link">CroustyRun (Éco-jeu)</a></li>
+                <li><a href="https://github.com/wassity/poudelard-belfar-bouaissi-sc1" target="_blank" rel="noopener noreferrer" class="main-footer__link">Poudelard (Simulation)</a></li>
+              </ul>
+            </li>
+  
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Navigation</h4>
+              <ul class="grid gap-xs text-sm">
+                <li><a href="#hero" class="main-footer__link">Accueil</a></li>
+                <li><a href="#projets" class="main-footer__link">Réalisations</a></li>
+                <li><a href="#parcours" class="main-footer__link">Parcours & EFREI</a></li>
+                <li><a href="#competences" class="main-footer__link">Compétences</a></li>
+                <li><a href="#contact" class="main-footer__link">Contact</a></li>
+              </ul>
+            </li>
+  
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Liens Externes</h4>
+              <ul class="grid gap-xs text-sm">
+                <li><a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="main-footer__link">GitHub @mlk0622</a></li>
+                <li><a href="https://www.efrei.fr" target="_blank" rel="noopener noreferrer" class="main-footer__link">EFREI Paris</a></li>
+                <li><a href="mailto:contact@mb-site.com" class="main-footer__link">Email Direct</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    
+      <div class="flex flex-column border-top padding-y-xs margin-top-lg flex-row@md justify-between@md items-center@md">
+        <div class="margin-bottom-sm margin-bottom-0@md">
+          <div class="text-sm text-xs@md color-contrast-medium flex flex-wrap gap-xs">
+            <span>&copy; 2024–2026 Malik Bouaissi. Tous droits réservés.</span>
+            <span>EFREI Paris Promo 2029</span>
+          </div>
+        </div>
+  
+        <div class="flex items-center gap-xs">
+          <a href="https://github.com/mlk0622" target="_blank" rel="noopener noreferrer" class="main-footer__social" aria-label="GitHub">
+            <svg class="icon block" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
-                const currentKey = getActiveViewKey();
-                const currentEl = views[currentKey];
-                const nextEl = views[targetView];
-
-                // Titre dynamique
-                if (targetView === 'projets') {
-                    document.title = "Projets — Malik B. (mb-site.com)";
-                } else if (targetView === 'apropos') {
-                    document.title = "À Propos — Malik B. (mb-site.com)";
-                } else {
-                    document.title = "Malik B. — mb-site.com";
-                }
-
-                setNavHighlight(targetView);
-
-                const targetHash = (targetView === 'projets') ? '#projets' : ((targetView === 'apropos') ? '#apropos' : '');
-                
-                // Déjà sur la vue demandée
-                if (currentKey === targetView && !nextEl.classList.contains('view-hidden')) {
-                    window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
-                    if (updateHistory) {
-                        history.pushState({ view: targetView }, '', targetHash || '/');
-                    }
-                    return;
-                }
-
-                if (instant) {
-                    Object.values(views).forEach(el => {
-                        if (el) {
-                            el.classList.add('view-hidden');
-                            el.classList.remove('view-visible');
-                        }
-                    });
-                    nextEl.classList.remove('view-hidden');
-                    nextEl.classList.add('view-visible');
-                    window.scrollTo(0, 0);
-                    return;
-                }
-
-                isAnimating = true;
-                
-                // Saut instantané à 0
-                document.documentElement.style.scrollBehavior = 'auto';
-                window.scrollTo(0, 0);
-
-                currentEl.style.opacity = '0';
-                currentEl.style.transform = 'translateY(-3px)';
-
-                setTimeout(() => {
-                    Object.values(views).forEach(el => {
-                        if (el) {
-                            el.classList.add('view-hidden');
-                            el.classList.remove('view-visible');
-                            el.style.opacity = '';
-                            el.style.transform = '';
-                        }
-                    });
-
-                    nextEl.classList.remove('view-hidden');
-                    nextEl.classList.add('view-visible');
-                    nextEl.style.opacity = '0';
-                    nextEl.style.transform = 'translateY(4px)';
-
-                    void nextEl.offsetWidth; // Force reflow
-
-                    nextEl.style.opacity = '1';
-                    nextEl.style.transform = 'translateY(0)';
-
-                    window.scrollTo(0, 0);
-                    document.documentElement.style.scrollBehavior = '';
-
-                    setTimeout(() => {
-                        nextEl.style.opacity = '';
-                        nextEl.style.transform = '';
-                        isAnimating = false;
-                    }, 150);
-
-                    if (updateHistory) {
-                        history.pushState({ view: targetView }, '', targetHash || '/');
-                    }
-                }, 100);
-            }
-
-            // Intercepter tous les clics de liens internes
-            document.addEventListener('click', function(e) {
-                const link = e.target.closest('a');
-                if (!link) return;
-
-                const href = link.getAttribute('href');
-                if (!href) return;
-
-                if (href === '/projets.html' || href === 'projets.html' || href === '#projets' || href === '/#projets') {
-                    e.preventDefault();
-                    transitionTo('projets', true);
-                } else if (href === '/apropos.html' || href === 'apropos.html' || href === '/a-propos.html' || href === '#apropos' || href === '/#apropos' || href === '#section-apropos') {
-                    e.preventDefault();
-                    transitionTo('apropos', true);
-                } else if (href === '/' || href === '/index.html' || href === '#accueil' || href === '/#accueil') {
-                    e.preventDefault();
-                    transitionTo('accueil', true);
-                }
-            });
-
-            // Navigation Précédent / Suivant
-            window.addEventListener('popstate', function(e) {
-                const hash = window.location.hash;
-                if (hash === '#projets') {
-                    transitionTo('projets', false);
-                } else if (hash === '#apropos') {
-                    transitionTo('apropos', false);
-                } else {
-                    transitionTo('accueil', false);
-                }
-            });
-
-            // Initialisation au chargement de la page
-            const initialHash = window.location.hash;
-            const path = window.location.pathname;
-            if (initialHash === '#projets' || path.includes('projets')) {
-                transitionTo('projets', false, true);
-            } else if (initialHash === '#apropos' || path.includes('apropos') || path.includes('a-propos')) {
-                transitionTo('apropos', false, true);
-            } else {
-                setNavHighlight('accueil');
-            }
-        })();
-    </script>
+  <script src="assets/js/scripts.js"></script>
 </body>
 </html>
