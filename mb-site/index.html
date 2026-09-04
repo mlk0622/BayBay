@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/favicon.png">
 
-    <!-- Google Fonts : Google Sans & Roboto -->
+    <!-- Google Fonts : Open Sans & Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -23,11 +23,15 @@
                 extend: {
                     colors: {
                         google: {
-                            blue: '#1a73e8',
+                            blue: '#4285F4',
+                            blueDark: '#1a73e8',
                             blueHover: '#1557d0',
-                            blueActive: '#174ea6',
-                            blueLight: '#e8f0fe',
-                            blueDark: '#1967d2',
+                            red: '#EA4335',
+                            redDark: '#d93025',
+                            yellow: '#FBBC05',
+                            yellowDark: '#b06000',
+                            green: '#34A853',
+                            greenDark: '#188038',
                             gray50: '#f8f9fa',
                             gray100: '#f1f3f4',
                             gray200: '#e8eaed',
@@ -124,14 +128,30 @@
 </head>
 <body class="min-h-screen min-h-[100dvh] flex flex-col bg-white text-google-gray900">
 
+    <!-- Ligne 4 couleurs signature Google -->
+    <div class="h-1 w-full flex flex-shrink-0">
+        <div class="h-full flex-1 bg-google-blue"></div>
+        <div class="h-full flex-1 bg-google-red"></div>
+        <div class="h-full flex-1 bg-google-yellow"></div>
+        <div class="h-full flex-1 bg-google-green"></div>
+    </div>
+
     <!-- Google-style Minimal Header -->
-    <header class="sticky top-0 z-50 bg-white border-b border-google-gray300 flex-shrink-0">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-google-gray300 flex-shrink-0">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
             
-            <!-- Brand avec Logo MB -->
-            <a href="/" class="flex items-center gap-3">
+            <!-- Brand avec Logo MB & points de couleur Google -->
+            <a href="/" class="flex items-center gap-3 group">
                 <img src="/favicon.png" alt="Logo MB" class="w-8 h-8 rounded-lg object-contain border border-google-gray300">
-                <span class="text-base sm:text-lg font-medium tracking-tight text-google-gray900">Malik B.</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-base sm:text-lg font-medium tracking-tight text-google-gray900">Malik B.</span>
+                    <div class="hidden sm:flex items-center gap-1 opacity-80">
+                        <span class="w-1.5 h-1.5 rounded-full bg-google-blue"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-google-red"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-google-yellow"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-google-green"></span>
+                    </div>
+                </div>
             </a>
 
             <!-- Navigation sobre -->
@@ -159,24 +179,21 @@
     <main class="flex-1 flex flex-col w-full">
 
         <!-- ================= VUE ACCUEIL ================= -->
-        <div id="view-home" class="view-section view-visible flex-1 flex flex-col justify-center py-8 sm:py-14 w-full">
+        <div id="view-home" class="view-section view-visible flex-1 flex flex-col justify-center py-10 sm:py-16 w-full">
 
-            <!-- HERO SECTION -->
+            <!-- HERO SECTION (Sans pilule artificielle) -->
             <section class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-                
-                <span class="inline-block text-xs font-medium text-google-blueDark bg-google-blueLight px-3 py-1 rounded-full border border-blue-100">
-                    Étudiant @ EFREI Paris • Promo 2029
-                </span>
 
-                <h1 class="text-3xl sm:text-5xl font-medium text-google-gray900 mt-5 mb-4 tracking-tight leading-tight">
-                    Conception et développement de logiciels fiables et performants.
+                <h1 class="text-3xl sm:text-5xl font-medium text-google-gray900 tracking-tight leading-tight mb-4">
+                    Conception de <span class="text-google-blue">logiciels</span>, <br class="hidden sm:inline">
+                    systèmes <span class="text-google-green">fiables</span> & <span class="text-google-red">performants</span>.
                 </h1>
 
                 <p class="text-base sm:text-lg text-google-gray700 max-w-2xl mx-auto leading-relaxed mb-8">
-                    Étudiant en 2ème année à l'EFREI Paris, je conçois et réalise des applications concrètes, des outils système et des architectures web en privilégiant la rigueur technique, la clarté du code et l'ergonomie.
+                    Étudiant en 2ème année à l'EFREI Paris (Promo 2029), je conçois et réalise des applications concrètes, des outils système et des architectures web en privilégiant la rigueur technique, la clarté du code et l'ergonomie.
                 </p>
 
-                <!-- Boutons d'action rapides Google style -->
+                <!-- Boutons d'action Google style -->
                 <div class="flex flex-wrap items-center justify-center gap-3">
                     <a href="/projets.html" class="inline-flex items-center px-6 py-2.5 rounded-full bg-google-blue hover:bg-google-blueHover text-white text-sm font-medium transition-all shadow-sm">
                         <span>Consulter les projets</span>
@@ -188,28 +205,31 @@
 
             </section>
 
-            <!-- APERÇU RAPIDE & PILIERS -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 w-full">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- APERÇU RAPIDE & 3 PILIERS AUX COULEURS DE GOOGLE -->
+            <section class="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     
-                    <div class="google-card p-6">
-                        <div class="text-xs font-medium uppercase tracking-wider text-google-blueDark mb-2">Formation académique</div>
+                    <!-- Carte 1 : Bleu Google -->
+                    <div class="google-card p-6 border-t-4 border-t-google-blue">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark mb-2">Formation académique</div>
                         <h2 class="text-base font-medium text-google-gray900 mb-2">EFREI Paris</h2>
                         <p class="text-xs text-google-gray700 leading-relaxed">
                             École d'ingénieurs du numérique. Bases algorithmiques solides, programmation système en C, structures de données et gestion de projets.
                         </p>
                     </div>
 
-                    <div class="google-card p-6">
-                        <div class="text-xs font-medium uppercase tracking-wider text-google-blueDark mb-2">Réalisations concrètes</div>
+                    <!-- Carte 2 : Vert Google -->
+                    <div class="google-card p-6 border-t-4 border-t-google-green">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark mb-2">Réalisations concrètes</div>
                         <h2 class="text-base font-medium text-google-gray900 mb-2">Projets logiciels</h2>
                         <p class="text-xs text-google-gray700 leading-relaxed">
                             Développement d'outils réels comme BayBay (suite logicielle de gestion locative v4.0), compilateur en langage C et simulations interactives.
                         </p>
                     </div>
 
-                    <div class="google-card p-6">
-                        <div class="text-xs font-medium uppercase tracking-wider text-google-blueDark mb-2">Méthodologie</div>
+                    <!-- Carte 3 : Rouge Google -->
+                    <div class="google-card p-6 border-t-4 border-t-google-red">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark mb-2">Méthodologie</div>
                         <h2 class="text-base font-medium text-google-gray900 mb-2">Qualité & Rigueur</h2>
                         <p class="text-xs text-google-gray700 leading-relaxed">
                             Conception modulaire, optimisation des performances, respect des standards de sécurité et gestion collaborative avec Git.
@@ -222,13 +242,10 @@
         </div>
 
         <!-- ================= VUE À PROPOS ================= -->
-        <div id="view-about" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 w-full">
+        <div id="view-about" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
             
-            <!-- Header À Propos -->
+            <!-- Header À Propos (Sans pilule artificielle) -->
             <div class="text-center mb-10">
-                <span class="inline-block text-xs font-medium text-google-blueDark bg-google-blueLight px-3 py-1 rounded-full border border-blue-100 mb-3">
-                    Présentation & Parcours
-                </span>
                 <h1 class="text-3xl sm:text-4xl font-medium text-google-gray900 tracking-tight">
                     À Propos de Malik B.
                 </h1>
@@ -238,7 +255,7 @@
             </div>
 
             <!-- Carte Profil -->
-            <div class="google-card p-6 sm:p-8 mb-8">
+            <div class="google-card p-6 sm:p-8 mb-8 border-l-4 border-l-google-blue">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-google-gray200">
                     <img src="/favicon.png" alt="Malik B." class="w-16 h-16 rounded-xl object-contain border border-google-gray300 flex-shrink-0">
                     <div class="text-center sm:text-left">
@@ -262,14 +279,16 @@
                 </div>
             </div>
 
-            <!-- Piliers techniques -->
+            <!-- 4 Piliers techniques aux 4 couleurs Google -->
             <div class="mb-10">
                 <h2 class="text-xl font-medium text-google-gray900 mb-4">Domaines de compétences</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <div class="google-card p-6">
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Web & Architectures API</h3>
+                    <!-- Pilier 1 : Bleu -->
+                    <div class="google-card p-6 border-t-4 border-t-google-blue">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark mb-1">Web & API</div>
+                        <h3 class="text-base font-medium text-google-gray900 mb-1">Architectures Web & REST</h3>
                         <p class="text-xs text-google-gray600 mb-3">Python/Flask, PHP, JavaScript ES6+, API REST</p>
                         <p class="text-xs text-google-gray700 leading-relaxed mb-3">
                             Développement de backends robustes, gestion des sessions, sécurisation des accès et interfaces dynamiques.
@@ -282,8 +301,10 @@
                         </div>
                     </div>
 
-                    <div class="google-card p-6">
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Applications Desktop & Ergonomie</h3>
+                    <!-- Pilier 2 : Rouge -->
+                    <div class="google-card p-6 border-t-4 border-t-google-red">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark mb-1">Desktop & Client</div>
+                        <h3 class="text-base font-medium text-google-gray900 mb-1">Applications Bureau & Ergonomie</h3>
                         <p class="text-xs text-google-gray600 mb-3">Electron.js, packaging natif, synchronisation locale/cloud</p>
                         <p class="text-xs text-google-gray700 leading-relaxed mb-3">
                             Conception d'applications de bureau avec installeur Windows (NSIS), intégration multi-plateformes et mise à jour automatique.
@@ -296,8 +317,10 @@
                         </div>
                     </div>
 
-                    <div class="google-card p-6">
-                        <h3 class="text-base font-medium text-google-gray900 mb-1">Bases de Données & Sécurité</h3>
+                    <!-- Pilier 3 : Jaune -->
+                    <div class="google-card p-6 border-t-4 border-t-google-yellow">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-yellowDark mb-1">Données & Sécurité</div>
+                        <h3 class="text-base font-medium text-google-gray900 mb-1">Bases de Données Relationnelles</h3>
                         <p class="text-xs text-google-gray600 mb-3">SQL, MariaDB, SQLite, SQLAlchemy, Chiffrement</p>
                         <p class="text-xs text-google-gray700 leading-relaxed mb-3">
                             Modélisation relationnelle rigoureuse, transactions sécurisées, hachage Bcrypt et protection contre les vulnérabilités courantes.
@@ -310,7 +333,9 @@
                         </div>
                     </div>
 
-                    <div class="google-card p-6">
+                    <!-- Pilier 4 : Vert -->
+                    <div class="google-card p-6 border-t-4 border-t-google-green">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark mb-1">Bas Niveau</div>
                         <h3 class="text-base font-medium text-google-gray900 mb-1">Langage C & Programmation Système</h3>
                         <p class="text-xs text-google-gray600 mb-3">Compilateur SimplCT, analyse syntaxique, gestion mémoire</p>
                         <p class="text-xs text-google-gray700 leading-relaxed mb-3">
@@ -340,13 +365,10 @@
         </div>
 
         <!-- ================= VUE PROJETS ================= -->
-        <div id="view-projects" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 w-full">
+        <div id="view-projects" class="view-section view-hidden max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 w-full">
             
-            <!-- Header Projets -->
+            <!-- Header Projets (Sans pilule artificielle) -->
             <div class="text-center mb-10">
-                <span class="inline-block text-xs font-medium text-google-blueDark bg-google-blueLight px-3 py-1 rounded-full border border-blue-100 mb-3">
-                    Portfolio & Réalisations
-                </span>
                 <h1 class="text-3xl sm:text-4xl font-medium text-google-gray900 tracking-tight">
                     Projets Réalisés
                 </h1>
@@ -357,12 +379,12 @@
 
             <div class="space-y-6">
                 
-                <!-- Projet 1 : BayBay -->
-                <article class="google-card p-6 sm:p-8">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span class="px-2.5 py-0.5 rounded-full bg-blue-50 text-google-blueDark border border-blue-100 text-xs font-medium">
+                <!-- Projet 1 : BayBay (Bleu Google) -->
+                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-blue">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-blueDark">
                             Logiciel de Gestion Locative • v4.0
-                        </span>
+                        </div>
                         <div class="text-xs text-google-gray600">
                             Auteur : <span class="font-medium text-google-gray800">Malik Bouaissi</span>
                         </div>
@@ -398,12 +420,12 @@
                     </div>
                 </article>
 
-                <!-- Projet 2 : SimplCT -->
-                <article class="google-card p-6 sm:p-8">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span class="px-2.5 py-0.5 rounded-full bg-google-gray100 text-google-gray800 border border-google-gray200 text-xs font-medium">
+                <!-- Projet 2 : SimplCT (Rouge Google) -->
+                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-red">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-redDark">
                             Projet Systèmes & Compilation en C
-                        </span>
+                        </div>
                         <div class="text-xs text-google-gray600">
                             Équipe : 
                             <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a> & 
@@ -438,12 +460,12 @@
                     </div>
                 </article>
 
-                <!-- Projet 3 : CroustyRun -->
-                <article class="google-card p-6 sm:p-8">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span class="px-2.5 py-0.5 rounded-full bg-google-gray100 text-google-gray800 border border-google-gray200 text-xs font-medium">
-                            Projet Collaboratif • Simulation Physique & Écologie (Python)
-                        </span>
+                <!-- Projet 3 : CroustyRun (Vert Google) -->
+                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-green">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-greenDark">
+                            Simulation Physique & Écologie (Python)
+                        </div>
                         <div class="text-xs text-google-gray600">
                             Équipe : 
                             <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a>, 
@@ -483,12 +505,12 @@
                     </div>
                 </article>
 
-                <!-- Projet 4 : Poudelard -->
-                <article class="google-card p-6 sm:p-8">
-                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                        <span class="px-2.5 py-0.5 rounded-full bg-google-gray100 text-google-gray800 border border-google-gray200 text-xs font-medium">
+                <!-- Projet 4 : Poudelard (Jaune Google) -->
+                <article class="google-card p-6 sm:p-8 border-l-4 border-l-google-yellow">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div class="text-xs font-semibold uppercase tracking-wider text-google-yellowDark">
                             Projet Académique EFREI Paris • SC1
-                        </span>
+                        </div>
                         <div class="text-xs text-google-gray600">
                             Équipe : 
                             <a href="https://github.com/wassity" target="_blank" class="font-medium text-google-blueDark hover:underline">Mohammed Belfar</a> & 
@@ -539,9 +561,15 @@
 
     </main>
 
-    <!-- Footer sobre style Google -->
-    <footer class="mt-auto flex-shrink-0 border-t border-google-gray300 py-6 px-4 sm:px-8 bg-google-gray50 text-xs text-google-gray700">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <!-- Footer sobre style Google avec ligne 4 couleurs -->
+    <footer class="mt-auto flex-shrink-0 border-t border-google-gray300 bg-google-gray50 text-xs text-google-gray700">
+        <div class="h-0.5 w-full flex">
+            <div class="h-full flex-1 bg-google-blue"></div>
+            <div class="h-full flex-1 bg-google-red"></div>
+            <div class="h-full flex-1 bg-google-yellow"></div>
+            <div class="h-full flex-1 bg-google-green"></div>
+        </div>
+        <div class="max-w-5xl mx-auto py-6 px-4 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
                 <img src="/favicon.png" alt="Logo MB" class="w-5 h-5 rounded object-contain border border-google-gray300">
                 <span class="font-medium text-google-gray900">Malik B.</span>
@@ -593,9 +621,9 @@
                     links.forEach(link => {
                         if (isActive) {
                             link.classList.remove('text-google-gray700', 'hover:bg-google-gray100');
-                            link.classList.add('bg-google-blueLight', 'text-google-blueDark', 'font-medium');
+                            link.classList.add('bg-blue-50', 'text-google-blueDark', 'font-medium');
                         } else {
-                            link.classList.remove('bg-google-blueLight', 'text-google-blueDark', 'font-medium');
+                            link.classList.remove('bg-blue-50', 'text-google-blueDark', 'font-medium');
                             link.classList.add('text-google-gray700', 'hover:bg-google-gray100');
                         }
                     });
