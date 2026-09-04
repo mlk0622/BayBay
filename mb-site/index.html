@@ -38,11 +38,34 @@
             box-sizing: border-box;
         }
 
+        html {
+            height: 100%;
+            scroll-behavior: smooth;
+        }
+
         body {
+            min-height: 100%;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
             background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
             color: #FFFFFF;
             overflow-x: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
+        }
+
+        main {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        footer {
+            margin-top: auto !important;
+            flex-shrink: 0;
         }
 
         .liquid-glass {
@@ -83,20 +106,28 @@
 
         /* Fluid view transition styles */
         .view-section {
-            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
 
         .view-hidden {
             display: none !important;
-            opacity: 0;
-            transform: translateY(10px);
         }
 
         .view-visible {
-            display: block !important;
             opacity: 1;
             transform: translateY(0);
+        }
+
+        #view-home.view-visible {
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #view-projects.view-visible,
+        #view-about.view-visible {
+            display: block !important;
         }
     </style>
 </head>
@@ -108,7 +139,7 @@
     <div class="glow-blob w-[450px] h-[450px] bg-cyan-500/15 top-[800px] right-[5%]"></div>
 
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
+    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10 flex-shrink-0">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <!-- Brand avec Logo -->
             <a href="/" class="flex items-center gap-3 group">
@@ -135,13 +166,13 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 relative z-10 w-full min-h-[calc(100dvh-160px)]">
+    <main class="flex-1 flex flex-col relative z-10 w-full">
 
         <!-- ================= VUE ACCUEIL ================= -->
-        <div id="view-home" class="view-section view-visible">
+        <div id="view-home" class="view-section view-visible flex-1 flex flex-col justify-between py-6 sm:py-8">
 
             <!-- HERO SECTION -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-28 pb-14 text-center relative z-10">
+            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-6 text-center relative z-10">
                 
                 <span class="text-blue-400 text-xs uppercase tracking-widest font-extrabold px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30">
                     Étudiant @ EFREI Paris
@@ -170,7 +201,7 @@
             </section>
 
             <!-- APERÇU RAPIDE & VALEURS -->
-            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+            <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 w-full">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div class="liquid-glass-card p-6 rounded-3xl border border-white/10 space-y-3">
                         <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-lg border border-blue-500/20">
@@ -553,38 +584,49 @@
                     
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <span class="px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold">
-                            Projet Collaboratif • Jeu Vidéo / Runner
+                            Projet Collaboratif • Simulation Physique & Écologie (Python)
                         </span>
-                        <div class="text-xs text-slate-300 flex items-center gap-1.5">
+                        <div class="text-xs text-slate-300 flex flex-wrap items-center gap-1.5">
                             <i class="fas fa-users text-amber-400"></i>
-                            <span>Organisation :</span>
-                            <a href="https://github.com/SuperCraft3M" target="_blank" class="text-amber-400 font-semibold hover:underline">SuperCraft3M</a>
+                            <span>Équipe :</span>
+                            <a href="https://github.com/wassity" target="_blank" class="text-amber-400 font-semibold hover:underline">Mohammed Belfar</a>,
+                            <a href="https://github.com/mlk0622" target="_blank" class="text-amber-400 font-semibold hover:underline">Malik Bouaissi</a>,
+                            <a href="https://github.com/stevi2007" target="_blank" class="text-amber-400 font-semibold hover:underline">Antoine Picou</a>
+                            <span>&</span>
+                            <a href="https://github.com/SuperCraft3M" target="_blank" class="text-amber-400 font-semibold hover:underline">Mathis Jacques--Llorens</a>
                         </div>
                     </div>
 
                     <div>
                         <h2 class="text-2xl sm:text-4xl font-black text-white">
-                            CroustyRun — Jeu de Course & Arcade
+                            CroustyRun — Jeu Éducatif & Simulation Physique
                         </h2>
                         <p class="text-slate-300 text-sm sm:text-base mt-3 leading-relaxed">
-                            Développement d'un jeu vidéo d'arcade et de course dynamique (Runner) réalisé au sein de l'organisation <strong>SuperCraft3M</strong>. Implémentation des mécaniques de gameplay en temps réel, génération d'obstacles, physique de mouvement et scoring.
+                            Jeu vidéo éducatif et écologique développé en <strong>Python</strong>, conçu pour sensibiliser de manière ludique les enfants aux enjeux du tri des déchets et de l'empreinte carbone à travers une simulation physique interactive. Le projet s'appuie sur une démarche complète d'<strong>éco-conception logicielle</strong> (réduction de -34% de CO2e mesurée avec CodeCarbon), des graphismes Pixel-Art 100% faits main sans recours à l'IA et un moteur fluide à 60 FPS.
                         </p>
                     </div>
 
                     <div class="p-5 rounded-2xl bg-black/40 border border-white/10 space-y-2.5 text-xs sm:text-sm text-slate-300">
                         <div class="flex items-center gap-2 text-amber-400 font-semibold">
                             <i class="fas fa-gamepad"></i>
-                            <span>Compétences & Fonctionnalités clés :</span>
+                            <span>Compétences & Caractéristiques techniques :</span>
                         </div>
-                        <p class="text-slate-400">
-                            Boucle de jeu (game loop), détection des collisions, logique interactive temps réel, gestion des animations et collaboration GitHub en équipe.
-                        </p>
+                        <ul class="space-y-1.5 text-slate-400 pl-2">
+                            <li>• <strong class="text-slate-200">Physique & Moteur en Python :</strong> Gravité continue (0.55), impulsions de saut (-14), gestion des échelles, calcul des trajectoires et détection précise des collisions (hitbox).</li>
+                            <li>• <strong class="text-slate-200">Éco-conception & Bilan Carbone :</strong> Mesure en temps réel via <em>CodeCarbon</em> (baisse de 18.5 Wh/h à 12.2 Wh/h, soit -34% d'émissions), culling du rendu hors champ et formats allégés.</li>
+                            <li>• <strong class="text-slate-200">Design Pixel-Art & Fluidité :</strong> Graphismes 100% dessinés à la main sans IA pour minimiser l'impact environnemental, résolution 1280×720 à 60 FPS constants.</li>
+                        </ul>
                     </div>
 
                     <div class="pt-2 flex flex-wrap items-center gap-4">
                         <a href="https://github.com/SuperCraft3M/CroustyRun" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-lg shadow-amber-600/30 transition-all">
                             <i class="fab fa-github text-sm"></i>
                             <span>Voir CroustyRun sur GitHub</span>
+                            <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                        <a href="https://croustyrun.supercraft.tech" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-white font-semibold text-xs transition-all">
+                            <i class="fas fa-globe text-amber-400"></i>
+                            <span>Site officiel & Démo</span>
                             <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
                     </div>
@@ -611,7 +653,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 mt-16 relative z-10">
+    <footer class="mt-auto flex-shrink-0 border-t border-white/10 py-6 sm:py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400 relative z-10">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
                 <img src="/favicon.png" alt="Logo" class="w-5 h-5 rounded-md object-contain border border-white/20">
@@ -718,17 +760,13 @@
                 }
 
                 isAnimating = true;
-                const mainEl = document.querySelector('main');
-                if (mainEl && currentEl) {
-                    mainEl.style.minHeight = Math.max(currentEl.offsetHeight, window.innerHeight - 160) + 'px';
-                }
-
                 currentEl.style.opacity = '0';
-                currentEl.style.transform = 'translateY(-6px)';
+                currentEl.style.transform = 'translateY(-4px)';
 
                 setTimeout(() => {
-                    // Scroll instantané vers le haut pour éliminer tout saut visuel du pied de page
-                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    // Désactiver temporairement scroll-behavior smooth pour un saut instantané à 0 sans glitch
+                    document.documentElement.style.scrollBehavior = 'auto';
+                    window.scrollTo(0, 0);
 
                     Object.values(views).forEach(el => {
                         if (el) {
@@ -742,26 +780,26 @@
                     nextEl.classList.remove('view-hidden');
                     nextEl.classList.add('view-visible');
                     nextEl.style.opacity = '0';
-                    nextEl.style.transform = 'translateY(8px)';
+                    nextEl.style.transform = 'translateY(6px)';
 
                     void nextEl.offsetWidth; // Force reflow
 
                     nextEl.style.opacity = '1';
                     nextEl.style.transform = 'translateY(0)';
 
+                    window.scrollTo(0, 0);
+                    document.documentElement.style.scrollBehavior = '';
+
                     setTimeout(() => {
-                        if (mainEl) {
-                            mainEl.style.minHeight = '';
-                        }
                         nextEl.style.opacity = '';
                         nextEl.style.transform = '';
                         isAnimating = false;
-                    }, 250);
+                    }, 180);
 
                     if (updateHistory) {
                         history.pushState({ view: targetView }, '', targetHash || '/');
                     }
-                }, 180);
+                }, 120);
             }
 
             // Intercepter tous les clics de liens internes
