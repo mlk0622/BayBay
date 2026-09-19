@@ -1,597 +1,571 @@
-<!DOCTYPE html>
-<html lang="fr" data-theme="dark" class="scroll-smooth">
+<!doctype html>
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BayBay - Gestion Locative Simple, Sécurisée & Accessible Partout</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        'primary-dark': '#2563eb',
-                        darkbg: '#0b131a',
-                    },
-                    fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'Segoe UI', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 45%, #070b12 100%) fixed !important;
-            color: #FFFFFF;
-            overflow-x: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BayBay v4.0 - Suite logicielle complète de gestion locative immobilière combinant application bureau Windows et SaaS cloud dédié.">
+  <meta name="author" content="Malik Bouaissi">
+  <title>BayBay v4.0 — Gestion Locative Hybride Simple, Sécurisée & Accessible Partout</title>
+  
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+  
+  <!-- google fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  
+  <style>
+    /* Écran d'ordinateur (Computer Monitor Mockup) */
+    .pc-screen {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .pc-screen__monitor {
+      background: #0f172a;
+      border-radius: 14px;
+      padding: 8px 8px 10px 8px;
+      border: 1px solid #1e293b;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      position: relative;
+      z-index: 2;
+    }
+    .pc-screen__camera {
+      width: 6px;
+      height: 6px;
+      background: #334155;
+      border-radius: 50%;
+      margin: 0 auto 6px auto;
+      box-shadow: inset 0 0 2px #000;
+    }
+    .pc-screen__bar {
+      background: #1e293b;
+      border-radius: 6px 6px 0 0;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    }
+    .pc-screen__dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .pc-screen__dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .pc-screen__dot--red { background: #ef4444; }
+    .pc-screen__dot--yellow { background: #f59e0b; }
+    .pc-screen__dot--green { background: #10b981; }
+    .pc-screen__url {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 2px 14px;
+      font-size: 11px;
+      color: #94a3b8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pc-screen__content {
+      overflow: hidden;
+      border-radius: 0 0 6px 6px;
+      background: #0b0f19;
+      line-height: 0;
+      display: block;
+      text-decoration: none;
+    }
+    .pc-screen__content img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .pc-screen__content:hover img {
+      transform: scale(1.01);
+    }
+    .pc-screen__stand {
+      width: 80px;
+      height: 34px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #94a3b8 0%, #cbd5e1 50%, #64748b 100%);
+      position: relative;
+      z-index: 1;
+      clip-path: polygon(14% 0%, 86% 0%, 100% 100%, 0% 100%);
+    }
+    .pc-screen__base {
+      width: 180px;
+      height: 9px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #e2e8f0 0%, #94a3b8 100%);
+      border-radius: 4px 4px 0 0;
+      box-shadow: 0 12px 24px -4px rgba(15, 23, 42, 0.25);
+      position: relative;
+      z-index: 1;
+    }
+    @media (max-width: 48rem) {
+      .pc-screen__stand {
+        width: 55px;
+        height: 22px;
+      }
+      .pc-screen__base {
+        width: 130px;
+        height: 6px;
+      }
+    }
 
-        .liquid-glass {
-            background: rgba(24, 24, 27, 0.65);
-            backdrop-filter: blur(20px) saturate(190%);
-            -webkit-backdrop-filter: blur(20px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        .liquid-glass-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .liquid-glass-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 50%, #38bdf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .glow-blob {
-            position: absolute;
-            border-radius: 9999px;
-            filter: blur(90px);
-            pointer-events: none;
-            z-index: 0;
-            transition: transform 0.2s ease-out;
-        }
-
-        .glow-btn-desktop {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #0284c7 100%);
-            box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.25s ease;
-        }
-
-        .glow-btn-desktop:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 15px 35px -5px rgba(37, 99, 235, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.4);
-            filter: brightness(1.1);
-        }
-
-        .glow-btn-web {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: all 0.25s ease;
-        }
-
-        .glow-btn-web:hover {
-            transform: translateY(-2px) scale(1.02);
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 15px 35px -5px rgba(255, 255, 255, 0.15);
-        }
-
-        /* Elements flottants qui tournent avec le scroll */
-        .parallax-floating-key {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-            transition: transform 0.15s cubic-bezier(0.1, 0.9, 0.2, 1);
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.6));
-        }
-
-        .tranquille-stickman {
-            animation: floatingChilling 4s ease-in-out infinite;
-        }
-
-        @keyframes floatingChilling {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(-2deg); }
-        }
-    </style>
+    /* Fond Hero Tech Mesh Gradient (Identique mb-site) */
+    .hero-tech-mesh {
+      background-color: #070a13 !important;
+      background-image: 
+        radial-gradient(ellipse 85% 65% at 50% -15%, rgba(59, 130, 246, 0.35), transparent 75%),
+        radial-gradient(ellipse 55% 50% at 88% 18%, rgba(139, 92, 246, 0.22), transparent 60%),
+        radial-gradient(ellipse 45% 45% at 12% 35%, rgba(14, 165, 233, 0.20), transparent 60%),
+        radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px) !important;
+      background-size: 100% 100%, 100% 100%, 100% 100%, 30px 30px !important;
+      background-position: 0 0, 0 0, 0 0, 0 0 !important;
+      position: relative;
+    }
+  </style>
 </head>
-<body class="min-h-screen text-slate-100 relative selection:bg-blue-500 selection:text-white">
-
-    <!-- Glowing background decorative orbs (bougent au scroll) -->
-    <div id="orb-1" class="glow-blob w-[550px] h-[550px] bg-blue-600/20 top-[-100px] left-1/2 -translate-x-1/2"></div>
-    <div id="orb-2" class="glow-blob w-[450px] h-[450px] bg-purple-600/15 top-[600px] left-[5%]"></div>
-    <div id="orb-3" class="glow-blob w-[500px] h-[500px] bg-cyan-500/15 top-[1200px] right-[5%]"></div>
-    <div id="orb-4" class="glow-blob w-[400px] h-[400px] bg-emerald-500/15 top-[2000px] left-[15%]"></div>
-
-    <!-- ================= ÉLÉMENTS FLOTTANTS INTERACTIFS AU SCROLL ================= -->
-    <!-- Clé Dorée Flottante 1 (Gauche) -->
-    <div id="key-1" class="parallax-floating-key hidden lg:flex top-[22%] left-[4%] w-24 h-24 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-amber-400 text-4xl shadow-2xl opacity-75">
-        <i class="fas fa-key"></i>
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header class="f-header position-absolute bg-transparent js-f-header" data-theme="dark">
+    <div class="f-header__mobile-content container max-width-lg">
+      <a href="{{ url_for('index') }}" class="inline-flex items-center gap-xxs text-decoration-none">
+        <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="width-sm height-sm object-contain" alt="BayBay Logo">
+        <span class="text-md font-bold color-white">BayBay</span>
+      </a>
+  
+      <button class="reset anim-menu-btn js-anim-menu-btn f-header__nav-control js-tab-focus" aria-label="Basculer le menu">
+        <i class="anim-menu-btn__icon anim-menu-btn__icon--close" aria-hidden="true"></i>
+      </button>
     </div>
-
-    <!-- Clé Dorée Flottante 2 (Droite) -->
-    <div id="key-2" class="parallax-floating-key hidden lg:flex top-[45%] right-[4%] w-20 h-20 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-yellow-300 text-3xl shadow-2xl opacity-70">
-        <i class="fas fa-key"></i>
+  
+    <div class="f-header__nav" role="navigation">
+      <div class="f-header__nav-grid justify-between@md container max-width-lg">
+        <div class="f-header__nav-logo-wrapper flex-grow flex-basis-0 items-center">
+          <a href="{{ url_for('index') }}" class="inline-flex items-center gap-xxs text-decoration-none">
+            <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="width-sm height-sm object-contain" alt="BayBay Logo">
+            <span class="text-md font-bold color-white">BayBay</span>
+            <span class="badge badge--primary text-xxs margin-left-xxxxs">v4.0</span>
+          </a>
+        </div>
+    
+        <ul class="f-header__list flex-grow flex-basis-0 justify-center@md">
+          <li class="f-header__item"><a href="#hero" class="f-header__link">Accueil</a></li>
+          <li class="f-header__item"><a href="#apercu" class="f-header__link">Aperçu</a></li>
+          <li class="f-header__item"><a href="#fonctionnalites" class="f-header__link">Fonctionnalités</a></li>
+          <li class="f-header__item"><a href="{{ url_for('a_propos') }}" class="f-header__link">À propos</a></li>
+          <li class="f-header__item"><a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="f-header__link">Portfolio MB</a></li>
+        </ul>
+    
+        <ul class="f-header__list flex-grow flex-basis-0 justify-end@md items-center gap-xs">
+          {% if current_user.is_authenticated %}
+            <li class="f-header__item">
+              <a href="{{ url_for('dashboard') }}" class="btn btn--primary btn--sm" style="box-shadow: none !important; filter: none !important;">
+                Mon Tableau de Bord &rarr;
+              </a>
+            </li>
+          {% else %}
+            <li class="f-header__item">
+              <a href="{{ url_for('login') }}" class="btn btn--subtle btn--sm">
+                Connexion
+              </a>
+            </li>
+            <li class="f-header__item">
+              <a href="{{ url_for('register') }}" class="btn btn--primary btn--sm" style="box-shadow: none !important; filter: none !important;">
+                Inscription
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
+  </header>
 
-    <!-- Clé Flottante 3 (Bas Gauche) -->
-    <div id="key-3" class="parallax-floating-key hidden lg:flex top-[72%] left-[3%] w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/20 items-center justify-center text-blue-400 text-2xl shadow-xl opacity-60">
-        <i class="fas fa-key"></i>
-    </div>
-
-    <!-- Navigation Header -->
-    <header class="sticky top-0 z-50 px-4 sm:px-8 py-3.5 liquid-glass border-b border-white/10">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <!-- Normal Standard BayBay Logo -->
-            <a href="{{ url_for('index') }}" class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" alt="BayBay Logo">
-                <span class="text-xl font-black text-white tracking-tight">BayBay</span>
+  <!-- ==================== HERO SECTION (IDENTIQUE MB-SITE) ==================== -->
+  <section id="hero" class="diagonal-section-bottom hero-tech-mesh" data-theme="dark">
+    <div class="container max-width-adaptive-md padding-y-xxl">
+      <div class="text-center padding-top-lg">
+        <div class="text-component margin-bottom-md">
+          <span class="badge badge--primary text-xs margin-bottom-xs">Suite Logicielle Hybride v4.0</span>
+          <h1 class="text-shadow-sm text-xxxl font-primary">
+            Votre gestion locative <em>sécurisée</em>, <em>accessible partout</em> et <em>en 1 clic</em>
+          </h1>
+          <p class="text-lg opacity-90% max-width-sm margin-x-auto color-contrast-medium">
+            Automatisation immobilière complète combinant une application de bureau Windows puissante et une plateforme cloud SaaS synchronisée sur serveur dédié.
+          </p>
+        </div>
+    
+        <div class="flex flex-wrap flex-center gap-sm">
+          {% if current_user.is_authenticated %}
+            <a class="btn btn--primary" href="{{ url_for('dashboard') }}" style="box-shadow: none !important; filter: none !important;">
+              Accéder au Tableau de Bord &rarr;
             </a>
-
-            <!-- Nav Links : Simples écritures -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="https://mb-site.com" class="hover:text-white transition-colors">mb-site</a>
-                <a href="{{ url_for('a_propos') }}" class="hover:text-white transition-colors">À propos</a>
-            </nav>
-
-            <!-- Top Right Action Buttons: Connexion & Inscription -->
-            <div class="flex items-center gap-3">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
-                        <i class="fas fa-chart-pie text-xs"></i>
-                        <span>Mon Tableau de Bord</span>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('login') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/10 transition-all">
-                        <i class="fas fa-sign-in-alt text-xs"></i>
-                        <span>Connexion</span>
-                    </a>
-                    <a href="{{ url_for('register') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition-all">
-                        <i class="fas fa-user-plus text-xs"></i>
-                        <span>Inscription</span>
-                    </a>
-                {% endif %}
-            </div>
+          {% else %}
+            <a class="btn btn--primary" href="{{ url_for('login') }}" style="box-shadow: none !important; filter: none !important;">
+              Accéder à la Version Web &rarr;
+            </a>
+          {% endif %}
+          <a class="btn btn--subtle" href="{{ url_for('download_desktop_app') }}">
+            <span>Télécharger Version Bureau (.exe)</span>
+            <svg class="icon margin-left-xxs" viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="2" x2="8" y2="12"/><polyline points="4 8 8 12 12 8"/><line x1="2" y1="14" x2="14" y2="14"/></g></svg>
+          </a>
         </div>
-    </header>
+      </div>
+    </div>
+  </section>
 
-    <!-- Main Content -->
-    <main class="relative z-10">
-
-        <!-- ================= HERO SECTION ================= -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-12 text-center">
-
-            <!-- Main Heading -->
-            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white max-w-5xl mx-auto leading-[1.15] mb-6">
-                Votre gestion locative <br class="hidden sm:inline">
-                <span class="gradient-text">sécurisée, accessible partout et en 1 clic.</span>
-            </h1>
-
-            <!-- Subtitle -->
-            <p class="text-base sm:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
-                Accédez à toutes vos informations immobilières où que vous soyez. Générez et envoyez vos <strong class="text-white font-semibold">quittances</strong>, <strong class="text-white font-semibold">avis d'échéance</strong> et <strong class="text-white font-semibold">documents</strong> en un seul clic avec une sécurité absolue de vos données.
+  <!-- ==================== FLAGSHIP SHOWCASE: BAYBAY v4.0 (IDENTIQUE MB-SITE) ==================== -->
+  <section id="apercu" class="position-relative z-index-1 padding-y-xxl bg-white" data-theme="default" style="background-color: #ffffff; color: #1e293b;">
+    <div class="container max-width-adaptive-lg position-relative z-index-2">
+      <div class="grid gap-lg items-center">
+        <div class="col-5@md">
+          <div class="text-component">
+            <div class="inline-flex items-center gap-xxs text-xs font-semibold color-primary text-uppercase letter-spacing-sm">
+              <span>Projet Phare • En Production</span>
+            </div>
+            <h2 class="text-xxl font-primary color-contrast-higher">BayBay v4.0 — Gestion Locative Hybride</h2>
+            <p class="color-contrast-medium">
+              Pilotez l'ensemble de votre parc immobilier en toute sérénité. Suivez les encaissements, générez vos documents certifiés et automatisez les échanges avec vos locataires.
             </p>
-
-            <!-- ================= CALL TO ACTION BUTTONS (DESKTOP & WEB) ================= -->
-            <div class="max-w-3xl mx-auto p-4 sm:p-6 rounded-3xl liquid-glass border border-white/20 shadow-2xl mb-8">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    <!-- Bouton 1 : Télécharger Version Bureau -->
-                    <a href="{{ url_for('download_desktop_app') }}" class="glow-btn-desktop group flex items-center justify-between p-5 rounded-2xl text-white text-left relative overflow-hidden">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                                <i class="fab fa-windows"></i>
-                            </div>
-                            <div>
-                                <span class="block text-lg font-black tracking-tight leading-tight">Version Bureau</span>
-                                <span class="text-xs text-blue-200 font-medium">Télécharger pour Windows (.exe)</span>
-                            </div>
-                        </div>
-                        <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-sm group-hover:translate-y-0.5 transition-transform shrink-0">
-                            <i class="fas fa-download"></i>
-                        </div>
-                    </a>
-
-                    <!-- Bouton 2 : Continuer vers la Version Web -->
-                    <a href="{{ url_for('dashboard') }}" class="glow-btn-web group flex items-center justify-between p-5 rounded-2xl text-white text-left relative overflow-hidden">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div>
-                                <span class="block text-lg font-black tracking-tight leading-tight">Version Web</span>
-                                <span class="text-xs text-slate-300 font-medium">Continuer vers la version web</span>
-                            </div>
-                        </div>
-                        <div class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-sm group-hover:translate-x-1 transition-transform shrink-0">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </a>
-
-                </div>
+            <ul class="list-v2 text-sm color-contrast-medium">
+              <li><strong class="color-contrast-higher">Quittances conformes Loi ALUR :</strong> Génération certifiée avec clé de vérification publique en ligne et signature cryptographique SHA-256.</li>
+              <li><strong class="color-contrast-higher">Automatisation SMTP :</strong> Envoi programmé et autonome des avis d'échéance, relances et quittances par e-mail avec accusé de réception.</li>
+              <li><strong class="color-contrast-higher">Calculs légaux & Fiscaux :</strong> Révision indicielle INSEE/IRL, calcul des provisions de charges et pré-remplissage pour votre déclaration 2044.</li>
+            </ul>
+          </div>
+  
+          <div class="margin-top-md">
+            <div class="flex flex-wrap gap-xs items-center">
+              {% if current_user.is_authenticated %}
+                <a class="btn btn--primary" href="{{ url_for('dashboard') }}" style="box-shadow: none !important; filter: none !important;">Ouvrir l'application</a>
+              {% else %}
+                <a class="btn btn--primary" href="{{ url_for('login') }}" style="box-shadow: none !important; filter: none !important;">Connexion SaaS</a>
+                <a class="btn btn--subtle" href="{{ url_for('register') }}">Créer un compte</a>
+              {% endif %}
             </div>
-
-        </section>
-
-        <!-- ================= GRANDE SECTION : CHOISISSEZ LA TRANQUILLITÉ ================= -->
-        <section id="tranquillite" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="text-center max-w-4xl mx-auto mb-14">
-                <h2 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
-                    Choisissez la tranquillité
-                </h2>
-            </div>
-
-            <!-- Illustration & Bonhomme Relax sans lunettes ni bulle zen -->
-            <div class="max-w-4xl mx-auto mb-12 p-8 rounded-3xl liquid-glass border border-white/20 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="max-w-md text-left">
-                    <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">
-                        Détendez-vous, tout est sous contrôle.
-                    </h3>
-                    <p class="text-slate-300 text-sm leading-relaxed mb-4">
-                        Pendant que vous vaquez à vos occupations, BayBay calcule vos montants dus, suit les paiements, alerte en cas de retard et génère vos quittances officielles à la seconde près.
-                    </p>
-                    <div class="flex items-center gap-3 text-xs text-slate-300 font-semibold">
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> Zéro stress</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> 100% Conforme</span>
-                        <span class="flex items-center gap-1.5"><i class="fas fa-check text-emerald-400"></i> Gain de temps</span>
-                    </div>
-                </div>
-
-                <!-- Bonhomme Allongé Relax en mode Chill (sans lunettes, sans bulle zen) -->
-                <div class="relative w-64 h-48 flex items-center justify-center shrink-0">
-                    <div id="chill-illustration" class="tranquille-stickman w-full h-full flex items-center justify-center">
-                        <svg viewBox="0 0 240 180" class="w-full h-full drop-shadow-[0_10px_20px_rgba(59,130,246,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Parasol arrière -->
-                            <path d="M170 30 C190 20, 220 20, 230 45 L170 45 Z" fill="url(#umbrellaGrad)" opacity="0.85" />
-                            <line x1="200" y1="35" x2="210" y2="150" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" />
-                            <!-- Transat / Chaise longue moderne -->
-                            <path d="M30 145 L70 140 L135 125 L180 85 L205 105" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                            <line x1="65" y1="140" x2="55" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
-                            <line x1="145" y1="120" x2="160" y2="165" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" />
-                            
-                            <!-- Bonhomme qui s'allonge en mode tranquille (visage souriant sans lunettes) -->
-                            <circle cx="170" cy="72" r="14" fill="#fed7aa" stroke="#fbbf24" stroke-width="2" />
-                            <!-- Yeux fermés détendus et sourire -->
-                            <path d="M164 70 Q167 73 170 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            <path d="M172 70 Q175 73 178 70" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            <path d="M167 78 Q171 82 175 78" stroke="#0f172a" stroke-width="2" stroke-linecap="round" fill="none" />
-                            
-                            <!-- Corps détendu -->
-                            <path d="M160 84 L125 118 L70 128 L40 135" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-                            
-                            <!-- Bras tenant un cocktail -->
-                            <path d="M142 98 L130 112 L110 95" stroke="#fed7aa" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
-                            
-                            <!-- Cocktail avec paille -->
-                            <polygon points="102,82 118,82 114,96 106,96" fill="#f43f5e" opacity="0.9" />
-                            <line x1="110" y1="96" x2="110" y2="104" stroke="#e2e8f0" stroke-width="2" />
-                            <line x1="104" y1="104" x2="116" y2="104" stroke="#e2e8f0" stroke-width="2" />
-                            <line x1="110" y1="84" x2="120" y2="72" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" />
-
-                            <defs>
-                                <linearGradient id="umbrellaGrad" x1="170" y1="30" x2="230" y2="45" gradientUnits="userSpaceOnUse">
-                                    <stop stop-color="#f43f5e"/>
-                                    <stop offset="1" stop-color="#fbbf24"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3 Piliers Clés Spacieux -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                
-                <!-- Carte 1 : Sécurité -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-emerald-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mb-6 border border-emerald-500/30">
-                            <i class="fas fa-shield-halved"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Sécurité Absolue</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Vos données sont protégées par un chiffrement strict de bout en bout et des sauvegardes continues. Vos dossiers locatifs et documents restent strictement confidentiels et sécurisés.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-emerald-400 font-semibold">
-                        <i class="fas fa-lock"></i> Données chiffrées & isolées
-                    </div>
-                </div>
-
-                <!-- Carte 2 : Partout -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-blue-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl mb-6 border border-blue-500/30">
-                            <i class="fas fa-globe"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Accessible Partout</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Consultez vos biens et retrouvez tous vos dossiers à tout moment : au bureau sur votre ordinateur, chez vous ou en déplacement sur votre smartphone et tablette.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-blue-400 font-semibold">
-                        <i class="fas fa-mobile-screen"></i> PC, Mac, Tablette & Mobile
-                    </div>
-                </div>
-
-                <!-- Carte 3 : 1 Clic -->
-                <div class="liquid-glass-card p-8 rounded-3xl border border-purple-500/30 flex flex-col justify-between shadow-xl">
-                    <div>
-                        <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl mb-6 border border-purple-500/30">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-3">Tout en 1 Clic</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Générez vos quittances officielles, avis d'échéance et documents en un clic, et transmettez-les instantanément par e-mail avec pièces jointes à vos locataires.
-                        </p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-white/10 flex items-center gap-2 text-xs text-purple-400 font-semibold">
-                        <i class="fas fa-paper-plane"></i> Envois et quittances instantanés
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= SECTION FONCTIONNALITÉS (8 BULLES ÉPURÉES SANS "ONGLET N") ================= -->
-        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/10">
-            <div class="text-center max-w-4xl mx-auto mb-14">
-                <h2 class="text-3xl sm:text-5xl font-extrabold text-white">
-                    Une application pensée pour chaque aspect de votre gestion
-                </h2>
-                <p class="text-slate-400 text-sm sm:text-base mt-3">
-                    Découvrez toutes les fonctionnalités intégrées pour piloter sereinement vos locations.
-                </p>
-            </div>
-
-            <!-- Grille de 8 Bulles épurées -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <!-- 1. Dashboard -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-blue-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-chart-pie"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Tableau de Bord</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Visualisez en un coup d'œil vos loyers attendus, vos encaissements réels, le taux de recouvrement global et les alertes d'impayés pour toutes vos SCI.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 2. Biens & SCI -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-indigo-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-home"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Biens & SCIs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Organisez votre patrimoine par SCI ou en détention directe. Structurez vos immeubles, lots, appartements, surfaces et charges déductibles associées.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 3. Locataires & Garants -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-emerald-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Locataires & Garants</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Fiches complètes des locataires, coordonnées, garants solidaires, contrats de bail signés, attestations d'assurance habitation et dépôts de garantie.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 4. Appels de Loyer (avec programmation & envoi) -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-cyan-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-file-invoice"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Appels de Loyer</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Génération instantanée des avis d'échéance avec calcul du loyer nu et des provisions, envoi en 1 clic ou programmé automatiquement chaque mois par e-mail.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 5. Quittances de Loyer (avec signature & programmation) -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-amber-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Quittances de Loyer</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Édition certifiée loi ALUR avec signature du bailleur, QR code public d'authenticité et expédition directe par e-mail ou envoi programmé.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 6. Résumé des Loyers -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-purple-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Résumé des Loyers</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Bilan financier mois par mois et synthèse pluriannuelle des loyers perçus, facilitant le suivi comptable et vos déclarations fiscales annuelles (2044 / 2072).
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 7. Comptes Locatifs -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-teal-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-400 border border-teal-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Comptes Locatifs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Suivi du grand livre individuel par locataire : débits, crédits, historique complet des règlements, régularisation des charges et solde net en direct.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 8. États des Lieux & Docs -->
-                <div class="liquid-glass-card p-6 rounded-3xl border border-rose-500/25 flex flex-col justify-between">
-                    <div>
-                        <div class="w-12 h-12 rounded-2xl bg-rose-600/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-xl mb-4">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2">États des Lieux & Docs</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Inventaires d'entrée et sortie numérisés, relevés de compteurs, insertion de photos horodatées pièce par pièce et archivage sécurisé des baux.
-                        </p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ================= FINAL CTA BOTTOM ================= -->
-        <section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <div class="p-8 sm:p-12 rounded-3xl liquid-glass border border-blue-500/30 shadow-2xl relative overflow-hidden">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-                    Prêt à simplifier votre gestion locative ?
-                </h2>
-                <p class="text-slate-300 text-sm max-w-xl mx-auto mb-8">
-                    Téléchargez l'application pour votre bureau ou accédez directement à la version web en ligne.
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="{{ url_for('download_desktop_app') }}" class="w-full sm:w-auto glow-btn-desktop py-3.5 px-8 rounded-xl font-bold text-white flex items-center justify-center gap-2">
-                        <i class="fas fa-download"></i>
-                        <span>Télécharger pour Windows</span>
-                    </a>
-                    <a href="{{ url_for('dashboard') }}" class="w-full sm:w-auto glow-btn-web py-3.5 px-8 rounded-xl font-bold text-white flex items-center justify-center gap-2">
-                        <i class="fas fa-globe"></i>
-                        <span>Continuer vers la version Web</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/10 py-8 px-4 sm:px-8 bg-black/40 text-xs text-slate-400">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2.5">
-                <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-6 h-6 object-contain" alt="BayBay Logo">
-                <span class="font-bold text-white">BayBay</span>
-                <span>— © 2026 Malik B. Tous droits réservés.</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
-                    <i class="fab fa-github text-sm"></i>
-                    <span>GitHub</span>
-                </a>
-                <a href="mailto:contact@mb-site.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-colors">
-                    <i class="fas fa-envelope text-sm text-blue-400"></i>
-                    <span>contact@mb-site.com</span>
-                </a>
-            </div>
+          </div>
         </div>
-    </footer>
+  
+        <!-- Mockup dans un Écran d'Ordinateur -->
+        <div class="col-7@md flex items-center justify-center">
+          <div class="pc-screen reveal-fx reveal-fx--clip-x">
+            <!-- Moniteur / Écran -->
+            <div class="pc-screen__monitor">
+              <div class="pc-screen__camera"></div>
+              <div class="pc-screen__bar">
+                <div class="pc-screen__dots">
+                  <span class="pc-screen__dot pc-screen__dot--red"></span>
+                  <span class="pc-screen__dot pc-screen__dot--yellow"></span>
+                  <span class="pc-screen__dot pc-screen__dot--green"></span>
+                </div>
+                <div class="pc-screen__url">
+                  <svg class="icon" viewBox="0 0 16 16" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M12 7V5a4 4 0 0 0-8 0v2H3a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-6-2a2 2 0 0 1 4 0v2H6V5z"/></svg>
+                  <span>baybay.mb-site.com</span>
+                </div>
+                <div style="width: 36px;"></div>
+              </div>
+              <a href="{% if current_user.is_authenticated %}{{ url_for('dashboard') }}{% else %}{{ url_for('login') }}{% endif %}" class="pc-screen__content" title="Accéder au tableau de bord BayBay">
+                <img src="{{ url_for('static', filename='images/mockup-pc.png') }}" alt="BayBay v4.0 - Interface affichée sur écran d'ordinateur">
+              </a>
+            </div>
+            <!-- Pied du moniteur -->
+            <div class="pc-screen__stand"></div>
+            <div class="pc-screen__base"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- Script d'animation interactive au défilement (Parallax & Clés qui tournent) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const key1 = document.getElementById('key-1');
-            const key2 = document.getElementById('key-2');
-            const key3 = document.getElementById('key-3');
-            const orb1 = document.getElementById('orb-1');
-            const orb2 = document.getElementById('orb-2');
-            const orb3 = document.getElementById('orb-3');
-            const chillIllustration = document.getElementById('chill-illustration');
+  <!-- ==================== FEATURES GRID: 8 MODULES CLÉS ==================== -->
+  <section id="fonctionnalites" class="padding-y-xxl bg-dark" data-theme="dark">
+    <div class="container max-width-adaptive-lg">
+      <div class="text-center margin-bottom-xl">
+        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Architecture & Outils</span>
+        <h2 class="text-xxl font-primary margin-top-xxs">Une Suite Complète pour Votre Gestion</h2>
+        <p class="color-contrast-medium text-sm max-width-xs margin-x-auto margin-top-xxs">
+          Chaque aspect de votre gestion locative a été automatisé et sécurisé.
+        </p>
+      </div>
 
-            let ticking = false;
+      <div class="grid gap-md">
+        <!-- 01. Dashboard -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">01</span>
+                Tableau de Bord
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Vue globale sur vos loyers attendus, encaissements réels, taux de recouvrement et alertes d'impayés en temps réel.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">KPIs Directs</span>
+            </div>
+          </div>
+        </div>
 
-            window.addEventListener('scroll', () => {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-                        const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+        <!-- 02. Biens & SCIs -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">02</span>
+                Biens & SCIs
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Gestion multi-sociétés (SCI ou nom propre), découpage en immeubles, lots, tantièmes et charges déductibles.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Multi-Patrimoine</span>
+            </div>
+          </div>
+        </div>
 
-                        // Rotation des clés en fonction du scroll
-                        if (key1) {
-                            const rot1 = scrollY * 0.45;
-                            const y1 = Math.sin(scrollY * 0.003) * 35;
-                            key1.style.transform = `translateY(${y1}px) rotate(${rot1}deg) scale(${1 + Math.sin(scrollY * 0.002) * 0.1})`;
-                        }
+        <!-- 03. Locataires & Garants -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">03</span>
+                Locataires & Garants
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Fiches détaillées, coordonnées, cautions solidaires, attestations d'assurance habitation et dépôts de garantie.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Dossiers Baux</span>
+            </div>
+          </div>
+        </div>
 
-                        if (key2) {
-                            const rot2 = -scrollY * 0.55;
-                            const y2 = Math.cos(scrollY * 0.003) * 30;
-                            key2.style.transform = `translateY(${y2}px) rotate(${rot2}deg) scale(${1 + Math.cos(scrollY * 0.002) * 0.1})`;
-                        }
+        <!-- 04. Appels de Loyer -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">04</span>
+                Appels de Loyer
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Édition instantanée des avis d'échéance et programmation de l'envoi mensuel automatique par e-mail SMTP.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Envois Auto</span>
+            </div>
+          </div>
+        </div>
 
-                        if (key3) {
-                            const rot3 = scrollY * 0.65;
-                            const y3 = Math.sin(scrollY * 0.004) * 25;
-                            key3.style.transform = `translateY(${y3}px) rotate(${rot3}deg)`;
-                        }
+        <!-- 05. Quittances ALUR -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">05</span>
+                Quittances ALUR
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Quittances conformes ALUR avec signature du bailleur, QR code public d'authenticité et clé SHA-256 infalsifiable.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Certifié SHA-256</span>
+            </div>
+          </div>
+        </div>
 
-                        // Mouvement subtil des bulles de fond lumineuses
-                        if (orb1) {
-                            orb1.style.transform = `translate(-50%, ${scrollY * 0.25}px)`;
-                        }
-                        if (orb2) {
-                            orb2.style.transform = `translateY(${scrollY * 0.18}px)`;
-                        }
-                        if (orb3) {
-                            orb3.style.transform = `translateY(${-scrollY * 0.15}px)`;
-                        }
+        <!-- 06. Résumé des Loyers -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">06</span>
+                Fiscalité & Bilan
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Synthèse mensuelle et pluriannuelle facilitant la comptabilité et le report direct sur la déclaration fiscale 2044 / 2072.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Déclaration 2044</span>
+            </div>
+          </div>
+        </div>
 
-                        // Léger mouvement relax sur l'illustration du bonhomme au scroll
-                        if (chillIllustration) {
-                            const chillAngle = Math.sin(scrollY * 0.01) * 3;
-                            chillIllustration.style.transform = `rotate(${chillAngle}deg) translateY(${Math.sin(scrollY * 0.008) * 8}px)`;
-                        }
+        <!-- 07. Comptes Locatifs -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">07</span>
+                Comptes Locatifs
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Grand livre individuel par locataire : débits, crédits, régularisations de charges et solde en direct.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Grand Livre</span>
+            </div>
+          </div>
+        </div>
 
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            }, { passive: true });
-        });
-    </script>
+        <!-- 08. États des Lieux -->
+        <div class="col-6@md col-3@xl">
+          <div class="padding-md bg-contrast-lower bg-opacity-40% radius-md height-100% flex flex-column justify-between">
+            <div>
+              <h3 class="text-md font-bold font-primary margin-bottom-xs color-contrast-higher flex items-center gap-xxs">
+                <span class="inline-flex items-center justify-center width-sm height-sm radius-50% bg-primary color-white text-xs">08</span>
+                États des Lieux
+              </h3>
+              <p class="text-sm color-contrast-medium">
+                Inventaires d'entrée et sortie numérisés, relevés de compteurs, photos horodatées et coffre-fort documentaire.
+              </p>
+            </div>
+            <div class="margin-top-sm">
+              <span class="badge badge--subtle">Photos Horodatées</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- ==================== CALL TO ACTION SECTION ==================== -->
+  <section class="position-relative z-index-1 padding-top-xl padding-bottom-xl bg-contrast-lower bg-opacity-20% text-center" data-theme="dark">
+    <div class="container max-width-adaptive-lg">
+      <div class="text-xl text-xxl@md font-bold margin-bottom-sm">
+        <p class="color-contrast-higher font-primary">Prêt à simplifier votre gestion locative ?</p>
+        <p class="color-contrast-medium font-secondary text-md margin-top-xxs">
+          Démarrez sur le SaaS cloud dès aujourd'hui ou installez l'application native sur votre poste Windows.
+        </p>
+      </div>
+      <div class="flex flex-wrap flex-center gap-sm">
+        {% if current_user.is_authenticated %}
+          <a class="btn btn--primary" href="{{ url_for('dashboard') }}" style="box-shadow: none !important; filter: none !important;">Accéder à mon Tableau de Bord</a>
+        {% else %}
+          <a class="btn btn--primary" href="{{ url_for('register') }}" style="box-shadow: none !important; filter: none !important;">Créer un compte gratuit</a>
+          <a class="btn btn--subtle" href="{{ url_for('login') }}">Connexion</a>
+        {% endif %}
+        <a class="btn btn--subtle" href="{{ url_for('download_desktop_app') }}">Télécharger l'application Windows (.exe)</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONTACT / INFO SECTION ==================== -->
+  <section id="contact" class="newsletter padding-y-xl text-center" data-theme="soft">
+    <div class="container max-width-sm position-relative z-index-2">
+      <div class="text-component margin-bottom-md">
+        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Assistance & Déploiement</span>
+        <h2 class="text-xxl font-primary">Une Question sur BayBay ?</h2>
+        <p class="color-contrast-medium text-md">
+          Besoin d'aide pour configurer votre serveur, vos SCIs ou connecter vos serveurs SMTP d'envoi automatique ?
+        </p>
+      </div>
+  
+      <div class="flex flex-wrap flex-center gap-sm margin-top-md">
+        <a class="btn btn--primary" href="mailto:contact@mb-site.com" style="box-shadow: none !important; filter: none !important;">
+          <svg class="icon margin-right-xxs" viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5h-13a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1z"/><polyline points="15.5 4.5 8 9.5 0.5 4.5"/></g></svg>
+          contact@mb-site.com
+        </a>
+        <a class="btn btn--subtle" href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer">
+          <svg class="icon margin-right-xxs" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+          Dépôt GitHub
+        </a>
+        <a class="btn btn--subtle" href="https://mb-site.com" target="_blank" rel="noopener noreferrer">
+          Portfolio MB
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="main-footer position-relative z-index-1 padding-top-xl bg-contrast-lower bg-opacity-20%" data-theme="dark">
+    <div class="container max-width-lg">
+      <div class="grid gap-lg">
+        <div class="col-4@lg order-2@lg text-right@lg">
+          <a class="main-footer__logo inline-flex items-center gap-xxs text-decoration-none" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="width-sm height-sm object-contain" alt="BayBay Logo">
+            <span class="text-md font-bold color-contrast-higher">BayBay v4.0</span>
+          </a>
+          <p class="text-xs color-contrast-medium margin-top-xs">
+            Suite logicielle d'automatisation et de gestion locative immobilière. Conçu et développé par Malik Bouaissi (EFREI Paris Promo 2029).
+          </p>
+        </div>
+        
+        <nav class="col-8@lg order-1@lg">
+          <ul class="grid gap-lg">
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Plateforme</h4>
+              <ul class="grid gap-xs text-sm">
+                <li><a href="#hero" class="main-footer__link">Accueil</a></li>
+                <li><a href="#apercu" class="main-footer__link">Aperçu & Démo</a></li>
+                <li><a href="#fonctionnalites" class="main-footer__link">Fonctionnalités</a></li>
+                <li><a href="{{ url_for('download_desktop_app') }}" class="main-footer__link">Version Windows (.exe)</a></li>
+              </ul>
+            </li>
+  
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Accès</h4>
+              <ul class="grid gap-xs text-sm">
+                {% if current_user.is_authenticated %}
+                  <li><a href="{{ url_for('dashboard') }}" class="main-footer__link">Tableau de Bord</a></li>
+                  <li><a href="{{ url_for('liste_biens') }}" class="main-footer__link">Biens & SCIs</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('login') }}" class="main-footer__link">Connexion</a></li>
+                  <li><a href="{{ url_for('register') }}" class="main-footer__link">Créer un Compte</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('a_propos') }}" class="main-footer__link">À propos</a></li>
+              </ul>
+            </li>
+  
+            <li class="col-4@xs">
+              <h4 class="margin-bottom-sm text-sm font-bold">Liens Externes</h4>
+              <ul class="grid gap-xs text-sm">
+                <li><a href="https://mb-site.com" target="_blank" rel="noopener noreferrer" class="main-footer__link">Portfolio mb-site.com</a></li>
+                <li><a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="main-footer__link">Dépôt GitHub</a></li>
+                <li><a href="mailto:contact@mb-site.com" class="main-footer__link">Support Technique</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    
+      <div class="flex flex-column border-top padding-y-xs margin-top-lg flex-row@md justify-between@md items-center@md">
+        <div class="margin-bottom-sm margin-bottom-0@md">
+          <div class="text-sm text-xs@md color-contrast-medium flex flex-wrap gap-xs">
+            <span>&copy; 2024–2026 BayBay v4.0. Tous droits réservés.</span>
+            <span>Malik Bouaissi • EFREI Paris Promo 2029</span>
+          </div>
+        </div>
+  
+        <div class="flex items-center gap-xs">
+          <a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="main-footer__social" aria-label="GitHub BayBay">
+            <svg class="icon block" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
