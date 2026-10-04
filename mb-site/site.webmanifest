@@ -1,0 +1,22 @@
+{
+  "name": "Portfolio de Malik Bouaissi",
+  "short_name": "Mb-site",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "description": "Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur.",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

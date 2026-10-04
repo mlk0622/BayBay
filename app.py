@@ -2371,8 +2371,8 @@ def index():
     return render_template('landing.html', app_version=VERSION)
 
 
-@app.route('/dashboard')
 @app.route('/app')
+@app.route('/dashboard')
 @login_required
 def dashboard():
     return render_app_consolidated('dashboard')

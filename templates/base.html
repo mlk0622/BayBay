@@ -713,13 +713,22 @@
         }
         
         document.getElementById('themeToggle')?.addEventListener('click', performThemeToggle);
-        document.getElementById('themeToggleMobile')?.addEventListener('click', performThemeToggle);        // Advanced SPA Transition and Caching Router for BayBay
+        document.getElementById('themeToggleMobile')?.addEventListener('click', performThemeToggle);
+        
+        // Advanced SPA Transition and Caching Router for BayBay
         (function() {
             const loadedViews = {};
             let isTransitioning = false;
             
+            function normalizePath(p) {
+                if (!p) return p;
+                if (p === '/app') return '/dashboard';
+                return p;
+            }
+
             const tabTitles = {
                 '/dashboard': 'Dashboard - BayBay',
+                '/app': 'Dashboard - BayBay',
                 '/biens': 'Biens - BayBay',
                 '/locataires': 'Locataires - BayBay',
                 '/appels-loyer': 'Appels de Loyer - BayBay',
@@ -747,7 +756,7 @@
                 if (!container || !pill) return;
                 
                 let activeLink = null;
-                const currentPath = window.location.pathname;
+                const currentPath = normalizePath(window.location.pathname);
                 
                 container.querySelectorAll('a').forEach(a => {
                     a.classList.remove('bg-primary', 'text-white');
@@ -759,7 +768,7 @@
                 });
                 
                 container.querySelectorAll('a').forEach(a => {
-                    const path = new URL(a.href).pathname;
+                    const path = normalizePath(new URL(a.href).pathname);
                     if (currentPath === path) {
                         activeLink = a;
                     }
@@ -795,13 +804,29 @@
             function syncMobileMenu() {
                 const mobileContainer = document.querySelector('.lg\\:hidden.border-t');
                 if (!mobileContainer) return;
-                const currentPath = window.location.pathname;
+                const currentPath = normalizePath(window.location.pathname);
                 mobileContainer.querySelectorAll('a').forEach(a => {
-                    const path = new URL(a.href).pathname;
+                    const path = normalizePath(new URL(a.href).pathname);
                     if (currentPath === path) {
                         a.className = "flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary text-white";
                     } else if (!a.href.includes('logout')) {
                         a.className = "flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 bg-slate-100";
+                    }
+                });
+            }
+
+            function activateOnlyView(targetPath) {
+                const normalizedTarget = normalizePath(targetPath);
+                document.querySelectorAll('.app-view').forEach(v => {
+                    const p = normalizePath(v.dataset.path);
+                    if (p === normalizedTarget) {
+                        v.classList.add('active');
+                        v.style.setProperty('display', 'block', 'important');
+                        v.style.setProperty('opacity', '1', 'important');
+                    } else {
+                        v.classList.remove('active');
+                        v.style.setProperty('display', 'none', 'important');
+                        v.style.setProperty('opacity', '0', 'important');
                     }
                 });
             }
@@ -812,8 +837,8 @@
                 
                 const fromUrl = window.location.href;
                 const toUrl = url;
-                const pathFrom = new URL(fromUrl).pathname;
-                const pathTo = new URL(toUrl).pathname;
+                const pathFrom = normalizePath(new URL(fromUrl).pathname);
+                const pathTo = normalizePath(new URL(toUrl).pathname);
                 
                 if (pathFrom === pathTo && !forceReload) return;
                 
@@ -840,31 +865,17 @@
                 } else {
                     const container = document.querySelector('.nav-pill-container');
                     if (container) {
-                        const isTab = Array.from(container.querySelectorAll('a')).some(a => new URL(a.href).pathname === pathTo);
+                        const isTab = Array.from(container.querySelectorAll('a')).some(a => normalizePath(new URL(a.href).pathname) === pathTo);
                         if (!isTab) {
                             const pill = document.querySelector('.nav-indicator-pill');
                             if (pill) pill.style.opacity = '0';
                         }
                     }
                 }
-                
-            function activateOnlyView(targetPath) {
-                document.querySelectorAll('.app-view').forEach(v => {
-                    const p = v.dataset.path;
-                    if (p === targetPath) {
-                        v.classList.add('active');
-                        v.style.setProperty('display', 'block', 'important');
-                        v.style.setProperty('opacity', '1', 'important');
-                    } else {
-                        v.classList.remove('active');
-                        v.style.setProperty('display', 'none', 'important');
-                        v.style.setProperty('opacity', '0', 'important');
-                    }
-                });
-            }
 
-            // 2. Load from DOM-preserved cache (Instant transition)
-            if (!forceReload && loadedViews[pathTo]) {
+                // 2. Load from DOM-preserved cache (Instant transition)
+                const cachedView = loadedViews[pathTo] || (pathTo === '/dashboard' ? loadedViews['/app'] : null);
+                if (!forceReload && cachedView) {
                 isTransitioning = true;
                 
                 wrapper.classList.add('fade-out');
@@ -900,14 +911,14 @@
                     return res.text().then(text => ({ url: finalUrl, text: text }));
                 })
                 .then(({ url: finalUrl, text: htmlText }) => {
-                    const finalPath = new URL(finalUrl).pathname;
+                    const finalPath = normalizePath(new URL(finalUrl).pathname);
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(htmlText, 'text/html');
                     
                     const newTitle = doc.querySelector('title') ? doc.querySelector('title').innerText : 'BayBay';
                     // Update all background tab views returned in doc
                     doc.querySelectorAll('.app-view').forEach(v => {
-                        const p = v.dataset.path;
+                        const p = normalizePath(v.dataset.path);
                         if (p && p !== finalPath && loadedViews[p]) {
                             loadedViews[p].innerHTML = v.innerHTML;
                             executeScripts(loadedViews[p]);
@@ -919,6 +930,9 @@
 
                     // Target exact view for finalPath
                     let incomingView = doc.querySelector(`.app-view[data-path="${finalPath}"]`);
+                    if (!incomingView && finalPath === '/dashboard') {
+                        incomingView = doc.querySelector('.app-view[data-path="/app"]');
+                    }
                     if (!incomingView) {
                         const allViews = doc.querySelectorAll('.app-view');
                         if (allViews.length === 1) {
@@ -945,6 +959,7 @@
                         
                         wrapper.appendChild(incomingView);
                         loadedViews[finalPath] = incomingView;
+                        if (finalPath === '/dashboard') loadedViews['/app'] = incomingView;
                         
                         executeScripts(incomingView);
                         if (window.setupEditor) {
@@ -993,7 +1008,7 @@
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(htmlText, 'text/html');
                         doc.querySelectorAll('.app-view').forEach(newView => {
-                            const path = newView.dataset.path;
+                            const path = normalizePath(newView.dataset.path);
                             if (path) {
                                 const oldView = loadedViews[path];
                                 if (oldView) {
@@ -1010,7 +1025,7 @@
                     .catch(err => console.warn("SPA: Reloading main tabs failed", err));
                 
                 // 2. Reload current detail page if on one
-                const currentPath = window.location.pathname;
+                const currentPath = normalizePath(window.location.pathname);
                 if (currentPath !== '/dashboard' && !tabTitles[currentPath]) {
                     fetch(window.location.href)
                         .then(res => {
@@ -1131,7 +1146,7 @@
             // SPA refresh: reload current view content in-place without replacing tabs or redirecting to dashboard
             window.refreshPage = function() {
                 const currentUrl = window.location.href;
-                const currentPath = window.location.pathname;
+                const currentPath = normalizePath(window.location.pathname);
                 console.log('SPA: refreshPage in-place for', currentPath);
                 
                 const fetchFn = window.__originalFetch || fetch;
@@ -1144,7 +1159,7 @@
                         
                         // Update loaded SPA views in-place
                         doc.querySelectorAll('.app-view').forEach(newView => {
-                            const path = newView.dataset.path;
+                            const path = normalizePath(newView.dataset.path);
                             if (path && loadedViews[path]) {
                                 loadedViews[path].innerHTML = newView.innerHTML;
                                 executeScripts(loadedViews[path]);
@@ -1324,15 +1339,25 @@
             };
 
             // Register preloaded views
-            document.addEventListener('DOMContentLoaded', () => {
+            function registerPreloadedViews() {
                 document.querySelectorAll('.app-view').forEach(view => {
-                    const path = view.dataset.path || window.location.pathname;
+                    const rawPath = view.dataset.path || window.location.pathname;
+                    const path = normalizePath(rawPath);
                     loadedViews[path] = view;
+                    if (path === '/dashboard') {
+                        loadedViews['/app'] = view;
+                    }
                 });
                 
                 setTimeout(syncNavPillWithCurrentRoute, 100);
                 setTimeout(syncMobileMenu, 100);
-            });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', registerPreloadedViews);
+            } else {
+                registerPreloadedViews();
+            }
 
             window.addEventListener('resize', () => {
                 syncNavPillWithCurrentRoute();

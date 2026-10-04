@@ -103,7 +103,7 @@
 </div>
 
 <script>
-const locatairesAppel = [
+var locatairesAppel = [
     {% for loc in locataires %}
     {
         id: {{ loc.id }},
@@ -176,7 +176,7 @@ function openScheduleModalFor(locataireId, locataireNom, locataireEmail, mois, a
     openScheduleModal(locataireId, locataireNom, locataireEmail, mois, annee);
 }
 
-let currentAppelEmailId = null;
+var currentAppelEmailId = null;
 
 function applyAppelEmailTemplate() {
     const modele = document.getElementById('appelEmailModele').value;

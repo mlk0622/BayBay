@@ -3,12 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Portfolio de Malik Bouaissi, étudiant ingénieur en 2ème année à l'EFREI Paris (Promo 2029). Spécialiste en ingénierie logicielle, compilateurs C, architectures hybrides et éco-conception.">
+  <title>Portfolio de Malik Bouaissi</title>
+  <meta name="description" content="Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur. Découvrez mes projets en informatique, web et logiciels.">
   <meta name="author" content="Malik Bouaissi">
-  <meta property="og:title" content="Malik Bouaissi | Ingénierie Logicielle & Systèmes | EFREI Paris">
-  <meta property="og:description" content="Portfolio et projets d'ingénierie logicielle : BayBay v4.0, Compilateur SimplCT, CroustyRun, Poudelard.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Nom du site pour Google Search (Google Site Name) -->
+  <meta property="og:site_name" content="Mb-site">
+  <meta name="application-name" content="Mb-site">
+  <meta name="apple-mobile-web-app-title" content="Mb-site">
+
+  <!-- Open Graph / Réseaux Sociaux & Aperçus Google -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Portfolio de Malik Bouaissi">
+  <meta property="og:description" content="Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur. Découvrez mes projets en informatique, web et logiciels.">
   <meta property="og:image" content="https://mb-site.com/logo.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
   <meta property="og:url" content="https://mb-site.com">
+
+  <!-- Twitter Card (summary adapté au format carré du logo 512x512) -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Portfolio de Malik Bouaissi">
+  <meta name="twitter:description" content="Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur. Découvrez mes projets en informatique, web et logiciels.">
+  <meta name="twitter:image" content="https://mb-site.com/logo.png">
+
+  <!-- URL Canonique -->
+  <link rel="canonical" href="https://mb-site.com/">
+
+  <!-- Web Manifest PWA -->
+  <link rel="manifest" href="/site.webmanifest">
+
   <script>document.getElementsByTagName("html")[0].className += " js";</script>
   
   <!-- google fonts -->
@@ -16,7 +42,57 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   
-  <link rel="icon" type="image/png" href="favicon.png">
+  <!-- Favicons Google Search & Navigateurs -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="48x48" href="https://mb-site.com/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="https://mb-site.com/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://mb-site.com/favicon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://mb-site.com/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://mb-site.com/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://mb-site.com/apple-touch-icon.png">
+
+  <!-- Schema.org Structured Data pour Google Search (Site Name, Logo & Profil) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Mb-site",
+    "alternateName": ["mb-site.com", "MB-Site", "Mb-Site"],
+    "url": "https://mb-site.com",
+    "description": "Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur. Découvrez mes projets en informatique, web et logiciels.",
+    "publisher": {
+      "@type": "Person",
+      "name": "Malik Bouaissi",
+      "url": "https://mb-site.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://mb-site.com/logo.png",
+        "width": 512,
+        "height": 512
+      }
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Malik Bouaissi",
+    "url": "https://mb-site.com",
+    "image": "https://mb-site.com/logo.png",
+    "description": "Portfolio de Malik Bouaissi, étudiant à l'EFREI Paris en cycle préparatoire ingénieur. Découvrez mes projets en informatique, web et logiciels.",
+    "jobTitle": "Élève-Ingénieur en Informatique",
+    "alumniOf": {
+      "@type": "EducationalOrganization",
+      "name": "EFREI Paris",
+      "url": "https://www.efrei.fr"
+    },
+    "sameAs": [
+      "https://github.com/mlk0622"
+    ]
+  }
+  </script>
+  
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     /* Écran d'ordinateur (Computer Monitor Mockup) */
@@ -137,13 +213,14 @@
       position: relative;
     }
   </style>
-  <title>Malik Bouaissi | Ingénierie Logicielle & Systèmes | EFREI Paris</title>
 </head>
 <body>
   <!-- ==================== HEADER ==================== -->
   <header class="f-header position-absolute bg-transparent js-f-header" data-theme="dark">
     <div class="f-header__mobile-content container max-width-lg">
-      <div></div>
+      <a href="index.html" class="inline-flex items-center gap-xxs text-decoration-none" aria-label="Accueil Malik Bouaissi">
+        <img src="logo.png" class="width-sm height-sm object-contain" alt="MB Logo" style="width: 36px; height: 36px; filter: drop-shadow(0 2px 8px rgba(255,255,255,0.15));">
+      </a>
   
       <button class="reset anim-menu-btn js-anim-menu-btn f-header__nav-control js-tab-focus" aria-label="Basculer le menu">
         <i class="anim-menu-btn__icon anim-menu-btn__icon--close" aria-hidden="true"></i>
@@ -152,7 +229,11 @@
   
     <div class="f-header__nav" role="navigation">
       <div class="f-header__nav-grid justify-between@md container max-width-lg">
-        <div class="f-header__nav-logo-wrapper flex-grow flex-basis-0"></div>
+        <div class="f-header__nav-logo-wrapper flex-grow flex-basis-0 items-center">
+          <a href="index.html" class="inline-flex items-center gap-xxs text-decoration-none" aria-label="Accueil Malik Bouaissi">
+            <img src="logo.png" class="width-sm height-sm object-contain" alt="MB Logo" style="width: 36px; height: 36px; filter: drop-shadow(0 2px 8px rgba(255,255,255,0.15));">
+          </a>
+        </div>
     
         <ul class="f-header__list flex-grow flex-basis-0 justify-center@md">
           <li class="f-header__item"><a href="#hero" class="f-header__link">Accueil</a></li>
@@ -162,7 +243,7 @@
               <svg class="f-header__dropdown-icon icon" aria-hidden="true" viewBox="0 0 12 12"><path d="M9.943,4.269A.5.5,0,0,0,9.5,4h-7a.5.5,0,0,0-.41.787l3.5,5a.5.5,0,0,0,.82,0l3.5-5A.5.5,0,0,0,9.943,4.269Z"/></svg>
             </a>
             <ul class="f-header__dropdown">
-              <li><a href="#baybay" class="f-header__dropdown-link">BayBay v4.0 (Gestion Locative)</a></li>
+              <li><a href="#baybay" class="f-header__dropdown-link">BayBay (Gestion Locative)</a></li>
               <li><a href="#simplct" class="f-header__dropdown-link">SimplCT (Compilateur C)</a></li>
               <li><a href="#croustyrun" class="f-header__dropdown-link">CroustyRun (Éco-conception 60 FPS)</a></li>
               <li><a href="#poudelard" class="f-header__dropdown-link">Poudelard (Simulation POO)</a></li>
@@ -202,7 +283,7 @@
         <div class="flex flex-wrap flex-center gap-sm">
           <a class="btn btn--primary" href="#projets" style="box-shadow: none !important; filter: none !important;">Explorer les réalisations</a>
           <a class="btn btn--subtle" href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer">
-            <span>Découvrir BayBay v4.0</span>
+            <span>Découvrir BayBay</span>
             <svg class="icon margin-left-xxs" viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="8" x2="14" y2="8"/><polyline points="9 3 14 8 9 13"/></g></svg>
           </a>
         </div>
@@ -210,16 +291,13 @@
     </div>
   </section>
 
-  <!-- ==================== FLAGSHIP PROJECT: BAYBAY v4.0 (DEVICES) ==================== -->
+  <!-- ==================== FLAGSHIP PROJECT: BAYBAY (DEVICES) ==================== -->
   <section id="baybay" class="position-relative z-index-1 padding-y-xxl bg-white" data-theme="default" style="background-color: #ffffff; color: #1e293b;">
     <div class="container max-width-adaptive-lg position-relative z-index-2">
       <div class="grid gap-lg items-center">
         <div class="col-5@md">
           <div class="text-component">
-            <div class="inline-flex items-center gap-xxs text-xs font-semibold color-primary text-uppercase letter-spacing-sm">
-              <span>Projet Phare • Production</span>
-            </div>
-            <h2 class="text-xxl font-primary color-contrast-higher">BayBay v4.0 — Gestion Locative Hybride</h2>
+            <h2 class="text-xxl font-primary color-contrast-higher">BayBay — Gestion Locative Hybride</h2>
             <p class="color-contrast-medium">
               Suite logicielle complète d'automatisation immobilière combinant une application de bureau Windows (Electron.js + Python standalone) et une plateforme cloud SaaS hébergée sur serveur dédié.
             </p>
@@ -257,7 +335,7 @@
                 <div style="width: 36px;"></div>
               </div>
               <a href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer" class="pc-screen__content" title="Tester le SaaS BayBay">
-                <img src="assets/img/mockup-pc.png" alt="BayBay v4.0 - Interface affichée sur écran d'ordinateur">
+                <img src="assets/img/mockup-pc.png" alt="BayBay - Interface affichée sur écran d'ordinateur">
               </a>
             </div>
             <!-- Pied du moniteur -->
@@ -281,9 +359,6 @@
   
           <div class="bg-contrast-lower bg-opacity-50% col-6@md">
             <div class="text-component text-space-y-md height-100% flex flex-column padding-md padding-lg@md">
-              <div class="text-xs color-contrast-medium text-uppercase letter-spacing-sm font-semibold">
-                Théorie des Langages & Systèmes
-              </div>
               <h3 class="text-xl text-xxl@md font-primary">SimplCT — Compilateur C Complet</h3>
               <p class="text-sm color-contrast-medium">
                 <strong>Par Mohammed Belfar & Malik Bouaissi</strong>
@@ -318,9 +393,6 @@
                 <img class="block width-100% height-100% object-cover" src="assets/img/croustyrun.png" alt="CroustyRun Eco-Game">
               </figure>
               <div class="padding-md padding-lg@md flex flex-column flex-grow">
-                <div class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold margin-bottom-xxs">
-                  Éco-conception & Green IT
-                </div>
                 <h3 class="text-xl font-primary color-contrast-higher margin-bottom-xxs">CroustyRun — Jeu Éco-conçu 60 FPS</h3>
                 <p class="text-xs color-contrast-medium margin-bottom-sm">
                   <strong>Par Mohammed Belfar, Malik Bouaissi, Antoine Picou & Mathis Jacques--Llorens</strong>
@@ -349,9 +421,6 @@
                 <img class="block max-width-100% height-100% object-contain padding-xs" src="assets/img/poudelard.png" alt="Poudelard Simulation">
               </figure>
               <div class="padding-md padding-lg@md flex flex-column flex-grow">
-                <div class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold margin-bottom-xxs">
-                  Simulation Systèmes & Modélisation POO
-                </div>
                 <h3 class="text-xl font-primary color-contrast-higher margin-bottom-xxs">Poudelard — Simulation POO Déterministe</h3>
                 <p class="text-xs color-contrast-medium margin-bottom-sm">
                   <strong>Par Mohammed Belfar & Malik Bouaissi</strong>
@@ -381,7 +450,6 @@
   <section id="contact" class="newsletter padding-y-xl text-center" data-theme="soft">
     <div class="container max-width-sm position-relative z-index-2">
       <div class="text-component margin-bottom-md">
-        <span class="text-xs color-primary text-uppercase letter-spacing-sm font-semibold">Prendre Contact</span>
         <h2 class="text-xxl font-primary">Échangeons Ensemble</h2>
         <p class="color-contrast-medium text-md">
           Étudiant ingénieur disponible pour des opportunités de stage, des échanges techniques ou des collaborations sur des projets ambitieux.
@@ -423,10 +491,11 @@
       <div class="grid gap-lg">
         <div class="col-4@lg order-2@lg text-right@lg">
           <a class="main-footer__logo inline-flex items-center gap-xxs text-decoration-none" href="index.html">
+            <img src="logo.png" class="width-sm height-sm object-contain" alt="MB Logo" style="width: 28px; height: 28px; filter: drop-shadow(0 2px 6px rgba(255,255,255,0.15));">
             <span class="text-md font-bold color-contrast-higher">Malik Bouaissi</span>
           </a>
           <p class="text-xs color-contrast-medium margin-top-xs">
-            Étudiant en 2ème année à l'EFREI Paris (Promo 2029). Spécialiste ingénierie logicielle, systèmes et compilateurs.
+            Étudiant en 2ème année à l'EFREI Paris (Promo 2030). Spécialiste ingénierie logicielle, systèmes et compilateurs.
           </p>
         </div>
         
@@ -435,7 +504,7 @@
             <li class="col-4@xs">
               <h4 class="margin-bottom-sm text-sm font-bold">Projets</h4>
               <ul class="grid gap-xs text-sm">
-                <li><a href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer" class="main-footer__link">BayBay v4.0 (SaaS)</a></li>
+                <li><a href="https://baybay.mb-site.com" target="_blank" rel="noopener noreferrer" class="main-footer__link">BayBay (SaaS)</a></li>
                 <li><a href="https://github.com/mlk0622/BayBay" target="_blank" rel="noopener noreferrer" class="main-footer__link">BayBay (GitHub)</a></li>
                 <li><a href="https://github.com/wassity/simplCT" target="_blank" rel="noopener noreferrer" class="main-footer__link">SimplCT (Compilateur C)</a></li>
                 <li><a href="https://croustyrun.supercraft.tech" target="_blank" rel="noopener noreferrer" class="main-footer__link">CroustyRun (Éco-jeu)</a></li>
@@ -467,8 +536,8 @@
       <div class="flex flex-column border-top padding-y-xs margin-top-lg flex-row@md justify-between@md items-center@md">
         <div class="margin-bottom-sm margin-bottom-0@md">
           <div class="text-sm text-xs@md color-contrast-medium flex flex-wrap gap-xs">
-            <span>&copy; 2024–2026 Malik Bouaissi. Tous droits réservés.</span>
-            <span>EFREI Paris Promo 2029</span>
+            <span>&copy; 2026 Malik Bouaissi. Tous droits réservés.</span>
+            <span>EFREI Paris Promo 2030</span>
           </div>
         </div>
   

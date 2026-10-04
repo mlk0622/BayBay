@@ -100,7 +100,7 @@
 </div>
 
 <script>
-const appartementsData = [
+var appartementsData = [
     {% for appart in appartements %}
     { id: {{ appart.id }}, label: "{{ appart.numero_porte }} - {{ appart.bien.adresse[:30] }} ({{ appart.bien.sci.nom }})" },
     {% endfor %}

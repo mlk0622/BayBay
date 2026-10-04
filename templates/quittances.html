@@ -75,7 +75,7 @@
 </div>
 
 <script>
-const locatairesQuittance = [
+var locatairesQuittance = [
     {% for loc in locataires %}
     {
         id: {{ loc.id }},
@@ -158,8 +158,8 @@ async function submitCreerQuittance(event) {
     }
 }
 
-let currentQuittanceEmailId = null;
-let currentQuittanceEmailRef = null;
+var currentQuittanceEmailId = null;
+var currentQuittanceEmailRef = null;
 
 function applyQuittanceEmailTemplate() {
     const modele = document.getElementById('quittanceEmailModele').value;
