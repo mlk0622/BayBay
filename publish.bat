@@ -97,11 +97,19 @@ if /i "%PUBLISH_LOCAL_ONLY%"=="1" (
 
 echo [5/7] Git commit
 git add -A
-git commit -m "v%VERSION%"
+git diff --cached --quiet
+if errorlevel 1 (
+    git commit -m "v%VERSION%"
+) else (
+    echo Aucun nouveau changement a committer.
+)
 git push origin main
 
 echo [6/7] Git tag
-git tag -a "v%VERSION%" -m "v%VERSION%"
+git tag -l "v%VERSION%" | findstr /x "v%VERSION%" >nul
+if errorlevel 1 (
+    git tag -a "v%VERSION%" -m "v%VERSION%"
+)
 git push origin "v%VERSION%"
 
 echo [7/7] GitHub release
