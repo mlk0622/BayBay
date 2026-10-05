@@ -17,8 +17,9 @@ cd electron-app
 cmd /c "npx @electron/packager . BayBay --platform=win32 --arch=x64 --out=dist-simple --icon=build/icon.ico --overwrite"
 cd ..
 
-echo [3/3] NSIS Installer
-"C:\Program Files (x86)\NSIS\makensis.exe" installer.nsi
+set "MAKENSIS=C:\Program Files (x86)\NSIS\makensis.exe"
+if not exist "%MAKENSIS%" set "MAKENSIS=%LOCALAPPDATA%\nsis-3.10\makensis.exe"
+"%MAKENSIS%" installer.nsi
 if errorlevel 1 (
     echo ERREUR: NSIS a echoue
     exit /b 1

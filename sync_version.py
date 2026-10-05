@@ -155,13 +155,20 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Synchronise les versions de release")
     parser.add_argument("version", nargs="?", help="Version cible (ex: 2.7)")
     parser.add_argument("--check", action="store_true", help="Vérifie seulement la cohérence")
+    parser.add_argument("--get", action="store_true", help="Affiche la version actuelle de app.py")
     args = parser.parse_args()
+
+    if args.get:
+        versions = read_versions()
+        print(versions.get("app.py") or "")
+        return 0
 
     if args.check and not args.version:
         return check_consistency()
 
     if not args.version:
-        parser.error("version requise sauf avec --check")
+        parser.error("version requise sauf avec --check ou --get")
+
 
     version = ensure_version_format(args.version)
 

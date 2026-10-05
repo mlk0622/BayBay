@@ -2,12 +2,22 @@
 setlocal enabledelayedexpansion
 
 set "GH=C:\Program Files\GitHub CLI\gh.exe"
+if not exist "%GH%" (
+    where gh >nul 2>&1
+    if not errorlevel 1 set "GH=gh"
+)
 cd /d "%~dp0"
 
 if not "%~1"=="" (
     set "VERSION=%~1"
 ) else (
-    set /p VERSION="Version: "
+    for /f "delims=" %%v in ('py sync_version.py --get 2^>nul') do set "DEFAULT_VERSION=%%v"
+    if defined DEFAULT_VERSION (
+        set /p VERSION="Version [!DEFAULT_VERSION!]: "
+        if "!VERSION!"=="" set "VERSION=!DEFAULT_VERSION!"
+    ) else (
+        set /p VERSION="Version: "
+    )
 )
 if "%VERSION%"=="" exit /b 1
 
