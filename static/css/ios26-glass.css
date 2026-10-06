@@ -1,80 +1,113 @@
 /* 
- * iOS Liquid Glass Design System - Light Ice Blue Edition
- * ====================================================
+ * ==========================================================================
+ * BayBay — Design Système Sombre Épuré (Inspiré de MB-Site & CodyHouse)
+ * ==========================================================================
+ * Strictement basé sur la charte graphique sombre de mb-site/assets/css/style.css:
+ * - Fond sombre ardoise profond (#0b0f19) sans bulles flottantes ni dégradés radiaux
+ * - Typographie classique et nette Inter sans-serif (zéro serif)
+ * - Pilulier de navigation glissant sur rail (#1e293b / #2563eb)
+ * - Cartes épurées (#111827) avec bordures fines (#1e293b / #334155)
+ * - Boutons et formulaires classiques avec coins arrondis soignés (10px - 12px)
+ * - Zéro effet néon, zéro lueur artificielle, contraste maximal et lisibilité parfaite
  */
 
 html {
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    background-color: #0b0f19;
 }
 
-/* 
- * iOS Liquid Glass Design System - Single Off-White / Light Gray Theme
- * ==================================================================
- */
-
-:root {
-    /* Fond Sombre Sobre (Style MB-Site Dark) */
-    --bg-1: #0b0f19;              /* Deep Dark Slate */
-    --bg-2: #0f172a;              /* Slate 900 */
-    --bg-3: #111827;              /* Dark Card Surface */
-    --text-main: #FFFFFF;         /* Texte Blanc Pur */
-    --text-muted: #94a3b8;        /* Slate 400 */
+:root,
+[data-theme="dark"],
+[data-theme="light"],
+html {
+    /* Palette de base sombre MB-Site */
+    --bg-main: #0b0f19;           /* Ardoise sombre profond */
+    --bg-surface: #111827;        /* Cartes et panneaux (Slate 900) */
+    --bg-surface-elevated: #0f172a;/* Navbar, modales et menus */
+    --bg-track: #1e293b;          /* Rails de piluliers et badges */
     
-    /* Contours & Surfaces sobres sans effet néon */
+    --border-main: #1e293b;       /* Bordures par défaut */
+    --border-hover: #334155;      /* Bordures au survol / focus */
     --border-glass: #1e293b;
-    --surface-glass: #111827;
-    --surface-glass-strong: #111827;
-    --surface-nav: #0f172a;
     
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --text-main: #f8fafc;         /* Blanc pur éclatant */
+    --text-muted: #94a3b8;        /* Gris ardoise lisible */
+    --text-subtle: #64748b;       /* Gris discret */
     
-    /* Palette fonctionnelle épurée MB-Site */
-    --primary: #2563eb;           /* Bleu roi signature */
-    --primary-strong: #1d4ed8;
-    --success: #10b981;           /* Vert */
-    --danger: #ef4444;            /* Rouge */
+    /* Couleurs d'action fonctionnelles */
+    --primary: #2563eb;           /* Bleu roi signature MB-Site */
+    --primary-hover: #1d4ed8;
+    --primary-subtle: rgba(37, 99, 235, 0.15);
+    
+    --success: #10b981;           /* Vert émeraude */
+    --success-subtle: rgba(16, 185, 129, 0.15);
+    
+    --danger: #ef4444;            /* Rouge corail */
+    --danger-subtle: rgba(239, 68, 68, 0.15);
+    
     --warning: #f59e0b;           /* Ambre */
+    --warning-subtle: rgba(245, 158, 11, 0.15);
+    
     --purple: #8b5cf6;            /* Violet */
+    --purple-subtle: rgba(139, 92, 246, 0.15);
 
     /* Variables de composants */
-    --modal-bg-end: #0f172a;
     --card-bg: #111827;
+    --modal-bg: #0f172a;
+    --modal-bg-end: #0f172a;
+    --modal-border-color: #334155;
+    --surface-nav: #0f172a;
+    --surface-glass: #111827;
+    --surface-glass-strong: #0f172a;
+
     --input-bg: #0f172a;
     --input-border: #334155;
     --select-bg: #0f172a;
     --select-scheme: dark;
-    --titlebar-bg: #0f172a;
-    --titlebar-text: #FFFFFF;
-    --titlebar-border: #1e293b;
-    --table-header-bg: #0b0f19;
+    --table-header-bg: #0f172a;
     --row-hover-bg: rgba(255, 255, 255, 0.02);
-    --modal-border-color: #334155;
 
-    --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.4);
-    --blob-1: transparent;
-    --blob-2: transparent;
-    --blob-3: transparent;
+    --scrollbar-thumb: #334155;
+    --scrollbar-thumb-hover: #475569;
+    
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.25);
 
     /* Éditeur de texte enrichi */
     --editor-bg: #0f172a;
-    --editor-text: #FFFFFF;
+    --editor-text: #ffffff;
     --editor-border: #334155;
     --editor-toolbar-bg: #1e293b;
     --editor-btn-bg: #334155;
-    --editor-btn-text: #FFFFFF;
+    --editor-btn-text: #ffffff;
     --editor-placeholder: #94a3b8;
 }
 
-/* Base style sombre sans bulle ni effet flottant */
+/* 1. Typographie classique & moderne unifiée partout */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif !important;
+    letter-spacing: -0.012em;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif !important;
+    letter-spacing: -0.02em !important;
+    font-weight: 700 !important;
+}
+
+/* 2. Arrière-plan épuré solide (pas de bulles ni effets flottants) */
 body,
 body.app-shell {
     position: relative;
-    color: #FFFFFF !important;
+    color: #f8fafc !important;
     background: #0b0f19 fixed !important;
-    background-attachment: fixed !important;
+    background-color: #0b0f19 !important;
+    min-height: 100vh;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
 }
 
 body.app-shell::before,
@@ -82,70 +115,91 @@ body.app-shell::after {
     display: none !important;
 }
 
-* {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-    letter-spacing: -0.02em !important;
-}
-
-/* Barre de navigation sombre épurée */
+/* 3. Barre de navigation sobre MB-Site */
 .app-nav {
     background: #0f172a !important;
     border-bottom: 1px solid #1e293b !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 }
 
-.app-nav .text-slate-900,
-.app-nav .text-slate-850,
-.app-nav .text-slate-700,
-.app-nav .text-slate-600 {
-    color: #94a3b8 !important;
+/* Logo de marque BayBay : toujours visible, net et protégé */
+.app-nav .brand-link,
+.app-nav .flex.items-center > a[href*="dashboard"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    text-decoration: none !important;
 }
 
-.app-nav .hover\:bg-slate-100:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
+.app-nav .brand-link img,
+.app-nav .flex.items-center > a[href*="dashboard"] img {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    object-fit: contain !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.app-nav .brand-link span,
+.app-nav .flex.items-center > a[href*="dashboard"] span {
     color: #ffffff !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
 }
 
-/* --- NAVIGATION EN PILULIER SOBRE (STYLE MB-SITE) --- */
-.app-nav .hidden.lg\:flex,
+/* 4. Rail du pilulier de navigation (MB-Site Pill Track) */
 .nav-pill-container {
     background: #1e293b !important;
     border: 1px solid #334155 !important;
     border-radius: 9999px !important;
-    padding: 4px !important;
-    box-shadow: none !important;
+    padding: 3px !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 2px !important;
 }
 
-.app-nav a {
+/* Liens à l'intérieur du pilulier */
+.nav-pill-container a.nav-pill-item,
+.nav-pill-container a {
     border-radius: 9999px !important;
-    margin: 0 2px !important;
-    padding: 0.5rem 1.1rem !important;
+    padding: 0.45rem 1rem !important;
     color: #94a3b8 !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    position: relative;
-    z-index: 1;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.18s ease !important;
+    position: relative !important;
+    z-index: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    border: none !important;
+    background: transparent !important;
 }
 
-.app-nav a:hover {
+.nav-pill-container a.nav-pill-item:hover,
+.nav-pill-container a:hover {
     color: #ffffff !important;
     background: rgba(255, 255, 255, 0.08) !important;
 }
 
-.app-nav a i,
-.app-nav a svg {
-    color: inherit !important;
-    fill: currentColor !important;
-}
-
-.app-nav a.bg-primary {
+/* Pilule active sur le rail */
+.nav-pill-container a.bg-primary,
+.nav-pill-container a.active {
     background: #2563eb !important;
     color: #ffffff !important;
     font-weight: 600 !important;
@@ -156,429 +210,428 @@ h1, h2, h3, h4, h5, h6 {
     animation: none !important;
 }
 
-.app-nav a.bg-primary i,
-.app-nav a.bg-primary * {
+.nav-pill-container a.bg-primary i,
+.nav-pill-container a.bg-primary span,
+.nav-pill-container a.active i,
+.nav-pill-container a.active span {
     color: #ffffff !important;
 }
 
-/* Cartes sobres (Style MB-Site Dark) */
+/* Pilule indicatrice coulissante */
+.nav-indicator-pill {
+    background: #2563eb !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
+    border-radius: 9999px !important;
+}
+
+/* 5. Cartes sobres & Modernes (Style MB-Site Cards) */
 .glass-card,
 .stat-card,
+.app-card,
 .bg-white.shadow-sm,
 .bg-white.rounded-xl {
     background: #111827 !important;
     border: 1px solid #1e293b !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    color: #ffffff !important;
 }
 
 .glass-card:hover,
-.stat-card:hover {
+.stat-card:hover,
+.app-card:hover {
     transform: none !important;
     border-color: #334155 !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Glowing blue stats card icons */
+/* 6. Icônes des cartes de statistiques */
 .stat-icon {
-    width: 3.2rem;
-    height: 3.2rem;
-    border-radius: 14px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .stat-icon.blue { 
-    background: rgba(96, 165, 250, 0.25) !important; 
-    color: #93c5fd !important;
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.3) !important;
+    background: rgba(37, 99, 235, 0.15) !important; 
+    color: #60a5fa !important;
+    border-color: rgba(37, 99, 235, 0.3) !important;
+    box-shadow: none !important;
 }
 .stat-icon.purple { 
-    background: rgba(168, 85, 247, 0.25) !important; 
+    background: rgba(139, 92, 246, 0.15) !important; 
     color: #c084fc !important;
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3) !important;
+    border-color: rgba(139, 92, 246, 0.3) !important;
+    box-shadow: none !important;
 }
 .stat-icon.green { 
-    background: rgba(52, 211, 153, 0.25) !important; 
-    color: #a7f3d0 !important;
-    box-shadow: 0 0 15px rgba(52, 211, 153, 0.3) !important;
+    background: rgba(16, 185, 129, 0.15) !important; 
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    box-shadow: none !important;
 }
 .stat-icon.red { 
-    background: rgba(248, 113, 113, 0.25) !important; 
-    color: #fca5a5 !important;
-    box-shadow: 0 0 15px rgba(248, 113, 113, 0.3) !important;
+    background: rgba(239, 68, 68, 0.15) !important; 
+    color: #f87171 !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    box-shadow: none !important;
 }
 
-/* Functional Button Palette (Blue, Green, Red, Yellow, Purple, Secondary) */
+/* 7. Boutons fonctionnels sobres */
 .ios-button,
-.ios-button-success,
-.ios-button-danger,
-.ios-button-warning,
-.ios-button-purple,
-.ios-button-secondary,
-.btn-secondary,
 .btn-primary,
-.btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-weight: 700 !important;
-    border-radius: 14px !important;
-    padding: 0.65rem 1.3rem !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+button[type="submit"]:not(.bg-red-600) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    background: #2563eb !important;
+    border: 1px solid #3b82f6 !important;
     color: #ffffff !important;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-}
-
-.ios-button i,
-.ios-button-success i,
-.ios-button-danger i,
-.ios-button-warning i,
-.ios-button-purple i,
-.ios-button-secondary i,
-.btn-secondary i,
-.btn-primary i,
-.btn-danger i {
-    color: #ffffff !important;
-}
-
-.ios-button svg,
-.ios-button-success svg,
-.ios-button-danger svg,
-.ios-button-warning svg,
-.ios-button-purple svg,
-.ios-button-secondary svg {
-    color: #ffffff !important;
-    stroke: #ffffff !important;
-}
-
-/* 1. BLEU - Actions principales / Navigation */
-.ios-button,
-.ios-btn-blue,
-.btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-    color: #ffffff !important;
-}
-
-/* 2. VERT - Validation / Confirmation / Enregistrer / Ajouter */
-.ios-button-success,
-.ios-btn-green {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    color: #ffffff !important;
-}
-
-/* 3. ROUGE - Suppression / Annulation / Déconnexion / Danger */
-.ios-button-danger,
-.ios-btn-red,
-.btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
-}
-
-/* 4. JAUNE - Modification / Warning */
-.ios-button-warning,
-.ios-btn-yellow {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    color: #ffffff !important;
-}
-
-/* 5. VIOLET - Options / Actions Spéciales */
-.ios-button-purple,
-.ios-btn-purple {
-    background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%) !important;
-    color: #ffffff !important;
-}
-
-/* 6. SECONDARY - Annuler / Ghost Glass */
-.ios-button-secondary,
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 10px !important;
+    padding: 0.55rem 1.2rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .ios-button:hover,
+.btn-primary:hover,
+button[type="submit"]:not(.bg-red-600):hover {
+    background: #1d4ed8 !important;
+    border-color: #2563eb !important;
+    transform: translateY(-1px) !important;
+}
+
+.ios-button-success,
+.bg-green-600,
+.bg-green-500 {
+    background: #10b981 !important;
+    border: 1px solid #34d399 !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.15s ease !important;
+}
 .ios-button-success:hover,
+.bg-green-600:hover {
+    background: #059669 !important;
+}
+
+.ios-button-danger,
+.bg-red-600,
+.bg-red-500 {
+    background: #ef4444 !important;
+    border: 1px solid #f87171 !important;
+    color: #ffffff !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.15s ease !important;
+}
 .ios-button-danger:hover,
-.ios-button-warning:hover,
-.ios-button-purple:hover,
+.bg-red-600:hover {
+    background: #dc2626 !important;
+}
+
+.ios-button-secondary,
+.btn-secondary,
+button.bg-white,
+button[class*="bg-white"],
+button[class*="border-slate-200"],
+[id$="Modal"] button[class*="text-slate-700"] {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transition: all 0.15s ease !important;
+}
+
 .ios-button-secondary:hover,
 .btn-secondary:hover,
-.btn-primary:hover,
-.btn-danger:hover {
-    transform: none !important;
-    filter: brightness(1.12);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+button.bg-white:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
 }
 
-.ios-button:active,
-.ios-button-success:active,
-.ios-button-danger:active,
-.ios-button-warning:active,
-.ios-button-purple:active,
-.ios-button-secondary:active {
-    transform: none !important;
+/* Boutons d'action dans les listes (.action-btn) */
+.action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 2.2rem !important;
+    height: 2.2rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #334155 !important;
+    background: #1e293b !important;
+    color: #cbd5e1 !important;
+    transition: all 0.15s ease !important;
+    cursor: pointer !important;
 }
+.action-btn:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
+    border-color: #475569 !important;
+}
+.action-btn.view { color: #60a5fa !important; }
+.action-btn.edit { color: #f59e0b !important; }
+.action-btn.delete { color: #ef4444 !important; }
+.action-btn.pdf { color: #ec4899 !important; }
+.action-btn.email { color: #10b981 !important; }
 
-/* Glass inputs and textareas */
-.glass-input,
-input,
+/* 8. Formulaires, Champs et Sélecteurs (Style Sombre Propre) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 select,
-textarea {
-    background: var(--input-bg) !important;
-    border: 1px solid var(--input-border) !important;
-    color: var(--text-main) !important;
-    border-radius: 14px !important;
-    padding: 0.75rem 1rem !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    backdrop-filter: blur(5px);
-}
-
-input::placeholder,
-textarea::placeholder {
-    color: var(--text-muted) !important;
-    opacity: 0.8;
+textarea,
+.glass-input {
+    background-color: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    color: #ffffff !important;
+    padding: 0.6rem 0.9rem !important;
+    font-size: 0.875rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 input:focus,
 select:focus,
-textarea:focus {
+textarea:focus,
+.glass-input:focus {
+    border-color: #2563eb !important;
     outline: none !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(96, 165, 250, 0.7) !important;
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
 }
 
-/* Form Dropdowns config */
-select {
-    color: var(--text-main) !important;
-    background-color: var(--select-bg) !important;
-    color-scheme: var(--select-scheme) !important;
+input::placeholder,
+textarea::placeholder {
+    color: #64748b !important;
 }
 
 select option,
 select optgroup {
-    color: var(--text-main) !important;
-    background-color: var(--select-bg) !important;
+    background-color: #0f172a !important;
+    color: #ffffff !important;
 }
 
-/* Liquid Tables */
-.table-ios, table {
+label {
+    color: #cbd5e1 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+}
+
+/* 9. Tableaux sombres unifiés */
+.table-ios,
+table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
-    width: 100%;
+    width: 100% !important;
+    background: #111827 !important;
+    border: 1px solid #1e293b !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
 }
 
-.table-ios thead th, table thead th {
-    text-align: left;
-    padding: 1.1rem 1rem !important;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border-glass) !important;
-    background: var(--table-header-bg);
+.table-ios thead th,
+table thead th {
+    text-align: left !important;
+    padding: 0.85rem 1rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: #94a3b8 !important;
+    border-bottom: 1px solid #1e293b !important;
+    background: #0f172a !important;
 }
 
-.table-ios tbody td, table tbody td {
-    padding: 1.1rem 1rem !important;
-    border-bottom: 1px solid var(--border-glass) !important;
-    color: var(--text-main) !important;
+.table-ios tbody td,
+table tbody td {
+    padding: 0.85rem 1rem !important;
+    border-bottom: 1px solid #1e293b !important;
+    color: #f1f5f9 !important;
     background: transparent !important;
+    font-size: 0.875rem !important;
 }
 
-.table-ios tbody tr:hover, table tbody tr:hover {
-    background: var(--row-hover-bg) !important;
+.table-ios tbody tr:last-child td,
+table tbody tr:last-child td {
+    border-bottom: none !important;
 }
 
-/* Glossy Action Buttons in lists */
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.3rem;
-    height: 2.3rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    color: #93c5fd !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+.table-ios tbody tr:hover,
+table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02) !important;
 }
 
-.action-btn:hover {
-    transform: none !important;
-    background: rgba(255, 255, 255, 0.18) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+/* 10. Modales & Popups */
+[id$="Modal"],
+[id$="modal"],
+.ios-modal {
+    background: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
 }
 
-.action-btn.view { color: #60a5fa !important; background: rgba(59, 130, 246, 0.12) !important; border: 1px solid rgba(59, 130, 246, 0.25) !important; }
-.action-btn.edit { color: #f59e0b !important; background: rgba(245, 158, 11, 0.12) !important; border: 1px solid rgba(245, 158, 11, 0.25) !important; }
-.action-btn.delete { color: #ef4444 !important; background: rgba(239, 68, 68, 0.12) !important; border: 1px solid rgba(239, 68, 68, 0.25) !important; }
-.action-btn.pdf { color: #ec4899 !important; background: rgba(236, 72, 153, 0.12) !important; border: 1px solid rgba(236, 72, 153, 0.25) !important; }
-.action-btn.email { color: #10b981 !important; background: rgba(16, 185, 129, 0.12) !important; border: 1px solid rgba(16, 185, 129, 0.25) !important; }
-
-.action-btn.view:hover { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important; color: #ffffff !important; }
-.action-btn.edit:hover { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; color: #ffffff !important; }
-.action-btn.delete:hover { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important; }
-.action-btn.pdf:hover { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important; color: #ffffff !important; }
-.action-btn.email:hover { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; color: #ffffff !important; }
-
-.action-btn.view i, .action-btn.view:hover i,
-.action-btn.edit i, .action-btn.edit:hover i,
-.action-btn.delete i, .action-btn.delete:hover i,
-.action-btn.pdf i, .action-btn.pdf:hover i,
-.action-btn.email i, .action-btn.email:hover i {
-    color: inherit !important;
-}
-
-/* Progress bars */
-.progress-bar {
-    width: 100%;
-    height: 8px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.progress-fill.green { background: linear-gradient(90deg, #34d399, #10b981); }
-.progress-fill.yellow { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
-.progress-fill.red { background: linear-gradient(90deg, #f87171, #ef4444); }
-
-/* Liquid Popups/Modals */
-[id$="Modal"]:not(.active-modal):not(.flex),
-[id$="modal"]:not(.active-modal):not(.flex) {
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    transition: opacity 0.25s ease, visibility 0.25s ease !important;
-    opacity: 0;
-    visibility: hidden !important;
-    pointer-events: none !important;
+[id$="Modal"]:not(.active-modal):not(.flex):not([style*="display: flex"]),
+[id$="modal"]:not(.active-modal):not(.flex):not([style*="display: flex"]) {
     display: none !important;
+    opacity: 0;
+    pointer-events: none !important;
 }
 
 [id$="Modal"].active-modal,
 [id$="modal"].active-modal {
-    opacity: 1 !important;
-    visibility: visible !important;
     display: flex !important;
+    opacity: 1 !important;
     pointer-events: auto !important;
 }
 
-[id$="Modal"] > div {
-    background: linear-gradient(135deg, var(--surface-glass-strong) 0%, var(--modal-bg-end) 100%) !important;
-    border: 1px solid var(--border-glass) !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), var(--shadow-soft) !important;
-    backdrop-filter: blur(40px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(160%) !important;
-    border-radius: 28px !important;
-    transform: scale(0.95);
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+[id$="Modal"] > div,
+[id$="modal"] > div {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+    color: #f1f5f9 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
-[id$="Modal"].active-modal > div {
-    transform: scale(1) !important;
-}
-
-/* Force theme borders in all modals */
-[id$="Modal"] .border-slate-200,
-[id$="Modal"] .border-white\/10,
-[id$="Modal"] div {
-    border-color: var(--modal-border-color) !important;
-}
-
-[id$="Modal"] .text-slate-900,
-[id$="Modal"] .text-slate-800,
-[id$="Modal"] .text-slate-700,
-[id$="Modal"] .text-slate-600,
-[id$="Modal"] .text-slate-500,
-[id$="Modal"] .text-slate-400 {
-    color: var(--text-main) !important;
-}
-
-/* Modal close button (la petite croix) */
 [id$="Modal"] button[onclick*="closeModal"] {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid var(--border-glass) !important;
-    color: var(--text-main) !important;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #94a3b8 !important;
+    border-radius: 8px !important;
 }
-
-[id$="Modal"] button[onclick*="closeModal"] i,
-[id$="Modal"] button[onclick*="closeModal"] .fa-times {
-    color: var(--text-main) !important;
-}
-
 [id$="Modal"] button[onclick*="closeModal"]:hover {
-    background: rgba(255, 255, 255, 0.16) !important;
+    background: #334155 !important;
+    color: #ffffff !important;
 }
 
-/* Fix for profile views and headers */
+/* 11. Badges & Statuts */
+.app-badge,
+[class*="rounded-full"][class*="text-xs"],
+[class*="rounded-xl"][class*="text-xs"] {
+    letter-spacing: 0.02em;
+}
+
+/* 12. Éditeur de texte enrichi */
+.rich-editor-shell {
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    background: #0f172a !important;
+}
+.rich-editor-toolbar {
+    background: #1e293b !important;
+    border-bottom: 1px solid #334155 !important;
+}
+.rich-editor-toolbar button,
+.rich-editor-toolbar label {
+    background: #334155 !important;
+    border: 1px solid #475569 !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+}
+.rich-editor-toolbar button:hover,
+.rich-editor-toolbar label:hover {
+    background: #475569 !important;
+}
+
+/* 13. Notifications Toasts */
+#notification {
+    background: #0f172a !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+}
+
+/* 14. Barres de progression */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: #1e293b !important;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.35s ease;
+}
+.progress-fill.green { background: #10b981 !important; }
+.progress-fill.yellow { background: #f59e0b !important; }
+.progress-fill.red { background: #ef4444 !important; }
+
+/* 15. Barres de défilement (Scrollbars épurées) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155 !important;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569 !important;
+}
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 #0b0f19 !important;
+}
+
+/* 16. Surcharges universelles de contraste élevé pour classes Tailwind */
 .text-slate-900,
+.text-slate-850,
 .text-slate-800,
-.text-slate-700,
-.text-slate-600 {
-    color: var(--text-main) !important;
+.text-slate-700 {
+    color: #f8fafc !important;
 }
 
+.text-slate-600,
 .text-slate-500,
 .text-slate-400 {
-    color: var(--text-muted) !important;
+    color: #94a3b8 !important;
 }
 
 .border-slate-200,
-.border-slate-100 {
-    border-color: var(--border-glass) !important;
+.border-slate-100,
+.border-white\/10,
+.border-white\/20 {
+    border-color: #1e293b !important;
 }
 
 .bg-slate-50,
 .bg-slate-100 {
-    background: rgba(255, 255, 255, 0.03) !important;
+    background-color: #0f172a !important;
 }
 
-/* Notifications toasts styling */
-#notification {
-    background: linear-gradient(135deg, rgba(96, 165, 250, 0.3) 0%, rgba(16, 28, 54, 0.8) 100%) !important;
-    border: 1px solid rgba(96, 165, 250, 0.4) !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-radius: 16px !important;
+.bg-white:not(.nav-indicator-pill):not([class*="bg-primary"]) {
+    background-color: #111827 !important;
 }
 
-/* Theme Toggle Button */
-#themeToggle {
-    border: 1px solid var(--border-glass) !important;
-    border-radius: 9999px !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    color: var(--text-main) !important;
-    transition: all 0.2s ease !important;
-}
-
-#themeToggle:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-    transform: rotate(15deg);
+.divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+.divide-white\/5 > :not([hidden]) ~ :not([hidden]),
+.divide-white\/10 > :not([hidden]) ~ :not([hidden]) {
+    border-color: #1e293b !important;
 }
 
 @media print {
@@ -586,895 +639,3 @@ select optgroup {
         display: none !important;
     }
 }
-
-/* Loading Blur Effect & Progress Animation */
-body.app-shell.app-loading-blur {
-    filter: blur(25px);
-    transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes fictive-loading {
-    0% {
-        width: 0%;
-        opacity: 0.6;
-    }
-    45% {
-        width: 65%;
-        opacity: 1;
-    }
-    85% {
-        width: 95%;
-        opacity: 1;
-    }
-    100% {
-        width: 100%;
-        opacity: 0.8;
-    }
-}
-
-/* Custom Window Titlebar — DISABLED: native frame is used (frame: true in Electron) */
-.window-titlebar {
-    display: none !important;
-    height: 0 !important;
-    max-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    border: none !important;
-    visibility: hidden !important;
-}
-
-body.has-electron-titlebar {
-    padding-top: 0 !important;
-}
-
-.window-controls {
-    display: flex;
-    height: 100%;
-    -webkit-app-region: no-drag;
-}
-
-.window-control-btn {
-    width: 46px;
-    height: 100%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-    border: none;
-    background: transparent;
-    color: var(--titlebar-text);
-}
-
-.window-control-btn i {
-    color: inherit !important; /* Force icons to inherit text color (essential for hover state) */
-    font-size: 10px;
-}
-
-.window-control-btn:hover {
-    background-color: rgba(255, 255, 255, 0.12);
-}
-
-html[data-theme="light"] .window-control-btn:hover {
-    background-color: rgba(0, 0, 0, 0.06);
-}
-
-.window-control-close:hover {
-    background-color: #e81123 !important;
-    color: #ffffff !important;
-}
-
-.window-control-minimize:hover,
-.window-control-maximize:hover {
-    color: var(--text-main);
-}
-
-/* --- Light Mode Specific Fonts and Small Logo/Icon Styling (Dark Blue) --- */
-html[data-theme="light"] [class*="text-white"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *):not(.btn *):not(.action-btn *),
-html[data-theme="light"] [class*="text-slate-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-slate-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-slate-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-slate-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-slate-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-50"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-100"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-200"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-300"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] .text-slate-900,
-html[data-theme="light"] .text-slate-800,
-html[data-theme="light"] .text-slate-700,
-html[data-theme="light"] .text-slate-600,
-html[data-theme="light"] .text-slate-500,
-html[data-theme="light"] .text-slate-400,
-html[data-theme="light"] .text-neutral-900,
-html[data-theme="light"] .text-neutral-800,
-html[data-theme="light"] .text-neutral-700,
-html[data-theme="light"] .text-neutral-600,
-html[data-theme="light"] .text-neutral-500,
-html[data-theme="light"] .text-neutral-400 {
-    color: var(--text-main) !important;
-}
-
-html[data-theme="light"] i.fas:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] i.far:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] i.fab:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *),
-html[data-theme="light"] svg:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.action-btn *):not(.nav-indicator-pill *) {
-    color: var(--text-main) !important;
-}
-
-/* App Nav Logo box adjustment to look gorgeous in light mode */
-html[data-theme="light"] .app-nav .bg-primary {
-    background: rgba(1, 12, 45, 0.1) !important;
-    border: 1px solid rgba(1, 12, 45, 0.2) !important;
-}
-html[data-theme="light"] .app-nav .bg-primary i {
-    color: #010c2d !important;
-}
-
-/* Stat icons highlight colors in light mode (perfect contrast) */
-html[data-theme="light"] .stat-icon.blue {
-    background: rgba(96, 165, 250, 0.25) !important;
-    color: #010c2d !important;
-    border-color: rgba(96, 165, 250, 0.45) !important;
-}
-html[data-theme="light"] .stat-icon.purple {
-    background: rgba(168, 85, 247, 0.25) !important;
-    color: #4c1d95 !important;
-    border-color: rgba(168, 85, 247, 0.45) !important;
-}
-html[data-theme="light"] .stat-icon.green {
-    background: rgba(52, 211, 153, 0.25) !important;
-    color: #064e3b !important;
-    border-color: rgba(52, 211, 153, 0.45) !important;
-}
-html[data-theme="light"] .stat-icon.red {
-    background: rgba(248, 113, 113, 0.25) !important;
-    color: #7f1d1d !important;
-    border-color: rgba(248, 113, 113, 0.45) !important;
-}
-
-/* Custom Webkit Scrollbars - Super discreet version */
-::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb) !important;
-    border-radius: 99px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover) !important;
-}
-
-/* Firefox scrollbar styles */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) transparent !important;
-}
-
-/* ====================================================
- * LIGHT THEME SPECIFIC IMPLEMENTATION (LIQUID GEL GLASS)
- * ==================================================== */
-html body.app-shell,
-html[data-theme="light"] body.app-shell {
-    background: radial-gradient(circle at 85% 85%, #334155 0%, #1e293b 30%, #0f172a 60%, #090d16 100%) fixed !important;
-}
-
-/* 24px/32px rounded corners for panels with Dark Ambient Liquid Glass */
-.glass-card,
-.stat-card,
-[id$="Modal"] > div,
-[id$="modal"] > div {
-    border-radius: 24px !important;
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.65) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
-    backdrop-filter: blur(28px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #FFFFFF !important;
-}
-
-/* 9999px perfect capsule pill style for buttons and search inputs */
-html[data-theme="light"] .ios-button,
-html[data-theme="light"] .ios-button-success,
-html[data-theme="light"] .ios-button-danger,
-html[data-theme="light"] button[type="submit"],
-html[data-theme="light"] .bg-primary:not(.app-nav .bg-primary),
-html[data-theme="light"] .bg-blue-600,
-html[data-theme="light"] button.bg-white,
-html[data-theme="light"] button[class*="bg-white"],
-html[data-theme="light"] button[class*="border-slate-200"],
-html[data-theme="light"] [id$="Modal"] button[class*="text-slate-700"],
-html[data-theme="light"] .app-nav a,
-html[data-theme="light"] .app-nav .hidden.lg\:flex,
-html[data-theme="light"] .nav-indicator-pill,
-html[data-theme="light"] .action-btn,
-html[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-html[data-theme="light"] select {
-    border-radius: 9999px !important;
-}
-
-/* Textareas keep rounded corners of 20px instead of 9999px */
-html[data-theme="light"] textarea {
-    border-radius: 20px !important;
-}
-
-/* Specular Highlights & Shadows for Accent_Purple_Gel (Primary/Submit Buttons) */
-.ios-button,
-button[type="submit"]:not(.bg-red-600):not(.bg-green-600),
-.bg-primary:not(.app-nav .bg-primary):not(.nav-pill-container *),
-.bg-purple-600 {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35) !important;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-/* Specular Highlights & Shadows for Accent_Teal_Gel (Success Buttons) */
-.ios-button-success,
-.bg-green-500,
-.bg-green-600 {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35) !important;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-/* Specular Highlights & Shadows for Accent_Red_Gel (Danger Buttons) */
-.ios-button-danger,
-.bg-red-500,
-.bg-red-600 {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.35) !important;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-/* Secondary Cancel/Action Buttons */
-button.bg-white,
-button[class*="bg-white"],
-button[class*="border-slate-200"],
-[id$="Modal"] button[class*="text-slate-700"] {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Interactive States: Hover (Swell light effect & increase opacity/glow) */
-html[data-theme="light"] .ios-button:hover,
-html[data-theme="light"] button[type="submit"]:hover:not(.bg-red-600):not(.bg-green-600),
-html[data-theme="light"] .bg-primary:hover:not(.app-nav .bg-primary):not(.nav-pill-container *),
-html[data-theme="light"] .bg-blue-600:hover {
-    transform: none !important;
-    filter: brightness(1.15);
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 16px 32px rgba(168, 85, 247, 0.35) !important;
-}
-
-html[data-theme="light"] .ios-button-success:hover,
-html[data-theme="light"] .bg-green-600:hover {
-    transform: none !important;
-    filter: brightness(1.15);
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 16px 32px rgba(13, 148, 136, 0.35) !important;
-}
-
-html[data-theme="light"] .ios-button-danger:hover,
-html[data-theme="light"] .bg-red-600:hover {
-    transform: none !important;
-    filter: brightness(1.15);
-    box-shadow: 
-        inset 0px 4px 6px rgba(255, 255, 255, 0.7), 
-        inset 0px -4px 8px rgba(0, 0, 0, 0.15), 
-        0px 16px 32px rgba(239, 68, 68, 0.35) !important;
-}
-
-/* Interactive States: Active (Compress gel & invert inner shadows) */
-html[data-theme="light"] .ios-button:active,
-html[data-theme="light"] button[type="submit"]:active:not(.bg-red-600):not(.bg-green-600),
-html[data-theme="light"] .bg-primary:active:not(.app-nav .bg-primary):not(.nav-pill-container *),
-html[data-theme="light"] .bg-blue-600:active {
-    transform: scale(0.98) !important;
-    box-shadow: 
-        inset 0px -4px 6px rgba(255, 255, 255, 0.4), 
-        inset 0px 4px 8px rgba(0, 0, 0, 0.2), 
-        0px 6px 12px rgba(168, 85, 247, 0.15) !important;
-}
-
-html[data-theme="light"] .ios-button-success:active,
-html[data-theme="light"] .bg-green-600:active {
-    transform: scale(0.98) !important;
-    box-shadow: 
-        inset 0px -4px 6px rgba(255, 255, 255, 0.4), 
-        inset 0px 4px 8px rgba(0, 0, 0, 0.2), 
-        0px 6px 12px rgba(13, 148, 136, 0.15) !important;
-}
-
-html[data-theme="light"] .ios-button-danger:active,
-html[data-theme="light"] .bg-red-600:active {
-    transform: scale(0.98) !important;
-    box-shadow: 
-        inset 0px -4px 6px rgba(255, 255, 255, 0.4), 
-        inset 0px 4px 8px rgba(0, 0, 0, 0.2), 
-        0px 6px 12px rgba(239, 68, 68, 0.15) !important;
-}
-
-/* Separating primary and secondary/muted text colors for high fidelity */
-html[data-theme="light"] [class*="text-slate-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-slate-500"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-gray-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-zinc-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-neutral-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-neutral-500"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-blue-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-indigo-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-cyan-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *),
-html[data-theme="light"] [class*="text-sky-400"]:not(.ios-button *):not(.bg-primary *):not(.bg-green-600 *):not(.bg-red-600 *):not(.bg-blue-600 *):not(.nav-indicator-pill *) {
-    color: var(--text-muted) !important;
-}
-
-/* GLOBAL MODALS: VIEWPORT CENTERING & TOP NAVBAR OVERLAP PREVENTION */
-.active-modal,
-[id$="Modal"].active-modal,
-[id$="modal"].active-modal,
-#emailPreviewModal.active-modal,
-#choixAjoutModal.active-modal {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 99999 !important;
-    background: rgba(0, 0, 0, 0.75) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-[id$="Modal"].hidden,
-[id$="modal"].hidden,
-.fixed.inset-0.hidden,
-.modal-overlay.hidden,
-[id$="Modal"]:not(.active-modal):not(.flex),
-[id$="modal"]:not(.active-modal):not(.flex) {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    z-index: -9999 !important;
-}
-
-/* Modals children styling: centered box with maximum height, scroll and dark glass */
-[id$="Modal"] > div,
-[id$="modal"] > div,
-#emailPreviewModal > div {
-    margin: auto !important;
-    max-height: 85vh !important;
-    overflow-y: auto !important;
-    z-index: 100000 !important;
-    position: relative !important;
-    background: rgba(18, 24, 38, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5) !important;
-    border-radius: 24px !important;
-    color: #FFFFFF !important;
-}
-html[data-theme="light"] [id$="Modal"] button.bg-white\/10,
-html[data-theme="light"] #emailPreviewModal button.border-white\/20,
-html[data-theme="light"] #emailPreviewModal button.bg-white\/10 {
-    border-color: rgba(92, 92, 100, 0.15) !important;
-    background: #FFFFFF !important;
-    color: var(--text-main) !important;
-}
-
-html[data-theme="light"] [id$="Modal"] button.border-white\/20:hover,
-html[data-theme="light"] [id$="Modal"] button.bg-white\/10:hover,
-html[data-theme="light"] #emailPreviewModal button.border-white\/20:hover,
-html[data-theme="light"] #emailPreviewModal button.bg-white\/10:hover {
-    background: rgba(18, 18, 20, 0.08) !important;
-}
-
-/* Desktop Nav & Titlebar Rules */
-.window-titlebar,
-#electron-titlebar {
-    display: none !important;
-    height: 0 !important;
-    max-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    border: none !important;
-}
-
-body,
-body.app-shell,
-body.has-electron-titlebar,
-body.is-desktop-app {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-}
-
-nav.app-nav,
-.app-nav,
-body.has-electron-titlebar nav.app-nav,
-body.has-electron-titlebar .app-nav {
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 50 !important;
-    margin-top: 0 !important;
-}
-
-#web-download-banner[style*="display: none"],
-body.is-desktop-app #web-download-banner,
-body.has-electron-titlebar #web-download-banner {
-    display: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 0 !important;
-    max-height: 0 !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-    border: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
-
-body.has-electron-titlebar nav.app-nav ~ #app-content-wrapper,
-body.has-electron-titlebar .app-nav ~ #app-content-wrapper {
-    margin-top: 0 !important;
-}
-
-/* Specificity override to ensure themed buttons and their elements keep white text in light theme */
-html[data-theme="light"] #app-body .ios-button,
-html[data-theme="light"] #app-body .ios-button *,
-html[data-theme="light"] #app-body .ios-button-success,
-html[data-theme="light"] #app-body .ios-button-success *,
-html[data-theme="light"] #app-body .ios-button-danger,
-html[data-theme="light"] #app-body .ios-button-danger *,
-html[data-theme="light"] #app-body button[type="submit"],
-html[data-theme="light"] #app-body button[type="submit"] *,
-html[data-theme="light"] #app-body .bg-primary,
-html[data-theme="light"] #app-body .bg-primary *,
-html[data-theme="light"] #app-body .bg-blue-600,
-html[data-theme="light"] #app-body .bg-blue-600 *,
-html[data-theme="light"] #app-body .bg-green-600,
-html[data-theme="light"] #app-body .bg-green-600 *,
-html[data-theme="light"] #app-body .bg-red-600,
-html[data-theme="light"] #app-body .bg-red-600 * {
-    color: #ffffff !important;
-}
-
-/* ==========================================================================
-   LIQUID GLASS EFFECT COMPONENTS & SWITCHER
-   ========================================================================== */
-
-.liquidGlass-wrapper {
-  position: relative;
-  display: flex;
-  font-weight: 600;
-  overflow: hidden;
-  color: black;
-  cursor: pointer;
-  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
-}
-
-.liquidGlass-effect {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  backdrop-filter: blur(3px);
-  filter: url(#glass-distortion);
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.liquidGlass-tint {
-  z-index: 1;
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.liquidGlass-shine {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
-    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
-}
-
-.liquidGlass-text {
-  z-index: 3;
-  font-size: 1rem;
-  color: var(--text-main);
-}
-
-/* ==========================================================================
-   UNIVERSAL HIGH-PRIORITY CENTERING MODALS & POPUPS
-   ========================================================================== */
-.fixed.inset-0.active-modal,
-.modal-overlay.active-modal,
-[id$="Modal"].active-modal,
-[id$="modal"].active-modal {
-    z-index: 99999 !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 1.5rem !important;
-    background: rgba(0, 0, 0, 0.65) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-[id$="Modal"].hidden,
-[id$="modal"].hidden,
-.fixed.inset-0.hidden,
-.modal-overlay.hidden,
-[id$="Modal"]:not(.active-modal):not(.flex),
-[id$="modal"]:not(.active-modal):not(.flex),
-.modal-overlay:not(.active-modal):not(.flex) {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    z-index: -9999 !important;
-}
-
-[id$="Modal"].flex,
-[id$="modal"].flex,
-[id$="Modal"].active-modal,
-[id$="modal"].active-modal {
-    display: flex !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-}
-
-[id$="Modal"] > div,
-[id$="modal"] > div {
-    margin: auto !important;
-    max-height: 85vh !important;
-    overflow-y: auto !important;
-    z-index: 100000 !important;
-    position: relative !important;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* ==========================================================================
-   SUPER FORCED WHITE THEME FOR ALL ICONS, TEXTS, LABELS, BUTTONS & POPUPS
-   ========================================================================== */
-/* ==========================================================================
-   CLEAN VECTOR & ICON NORMALIZATION (NO BLOB/SOLID WHITE OVERWRITES)
-   ========================================================================== */
-i, .fas, .far, .fab, .fal, .fad {
-    color: currentColor;
-}
-
-svg {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* Stroke icons (Lucide, Heroicons, Feather, FontAwesome SVGs) keep fill="none" */
-svg[fill="none"],
-svg:not([fill]) {
-    fill: none !important;
-}
-
-svg[stroke="currentColor"],
-svg:not([stroke]) {
-    stroke: currentColor;
-}
-
-svg[fill="currentColor"] {
-    fill: currentColor !important;
-}
-
-/* ABSOLUTE FORCE PURE WHITE TEXT ON TOP NAV */
-.app-nav,
-.app-nav a,
-.app-nav span,
-.app-nav i,
-.nav-pill-container,
-.nav-pill-container a,
-.nav-pill-container span,
-.nav-pill-container i {
-    color: #FFFFFF !important;
-    opacity: 1 !important;
-}
-
-body,
-main,
-.app-view,
-.glass-card,
-.stat-card,
-.modal-content,
-[id$="Modal"],
-[id$="modal"],
-table, tr, td, th,
-p, span, h1, h2, h3, h4, h5, h6, label {
-    color: #FFFFFF;
-}
-
-/* Popup/modal cards in dark glass theme */
-[id$="Modal"] > div,
-[id$="modal"] > div,
-.glass-card,
-.modal-content,
-.modal-container {
-    background: linear-gradient(135deg, rgba(39, 39, 42, 0.95) 0%, rgba(24, 24, 27, 0.98) 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7) !important;
-}
-
-[id$="Modal"] .bg-white,
-[id$="modal"] .bg-white,
-[id$="Modal"] .bg-slate-50,
-[id$="modal"] .bg-slate-50,
-[id$="Modal"] .bg-slate-100,
-[id$="modal"] .bg-slate-100 {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #FFFFFF !important;
-}
-
-[id$="Modal"] input,
-[id$="modal"] input,
-[id$="Modal"] select,
-[id$="modal"] select,
-[id$="Modal"] textarea,
-[id$="modal"] textarea {
-    color: #ffffff !important;
-    background-color: rgba(0, 0, 0, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-[id$="Modal"] select option,
-[id$="modal"] select option {
-    background-color: #18181b !important;
-    color: #ffffff !important;
-}
-
-/* Background overrides for glass containers */
-.bg-white,
-.bg-slate-50,
-.bg-slate-100,
-.bg-slate-200,
-.bg-slate-300 {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* 1. Modal Top-Right Close (X) Button */
-.modal-close-btn,
-button.rounded-full[onclick*="close"],
-button.rounded-full[onclick*="Modal"],
-.w-8.h-8.rounded-full[onclick*="close"] {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 2rem !important;
-    height: 2rem !important;
-    border-radius: 9999px !important;
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    color: #ffffff !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-}
-
-.modal-close-btn:hover,
-button.rounded-full[onclick*="close"]:hover,
-button.rounded-full[onclick*="Modal"]:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.4) !important;
-    color: #ffffff !important;
-    transform: none !important;
-}
-
-.modal-close-btn svg,
-button.rounded-full[onclick*="close"] svg {
-    width: 1rem !important;
-    height: 1rem !important;
-    stroke: #ffffff !important;
-    fill: none !important;
-    stroke-width: 2.2 !important;
-}
-
-.modal-close-btn i,
-button.rounded-full[onclick*="close"] i {
-    color: #ffffff !important;
-    font-size: 0.875rem !important;
-}
-
-/* 2. Modal Bottom Secondary / Cancel Buttons (Clean Liquid Glass Secondary) */
-.ios-button-secondary,
-.btn-secondary,
-button[onclick*="closeModal"]:not(.rounded-full):not(.w-8):not(.h-8),
-button[onclick*="close"]:not(.rounded-full):not(.w-8):not(.h-8) {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    font-size: 0.875rem !important;
-    padding: 0.5rem 1.15rem !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    cursor: pointer !important;
-}
-
-.ios-button-secondary:hover,
-.btn-secondary:hover,
-button[onclick*="closeModal"]:not(.rounded-full):not(.w-8):not(.h-8):hover,
-button[onclick*="close"]:not(.rounded-full):not(.w-8):not(.h-8):hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    color: #ffffff !important;
-    transform: translateY(-1px);
-}
-
-/* Delete / Trash buttons (keep vibrant red gradient, white text) */
-button[onclick*="Delete"],
-button[onclick*="delete"],
-.bg-red-500,
-.bg-red-600 {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-    color: #FFFFFF !important;
-    border: none !important;
-}
-
-/* PDF, Preview & Action buttons */
-a[href*=".pdf"],
-button[onclick*="pdf"],
-button[onclick*="Pdf"],
-button[onclick*="preview"],
-button[onclick*="Preview"] {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #FFFFFF !important;
-}
-
-/* Bien & Via SCI Choice Buttons in Add Popup */
-#choixAjoutModal button,
-#choixSciModal button {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: #FFFFFF !important;
-}
-#choixAjoutModal button:hover,
-/* ==========================================================================
-   UNIFIED LIQUID GLASS EMPTY STATES (Compact & Elegant)
-   ========================================================================== */
-.empty-state {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    padding: 1.75rem 1.5rem !important;
-    margin: 1rem auto !important;
-    width: 100% !important;
-    max-width: 520px !important;
-    border-radius: 16px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.25s ease !important;
-}
-
-.empty-state:hover {
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Icon badge inside empty state */
-.empty-state i:first-child,
-.empty-state .empty-icon {
-    font-size: 1.4rem !important;
-    color: rgba(255, 255, 255, 0.9) !important;
-    margin-bottom: 0.75rem !important;
-    width: 3.25rem !important;
-    height: 3.25rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Text elements inside empty state */
-.empty-state p,
-.empty-state span {
-    color: rgba(255, 255, 255, 0.75) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    margin-bottom: 0.85rem !important;
-    max-width: 420px !important;
-    line-height: 1.45 !important;
-}
-
-.empty-state h3 {
-    font-size: 1.05rem !important;
-    font-weight: 700 !important;
-    color: #ffffff !important;
-    margin-bottom: 0.25rem !important;
-}
-
-/* Buttons inside empty state */
-.empty-state button,
-.empty-state a {
-    margin-top: 0.2rem !important;
-}
-
-
-
-

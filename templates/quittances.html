@@ -42,7 +42,7 @@
                         <td class="text-white/70">{{ q.date_paiement|date_fr if q.date_paiement else '-' }}</td>
                         <td class="text-right">
                             <div class="flex items-center justify-end space-x-2">
-                                <button onclick="previewQuittanceALUR('{{ q.locataire.nom_complet }}', '{{ q.total|currency }}', '{{ (q.locataire.appartement.nom if q.locataire and q.locataire.appartement else q.locataire.nom_complet)|replace("'", "\\'") }}', '{{ q.public_ref }}', '{{ q.loyer_hc|currency }}', '{{ q.charges|currency }}', '{{ MOIS_FR[q.mois] }} {{ q.annee }}', {{ q.id }})"
+                                <button onclick="previewQuittanceALUR('{{ (q.locataire.nom_complet if q.locataire else 'Locataire')|replace('\'', '\\\'') }}', '{{ q.total|currency }}', '{{ (q.locataire.appartement.nom if q.locataire and q.locataire.appartement else 'Logement')|replace('\'', '\\\'') }}', '{{ q.public_ref }}', '{{ q.loyer_hc|currency }}', '{{ q.charges|currency }}', '{{ MOIS_FR[q.mois] }} {{ q.annee }}', {{ q.id }})"
                                     class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm" title="Aperçu Quittance ALUR">
                                     <i class="fas fa-eye text-white text-sm font-bold"></i>
                                 </button>
@@ -249,6 +249,8 @@ async function previewQuittanceEmail() {
     } catch (error) {
         showNotification('Erreur lors de la génération de l\'aperçu', 'error');
     }
+}
+
 function previewQuittanceALUR(tenantName, total, propertyName, publicRef, rentBare, charges, period, quittanceId) {
     document.getElementById('alur-tenant-name').textContent = tenantName;
     document.getElementById('alur-property-name').textContent = propertyName;

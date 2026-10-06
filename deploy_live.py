@@ -78,6 +78,7 @@ def main():
     # 5. Synchronisation mb-site vers /var/www/html
     print("\n5. Synchronisation de mb-site...")
     run_cmd(client, "sudo -S cp -r /home/baybay/baybay/mb-site/* /var/www/html/", use_sudo=True)
+    run_cmd(client, "sudo -S cp -r /home/baybay/baybay/static /var/www/html/", use_sudo=True)
     run_cmd(client, "sudo -S chown -R www-data:www-data /var/www/html", use_sudo=True)
 
     # 6. Redémarrage des services
