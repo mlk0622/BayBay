@@ -14,186 +14,146 @@ html {
  */
 
 :root {
-    /* Fond Sombre Gris Premium (Dark Slate Gray) */
-    --bg-1: #121214;              /* Deep Dark Gray */
-    --bg-2: #18181b;              /* Dark Zinc/Slate Gray */
-    --bg-3: #27272a;              /* Medium Gray Glow */
-    --text-main: #FFFFFF;         /* Texte Blanc Pur Universel */
-    --text-muted: #FFFFFF;        /* Texte Blanc Pur Universel */
+    /* Fond Sombre Sobre (Style MB-Site Dark) */
+    --bg-1: #0b0f19;              /* Deep Dark Slate */
+    --bg-2: #0f172a;              /* Slate 900 */
+    --bg-3: #111827;              /* Dark Card Surface */
+    --text-main: #FFFFFF;         /* Texte Blanc Pur */
+    --text-muted: #94a3b8;        /* Slate 400 */
     
-    /* Liquid Glass Effects */
-    --border-glass: rgba(255, 255, 255, 0.2);
-    --surface-glass: rgba(24, 24, 27, 0.75);
-    --surface-glass-strong: rgba(39, 39, 42, 0.85);
-    --surface-nav: rgba(18, 18, 20, 0.85);
+    /* Contours & Surfaces sobres sans effet néon */
+    --border-glass: #1e293b;
+    --surface-glass: #111827;
+    --surface-glass-strong: #111827;
+    --surface-nav: #0f172a;
     
-    --shadow-soft: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.3);
     
-    /* Functional Palette Colors (Preserved) */
-    --primary: #3b82f6;           /* Bleu */
-    --primary-strong: #2563eb;
+    /* Palette fonctionnelle épurée MB-Site */
+    --primary: #2563eb;           /* Bleu roi signature */
+    --primary-strong: #1d4ed8;
     --success: #10b981;           /* Vert */
     --danger: #ef4444;            /* Rouge */
-    --warning: #f59e0b;           /* Jaune / Amber */
+    --warning: #f59e0b;           /* Ambre */
     --purple: #8b5cf6;            /* Violet */
 
-    /* Dynamic Component Variables */
-    --modal-bg-end: rgba(24, 24, 27, 0.95);
-    --card-bg: rgba(24, 24, 27, 0.75);
-    --input-bg: rgba(0, 0, 0, 0.5);
-    --input-border: rgba(255, 255, 255, 0.3);
-    --select-bg: #18181b;
+    /* Variables de composants */
+    --modal-bg-end: #0f172a;
+    --card-bg: #111827;
+    --input-bg: #0f172a;
+    --input-border: #334155;
+    --select-bg: #0f172a;
     --select-scheme: dark;
-    --titlebar-bg: rgba(18, 18, 20, 0.95);
+    --titlebar-bg: #0f172a;
     --titlebar-text: #FFFFFF;
-    --titlebar-border: rgba(255, 255, 255, 0.15);
-    --table-header-bg: rgba(255, 255, 255, 0.08);
-    --row-hover-bg: rgba(255, 255, 255, 0.1);
-    --modal-border-color: rgba(255, 255, 255, 0.25);
+    --titlebar-border: #1e293b;
+    --table-header-bg: #0b0f19;
+    --row-hover-bg: rgba(255, 255, 255, 0.02);
+    --modal-border-color: #334155;
 
-    --scrollbar-thumb: rgba(255, 255, 255, 0.3);
-    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.6);
-    --blob-1: rgba(255, 255, 255, 0.03);
-    --blob-2: rgba(255, 255, 255, 0.03);
-    --blob-3: rgba(255, 255, 255, 0.02);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.4);
+    --blob-1: transparent;
+    --blob-2: transparent;
+    --blob-3: transparent;
 
-    /* Rich Text Editor Variables */
-    --editor-bg: rgba(0, 0, 0, 0.5);
+    /* Éditeur de texte enrichi */
+    --editor-bg: #0f172a;
     --editor-text: #FFFFFF;
-    --editor-border: rgba(255, 255, 255, 0.3);
-    --editor-toolbar-bg: rgba(255, 255, 255, 0.15);
-    --editor-btn-bg: rgba(255, 255, 255, 0.2);
+    --editor-border: #334155;
+    --editor-toolbar-bg: #1e293b;
+    --editor-btn-bg: #334155;
     --editor-btn-text: #FFFFFF;
-    --editor-placeholder: rgba(255, 255, 255, 0.6);
+    --editor-placeholder: #94a3b8;
 }
 
-/* Animations de vagues liquides en arrière-plan */
-@keyframes float-blob-1 {
-    0% { transform: translate(0px, 0px) scale(1); }
-    33% { transform: translate(40px, -60px) scale(1.15); }
-    66% { transform: translate(-30px, 30px) scale(0.9); }
-    100% { transform: translate(0px, 0px) scale(1); }
-}
-
-@keyframes float-blob-2 {
-    0% { transform: translate(0px, 0px) scale(1); }
-    50% { transform: translate(-50px, 50px) scale(1.2); }
-    100% { transform: translate(0px, 0px) scale(1); }
-}
-
-* {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", system-ui, sans-serif;
-    letter-spacing: -0.015em;
-}
-
-/* Base style with fixed multi-gradient liquid background */
+/* Base style sombre sans bulle ni effet flottant */
 body,
 body.app-shell {
     position: relative;
     color: #FFFFFF !important;
-    background: radial-gradient(circle at 85% 85%, #334155 0%, #1e293b 30%, #0f172a 60%, #090d16 100%) fixed !important;
+    background: #0b0f19 fixed !important;
     background-attachment: fixed !important;
     overflow-x: hidden;
 }
 
-/* Liquid Blobs floating behind all content */
 body.app-shell::before,
 body.app-shell::after {
-    content: "";
-    position: fixed;
-    border-radius: 9999px;
-    filter: blur(130px);
-    pointer-events: none;
-    z-index: -2;
+    display: none !important;
 }
 
-body.app-shell::before {
-    width: 45vw;
-    height: 45vw;
-    top: -10vw;
-    right: -5vw;
-    background: radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, rgba(56, 189, 248, 0) 70%);
-    animation: float-blob-1 20s infinite ease-in-out;
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
-body.app-shell::after {
-    width: 40vw;
-    height: 40vw;
-    left: -10vw;
-    bottom: -5vw;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.25) 0%, rgba(129, 140, 248, 0) 70%);
-    animation: float-blob-2 18s infinite ease-in-out;
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    letter-spacing: -0.02em !important;
 }
 
-/* Sticky frosted glass navbar */
+/* Barre de navigation sombre épurée */
 .app-nav {
-    background: rgba(15, 23, 42, 0.75) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+    background: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .app-nav .text-slate-900,
 .app-nav .text-slate-850,
 .app-nav .text-slate-700,
 .app-nav .text-slate-600 {
-    color: rgba(255, 255, 255, 0.85) !important;
+    color: #94a3b8 !important;
 }
 
 .app-nav .hover\:bg-slate-100:hover {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     color: #ffffff !important;
 }
 
-.app-nav .bg-white,
-.app-nav .bg-slate-100 {
-    background: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* --- NAVIGATION PILLULE GLISSANTE --- */
+/* --- NAVIGATION EN PILULIER SOBRE (STYLE MB-SITE) --- */
 .app-nav .hidden.lg\:flex,
 .nav-pill-container {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
     border-radius: 9999px !important;
     padding: 4px !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 8px 32px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 .app-nav a {
     border-radius: 9999px !important;
     margin: 0 2px !important;
     padding: 0.5rem 1.1rem !important;
-    color: rgba(255, 255, 255, 0.9) !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    color: #94a3b8 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
     z-index: 1;
 }
 
-.app-nav a i,
-.app-nav a svg {
+.app-nav a:hover {
     color: #ffffff !important;
-    fill: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Effet de transition de la pillule active */
-@keyframes active-pill-slide {
-    from { transform: scale(0.93) translateY(1px); opacity: 0.8; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
+.app-nav a i,
+.app-nav a svg {
+    color: inherit !important;
+    fill: currentColor !important;
 }
 
 .app-nav a.bg-primary {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: #2563eb !important;
     color: #ffffff !important;
-    font-weight: 700 !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: inset 1px 1px 2px 0 rgba(255, 255, 255, 0.6), inset -1px -1px 2px 1px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(20px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(200%) !important;
-    animation: active-pill-slide 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    animation: none !important;
 }
 
 .app-nav a.bg-primary i,
@@ -201,25 +161,25 @@ body.app-shell::after {
     color: #ffffff !important;
 }
 
-/* Ice Glass Cards (Reflections & inner border shine) */
+/* Cartes sobres (Style MB-Site Dark) */
 .glass-card,
 .stat-card,
 .bg-white.shadow-sm,
 .bg-white.rounded-xl {
-    background: var(--card-bg) !important;
-    border: 1px solid var(--border-glass) !important;
-    border-radius: 24px !important;
-    backdrop-filter: blur(40px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), var(--shadow-soft) !important;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease !important;
+    background: #111827 !important;
+    border: 1px solid #1e293b !important;
+    border-radius: 12px !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .glass-card:hover,
 .stat-card:hover {
     transform: none !important;
-    border-color: rgba(96, 165, 250, 0.45) !important;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35), 0 30px 70px -10px rgba(0, 8, 30, 0.5) !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Glowing blue stats card icons */

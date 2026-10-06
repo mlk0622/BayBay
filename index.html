@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BayBay — Version Web (Mode Sombre Épuré & Police Classique)</title>
+  <meta name="description" content="Version Web de l'application BayBay : mode sombre sobre et moderne basé sur mb-site/assets/css/style.css, police classique sans-serif, système de pilulier, zéro néon, zéro flottement.">
+  
+  <link rel="icon" type="image/png" href="static/images/door_logo.png">
+  <link rel="shortcut icon" href="door_logo.ico">
+  
+  <!-- Police classique & moderne Inter (Sans-serif nette, pas de Playfair ni serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Feuille de style PRINCIPALE mb-site/assets/css/style.css demandée -->
+  <link rel="stylesheet" href="mb-site/assets/css/style.css">
+
+  <style>
+    /* ==========================================================================
+       MODE SOMBRE SOBRE (DARK SLATE) & POLICE CLASSIQUE PARTOUT
+       Strictement basé sur mb-site/assets/css/style.css
+       Zéro serif (adieu Playfair Display), zéro néon, zéro effet flottant
+       ========================================================================== */
+    :root, [data-theme="dark"], body, html {
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      --font-secondary: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      --app-font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
+
+    /* Remplacement systématique de TOUTES les polices serif par la police classique */
+    h1, h2, h3, h4, h5, h6, .font-secondary, .text-component h1, .text-component h2, .text-component h3 {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      letter-spacing: -0.02em !important;
+      font-weight: 700 !important;
+    }
+
+    body {
+      background-color: #0b0f19 !important; /* Noir/Ardoise profond de mb-site */
+      color: #e2e8f0 !important;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 1. Bandeau de contrôle de validation en haut de page */
+    .validation-topbar {
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 10px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .badge-mb {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 50em;
+      font-size: 12px;
+      font-weight: 600;
+      background-color: #1e293b;
+      color: #60a5fa;
+      border: 1px solid #334155;
+    }
+
+    /* 2. En-tête principal sombre */
+    .app-header {
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 12px 24px;
+    }
+
+    /* 3. SYSTÈME DE PILULIER SOMBRE (NAVIGATION CAPSULE MB-SITE) */
+    .pill-nav-container {
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      padding: 10px 24px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .pill-track {
+      display: inline-flex;
+      align-items: center;
+      background-color: #1e293b;
+      padding: 4px;
+      border-radius: 50em;
+      border: 1px solid #334155;
+      gap: 4px;
+    }
+
+    .pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 50em;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .pill-btn:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .pill-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .pill-btn .pill-counter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 6px;
+      border-radius: 50em;
+      font-size: 11px;
+      font-weight: 700;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: currentColor;
+    }
+
+    .pill-btn:not(.active) .pill-counter {
+      background-color: #334155;
+      color: #94a3b8;
+    }
+
+    /* 4. Cartes & Composants d'affichage sobres sombres */
+    .app-card {
+      background-color: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .app-card:hover {
+      border-color: #334155;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 5. Stat Badges sobres sombres */
+    .app-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 50em;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .app-badge--success {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .app-badge--primary {
+      background-color: rgba(37, 99, 235, 0.18);
+      color: #60a5fa;
+      border: 1px solid rgba(37, 99, 235, 0.35);
+    }
+
+    .app-badge--warning {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    /* 6. Tableau de données épuré sombre */
+    .app-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      background-color: #111827;
+    }
+
+    .app-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    .app-table th {
+      background-color: #0b0f19;
+      padding: 12px 16px;
+      font-weight: 600;
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .app-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e293b;
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .app-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .app-table tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    /* 7. Onglets / Vues */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.15s ease-in-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form controls & boutons sombres */
+    .form-control {
+      background-color: #0f172a !important;
+      border: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+      box-shadow: none !important;
+      font-size: 14px;
+      border-radius: 6px;
+    }
+
+    .form-control:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    .btn--primary {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+      border: none !important;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3) !important;
+      filter: none !important;
+    }
+
+    .btn--primary:hover {
+      background-color: #1d4ed8 !important;
+    }
+
+    .btn--subtle {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+      box-shadow: none !important;
+    }
+
+    .btn--subtle:hover {
+      background-color: #334155 !important;
+      border-color: #475569 !important;
+    }
+
+    /* Radio switch CodyHouse en mode sombre */
+    .radio-switch {
+      background-color: #1e293b !important;
+      border: 1px solid #334155;
+    }
+
+    .radio-switch__label {
+      color: #94a3b8;
+    }
+
+    .radio-switch__marker {
+      background-color: #2563eb !important;
+    }
+
+    /* Quittance ALUR Sombre & Nette */
+    .alur-receipt-sheet {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 32px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+      position: relative;
+      color: #f1f5f9;
+    }
+
+    .alur-receipt-sheet::before {
+      content: "CONFORME LOI ALUR — ART. 21";
+      position: absolute;
+      top: 14px;
+      right: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== BANDEAU DE VALIDATION DIRECTE ==================== -->
+  <aside class="validation-topbar" aria-label="Validation du design">
+    <div class="container max-width-adaptive-xl flex items-center justify-between">
+      <div class="flex items-center gap-xs">
+        <span class="badge-mb">
+          <i class="fa-solid fa-moon"></i> Mode Sombre mb-site/assets/css/style.css
+        </span>
+        <span class="text-xs color-contrast-medium hidden@sm">
+          Police classique sans-serif • Pilulier sombre • Zéro néon • Zéro flottement
+        </span>
+      </div>
+
+      <div class="flex items-center gap-xs">
+        <a href="mb-site/index.html" target="_blank" class="btn btn--subtle btn--sm" title="Comparer avec le portfolio MB-Site">
+          <i class="fa-solid fa-arrow-up-right-from-square margin-right-xxs"></i> Comparer MB-Site
+        </a>
+        <button class="btn btn--primary btn--sm" onclick="deployPrompt()">
+          <i class="fa-solid fa-rocket margin-right-xxs"></i> Valider ce design & Déployer
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== HEADER OFFICIEL BAYBAY SOMBRE ==================== -->
+  <header class="app-header">
+    <div class="container max-width-adaptive-xl flex items-center justify-between">
+      <!-- Logo & Nom de l'app -->
+      <div class="flex items-center gap-sm">
+        <a href="#dashboard" class="flex items-center gap-xs text-decoration-none" onclick="switchTab('tab-dashboard')">
+          <img src="static/images/door_logo.png" alt="BayBay Logo" style="width: 32px; height: 32px; object-fit: contain;">
+          <div>
+            <span class="text-lg font-bold color-white block" style="line-height: 1.1;">BayBay</span>
+            <span class="text-xs color-contrast-medium block">Gestion Locative Hybride</span>
+          </div>
+        </a>
+
+        <!-- Sélecteur de Patrimoine / SCI -->
+        <div class="margin-left-md hidden@md">
+          <select class="form-control text-xs" style="padding: 6px 12px; height: auto;" onchange="alert('Filtrage pour: ' + this.value)">
+            <option value="all">🏢 Tout le patrimoine (12 lots)</option>
+            <option value="sci1">SCI Les Pins (5 lots)</option>
+            <option value="sci2">SCI Horizon (4 lots)</option>
+            <option value="perso">Nom Propre (3 lots)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions Rapides & Profil -->
+      <div class="flex items-center gap-xs">
+        <div class="hidden@sm">
+          <div class="flex items-center gap-xxs bg-contrast-lower bg-opacity-10% radius-md padding-xxs border border-contrast-lower">
+            <i class="fa-solid fa-magnifying-glass color-contrast-medium margin-left-xxs text-xs"></i>
+            <input type="text" placeholder="Rechercher locataire, bien, lot..." class="reset text-xs padding-x-xxs" style="outline: none; background: transparent; width: 200px; color: #ffffff;">
+          </div>
+        </div>
+
+        <button class="btn btn--subtle btn--sm" onclick="alert('Module de quittances rapides ouvert !')">
+          <i class="fa-solid fa-file-invoice margin-right-xxs text-primary"></i> Quittance rapide
+        </button>
+
+        <button class="btn btn--primary btn--sm" onclick="alert('Formulaire d\'ajout de bien / locataire')">
+          <i class="fa-solid fa-plus margin-right-xxs"></i> Ajouter
+        </button>
+
+        <!-- Avatar Utilisateur -->
+        <div class="flex items-center gap-xxs margin-left-xs padding-left-xs border-left border-contrast-lower">
+          <div class="radius-50% bg-primary flex items-center justify-center color-white text-xs font-bold" style="width: 32px; height: 32px;">
+            MB
+          </div>
+          <span class="text-xs font-medium color-white hidden@sm">Malik B.</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== LE SYSTÈME DE PILULIER SOMBRE ==================== -->
+  <nav class="pill-nav-container" aria-label="Navigation principale">
+    <div class="container max-width-adaptive-xl flex items-center justify-between">
+      <div class="pill-track" role="tablist">
+        <button class="pill-btn active" data-target="tab-dashboard" onclick="switchTab('tab-dashboard')" role="tab">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Tableau de bord</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-biens" onclick="switchTab('tab-biens')" role="tab">
+          <i class="fa-solid fa-building"></i>
+          <span>Biens & SCIs</span>
+          <span class="pill-counter">12</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-locataires" onclick="switchTab('tab-locataires')" role="tab">
+          <i class="fa-solid fa-users"></i>
+          <span>Locataires</span>
+          <span class="pill-counter">11</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-appels" onclick="switchTab('tab-appels')" role="tab">
+          <i class="fa-solid fa-envelope-open-text"></i>
+          <span>Appels de loyer</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-quittances" onclick="switchTab('tab-quittances')" role="tab">
+          <i class="fa-solid fa-file-invoice"></i>
+          <span>Quittances ALUR</span>
+          <span class="pill-counter">11/11</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-comptes" onclick="switchTab('tab-comptes')" role="tab">
+          <i class="fa-solid fa-wallet"></i>
+          <span>Finances & 2044</span>
+        </button>
+
+        <button class="pill-btn" data-target="tab-parametres" onclick="switchTab('tab-parametres')" role="tab">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Paramètres</span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ==================== CONTENU DES VUES EN MODE SOMBRE ==================== -->
+  <main class="container max-width-adaptive-xl padding-y-lg flex-grow">
+
+    <!-- ------------------------------------------------------------------------
+         VUE 1 : TABLEAU DE BORD (DASHBOARD)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-dashboard" class="tab-content active">
+      
+      <!-- Titre de section classique & Date -->
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Tableau de bord général</h1>
+          <p class="text-sm color-contrast-medium">Synthèse locative du mois d'octobre 2026 • 12 lots sous gestion</p>
+        </div>
+        <div class="flex items-center gap-xs">
+          <span class="app-badge app-badge--success">
+            <i class="fa-solid fa-circle-check"></i> 100% à jour (0 retard)
+          </span>
+          <button class="btn btn--subtle btn--sm" onclick="exportData()">
+            <i class="fa-solid fa-file-export margin-right-xxs"></i> Export Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 Cartes Statistiques KPI en Mode Sombre -->
+      <div class="grid gap-md margin-bottom-lg">
+        <!-- KPI 1 : Loyers Collectés -->
+        <div class="col-3@lg col-6@sm">
+          <div class="app-card">
+            <div class="flex items-center justify-between margin-bottom-xxs">
+              <span class="text-xs font-semibold uppercase color-contrast-medium tracking-wide">Loyers collectés</span>
+              <div class="radius-50% bg-primary bg-opacity-20% padding-xxs flex items-center justify-center" style="width: 32px; height: 32px;">
+                <i class="fa-solid fa-euro-sign color-primary text-xs"></i>
+              </div>
+            </div>
+            <div class="text-xxl font-bold color-white margin-bottom-xxs">8 450,00 €</div>
+            <div class="flex items-center gap-xxs text-xs">
+              <span class="color-success font-semibold flex items-center gap-xxxxs">
+                <i class="fa-solid fa-arrow-trend-up"></i> 100%
+              </span>
+              <span class="color-contrast-medium">11/11 loyers encaissés</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 2 : Taux d'occupation -->
+        <div class="col-3@lg col-6@sm">
+          <div class="app-card">
+            <div class="flex items-center justify-between margin-bottom-xxs">
+              <span class="text-xs font-semibold uppercase color-contrast-medium tracking-wide">Taux d'occupation</span>
+              <div class="radius-50% bg-success bg-opacity-20% padding-xxs flex items-center justify-center" style="width: 32px; height: 32px;">
+                <i class="fa-solid fa-key color-success text-xs"></i>
+              </div>
+            </div>
+            <div class="text-xxl font-bold color-white margin-bottom-xxs">91.7%</div>
+            <div class="flex items-center gap-xxs text-xs">
+              <span class="color-white font-semibold">11 occupés</span>
+              <span class="color-contrast-medium">• 1 lot en relocation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 3 : Quittances ALUR émises -->
+        <div class="col-3@lg col-6@sm">
+          <div class="app-card">
+            <div class="flex items-center justify-between margin-bottom-xxs">
+              <span class="text-xs font-semibold uppercase color-contrast-medium tracking-wide">Quittances ALUR</span>
+              <div class="radius-50% bg-primary bg-opacity-20% padding-xxs flex items-center justify-center" style="width: 32px; height: 32px;">
+                <i class="fa-solid fa-certificate color-primary text-xs"></i>
+              </div>
+            </div>
+            <div class="text-xxl font-bold color-white margin-bottom-xxs">11 / 11</div>
+            <div class="flex items-center gap-xxs text-xs">
+              <span class="color-success font-semibold">Signées SHA-256</span>
+              <span class="color-contrast-medium">• 0 en attente</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI 4 : Trésorerie nette cumulée -->
+        <div class="col-3@lg col-6@sm">
+          <div class="app-card">
+            <div class="flex items-center justify-between margin-bottom-xxs">
+              <span class="text-xs font-semibold uppercase color-contrast-medium tracking-wide">Trésorerie nette SCIs</span>
+              <div class="radius-50% bg-contrast-lower bg-opacity-20% padding-xxs flex items-center justify-center" style="width: 32px; height: 32px;">
+                <i class="fa-solid fa-vault color-white text-xs"></i>
+              </div>
+            </div>
+            <div class="text-xxl font-bold color-white margin-bottom-xxs">24 180,00 €</div>
+            <div class="flex items-center gap-xxs text-xs">
+              <span class="color-primary font-semibold">Solde positif</span>
+              <span class="color-contrast-medium">• Provisions incluses</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deuxième rangée : Tableau des derniers loyers & Actions rapides -->
+      <div class="grid gap-md">
+        <!-- Colonne principale (Tableau des paiements et quittances) -->
+        <div class="col-8@lg">
+          <div class="app-card padding-0">
+            <div class="padding-md border-bottom border-contrast-lower flex items-center justify-between">
+              <div>
+                <h2 class="text-md font-bold color-white">Derniers encaissements & Quittances ALUR</h2>
+                <p class="text-xs color-contrast-medium">Suivi des règlements pour le mois d'octobre 2026</p>
+              </div>
+              <button class="btn btn--subtle btn--sm" onclick="switchTab('tab-quittances')">
+                Voir toutes les quittances &rarr;
+              </button>
+            </div>
+
+            <div class="app-table-wrapper" style="border: none; border-radius: 0;">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Bien / Lot</th>
+                    <th>Locataire</th>
+                    <th>Loyer CC</th>
+                    <th>Date paiement</th>
+                    <th>Statut</th>
+                    <th style="text-align: right;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="font-semibold color-white">Apt 12 — Résidence Étoile</div>
+                      <div class="text-xs color-contrast-medium">SCI Les Pins (Paris 15)</div>
+                    </td>
+                    <td>
+                      <div class="font-medium color-white">Thomas Bernard</div>
+                      <div class="text-xs color-contrast-medium">thomas.bernard@email.fr</div>
+                    </td>
+                    <td>
+                      <div class="font-bold color-white">850,00 €</div>
+                      <div class="text-xs color-contrast-medium">Charges : 65 €</div>
+                    </td>
+                    <td>01/10/2026</td>
+                    <td>
+                      <span class="app-badge app-badge--success">
+                        <i class="fa-solid fa-check"></i> Encaissé
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="btn btn--subtle btn--sm" onclick="showReceiptModal('Thomas Bernard', '850.00 €', 'Apt 12 — Résidence Étoile')">
+                        <i class="fa-solid fa-file-pdf margin-right-xxs text-primary"></i> Quittance ALUR
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="font-semibold color-white">Studio 04 — Rue de la Paix</div>
+                      <div class="text-xs color-contrast-medium">Nom Propre (Lyon 02)</div>
+                    </td>
+                    <td>
+                      <div class="font-medium color-white">Camille Dupont</div>
+                      <div class="text-xs color-contrast-medium">c.dupont@orange.fr</div>
+                    </td>
+                    <td>
+                      <div class="font-bold color-white">620,00 €</div>
+                      <div class="text-xs color-contrast-medium">Charges : 40 €</div>
+                    </td>
+                    <td>02/10/2026</td>
+                    <td>
+                      <span class="app-badge app-badge--success">
+                        <i class="fa-solid fa-check"></i> Encaissé
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="btn btn--subtle btn--sm" onclick="showReceiptModal('Camille Dupont', '620.00 €', 'Studio 04 — Rue de la Paix')">
+                        <i class="fa-solid fa-file-pdf margin-right-xxs text-primary"></i> Quittance ALUR
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="font-semibold color-white">T3 Lumineux — Horizon Sud</div>
+                      <div class="text-xs color-contrast-medium">SCI Horizon (Bordeaux)</div>
+                    </td>
+                    <td>
+                      <div class="font-medium color-white">Alexandre Rousseau</div>
+                      <div class="text-xs color-contrast-medium">alex.rousseau@gmail.com</div>
+                    </td>
+                    <td>
+                      <div class="font-bold color-white">1 150,00 €</div>
+                      <div class="text-xs color-contrast-medium">Charges : 90 €</div>
+                    </td>
+                    <td>03/10/2026</td>
+                    <td>
+                      <span class="app-badge app-badge--success">
+                        <i class="fa-solid fa-check"></i> Encaissé
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="btn btn--subtle btn--sm" onclick="showReceiptModal('Alexandre Rousseau', '1 150.00 €', 'T3 Lumineux — Horizon Sud')">
+                        <i class="fa-solid fa-file-pdf margin-right-xxs text-primary"></i> Quittance ALUR
+                      </button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <div class="font-semibold color-white">Local Commercial — Grand Rue</div>
+                      <div class="text-xs color-contrast-medium">SCI Les Pins (Nantes)</div>
+                    </td>
+                    <td>
+                      <div class="font-medium color-white">SARL Optique Vision</div>
+                      <div class="text-xs color-contrast-medium">contact@optique-vision.fr</div>
+                    </td>
+                    <td>
+                      <div class="font-bold color-white">1 480,00 €</div>
+                      <div class="text-xs color-contrast-medium">TVA & Charges : 210 €</div>
+                    </td>
+                    <td>04/10/2026</td>
+                    <td>
+                      <span class="app-badge app-badge--success">
+                        <i class="fa-solid fa-check"></i> Encaissé
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <button class="btn btn--subtle btn--sm" onclick="showReceiptModal('SARL Optique Vision', '1 480.00 €', 'Local Commercial — Grand Rue')">
+                        <i class="fa-solid fa-file-pdf margin-right-xxs text-primary"></i> Quittance ALUR
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Colonne latérale : Actions Rapides & Échéances -->
+        <div class="col-4@lg">
+          <!-- Carte Actions Automatisées -->
+          <div class="app-card margin-bottom-md">
+            <h3 class="text-sm font-bold color-white margin-bottom-sm flex items-center gap-xxs">
+              <i class="fa-solid fa-bolt color-primary"></i> Actions Rapides
+            </h3>
+            
+            <div class="flex flex-column gap-xs">
+              <button class="btn btn--primary btn--sm width-100% flex items-center justify-between" onclick="alert('Envoi des appels de loyer SMTP déclenché pour tous les locataires.')">
+                <span><i class="fa-solid fa-paper-plane margin-right-xxs"></i> Émettre les appels de loyer</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+
+              <button class="btn btn--subtle btn--sm width-100% flex items-center justify-between" onclick="alert('Génération par lot des quittances ALUR certifiées.')">
+                <span><i class="fa-solid fa-certificate margin-right-xxs text-primary"></i> Générer toutes les quittances</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+
+              <button class="btn btn--subtle btn--sm width-100% flex items-center justify-between" onclick="alert('Formulaire de saisie d\'un virement / chèque reçu.')">
+                <span><i class="fa-solid fa-hand-holding-dollar margin-right-xxs"></i> Enregistrer un encaissement</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+
+              <button class="btn btn--subtle btn--sm width-100% flex items-center justify-between" onclick="alert('Calculateur IRL INSEE ouvert.')">
+                <span><i class="fa-solid fa-arrow-trend-up margin-right-xxs"></i> Révision de loyer IRL (INSEE)</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Carte Échéances & Alertes -->
+          <div class="app-card">
+            <h3 class="text-sm font-bold color-white margin-bottom-sm flex items-center gap-xxs">
+              <i class="fa-solid fa-calendar-check color-primary"></i> Prochaines Échéances
+            </h3>
+
+            <div class="flex flex-column gap-sm text-xs">
+              <div class="flex items-start gap-xs">
+                <div class="radius-50% bg-warning bg-opacity-20% padding-xxs flex items-center justify-center shrink-0" style="width: 24px; height: 24px;">
+                  <i class="fa-solid fa-clock color-warning text-xxs"></i>
+                </div>
+                <div>
+                  <div class="font-semibold color-white">Révision IRL — Apt 08 Résidence Bel-Air</div>
+                  <div class="color-contrast-medium">Indice T3 INSEE applicable (+3.2%) au 15/11/2026</div>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-xs">
+                <div class="radius-50% bg-primary bg-opacity-20% padding-xxs flex items-center justify-center shrink-0" style="width: 24px; height: 24px;">
+                  <i class="fa-solid fa-file-contract color-primary text-xxs"></i>
+                </div>
+                <div>
+                  <div class="font-semibold color-white">Renouvellement Bail — Studio 04</div>
+                  <div class="color-contrast-medium">Fin de bail 3 ans le 31/12/2026 (Camille Dupont)</div>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-xs">
+                <div class="radius-50% bg-success bg-opacity-20% padding-xxs flex items-center justify-center shrink-0" style="width: 24px; height: 24px;">
+                  <i class="fa-solid fa-shield-halved color-success text-xxs"></i>
+                </div>
+                <div>
+                  <div class="font-semibold color-white">Attestation Assurance Habitation</div>
+                  <div class="color-contrast-medium">11/11 attestations locataires valides et vérifiées</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 2 : BIENS & SCIS (PROPERTIES)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-biens" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Gestion des Biens & Sociétés Civiles</h1>
+          <p class="text-sm color-contrast-medium">12 biens répartis sur 2 SCIs et 1 détention directe</p>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="alert('Ajout d\'un nouveau bien immobilier')">
+          <i class="fa-solid fa-plus margin-right-xxs"></i> Nouveau bien
+        </button>
+      </div>
+
+      <!-- Filtres sous forme de Pilulier secondaire sombre -->
+      <div class="margin-bottom-md">
+        <div class="pill-track">
+          <button class="pill-btn active" onclick="filterProperties('all', this)">Tous les biens (12)</button>
+          <button class="pill-btn" onclick="filterProperties('sci1', this)">SCI Les Pins (5)</button>
+          <button class="pill-btn" onclick="filterProperties('sci2', this)">SCI Horizon (4)</button>
+          <button class="pill-btn" onclick="filterProperties('perso', this)">Nom Propre (3)</button>
+        </div>
+      </div>
+
+      <!-- Grille de cartes des biens sombres -->
+      <div class="grid gap-md">
+        <!-- Bien 1 -->
+        <div class="col-4@md col-6@sm prop-card" data-group="sci1">
+          <div class="app-card padding-0 overflow-hidden">
+            <div style="height: 140px; background: #1e293b; display: flex; align-items: center; justify-content: center; position: relative;">
+              <i class="fa-solid fa-building text-xxl color-contrast-medium" style="opacity: 0.3;"></i>
+              <span class="app-badge app-badge--success" style="position: absolute; top: 12px; right: 12px;">Loué</span>
+            </div>
+            <div class="padding-md">
+              <span class="text-xs font-semibold color-primary uppercase tracking-wide">SCI Les Pins</span>
+              <h3 class="text-md font-bold color-white margin-y-xxs">Apt 12 — Résidence Étoile</h3>
+              <p class="text-xs color-contrast-medium margin-bottom-sm"><i class="fa-solid fa-location-dot margin-right-xxxxs"></i> 45 Avenue de Breteuil, 75015 Paris</p>
+              
+              <div class="flex items-center justify-between padding-y-xs border-top border-contrast-lower text-xs">
+                <div>
+                  <span class="color-contrast-medium block">Loyer CC</span>
+                  <span class="font-bold color-white text-sm">850,00 €</span>
+                </div>
+                <div style="text-align: right;">
+                  <span class="color-contrast-medium block">Locataire</span>
+                  <span class="font-semibold color-white">Thomas Bernard</span>
+                </div>
+              </div>
+
+              <div class="margin-top-sm flex items-center gap-xs">
+                <button class="btn btn--subtle btn--sm flex-grow" onclick="alert('Détail du bien Apt 12')">Consulter la fiche</button>
+                <button class="btn btn--primary btn--sm" onclick="showReceiptModal('Thomas Bernard', '850.00 €', 'Apt 12 — Résidence Étoile')"><i class="fa-solid fa-file-invoice"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bien 2 -->
+        <div class="col-4@md col-6@sm prop-card" data-group="perso">
+          <div class="app-card padding-0 overflow-hidden">
+            <div style="height: 140px; background: #1e293b; display: flex; align-items: center; justify-content: center; position: relative;">
+              <i class="fa-solid fa-house-chimney text-xxl color-contrast-medium" style="opacity: 0.3;"></i>
+              <span class="app-badge app-badge--success" style="position: absolute; top: 12px; right: 12px;">Loué</span>
+            </div>
+            <div class="padding-md">
+              <span class="text-xs font-semibold color-primary uppercase tracking-wide">Nom Propre</span>
+              <h3 class="text-md font-bold color-white margin-y-xxs">Studio 04 — Rue de la Paix</h3>
+              <p class="text-xs color-contrast-medium margin-bottom-sm"><i class="fa-solid fa-location-dot margin-right-xxxxs"></i> 18 Rue de la Paix, 69002 Lyon</p>
+              
+              <div class="flex items-center justify-between padding-y-xs border-top border-contrast-lower text-xs">
+                <div>
+                  <span class="color-contrast-medium block">Loyer CC</span>
+                  <span class="font-bold color-white text-sm">620,00 €</span>
+                </div>
+                <div style="text-align: right;">
+                  <span class="color-contrast-medium block">Locataire</span>
+                  <span class="font-semibold color-white">Camille Dupont</span>
+                </div>
+              </div>
+
+              <div class="margin-top-sm flex items-center gap-xs">
+                <button class="btn btn--subtle btn--sm flex-grow" onclick="alert('Détail du studio 04')">Consulter la fiche</button>
+                <button class="btn btn--primary btn--sm" onclick="showReceiptModal('Camille Dupont', '620.00 €', 'Studio 04 — Rue de la Paix')"><i class="fa-solid fa-file-invoice"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bien 3 -->
+        <div class="col-4@md col-6@sm prop-card" data-group="sci2">
+          <div class="app-card padding-0 overflow-hidden">
+            <div style="height: 140px; background: #1e293b; display: flex; align-items: center; justify-content: center; position: relative;">
+              <i class="fa-solid fa-building-user text-xxl color-contrast-medium" style="opacity: 0.3;"></i>
+              <span class="app-badge app-badge--success" style="position: absolute; top: 12px; right: 12px;">Loué</span>
+            </div>
+            <div class="padding-md">
+              <span class="text-xs font-semibold color-primary uppercase tracking-wide">SCI Horizon</span>
+              <h3 class="text-md font-bold color-white margin-y-xxs">T3 Lumineux — Horizon Sud</h3>
+              <p class="text-xs color-contrast-medium margin-bottom-sm"><i class="fa-solid fa-location-dot margin-right-xxxxs"></i> 8 Quai des Chartrons, 33000 Bordeaux</p>
+              
+              <div class="flex items-center justify-between padding-y-xs border-top border-contrast-lower text-xs">
+                <div>
+                  <span class="color-contrast-medium block">Loyer CC</span>
+                  <span class="font-bold color-white text-sm">1 150,00 €</span>
+                </div>
+                <div style="text-align: right;">
+                  <span class="color-contrast-medium block">Locataire</span>
+                  <span class="font-semibold color-white">Alexandre Rousseau</span>
+                </div>
+              </div>
+
+              <div class="margin-top-sm flex items-center gap-xs">
+                <button class="btn btn--subtle btn--sm flex-grow" onclick="alert('Détail du T3')">Consulter la fiche</button>
+                <button class="btn btn--primary btn--sm" onclick="showReceiptModal('Alexandre Rousseau', '1 150.00 €', 'T3 Lumineux — Horizon Sud')"><i class="fa-solid fa-file-invoice"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 3 : LOCATAIRES (TENANTS)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-locataires" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Répertoire des Locataires</h1>
+          <p class="text-sm color-contrast-medium">11 locataires actifs • Baux enregistrés et à jour</p>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="alert('Ajout d\'un locataire')">
+          <i class="fa-solid fa-user-plus margin-right-xxs"></i> Nouveau locataire
+        </button>
+      </div>
+
+      <div class="app-card padding-0">
+        <div class="app-table-wrapper" style="border: none;">
+          <table class="app-table">
+            <thead>
+              <tr>
+                <th>Locataire</th>
+                <th>Bien occupé</th>
+                <th>Loyer & Charges</th>
+                <th>Début du bail</th>
+                <th>Contact</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="font-bold color-white">Thomas Bernard</div>
+                  <div class="text-xs color-contrast-medium">Bail d'habitation meublé</div>
+                </td>
+                <td>Apt 12 — Résidence Étoile (Paris 15)</td>
+                <td><strong>850,00 €</strong> <span class="text-xs color-contrast-medium">(65 € ch.)</span></td>
+                <td>01/09/2023</td>
+                <td>
+                  <div class="text-xs">thomas.bernard@email.fr</div>
+                  <div class="text-xs color-contrast-medium">06 12 34 56 78</div>
+                </td>
+                <td style="text-align: right;">
+                  <button class="btn btn--subtle btn--sm" onclick="alert('Envoi message à Thomas')"><i class="fa-solid fa-envelope"></i></button>
+                  <button class="btn btn--primary btn--sm" onclick="showReceiptModal('Thomas Bernard', '850.00 €', 'Apt 12')"><i class="fa-solid fa-file-invoice"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="font-bold color-white">Camille Dupont</div>
+                  <div class="text-xs color-contrast-medium">Bail d'habitation nu</div>
+                </td>
+                <td>Studio 04 — Rue de la Paix (Lyon 02)</td>
+                <td><strong>620,00 €</strong> <span class="text-xs color-contrast-medium">(40 € ch.)</span></td>
+                <td>15/01/2024</td>
+                <td>
+                  <div class="text-xs">c.dupont@orange.fr</div>
+                  <div class="text-xs color-contrast-medium">07 98 76 54 32</div>
+                </td>
+                <td style="text-align: right;">
+                  <button class="btn btn--subtle btn--sm" onclick="alert('Envoi message à Camille')"><i class="fa-solid fa-envelope"></i></button>
+                  <button class="btn btn--primary btn--sm" onclick="showReceiptModal('Camille Dupont', '620.00 €', 'Studio 04')"><i class="fa-solid fa-file-invoice"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 4 : APPELS DE LOYER (RENT NOTICES)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-appels" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Appels de Loyer & Avis d'Échéance</h1>
+          <p class="text-sm color-contrast-medium">Automatisation mensuelle SMTP intégrée à BayBay</p>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="alert('Envoi groupé des avis d\'échéance du 25')">
+          <i class="fa-solid fa-paper-plane margin-right-xxs"></i> Envoyer les avis par e-mail
+        </button>
+      </div>
+
+      <div class="app-card margin-bottom-md">
+        <div class="flex items-center gap-sm">
+          <div class="radius-50% bg-primary bg-opacity-20% padding-xs flex items-center justify-center" style="width: 44px; height: 44px;">
+            <i class="fa-solid fa-envelope-circle-check color-primary text-md"></i>
+          </div>
+          <div>
+            <h3 class="text-md font-bold color-white">Automatisation active</h3>
+            <p class="text-xs color-contrast-medium">Les avis d'échéance sont automatiquement envoyés aux locataires chaque 25 du mois pour le terme à échoir.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-card padding-0">
+        <div class="app-table-wrapper" style="border: none;">
+          <table class="app-table">
+            <thead>
+              <tr>
+                <th>Période</th>
+                <th>Nombre de lots</th>
+                <th>Total appelé</th>
+                <th>Date d'émission</th>
+                <th>Canal</th>
+                <th style="text-align: right;">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Novembre 2026 (À échoir)</strong></td>
+                <td>11 locataires</td>
+                <td>8 450,00 €</td>
+                <td>25/10/2026 (Planifié)</td>
+                <td>SMTP Automatisé</td>
+                <td style="text-align: right;"><span class="app-badge app-badge--primary">Programmé</span></td>
+              </tr>
+              <tr>
+                <td><strong>Octobre 2026</strong></td>
+                <td>11 locataires</td>
+                <td>8 450,00 €</td>
+                <td>25/09/2026 à 08:00</td>
+                <td>SMTP Automatisé</td>
+                <td style="text-align: right;"><span class="app-badge app-badge--success">11/11 Envoyés</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 5 : QUITTANCES ALUR (RECEIPTS & LEGAL SEAL)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-quittances" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Quittances Conformes Loi ALUR</h1>
+          <p class="text-sm color-contrast-medium">Génération cryptographique certifiée SHA-256 avec clé publique de vérification</p>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="alert('Exportation de toutes les quittances en ZIP')">
+          <i class="fa-solid fa-download margin-right-xxs"></i> Télécharger tout (ZIP)
+        </button>
+      </div>
+
+      <div class="grid gap-md">
+        <!-- Liste des quittances -->
+        <div class="col-6@lg">
+          <div class="app-card padding-0">
+            <div class="padding-md border-bottom border-contrast-lower">
+              <h2 class="text-md font-bold color-white">Quittances d'octobre 2026</h2>
+              <p class="text-xs color-contrast-medium">Sélectionnez une quittance pour visualiser son aperçu conforme ALUR</p>
+            </div>
+            <div class="app-table-wrapper" style="border: none;">
+              <table class="app-table">
+                <thead>
+                  <tr>
+                    <th>Locataire</th>
+                    <th>Montant</th>
+                    <th>Clé SHA-256</th>
+                    <th style="text-align: right;">Aperçu</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="cursor: pointer;" onclick="showReceiptModal('Thomas Bernard', '850.00 €', 'Apt 12 — Résidence Étoile')">
+                    <td>
+                      <div class="font-bold color-white">Thomas Bernard</div>
+                      <div class="text-xs color-contrast-medium">Apt 12 Paris 15</div>
+                    </td>
+                    <td><strong>850,00 €</strong></td>
+                    <td><code class="text-xs bg-contrast-lower bg-opacity-30% padding-xxxs radius-sm" style="color: #60a5fa;">#e3b0c442...</code></td>
+                    <td style="text-align: right;">
+                      <span class="btn btn--subtle btn--sm"><i class="fa-solid fa-eye"></i></span>
+                    </td>
+                  </tr>
+                  <tr style="cursor: pointer;" onclick="showReceiptModal('Camille Dupont', '620.00 €', 'Studio 04 — Rue de la Paix')">
+                    <td>
+                      <div class="font-bold color-white">Camille Dupont</div>
+                      <div class="text-xs color-contrast-medium">Studio 04 Lyon 02</div>
+                    </td>
+                    <td><strong>620,00 €</strong></td>
+                    <td><code class="text-xs bg-contrast-lower bg-opacity-30% padding-xxxs radius-sm" style="color: #60a5fa;">#8a6b102f...</code></td>
+                    <td style="text-align: right;">
+                      <span class="btn btn--subtle btn--sm"><i class="fa-solid fa-eye"></i></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aperçu Interactif de Quittance ALUR Sombre -->
+        <div class="col-6@lg">
+          <div class="alur-receipt-sheet" id="receipt-preview-box">
+            <div class="flex items-center justify-between border-bottom border-contrast-lower padding-bottom-sm margin-bottom-md">
+              <div class="flex items-center gap-xs">
+                <img src="static/images/door_logo.png" alt="BayBay" style="width: 28px; height: 28px;">
+                <div>
+                  <h3 class="text-md font-bold color-white">QUITTANCE DE LOYER</h3>
+                  <p class="text-xs color-contrast-medium">Période du 01/10/2026 au 31/10/2026</p>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span class="text-xs color-contrast-medium block">N° Quittance</span>
+                <span class="font-bold text-xs color-white">QUI-2026-10-0012</span>
+              </div>
+            </div>
+
+            <div class="grid gap-sm margin-bottom-md text-xs">
+              <div class="col-6">
+                <strong class="color-white block margin-bottom-xxs">BAILLEUR :</strong>
+                <div>SCI Les Pins</div>
+                <div class="color-contrast-medium">Représentée par M. Malik Bouaissi</div>
+                <div class="color-contrast-medium">45 Avenue de Breteuil, 75015 Paris</div>
+              </div>
+              <div class="col-6">
+                <strong class="color-white block margin-bottom-xxs">LOCATAIRE :</strong>
+                <div id="preview-tenant-name" class="font-semibold color-white">Thomas Bernard</div>
+                <div class="color-contrast-medium" id="preview-property-name">Apt 12 — Résidence Étoile</div>
+                <div class="color-contrast-medium">75015 Paris</div>
+              </div>
+            </div>
+
+            <table class="app-table margin-bottom-md" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th>Détail de la quittance</th>
+                  <th style="text-align: right;">Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Loyer principal net de charges</td>
+                  <td style="text-align: right;" id="preview-rent-bare">785,00 €</td>
+                </tr>
+                <tr>
+                  <td>Provision sur charges récupérables</td>
+                  <td style="text-align: right;" id="preview-charges">65,00 €</td>
+                </tr>
+                <tr style="background-color: #111827;">
+                  <td><strong>TOTAL ACQUITTÉ ET REÇU</strong></td>
+                  <td style="text-align: right; font-weight: bold; color: #60a5fa;" id="preview-total">850,00 €</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="text-xxs color-contrast-medium margin-bottom-md" style="line-height: 1.4;">
+              Je soussigné bailleur certifie avoir reçu de la part du locataire désigné ci-dessus la somme totale indiquée en paiement du loyer et des charges pour la période mentionnée. Cette quittance annule tout reçu antérieur.
+            </div>
+
+            <div class="flex items-center justify-between border-top border-contrast-lower padding-top-sm">
+              <div class="text-xxs color-contrast-medium">
+                <div><strong>Empreinte SHA-256 :</strong> 9f83a21b3e8c7410e5b7218a...</div>
+                <div>Vérifiable en ligne sur <code>baybay.mb-site.com/verify</code></div>
+              </div>
+              <div class="radius-sm border border-contrast-lower padding-xxs bg-contrast-lower bg-opacity-20% text-xxs font-bold color-success">
+                <i class="fa-solid fa-stamp margin-right-xxxxs"></i> VALIDÉ ALUR
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 6 : COMPTES & 2044 (FINANCES)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-comptes" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Comptabilité Locative & Déclaration 2044</h1>
+          <p class="text-sm color-contrast-medium">Calcul des revenus fonciers nets, déduction des charges et fiscalité</p>
+        </div>
+        <button class="btn btn--primary btn--sm" onclick="alert('Export CERFA 2044 pré-rempli')">
+          <i class="fa-solid fa-file-excel margin-right-xxs"></i> Préparation CERFA 2044
+        </button>
+      </div>
+
+      <div class="grid gap-md">
+        <div class="col-4@md">
+          <div class="app-card">
+            <span class="text-xs uppercase font-bold color-contrast-medium">Total Recettes Brutes 2026</span>
+            <div class="text-xxl font-bold color-white margin-y-xxs">84 500,00 €</div>
+            <p class="text-xs color-contrast-medium">10 mois comptabilisés (100% perçus)</p>
+          </div>
+        </div>
+        <div class="col-4@md">
+          <div class="app-card">
+            <span class="text-xs uppercase font-bold color-contrast-medium">Charges Déductibles</span>
+            <div class="text-xxl font-bold color-white margin-y-xxs">12 420,00 €</div>
+            <p class="text-xs color-contrast-medium">Travaux, assurances PNO, intérêts emprunt</p>
+          </div>
+        </div>
+        <div class="col-4@md">
+          <div class="app-card">
+            <span class="text-xs uppercase font-bold color-contrast-medium">Revenu Net Imposable</span>
+            <div class="text-xxl font-bold text-primary margin-y-xxs">72 080,00 €</div>
+            <p class="text-xs color-contrast-medium">Base imposable répartie selon quotes-parts</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         VUE 7 : PARAMÈTRES (SETTINGS)
+         ------------------------------------------------------------------------ -->
+    <div id="tab-parametres" class="tab-content">
+      <div class="flex items-center justify-between margin-bottom-md">
+        <div>
+          <h1 class="text-xl font-bold color-white">Configuration du Compte & Système</h1>
+          <p class="text-sm color-contrast-medium">Options de synchronisation, SMTP et mise à jour</p>
+        </div>
+      </div>
+
+      <div class="grid gap-md">
+        <div class="col-6@md">
+          <div class="app-card">
+            <h3 class="text-md font-bold color-white margin-bottom-sm">Configuration SMTP (Envois e-mails)</h3>
+            <div class="flex flex-column gap-xs">
+              <div>
+                <label class="form-label text-xs font-semibold color-contrast-high block margin-bottom-xxxs">Serveur SMTP Hôte</label>
+                <input type="text" class="form-control width-100%" value="smtp.office365.com">
+              </div>
+              <div>
+                <label class="form-label text-xs font-semibold color-contrast-high block margin-bottom-xxxs">Port de connexion</label>
+                <input type="number" class="form-control width-100%" value="587">
+              </div>
+              <div>
+                <label class="form-label text-xs font-semibold color-contrast-high block margin-bottom-xxxs">Adresse e-mail émettrice</label>
+                <input type="email" class="form-control width-100%" value="gestion@mb-site.com">
+              </div>
+              <button class="btn btn--primary btn--sm margin-top-xs" onclick="alert('Test SMTP réussi ! Les e-mails sont bien configurés.')">Tester la connexion SMTP</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6@md">
+          <div class="app-card">
+            <h3 class="text-md font-bold color-white margin-bottom-sm">Version & Mises à Jour</h3>
+            <div class="flex flex-column gap-sm text-xs">
+              <div class="flex items-center justify-between padding-y-xxs border-bottom border-contrast-lower">
+                <span class="color-contrast-medium">Version actuelle installée</span>
+                <span class="font-bold color-white">v4.0.5 (Dernière version)</span>
+              </div>
+              <div class="flex items-center justify-between padding-y-xxs border-bottom border-contrast-lower">
+                <span class="color-contrast-medium">Mise à jour automatique</span>
+                <span class="app-badge app-badge--success">Activée</span>
+              </div>
+              <div class="flex items-center justify-between padding-y-xxs border-bottom border-contrast-lower">
+                <span class="color-contrast-medium">Statut du serveur live</span>
+                <span class="app-badge app-badge--primary">En ligne (88.190.118.23)</span>
+              </div>
+              <button class="btn btn--subtle btn--sm margin-top-xs" onclick="alert('Recherche de mise à jour : vous disposez déjà de la version 4.0.5 la plus récente !')">
+                <i class="fa-solid fa-arrows-rotate margin-right-xxs"></i> Vérifier les mises à jour
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== PIED DE PAGE SOMBRE MB-SITE ==================== -->
+  <footer class="padding-y-md border-top border-contrast-lower text-xs color-contrast-medium" style="background-color: #0f172a;">
+    <div class="container max-width-adaptive-xl flex flex-wrap items-center justify-between gap-xs">
+      <div class="flex items-center gap-xs">
+        <span class="font-bold color-white">BayBay</span>
+        <span>•</span>
+        <span>Design sombre unifié basé sur <code>mb-site/assets/css/style.css</code></span>
+      </div>
+      <div>
+        <span>Développé par Malik Bouaissi • Tous droits réservés &copy; 2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== LOGIQUE INTERACTIVE DES ONGLETS DU PILULIER ==================== -->
+  <script>
+    // Bascule dynamique des onglets du pilulier
+    function switchTab(tabId) {
+      const pills = document.querySelectorAll('.pill-btn');
+      pills.forEach(p => p.classList.remove('active'));
+
+      const activePill = document.querySelector(`.pill-btn[data-target="${tabId}"]`);
+      if (activePill) {
+        activePill.classList.add('active');
+      }
+
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+
+      const targetContent = document.getElementById(tabId);
+      if (targetContent) {
+        targetContent.classList.add('active');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Filtrage des biens
+    function filterProperties(group, btn) {
+      const parentPillTrack = btn.closest('.pill-track');
+      if (parentPillTrack) {
+        parentPillTrack.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+
+      const cards = document.querySelectorAll('.prop-card');
+      cards.forEach(card => {
+        if (group === 'all' || card.getAttribute('data-group') === group) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Mise à jour de l'aperçu de quittance ALUR
+    function showReceiptModal(tenantName, amount, propName) {
+      switchTab('tab-quittances');
+      
+      const tenantEl = document.getElementById('preview-tenant-name');
+      const propEl = document.getElementById('preview-property-name');
+      const totalEl = document.getElementById('preview-total');
+      
+      if (tenantEl) tenantEl.textContent = tenantName;
+      if (propEl) propEl.textContent = propName;
+      if (totalEl) totalEl.textContent = amount;
+
+      const box = document.getElementById('receipt-preview-box');
+      if (box) {
+        box.style.borderColor = '#3b82f6';
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          box.style.borderColor = '#334155';
+        }, 1200);
+      }
+    }
+
+    function changePeriod(label) {
+      alert('Période modifiée : ' + label + ' (données mises à jour)');
+    }
+
+    function exportData() {
+      alert('Génération du fichier Excel (.xlsx) pour octobre 2026...');
+    }
+
+    function deployPrompt() {
+      const confirmed = confirm(
+        "Voulez-vous valider ce design sombre avec police classique et lancer le déploiement sur le serveur de production (88.190.118.23) ?"
+      );
+      if (confirmed) {
+        alert("Validation confirmée ! Dites à l'assistant de lancer le script de déploiement deploy_live.py.");
+      }
+    }
+  </script>
+
+  <!-- Script CodyHouse officiel de mb-site -->
+  <script src="mb-site/assets/js/scripts.js"></script>
+</body>
+</html>

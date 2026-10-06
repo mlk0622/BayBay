@@ -42,6 +42,10 @@
                         <td class="text-white/70">{{ q.date_paiement|date_fr if q.date_paiement else '-' }}</td>
                         <td class="text-right">
                             <div class="flex items-center justify-end space-x-2">
+                                <button onclick="previewQuittanceALUR('{{ q.locataire.nom_complet }}', '{{ q.total|currency }}', '{{ (q.locataire.appartement.nom if q.locataire and q.locataire.appartement else q.locataire.nom_complet)|replace("'", "\\'") }}', '{{ q.public_ref }}', '{{ q.loyer_hc|currency }}', '{{ q.charges|currency }}', '{{ MOIS_FR[q.mois] }} {{ q.annee }}', {{ q.id }})"
+                                    class="p-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 transition-all shadow-sm" title="Aperçu Quittance ALUR">
+                                    <i class="fas fa-eye text-white text-sm font-bold"></i>
+                                </button>
                                 <button onclick="openQuittanceEmailModal({{ q.id }}, '{{ q.public_ref }}')"
                                     class="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-all shadow-sm" title="Envoyer par email">
                                     <i class="fas fa-paper-plane text-white text-sm font-bold"></i>
@@ -245,6 +249,123 @@ async function previewQuittanceEmail() {
     } catch (error) {
         showNotification('Erreur lors de la génération de l\'aperçu', 'error');
     }
+function previewQuittanceALUR(tenantName, total, propertyName, publicRef, rentBare, charges, period, quittanceId) {
+    document.getElementById('alur-tenant-name').textContent = tenantName;
+    document.getElementById('alur-property-name').textContent = propertyName;
+    document.getElementById('alur-period').textContent = 'Période du terme : ' + period;
+    document.getElementById('alur-ref').textContent = publicRef;
+    document.getElementById('alur-rent-bare').textContent = rentBare;
+    document.getElementById('alur-charges').textContent = charges;
+    document.getElementById('alur-total').textContent = total;
+    document.getElementById('alur-verify-link').href = '/quittance/verification/' + publicRef;
+    document.getElementById('alur-download-pdf-btn').href = '/quittance/document/' + publicRef + '/pdf';
+    document.getElementById('alur-send-email-btn').onclick = function() {
+        closeQuittancePreviewModal();
+        openQuittanceEmailModal(quittanceId, publicRef);
+    };
+    document.getElementById('quittanceAlurPreviewModal').classList.remove('hidden');
 }
 
+function closeQuittancePreviewModal() {
+    document.getElementById('quittanceAlurPreviewModal').classList.add('hidden');
+}
 </script>
+
+<!-- Modal Aperçu Quittance ALUR Conforme Loi ALUR -->
+<div id="quittanceAlurPreviewModal" class="ios-modal fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden" onclick="if(event.target === this) closeQuittancePreviewModal()">
+    <div class="relative w-full max-w-2xl bg-[#0f172a] border border-[#334155] rounded-2xl shadow-2xl p-6 sm:p-8 text-[#f1f5f9] overflow-y-auto max-h-[90vh]">
+        <div class="flex items-center justify-between pb-4 border-b border-[#1e293b] mb-6">
+            <div class="flex items-center gap-3">
+                <img src="{{ url_for('static', filename='images/door_logo.png') }}" alt="BayBay" class="w-8 h-8 object-contain">
+                <div>
+                    <h2 class="text-xl font-bold text-white tracking-tight">Aperçu Quittance Conforme Loi ALUR</h2>
+                    <p class="text-xs text-[#94a3b8]">Certification numérique & calculs conformes Article 21</p>
+                </div>
+            </div>
+            <button onclick="closeQuittancePreviewModal()" class="w-8 h-8 rounded-lg bg-[#1e293b] hover:bg-[#334155] text-[#94a3b8] hover:text-white flex items-center justify-center transition-colors">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+
+        <div class="bg-[#111827] border border-[#334155] rounded-xl p-6 shadow-inner relative mb-6">
+            <div class="absolute top-4 right-4 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
+                CONFORME LOI ALUR — ART. 21
+            </div>
+
+            <div class="flex items-center justify-between pb-3 border-b border-[#1e293b] mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-white tracking-wide">QUITTANCE DE LOYER</h3>
+                    <p class="text-xs text-[#94a3b8]" id="alur-period">Période concernée</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-[#94a3b8] block">Réf. Quittance</span>
+                    <span class="font-mono text-xs font-bold text-white" id="alur-ref">QUI-0000</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-4">
+                <div>
+                    <strong class="text-white block mb-1">BAILLEUR :</strong>
+                    <div class="text-[#e2e8f0]">Bailleur certifié BayBay</div>
+                    <div class="text-[#94a3b8]">Gestion dématérialisée</div>
+                </div>
+                <div>
+                    <strong class="text-white block mb-1">LOCATAIRE :</strong>
+                    <div class="font-semibold text-white" id="alur-tenant-name">-</div>
+                    <div class="text-[#94a3b8]" id="alur-property-name">-</div>
+                </div>
+            </div>
+
+            <table class="w-full text-xs mb-4 border-collapse">
+                <thead>
+                    <tr class="border-b border-[#1e293b] text-[#94a3b8]">
+                        <th class="py-2 text-left font-semibold">Désignation</th>
+                        <th class="py-2 text-right font-semibold">Montant</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#1e293b] text-[#e2e8f0]">
+                    <tr>
+                        <td class="py-2.5">Loyer principal net de charges</td>
+                        <td class="py-2.5 text-right font-medium" id="alur-rent-bare">-</td>
+                    </tr>
+                    <tr>
+                        <td class="py-2.5">Provision sur charges locatives</td>
+                        <td class="py-2.5 text-right font-medium" id="alur-charges">-</td>
+                    </tr>
+                    <tr class="bg-[#0b0f19]/60 font-bold">
+                        <td class="py-2.5 px-2 text-white">TOTAL REÇU ET ACQUITTÉ</td>
+                        <td class="py-2.5 px-2 text-right text-blue-400 text-sm" id="alur-total">-</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="text-[11px] text-[#94a3b8] leading-relaxed mb-4">
+                Le bailleur certifie avoir reçu de la part du locataire la somme mentionnée ci-dessus en paiement du loyer et des charges pour la période désignée. Cette quittance annule tout reçu partiel antérieur.
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-[#1e293b] text-[10px] text-[#94a3b8]">
+                <div>
+                    <div><strong>Contrôle d'intégrité :</strong> Signature numérique vérifiable</div>
+                    <div>Portail de contrôle : <a href="#" id="alur-verify-link" target="_blank" class="text-blue-400 hover:underline">Vérifier l'authenticité en ligne</a></div>
+                </div>
+                <div class="px-2 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded text-emerald-400 font-bold flex items-center gap-1">
+                    <i class="fas fa-check-circle"></i> VALIDÉ ALUR
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button onclick="closeQuittancePreviewModal()" class="px-4 py-2 rounded-xl bg-[#1e293b] hover:bg-[#334155] text-white text-xs font-semibold transition-colors">
+                Fermer
+            </button>
+            <div class="flex items-center gap-2">
+                <a id="alur-download-pdf-btn" href="#" target="_blank" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-file-pdf"></i> Télécharger le PDF officiel
+                </a>
+                <button id="alur-send-email-btn" onclick="" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-paper-plane"></i> Envoyer au locataire
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
