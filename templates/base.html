@@ -8,9 +8,6 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ios26-glass.css') }}?v={{ app_version }}">
     <style>
@@ -167,7 +164,7 @@
         };
 
         (function initTheme() {
-            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.setAttribute('data-theme', 'light');
         })();
     </script>
 </head>
@@ -329,76 +326,76 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <!-- Logo -->
-                <div class="flex items-center shrink-0">
-                    <a href="{{ url_for('dashboard') }}" class="brand-link flex items-center gap-2.5">
-                        <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-9 h-9 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] shrink-0" alt="BayBay Logo">
-                        <span class="text-xl font-bold text-white tracking-tight">BayBay</span>
+                <div class="flex items-center">
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center gap-2.5">
+                        <img src="{{ url_for('static', filename='images/door_logo.png') }}" class="w-8 h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" alt="BayBay Logo">
+                        <span class="text-xl font-black text-white tracking-tight">BayBay</span>
                     </a>
                 </div>
 
                 <!-- Navigation Desktop & Mobile (Always visible pilulier) -->
                 <div class="flex items-center gap-1 relative nav-pill-container my-auto overflow-x-auto max-w-full">
-                    <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: #2563eb; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4); pointer-events: none; opacity: 0;"></div>
+                    <div class="nav-indicator-pill" style="position: absolute; z-index: 0; border-radius: 9999px; transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease; background: rgba(255, 255, 255, 0.25); border: 1.5px solid rgba(255,255,255,0.4); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); backdrop-filter: blur(16px) saturate(200%); -webkit-backdrop-filter: blur(16px) saturate(200%); pointer-events: none; opacity: 0;"></div>
                     <a href="{{ url_for('dashboard') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'dashboard' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'dashboard' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-chart-pie mr-2 text-white"></i>Dashboard
                     </a>
                     <a href="{{ url_for('liste_biens') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'liste_biens' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'liste_biens' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-home mr-2 text-white"></i>Biens
                     </a>
                     <a href="{{ url_for('liste_locataires') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'liste_locataires' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'liste_locataires' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-users mr-2 text-white"></i>Locataires
                     </a>
                     <a href="{{ url_for('appels_loyer') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'appels_loyer' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'appels_loyer' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-file-invoice mr-2 text-white"></i>Appels
                     </a>
                     <a href="{{ url_for('quittances') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'quittances' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'quittances' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-receipt mr-2 text-white"></i>Quittances
                     </a>
                     <a href="{{ url_for('resume_loyers') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'resume_loyers' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'resume_loyers' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-chart-bar mr-2 text-white"></i>Résumé
                     </a>
                     <a href="{{ url_for('comptes_locatifs') }}"
-                       class="nav-pill-item px-4 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'comptes_locatifs' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}">
+                       class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'comptes_locatifs' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-calculator mr-2 text-white"></i>Comptes
                     </a>
                     <a href="{{ url_for('parametres') }}"
-                       class="nav-pill-item px-3 py-2 rounded-full text-sm font-semibold transition-colors text-white
-                              {% if request.endpoint == 'parametres' %}bg-primary text-white font-bold{% else %}text-slate-300 hover:text-white hover:bg-white/10{% endif %}" title="Paramètres">
+                       class="px-3 py-2 rounded-lg text-sm font-semibold transition-colors text-white
+                              {% if request.endpoint == 'parametres' %}bg-primary text-white font-bold{% else %}text-white hover:bg-white/20{% endif %}">
                         <i class="fas fa-cog text-white"></i>
                     </a>
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <a href="{{ url_for('logout') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 transition-all flex items-center gap-1.5">
-                        <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
+                    <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Se deconnecter
                     </a>
                 </div>
             </div>
         </div>
 
         <!-- Navigation Mobile -->
-        <div class="lg:hidden border-t border-[#1e293b] overflow-x-auto bg-[#0f172a]">
+        <div class="lg:hidden border-t border-slate-200 overflow-x-auto bg-white">
             <div class="flex px-4 py-2 gap-2">
-                <a href="{{ url_for('dashboard') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'dashboard' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}">Dashboard</a>
-                <a href="{{ url_for('liste_biens') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_biens' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}">Biens</a>
-                <a href="{{ url_for('liste_locataires') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_locataires' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}">Locataires</a>
-                <a href="{{ url_for('appels_loyer') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'appels_loyer' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}">Appels</a>
-                <a href="{{ url_for('quittances') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'quittances' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}">Quittances</a>
-                <a href="{{ url_for('parametres') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'parametres' %}bg-blue-600 text-white font-bold{% else %}text-slate-300 bg-[#1e293b]{% endif %}"><i class="fas fa-cog"></i></a>
-                <a href="{{ url_for('logout') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20">Déconnexion</a>
+                <a href="{{ url_for('dashboard') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Dashboard</a>
+                <a href="{{ url_for('liste_biens') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_biens' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Biens</a>
+                <a href="{{ url_for('liste_locataires') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'liste_locataires' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Locataires</a>
+                <a href="{{ url_for('appels_loyer') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'appels_loyer' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Appels</a>
+                <a href="{{ url_for('quittances') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'quittances' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}">Quittances</a>
+                <a href="{{ url_for('parametres') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium {% if request.endpoint == 'parametres' %}bg-primary text-white{% else %}text-slate-600 bg-slate-100{% endif %}"><i class="fas fa-cog"></i></a>
+                <a href="{{ url_for('logout') }}" class="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-red-600 bg-red-50">Deconnexion</a>
             </div>
         </div>
     </nav>
