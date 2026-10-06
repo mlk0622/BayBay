@@ -156,7 +156,21 @@ def main() -> int:
     parser.add_argument("version", nargs="?", help="Version cible (ex: 2.7)")
     parser.add_argument("--check", action="store_true", help="Vérifie seulement la cohérence")
     parser.add_argument("--get", action="store_true", help="Affiche la version actuelle de app.py")
+    parser.add_argument("--gh-token", action="store_true", help="Recupere le token GitHub depuis git credential")
     args = parser.parse_args()
+
+    if args.gh_token:
+        import subprocess
+        try:
+            p = subprocess.Popen(["git", "credential", "fill"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            out, _ = p.communicate("protocol=https\nhost=github.com\n\n")
+            for line in out.splitlines():
+                if line.startswith("password="):
+                    print(line.split("=", 1)[1].strip())
+                    return 0
+        except Exception:
+            pass
+        return 1
 
     if args.get:
         versions = read_versions()

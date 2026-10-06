@@ -6,6 +6,9 @@ if not exist "%GH%" (
     where gh >nul 2>&1
     if not errorlevel 1 set "GH=gh"
 )
+if not defined GH_TOKEN (
+    for /f "delims=" %%t in ('py sync_version.py --gh-token 2^>nul') do set "GH_TOKEN=%%t"
+)
 cd /d "%~dp0"
 
 if not "%~1"=="" (
@@ -113,7 +116,18 @@ if errorlevel 1 (
 git push origin "v%VERSION%"
 
 echo [7/7] GitHub release
-"%GH%" release create "v%VERSION%" "%SETUP_FILE%" --title "v%VERSION%" --notes "v%VERSION%"
+"%GH%" release view "v%VERSION%" >nul 2>&1
+if not errorlevel 1 (
+    echo La release v%VERSION% existe deja sur GitHub. Televersement du setup...
+    "%GH%" release upload "v%VERSION%" "%SETUP_FILE%" --clobber
+) else (
+    "%GH%" release create "v%VERSION%" "%SETUP_FILE%" --title "v%VERSION%" --notes "v%VERSION%"
+)
+if errorlevel 1 (
+    echo ERREUR: La creation ou mise a jour de la release GitHub a echoue.
+    pause
+    exit /b 1
+)
 
 echo RELEASE OK: https://github.com/mlk0622/BayBay/releases/tag/v%VERSION%
 pause
