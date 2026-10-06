@@ -371,6 +371,42 @@ function isNewerVersion(current, remote) {
     return false;
 }
 
+function checkViaWebRedirect(callback) {
+    console.log('[Updater] Falling back to GitHub web redirect check...');
+    const req = https.get('https://github.com/mlk0622/BayBay/releases/latest', { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+        const location = res.headers.location;
+        res.resume();
+        if ((res.statusCode === 301 || res.statusCode === 302) && location) {
+            const tag = location.split('/').pop();
+            const currentVersion = app.getVersion();
+            console.log(`[Updater] Web redirect: local=${currentVersion}, remote=${tag}`);
+            if (tag && isNewerVersion(currentVersion, tag)) {
+                const cleanTag = tag.replace(/^v/, '');
+                const downloadUrl = `https://github.com/mlk0622/BayBay/releases/download/${tag}/Bay.Bay.Setup.${cleanTag}.exe`;
+                console.log(`[Updater] Update found via web redirect: ${tag} -> ${downloadUrl}`);
+                callback({
+                    version: tag,
+                    downloadUrl: downloadUrl,
+                    assetName: `Bay.Bay.Setup.${cleanTag}.exe`,
+                    notes: `Mise à jour vers ${tag}`
+                });
+                return;
+            } else {
+                console.log('[Updater] App is up to date (via web redirect).');
+            }
+        }
+        callback(null);
+    });
+    req.on('error', (e) => {
+        console.error('[Updater] Web redirect check failed:', e.message);
+        callback(null);
+    });
+    req.setTimeout(8000, () => {
+        req.destroy();
+        callback(null);
+    });
+}
+
 function checkForUpdates(callback) {
     console.log('[Updater] Checking for updates on GitHub...');
     const options = {
@@ -388,8 +424,8 @@ function checkForUpdates(callback) {
         res.on('end', () => {
             try {
                 if (res.statusCode !== 200) {
-                    console.log(`[Updater] GitHub API returned status ${res.statusCode}`);
-                    callback(null);
+                    console.log(`[Updater] GitHub API returned status ${res.statusCode}, trying web fallback...`);
+                    checkViaWebRedirect(callback);
                     return;
                 }
                 const release = JSON.parse(data);
@@ -436,21 +472,21 @@ function checkForUpdates(callback) {
                     callback(null);
                 }
             } catch (e) {
-                console.error('[Updater] Error parsing update check response:', e);
-                callback(null);
+                console.error('[Updater] Error parsing update check response, trying web fallback:', e);
+                checkViaWebRedirect(callback);
             }
         });
     });
 
     req.on('error', (err) => {
-        console.error('[Updater] Error checking for updates:', err);
-        callback(null);
+        console.error('[Updater] Error checking for updates, trying web fallback:', err);
+        checkViaWebRedirect(callback);
     });
 
     req.on('timeout', () => {
         req.destroy();
-        console.log('[Updater] Update check timed out');
-        callback(null);
+        console.log('[Updater] Update check timed out, trying web fallback...');
+        checkViaWebRedirect(callback);
     });
 }
 
